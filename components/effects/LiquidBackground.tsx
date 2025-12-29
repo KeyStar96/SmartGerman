@@ -3,43 +3,40 @@
 import { useMemo } from "react";
 
 export default function LiquidBackground() {
-  // Performance: Noise-Texture nur einmal berechnen
+  // Awwwards Fine Grain: Reduzierte baseFrequency für subtileres Filmkorn
   const noiseTexture = useMemo(
-    () => `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+    () => `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
     []
   );
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background transition-colors duration-500">
-      {/* Wir nutzen 'bg-background', damit die Farbe aus deiner globals.css 
-          (Off-White vs. Deep Black) automatisch übernommen wird. 
-      */}
+      {/* Awwwards-Style: Entsättigte, tiefere Töne im Darkmode | Milchige Pastelltöne im Lightmode */}
 
-      {/* Orb 1: Neon Blue - PERFORMANCE: Blur reduziert von 120px auf 80px, nur im Darkmode */}
+      {/* Orb 1: Deep Indigo (Dark) / Ice Blue (Light) */}
       <div 
         className="absolute top-[10%] left-[10%] w-[40vw] h-[40vw] rounded-full 
-                    bg-[#00f2ff] 
-                    blur-[40px] dark:blur-[80px]
-                    opacity-[0.03] dark:opacity-40 
+                    bg-[#E6F0F8] dark:bg-[#1E2A44]
+                    blur-[150px] dark:blur-[180px]
+                    opacity-[0.15] dark:opacity-35 
                     transition-opacity duration-1000 
-                    saturate-[0.5] dark:saturate-100
+                    saturate-[0.3] dark:saturate-[0.4]
                     animate-pulse-slow
                     will-change-[opacity,transform]"
         style={{ 
-          // Performance: GPU-Beschleunigung nur bei Bedarf
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden',
         }}
       />
 
-      {/* Orb 2: Neon Purple - PERFORMANCE: Blur reduziert von 100px auf 70px */}
+      {/* Orb 2: Soft Lavender (Light) / Muted Violet (Dark) */}
       <div 
         className="absolute top-[30%] right-[10%] w-[35vw] h-[35vw] rounded-full 
-                    bg-[#7000ff] 
-                    blur-[35px] dark:blur-[70px]
-                    opacity-[0.02] dark:opacity-30 
+                    bg-[#F3E8FF] dark:bg-[#2D1B33]
+                    blur-[160px] dark:blur-[170px]
+                    opacity-[0.12] dark:opacity-30 
                     transition-opacity duration-1000 
-                    saturate-[0.5] dark:saturate-100
+                    saturate-[0.3] dark:saturate-[0.4]
                     animate-pulse-slow
                     will-change-[opacity,transform]"
         style={{ 
@@ -49,14 +46,14 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* Orb 3: Neon Orange - PERFORMANCE: Blur reduziert von 150px auf 90px */}
+      {/* Orb 3: Champagne (Light) / Amber (Dark) */}
       <div 
         className="absolute bottom-[15%] left-[15%] w-[45vw] h-[45vw] rounded-full 
-                    bg-[#ff4d00] 
-                    blur-[45px] dark:blur-[90px]
-                    opacity-[0.02] dark:opacity-25 
+                    bg-[#FFF5E6] dark:bg-[#332211]
+                    blur-[180px] dark:blur-[200px]
+                    opacity-[0.1] dark:opacity-25 
                     transition-opacity duration-1000 
-                    saturate-[0.5] dark:saturate-100
+                    saturate-[0.3] dark:saturate-[0.4]
                     animate-pulse-slow
                     will-change-[opacity,transform]"
         style={{ 
@@ -66,9 +63,9 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* High-End Finish: Subtiles Awwwards-Filmkorn - PERFORMANCE: mix-blend-overlay nur im Darkmode */}
+      {/* Awwwards Fine Grain: Subtiles Filmkorn mit reduzierter Opacity */}
       <div 
-        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.2] pointer-events-none dark:mix-blend-overlay" 
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none dark:mix-blend-overlay" 
         style={{ 
           backgroundImage: noiseTexture,
           transform: 'translateZ(0)',

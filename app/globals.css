@@ -71,4 +71,15 @@ body {
       opacity: 0;
       transform: translateY(30px);
     }
+    
+    /* Awwwards-Style: Subtiler Glow für interaktive Elemente */
+    /* Nur für Buttons mit #FF5C00 - 20% Deckkraft für weichen, atmosphärischen Effekt */
+    .btn-glow-orange {
+      box-shadow: 0 10px 40px rgba(255, 92, 0, 0.2);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    
+    .btn-glow-orange:hover {
+      box-shadow: 0 15px 50px rgba(255, 92, 0, 0.3);
+    }
   }

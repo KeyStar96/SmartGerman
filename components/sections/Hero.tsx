@@ -142,7 +142,7 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-wrap gap-6 justify-center">
-            <button className="px-10 py-5 bg-[#FF5C00] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-[0_10px_40px_rgba(255,92,0,0.3)]">
+            <button className="px-10 py-5 bg-[#FF5C00] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-transform btn-glow-orange">
               Kurs finden
             </button>
             <button className="px-10 py-5 border-2 border-foreground/10 backdrop-blur-md rounded-full font-bold uppercase tracking-widest hover:bg-foreground/5 text-foreground transition-all">
