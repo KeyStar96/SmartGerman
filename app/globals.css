@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-    --background: #F5F1E8; /* Warmes, edles Beige für luxuriösen Paper-Feel */
+    --background: #E8DDD0; /* Edler Beige-Ton wie von einer teuren Schmuckmarke - warm, cremig, luxuriös */
     --foreground: #1A1A1A; /* Weiches Anthrazit für besseren Lesekomfort */
   }
 
 .dark {
-  /* Deep Midnight für Darkmode */
-  --background: #050505;
+  /* Edler Carbon-Look - warmes dunkles Grau statt hartem Schwarz */
+  --background: #1A1A1A;
   --foreground: #ffffff;
 }
 
@@ -42,7 +42,7 @@ body {
     }
     
     .dark .glass-header {
-      background: rgba(5, 5, 5, 0.7);
+      background: rgba(26, 26, 26, 0.7); /* Carbon-Look statt tiefem Schwarz */
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     }
     

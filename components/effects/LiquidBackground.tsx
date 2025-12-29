@@ -18,14 +18,14 @@ export default function LiquidBackground() {
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background transition-colors duration-500">
       {/* Edles Paper-Feel: Warmes Beige mit sichtbaren, harmonischen Orbs */}
 
-      {/* Orb 1: Ice Blue - Deutlich sichtbar im warmen Beige */}
+      {/* Orb 1: Ice Blue - DEUTLICH sichtbar im edlen Beige */}
       <div 
         className="absolute top-[10%] left-[10%] w-[40vw] h-[40vw] rounded-full 
                     bg-[#D9E9F5] dark:bg-[#1E2A44]
-                    blur-[100px] dark:blur-[180px]
-                    opacity-[0.35] dark:opacity-35 
+                    blur-[85px] dark:blur-[180px]
+                    opacity-[0.50] dark:opacity-35 
                     transition-opacity duration-1000 
-                    saturate-[0.3] dark:saturate-[0.4]
+                    saturate-[0.4] dark:saturate-[0.4]
                     mix-blend-multiply dark:mix-blend-screen
                     animate-pulse-luxury
                     will-change-[opacity,transform]"
@@ -35,14 +35,14 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* Orb 2: Lavender - Deutlich sichtbar im warmen Beige */}
+      {/* Orb 2: Lavender - DEUTLICH sichtbar im edlen Beige */}
       <div 
         className="absolute top-[30%] right-[10%] w-[35vw] h-[35vw] rounded-full 
                     bg-[#EBE0FF] dark:bg-[#2D1B33]
-                    blur-[110px] dark:blur-[170px]
-                    opacity-[0.30] dark:opacity-30 
+                    blur-[90px] dark:blur-[170px]
+                    opacity-[0.45] dark:opacity-30 
                     transition-opacity duration-1000 
-                    saturate-[0.3] dark:saturate-[0.4]
+                    saturate-[0.4] dark:saturate-[0.4]
                     mix-blend-multiply dark:mix-blend-screen
                     animate-pulse-luxury
                     will-change-[opacity,transform]"
@@ -53,14 +53,14 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* Orb 3: Champagne - Deutlich sichtbar im warmen Beige */}
+      {/* Orb 3: Champagne - DEUTLICH sichtbar im edlen Beige */}
       <div 
         className="absolute bottom-[15%] left-[15%] w-[45vw] h-[45vw] rounded-full 
                     bg-[#F7EEDF] dark:bg-[#332211]
-                    blur-[120px] dark:blur-[200px]
-                    opacity-[0.28] dark:opacity-25 
+                    blur-[95px] dark:blur-[200px]
+                    opacity-[0.42] dark:opacity-25 
                     transition-opacity duration-1000 
-                    saturate-[0.3] dark:saturate-[0.4]
+                    saturate-[0.4] dark:saturate-[0.4]
                     mix-blend-multiply dark:mix-blend-screen
                     animate-pulse-luxury
                     will-change-[opacity,transform]"
