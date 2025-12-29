@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-    --background: #F2F0E9; /* Luxuriöses Beige/Off-White für Paper-Feel */
+    --background: #F5F1E8; /* Warmes, edles Beige für luxuriösen Paper-Feel */
     --foreground: #1A1A1A; /* Weiches Anthrazit für besseren Lesekomfort */
   }
 
