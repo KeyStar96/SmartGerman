@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-    --background: #E8DDD0; /* Edler Beige-Ton wie von einer teuren Schmuckmarke - warm, cremig, luxuriös */
+    --background: #F5F2E8; /* Warmes Beige - hochwertiges Briefpapier */
     --foreground: #1A1A1A; /* Weiches Anthrazit für besseren Lesekomfort */
   }
 
 .dark {
-  /* Edler Carbon-Look - warmes dunkles Grau statt hartem Schwarz */
-  --background: #1A1A1A;
+  /* Deep Obsidian - professionelles Fotostudio */
+  --background: #0D0D0D;
   --foreground: #ffffff;
 }
 
@@ -81,5 +81,11 @@ body {
     
     .btn-glow-orange:hover {
       box-shadow: 0 15px 50px rgba(255, 92, 0, 0.3);
+    }
+    
+    /* Texturierte Oberfläche: Paper-Feel mit weichem Theme-Übergang */
+    .textured-surface {
+      background-color: var(--background);
+      transition: background-color 0.5s ease;
     }
   }
