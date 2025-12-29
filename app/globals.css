@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --background: #FDFDFB; /* Noch weicheres Papier-Weiß */
+    --foreground: #1A1A1A; /* Weicheres Anthrazit für besseren Lesekomfort */
+  }
+
+.dark {
+  /* Deep Midnight für Darkmode */
+  --background: #050505;
+  --foreground: #ffffff;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  /* Sanfter Übergang für das gesamte Layout beim Theme-Wechsel */
+  transition: background-color 0.5s ease, color 0.5s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
+.bg-background {
+  background-color: var(--background) !important;
+}
+
+/* High-End Glassmorphismus, der sich dem Theme anpasst */
+/* Verfeinerter Glass-Effekt für Karten */
+@layer components {
+    .glass-panel {
+      @apply bg-black/[0.02] dark:bg-white/[0.03] backdrop-blur-xl border border-black/[0.05] dark:border-white/10 rounded-2xl shadow-xl transition-all duration-500;
+    }
+    
+    /* Glassmorphismus für Header */
+    .glass-header {
+      @apply backdrop-blur-2xl backdrop-saturate-150;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .glass-header {
+      background: rgba(5, 5, 5, 0.7);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    }
+    
+    /* GPU-Acceleration für High-Performance Animationen */
+    /* will-change nur bei aktiven Animationen setzen, nicht dauerhaft */
+    .gpu-render {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    
+    /* Hero-Text initial versteckt - verhindert FOUC */
+    .hero-text-reveal {
+      clip-path: inset(100% 0 0 0);
+      transform-origin: center bottom;
+    }
+    
+    /* Hero-Content initial versteckt - verhindert FOUC */
+    .hero-content-fade {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+  }
