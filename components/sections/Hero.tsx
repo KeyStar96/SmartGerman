@@ -7,6 +7,7 @@ export default function Hero() {
   const container = useRef<HTMLDivElement>(null);
   const heroTextWrapper = useRef<HTMLHeadingElement>(null);
   const perspectiveContainer = useRef<HTMLDivElement>(null);
+  const contentWrapper = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -33,9 +34,26 @@ export default function Hero() {
       }, 0);
     }
 
-    // 3. 3D Scroll-X Rotation - Umfallen-Effekt
+    // 3. 3D Scroll-X Rotation - Umfallen-Effekt für SmartGerman Text
     if (heroTextWrapper.current) {
       gsap.to(heroTextWrapper.current, {
+        scrollTrigger: {
+          trigger: container.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1, // Smooth following
+        },
+        rotateX: -90, // Kippt nach hinten (umfallen)
+        z: -1200, // Mehr Tiefe für dramatischeren Effekt
+        opacity: 0,
+        transformOrigin: "center bottom", // Rotiert um die untere Kante (wie umfallen)
+        ease: "none",
+      });
+    }
+
+    // 4. 3D Scroll-X Rotation - Umfallen-Effekt für Content (Text + Buttons)
+    if (contentWrapper.current) {
+      gsap.to(contentWrapper.current, {
         scrollTrigger: {
           trigger: container.current,
           start: "top top",
@@ -103,7 +121,16 @@ export default function Hero() {
           </h1>
         </div>
         
-        <div className="hero-content-fade mt-12" style={{ opacity: 0, transform: "translateY(30px)" }}>
+        <div 
+          ref={contentWrapper}
+          className="hero-content-fade mt-12 gpu-render" 
+          style={{ 
+            opacity: 0, 
+            transform: "translateY(30px)",
+            transformStyle: "preserve-3d",
+            transformOrigin: "center bottom"
+          }}
+        >
           <p className="text-xl md:text-2xl text-foreground/60 max-w-2xl mx-auto font-light leading-relaxed mb-10">
             Professionelle Deutschkurse in Hannover. 
             <span className="block mt-2 font-medium text-foreground/80 italic">Präzise. Modern. Effektiv.</span>
