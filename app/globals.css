@@ -51,6 +51,13 @@ body {
     .gpu-render {
       transform: translateZ(0);
       backface-visibility: hidden;
+      /* Performance: will-change nur bei Bedarf, nicht dauerhaft */
+      will-change: transform;
+    }
+    
+    /* Performance: Reduziere Re-Paints bei statischen Elementen */
+    .hero-content-fade {
+      contain: layout style paint;
     }
     
     /* Hero-Text initial versteckt - verhindert FOUC */

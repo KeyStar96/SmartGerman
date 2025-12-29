@@ -42,16 +42,19 @@ export default function Hero() {
           start: "top top",
           end: "bottom top",
           scrub: 1, // Smooth following
+          refreshPriority: 0, // Performance: normale Priorität
         },
         rotateX: -90, // Kippt nach hinten (umfallen)
         z: -1200, // Mehr Tiefe für dramatischeren Effekt
         opacity: 0,
         transformOrigin: "center bottom", // Rotiert um die untere Kante (wie umfallen)
         ease: "none",
+        force3D: true, // GPU-Beschleunigung
       });
     }
 
     // 4. 3D Scroll-X Rotation - Umfallen-Effekt für Content (Text + Buttons)
+    // WICHTIG: opacity bleibt bei 1, damit der Content sichtbar bleibt
     if (contentWrapper.current) {
       gsap.to(contentWrapper.current, {
         scrollTrigger: {
@@ -59,12 +62,14 @@ export default function Hero() {
           start: "top top",
           end: "bottom top",
           scrub: 1, // Smooth following
+          refreshPriority: -1, // Performance: niedrigere Priorität
         },
         rotateX: -90, // Kippt nach hinten (umfallen)
         z: -1200, // Mehr Tiefe für dramatischeren Effekt
-        opacity: 0,
+        // opacity NICHT animieren - Content soll sichtbar bleiben!
         transformOrigin: "center bottom", // Rotiert um die untere Kante (wie umfallen)
         ease: "none",
+        force3D: true, // GPU-Beschleunigung
       });
     }
 
