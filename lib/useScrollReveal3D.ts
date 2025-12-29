@@ -50,37 +50,43 @@ export function useScrollReveal3D(
       transformStyle: "preserve-3d",
     });
 
-    // Timeline für die gesamte Scroll-Animation
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: triggerTarget,
-        start: "top bottom",
-        end: "bottom top",
-        scrub,
-        refreshPriority: -1,
-      },
-    });
-
-    // Phase 1: Von hinten nach vorne (erste Hälfte des Scroll-Bereichs)
-    tl.to(element, {
+    // Phase 1: Aufstellen beim Erscheinen (von unten kommend)
+    // Element kippt von +90° auf 0° - "stellt sich auf"
+    const revealAnimation = gsap.to(element, {
       rotateX: 0,
       z: 0,
       opacity: 1,
+      scrollTrigger: {
+        trigger: triggerTarget,
+        start: "top bottom", // Startet wenn Element von unten in Viewport kommt
+        end: "center center", // Endet wenn Element zentriert ist
+        scrub,
+        refreshPriority: -1,
+      },
       ease: "none",
       force3D: true,
     });
 
-    // Phase 2: Nach hinten weg (zweite Hälfte des Scroll-Bereichs)
-    tl.to(element, {
+    // Phase 2: Nach hinten kippen beim Verschwinden (nach oben)
+    // Element kippt von 0° auf -90° - "kippt nach hinten weg"
+    const hideAnimation = gsap.to(element, {
       rotateX: -90,
       z,
       opacity: 0,
+      scrollTrigger: {
+        trigger: triggerTarget,
+        start: "top top", // Startet wenn Element oben am Viewport ist
+        end: "bottom top", // Endet wenn Element komplett oben raus ist
+        scrub,
+        refreshPriority: -1,
+      },
       ease: "none",
       force3D: true,
     });
 
     return () => {
-      tl.kill();
+      revealAnimation.kill();
+      hideAnimation.kill();
     };
   }, [elementRef, trigger, scrub, z, transformOrigin]);
 }
