@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-    --background: #FDFDFB; /* Noch weicheres Papier-Weiß */
-    --foreground: #1A1A1A; /* Weicheres Anthrazit für besseren Lesekomfort */
+    --background: #F2F0E9; /* Luxuriöses Beige/Off-White für Paper-Feel */
+    --foreground: #1A1A1A; /* Weiches Anthrazit für besseren Lesekomfort */
   }
 
 .dark {

@@ -3,26 +3,26 @@
 import { useMemo } from "react";
 
 export default function LiquidBackground() {
-  // Dithering: Organischeres Korn (baseFrequency 0.65) zur Eliminierung von Color Banding
+  // Luxuriöses Paper-Feel: Dichte Körnung (baseFrequency 0.45) zur effektiven Banding-Eliminierung
   const noiseTexture = useMemo(
-    () => `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+    () => `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
     []
   );
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background transition-colors duration-500">
-      {/* Awwwards-Style: Entsättigte, tiefere Töne im Darkmode | Milchige Pastelltöne im Lightmode */}
+      {/* Luxuriöses Paper-Feel: Orbs "versinken" ins Beige durch mix-blend-multiply */}
 
-      {/* Orb 1: Deep Indigo (Dark) / Sky Blue (Light) - Kräftiger für besseren Kontrast */}
+      {/* Orb 1: Ice Blue - Versinkt ins Beige-Papier */}
       <div 
         className="absolute top-[10%] left-[10%] w-[40vw] h-[40vw] rounded-full 
-                    bg-[#D0E7FF] dark:bg-[#1E2A44]
-                    blur-[120px] dark:blur-[180px]
-                    opacity-[0.25] dark:opacity-35 
+                    bg-[#D9E9F5] dark:bg-[#1E2A44]
+                    blur-[140px] dark:blur-[180px]
+                    opacity-[0.2] dark:opacity-35 
                     transition-opacity duration-1000 
                     saturate-[0.3] dark:saturate-[0.4]
                     mix-blend-multiply dark:mix-blend-screen
-                    animate-pulse-slow
+                    animate-pulse-luxury
                     will-change-[opacity,transform]"
         style={{ 
           transform: 'translateZ(0)',
@@ -30,16 +30,16 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* Orb 2: Soft Lavender (Light) / Muted Violet (Dark) */}
+      {/* Orb 2: Lavender - Versinkt ins Beige-Papier */}
       <div 
         className="absolute top-[30%] right-[10%] w-[35vw] h-[35vw] rounded-full 
-                    bg-[#F3E8FF] dark:bg-[#2D1B33]
-                    blur-[130px] dark:blur-[170px]
-                    opacity-[0.20] dark:opacity-30 
+                    bg-[#EBE0FF] dark:bg-[#2D1B33]
+                    blur-[120px] dark:blur-[170px]
+                    opacity-[0.15] dark:opacity-30 
                     transition-opacity duration-1000 
                     saturate-[0.3] dark:saturate-[0.4]
                     mix-blend-multiply dark:mix-blend-screen
-                    animate-pulse-slow
+                    animate-pulse-luxury
                     will-change-[opacity,transform]"
         style={{ 
           animationDelay: '2s',
@@ -48,16 +48,16 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* Orb 3: Champagne (Light) / Amber (Dark) */}
+      {/* Orb 3: Champagne - Versinkt ins Beige-Papier */}
       <div 
         className="absolute bottom-[15%] left-[15%] w-[45vw] h-[45vw] rounded-full 
-                    bg-[#FFF5E6] dark:bg-[#332211]
-                    blur-[140px] dark:blur-[200px]
-                    opacity-[0.18] dark:opacity-25 
+                    bg-[#F7EEDF] dark:bg-[#332211]
+                    blur-[160px] dark:blur-[200px]
+                    opacity-[0.15] dark:opacity-25 
                     transition-opacity duration-1000 
                     saturate-[0.3] dark:saturate-[0.4]
                     mix-blend-multiply dark:mix-blend-screen
-                    animate-pulse-slow
+                    animate-pulse-luxury
                     will-change-[opacity,transform]"
         style={{ 
           animationDelay: '4s',
@@ -66,9 +66,9 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* Dithering: Erhöhte Noise-Opacity zur Eliminierung von Color Banding */}
+      {/* Luxuriöses Paper-Feel: Dichte Körnung eliminiert Color Banding */}
       <div 
-        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12] pointer-events-none dark:mix-blend-overlay" 
+        className="absolute inset-0 opacity-[0.05] dark:opacity-[0.08] pointer-events-none dark:mix-blend-overlay" 
         style={{ 
           backgroundImage: noiseTexture,
           transform: 'translateZ(0)',

@@ -25,6 +25,7 @@ const config: Config = {
       // PERFORMANCE: Optimierte Animation - nur opacity-Änderungen, keine scale-Transformationen
       animation: {
         'pulse-slow': 'pulse-slow-optimized 12s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'pulse-luxury': 'pulse-luxury-optimized 18s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'marquee': 'marquee 20s linear infinite',
       },
       keyframes: {
@@ -36,6 +37,11 @@ const config: Config = {
         'pulse-slow-optimized': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.85' },
+        },
+        // Luxuriöse, fast unmerkliche Animation gegen Color Banding
+        'pulse-luxury-optimized': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.88' },
         },
       },
     },
