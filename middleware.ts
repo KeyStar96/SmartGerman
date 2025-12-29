@@ -18,6 +18,15 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Ignoriere System-Dateien und statische Inhalte (Bilder, Favicon etc.)
-  matcher: ['/((?!api|_next/static|_next/image|Bilder|favicon.ico).*)'],
+  // Erweiteter Matcher, um alle Next-Interna und statischen Bilder sicher auszuschließen
+  matcher: [
+    /*
+     * Matcht alle Pfade außer:
+     * 1. /api (API-Routen)
+     * 2. /_next (Next.js Interna wie static, image, data)
+     * 3. /Bilder, /public (Deine Assets)
+     * 4. favicon.ico, sitemap.xml, robots.txt
+     */
+    '/((?!api|_next|Bilder|public|favicon.ico|sitemap.xml|robots.txt).*)',
+  ],
 }

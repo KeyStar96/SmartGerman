@@ -8,6 +8,7 @@ import { Globe, Sun, Moon } from "lucide-react";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [currentLang, setCurrentLang] = useState("de");
 
   useEffect(() => {
     // Initialisierung des Themes
@@ -15,6 +16,13 @@ export default function Header() {
     const isDark = savedTheme === "dark";
     setIsDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
+
+    // Sprache aus URL extrahieren
+    const pathname = window.location.pathname;
+    const langMatch = pathname.match(/^\/(de|en)(\/|$)/);
+    if (langMatch) {
+      setCurrentLang(langMatch[1]);
+    }
 
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
@@ -84,7 +92,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           
           {/* Logo Section - Logo-Farbe gekoppelt an Header-Hintergrund */}
-          <Link href="/" className="group block">
+          <Link href={`/${currentLang}`} className="group block">
             <Image 
               src="/Bilder/SmartGerman-bg-remove.png" 
               alt="SmartGerman Logo" 
@@ -125,7 +133,7 @@ export default function Header() {
             </button>
             
             <Link 
-              href="/anmeldung"
+              href={`/${currentLang}/anmeldung`}
               className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                 !isScrolled && !isDarkMode
                   ? "bg-black text-white hover:bg-brand-orange"
