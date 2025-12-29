@@ -88,4 +88,10 @@ body {
       background-color: var(--background);
       transition: background-color 0.5s ease;
     }
+    
+    /* 3D Perspective Container für Scroll-Animationen */
+    .scroll-3d-container {
+      perspective: 2000px;
+      transform-style: preserve-3d;
+    }
   }

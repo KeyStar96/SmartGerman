@@ -43,7 +43,7 @@ export default async function RootLayout({
         <Header /> {/* Hier sitzt der Header fest am oberen Rand */}
         <LiquidBackground />
         <SmoothScroll>
-          <main className="pt-32"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
+          <main className="pt-32 scroll-3d-container"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
             {children}
           </main>
         </SmoothScroll>

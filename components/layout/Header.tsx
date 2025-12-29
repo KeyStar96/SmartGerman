@@ -136,7 +136,9 @@ export default function Header() {
               href={`/${currentLang}/anmeldung`}
               className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                 !isScrolled && !isDarkMode
-                  ? "bg-black text-white hover:bg-brand-orange"
+                  ? "bg-black text-white hover:bg-brand-orange hover:text-white"
+                  : isDarkMode
+                  ? "bg-[#FF5C00] text-white hover:bg-[#FF6F1A] hover:scale-105"
                   : "bg-foreground text-background hover:bg-brand-orange hover:text-white"
               }`}
             >
