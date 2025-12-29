@@ -3,9 +3,9 @@
 import { useMemo } from "react";
 
 export default function LiquidBackground() {
-  // Awwwards Fine Grain: Reduzierte baseFrequency für subtileres Filmkorn
+  // Dithering: Organischeres Korn (baseFrequency 0.65) zur Eliminierung von Color Banding
   const noiseTexture = useMemo(
-    () => `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+    () => `url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
     []
   );
 
@@ -13,14 +13,15 @@ export default function LiquidBackground() {
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background transition-colors duration-500">
       {/* Awwwards-Style: Entsättigte, tiefere Töne im Darkmode | Milchige Pastelltöne im Lightmode */}
 
-      {/* Orb 1: Deep Indigo (Dark) / Ice Blue (Light) */}
+      {/* Orb 1: Deep Indigo (Dark) / Sky Blue (Light) - Kräftiger für besseren Kontrast */}
       <div 
         className="absolute top-[10%] left-[10%] w-[40vw] h-[40vw] rounded-full 
-                    bg-[#E6F0F8] dark:bg-[#1E2A44]
-                    blur-[150px] dark:blur-[180px]
-                    opacity-[0.15] dark:opacity-35 
+                    bg-[#D0E7FF] dark:bg-[#1E2A44]
+                    blur-[120px] dark:blur-[180px]
+                    opacity-[0.25] dark:opacity-35 
                     transition-opacity duration-1000 
                     saturate-[0.3] dark:saturate-[0.4]
+                    mix-blend-multiply dark:mix-blend-screen
                     animate-pulse-slow
                     will-change-[opacity,transform]"
         style={{ 
@@ -33,10 +34,11 @@ export default function LiquidBackground() {
       <div 
         className="absolute top-[30%] right-[10%] w-[35vw] h-[35vw] rounded-full 
                     bg-[#F3E8FF] dark:bg-[#2D1B33]
-                    blur-[160px] dark:blur-[170px]
-                    opacity-[0.12] dark:opacity-30 
+                    blur-[130px] dark:blur-[170px]
+                    opacity-[0.20] dark:opacity-30 
                     transition-opacity duration-1000 
                     saturate-[0.3] dark:saturate-[0.4]
+                    mix-blend-multiply dark:mix-blend-screen
                     animate-pulse-slow
                     will-change-[opacity,transform]"
         style={{ 
@@ -50,10 +52,11 @@ export default function LiquidBackground() {
       <div 
         className="absolute bottom-[15%] left-[15%] w-[45vw] h-[45vw] rounded-full 
                     bg-[#FFF5E6] dark:bg-[#332211]
-                    blur-[180px] dark:blur-[200px]
-                    opacity-[0.1] dark:opacity-25 
+                    blur-[140px] dark:blur-[200px]
+                    opacity-[0.18] dark:opacity-25 
                     transition-opacity duration-1000 
                     saturate-[0.3] dark:saturate-[0.4]
+                    mix-blend-multiply dark:mix-blend-screen
                     animate-pulse-slow
                     will-change-[opacity,transform]"
         style={{ 
@@ -63,9 +66,9 @@ export default function LiquidBackground() {
         }}
       />
 
-      {/* Awwwards Fine Grain: Subtiles Filmkorn mit reduzierter Opacity */}
+      {/* Dithering: Erhöhte Noise-Opacity zur Eliminierung von Color Banding */}
       <div 
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none dark:mix-blend-overlay" 
+        className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12] pointer-events-none dark:mix-blend-overlay" 
         style={{ 
           backgroundImage: noiseTexture,
           transform: 'translateZ(0)',
