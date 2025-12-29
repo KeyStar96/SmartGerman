@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   
   // Überprüfen, ob die URL bereits mit einer Sprache beginnt
@@ -30,3 +30,4 @@ export const config = {
     '/((?!api|_next|Bilder|public|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 }
+

@@ -28,10 +28,17 @@ export function useScrollReveal3D(
 
   useEffect(() => {
     const element = elementRef.current;
-    const triggerElement = trigger && "current" in trigger ? trigger.current : trigger;
     if (!element) return;
 
-    const triggerTarget = triggerElement || element;
+    // Resolve trigger element - ensure it's an HTMLElement, not a RefObject
+    let triggerTarget: HTMLElement = element;
+    if (trigger) {
+      if ("current" in trigger && trigger.current) {
+        triggerTarget = trigger.current;
+      } else if (!("current" in trigger)) {
+        triggerTarget = trigger;
+      }
+    }
 
     // Initial: Element startet von hinten (rotateX: 90) - unsichtbar
     gsap.set(element, {
