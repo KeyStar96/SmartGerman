@@ -3,12 +3,28 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Globe, Sun, Moon } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Globe, Sun, Moon, ChevronDown } from "lucide-react";
 
-export default function Header() {
+interface HeaderProps {
+  lang: string;
+  dictionary: any;
+}
+
+const languages = [
+  { code: "de", label: "DE" },
+  { code: "en", label: "EN" },
+  { code: "uk", label: "UK" },
+  { code: "ru", label: "RU" },
+  { code: "tu", label: "TU" },
+];
+
+export default function Header({ lang, dictionary }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [currentLang, setCurrentLang] = useState("de");
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     // Initialisierung des Themes
@@ -16,13 +32,6 @@ export default function Header() {
     const isDark = savedTheme === "dark";
     setIsDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
-
-    // Sprache aus URL extrahieren
-    const pathname = window.location.pathname;
-    const langMatch = pathname.match(/^\/(de|en)(\/|$)/);
-    if (langMatch) {
-      setCurrentLang(langMatch[1]);
-    }
 
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
@@ -60,6 +69,15 @@ export default function Header() {
     localStorage.setItem("theme", newTheme ? "dark" : "light");
   };
 
+  const switchLanguage = (newLang: string) => {
+    setIsLanguageDropdownOpen(false);
+    // Ersetze die Sprache im aktuellen Pfad
+    const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
+    router.push(newPath);
+  };
+
+  const currentLanguage = languages.find((l) => l.code === lang) || languages[0];
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300">
       {/* 1. Ankündigungs-Banner - Endless Marquee */}
@@ -69,15 +87,15 @@ export default function Header() {
           {[1, 2, 3, 4].map((duplicate) => (
             <div key={duplicate} className="flex items-center gap-6 text-white text-[12px] font-bold uppercase tracking-[0.2em] flex-shrink-0">
               <span className="opacity-50 flex items-center">•</span>
-              <span>Nächster Kursstart: 03. Februar 2026</span>
+              <span>{dictionary.header.banner.next_course}</span>
               <span className="opacity-50 flex items-center">•</span>
-              <span>Jetzt Platz sichern</span>
+              <span>{dictionary.header.banner.reserve_spot}</span>
               <span className="opacity-50 flex items-center">•</span>
-              <span>SmartGerman Hannover</span>
+              <span>{dictionary.header.banner.location}</span>
               <span className="opacity-50 flex items-center">•</span>
-              <span>Muttersprachliche Lehrer</span>
+              <span>{dictionary.header.banner.native_teachers}</span>
               <span className="opacity-50 flex items-center">•</span>
-              <span>Online-Kurse</span>
+              <span>{dictionary.header.banner.online_courses}</span>
             </div>
           ))}
         </div>
@@ -92,7 +110,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           
           {/* Logo Section - Logo-Farbe gekoppelt an Header-Hintergrund */}
-          <Link href={`/${currentLang}`} className="group block">
+          <Link href={`/${lang}`} className="group block">
             <Image 
               src="/Bilder/SmartGerman-bg-remove.png" 
               alt="SmartGerman Logo" 
@@ -106,12 +124,18 @@ export default function Header() {
           {/* Menu & Actions */}
           <div className="flex items-center gap-4 md:gap-8">
             <div className="hidden md:flex items-center gap-8 mr-4">
-              {["Home", "Kurse", "Preise"].map((item) => (
-                <Link key={item} href={`#${item.toLowerCase()}`} 
-                  className={`text-sm font-light hover:text-brand-orange transition-colors ${getTextColor()}`}>
-                  {item}
-                </Link>
-              ))}
+              <Link href="#home" 
+                className={`text-sm font-light hover:text-brand-orange transition-colors ${getTextColor()}`}>
+                {dictionary.header.nav.home}
+              </Link>
+              <Link href="#courses" 
+                className={`text-sm font-light hover:text-brand-orange transition-colors ${getTextColor()}`}>
+                {dictionary.header.nav.courses}
+              </Link>
+              <Link href="#prices" 
+                className={`text-sm font-light hover:text-brand-orange transition-colors ${getTextColor()}`}>
+                {dictionary.header.nav.prices}
+              </Link>
             </div>
 
             {/* Theme Toggle Button */}
@@ -127,13 +151,44 @@ export default function Header() {
               )}
             </button>
 
-            <button className={`flex items-center gap-1 text-xs font-medium uppercase tracking-widest ${getTextColor()}`}>
-              <Globe className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`} />
-              <span>DE</span>
-            </button>
+            {/* Language Switcher */}
+            <div className="relative">
+              <button 
+                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                className={`flex items-center gap-1 text-xs font-medium uppercase tracking-widest ${getTextColor()}`}
+              >
+                <Globe className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`} />
+                <span>{currentLanguage.label}</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {isLanguageDropdownOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setIsLanguageDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-[#1A1A1A] rounded-lg shadow-xl border border-black/10 dark:border-white/10 z-50 overflow-hidden">
+                    {languages.map((language) => (
+                      <button
+                        key={language.code}
+                        onClick={() => switchLanguage(language.code)}
+                        className={`w-full px-4 py-2 text-left text-xs font-medium uppercase tracking-widest transition-colors ${
+                          lang === language.code
+                            ? "bg-brand-orange/20 text-brand-orange"
+                            : "text-foreground hover:bg-black/5 dark:hover:bg-white/5"
+                        }`}
+                      >
+                        {language.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
             
             <Link 
-              href={`/${currentLang}/anmeldung`}
+              href={`/${lang}/anmeldung`}
               className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                 !isScrolled && !isDarkMode
                   ? "bg-black text-white hover:bg-brand-orange hover:text-white"
@@ -142,7 +197,7 @@ export default function Header() {
                   : "bg-foreground text-background hover:bg-brand-orange hover:text-white"
               }`}
             >
-              Anmelden
+              {dictionary.header.nav.enroll}
             </Link>
           </div>
         </div>

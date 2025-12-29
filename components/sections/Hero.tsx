@@ -3,7 +3,11 @@
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 
-export default function Hero() {
+interface HeroProps {
+  dictionary: any;
+}
+
+export default function Hero({ dictionary }: HeroProps) {
   const container = useRef<HTMLDivElement>(null);
   const heroTextWrapper = useRef<HTMLHeadingElement>(null);
   const perspectiveContainer = useRef<HTMLDivElement>(null);
@@ -137,16 +141,16 @@ export default function Hero() {
           }}
         >
           <p className="text-xl md:text-2xl text-foreground/60 max-w-2xl mx-auto font-light leading-relaxed mb-10">
-            Professionelle Deutschkurse in Hannover. 
-            <span className="block mt-2 font-medium text-foreground/80 italic">Präzise. Modern. Effektiv.</span>
+            {dictionary.hero.subtitle}
+            <span className="block mt-2 font-medium text-foreground/80 italic">{dictionary.hero.subtitle_italic}</span>
           </p>
 
           <div className="flex flex-wrap gap-6 justify-center">
             <button className="px-10 py-5 bg-[#FF5C00] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-transform btn-glow-orange">
-              Kurs finden
+              {dictionary.hero.cta_primary}
             </button>
             <button className="px-10 py-5 border-2 border-foreground/10 backdrop-blur-md rounded-full font-bold uppercase tracking-widest hover:bg-foreground/5 text-foreground transition-all">
-              Mehr erfahren
+              {dictionary.hero.cta_secondary}
             </button>
           </div>
         </div>

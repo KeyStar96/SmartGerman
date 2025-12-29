@@ -1,19 +1,28 @@
 import Hero from "@/components/sections/Hero";
 import ScrollReveal3D from "@/components/effects/ScrollReveal3D";
+import { getDictionary } from "@/lib/dictionary";
 
-export default function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
+
   return (
     <div className="flex flex-col items-center">
-      <Hero />
+      <Hero dictionary={dictionary} />
       
       {/* Weitere Sektionen folgen hier */}
       <section className="h-screen flex flex-col justify-center items-center px-4">
         <ScrollReveal3D>
           <div className="glass-panel p-12 max-w-xl text-center">
-            <h2 className="text-3xl font-bold text-brand-blue mb-4">Qualität & Erfolg</h2>
+            <h2 className="text-3xl font-bold text-brand-blue mb-4">
+              {dictionary.sections.quality_success.title}
+            </h2>
             <p className="text-white/80">
-              Unsere Kurse sind auf maximale Effizienz ausgelegt. 
-              Erlebe modernes Lernen in einer inspirierenden Umgebung.
+              {dictionary.sections.quality_success.description}
             </p>
           </div>
         </ScrollReveal3D>
@@ -23,10 +32,11 @@ export default function HomePage() {
       <section className="h-screen flex flex-col justify-center items-center px-4">
         <ScrollReveal3D>
           <div className="glass-panel p-12 max-w-xl text-center">
-            <h2 className="text-3xl font-bold text-brand-orange mb-4">Moderne Methoden</h2>
+            <h2 className="text-3xl font-bold text-brand-orange mb-4">
+              {dictionary.sections.modern_methods.title}
+            </h2>
             <p className="text-white/80">
-              Innovative Lernmethoden für schnelle Fortschritte.
-              Unser Team begleitet dich auf deinem Weg zum Erfolg.
+              {dictionary.sections.modern_methods.description}
             </p>
           </div>
         </ScrollReveal3D>

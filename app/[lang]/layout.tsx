@@ -4,13 +4,9 @@ import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import LiquidBackground from "@/components/effects/LiquidBackground";
 import Header from "@/components/layout/Header";
+import { getDictionary } from "@/lib/dictionary";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "SmartGerman | Deutsch lernen in Hannover",
-  description: "Professionelle Deutschkurse für Ukrainer & Russischsprachige.",
-};
 
 // Wir machen die Funktion 'async'
 export default async function RootLayout({
@@ -22,6 +18,7 @@ export default async function RootLayout({
 }) {
   // Hier "warten" wir auf die Sprache
   const { lang } = await params;
+  const dictionary = await getDictionary(lang);
 
   return (
     <html lang={lang} suppressHydrationWarning>
@@ -40,7 +37,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
-        <Header /> {/* Hier sitzt der Header fest am oberen Rand */}
+        <Header lang={lang} dictionary={dictionary} />
         <LiquidBackground />
         <SmoothScroll>
           <main className="pt-32 scroll-3d-container"> {/* Abstand nach oben, damit der Header nichts verdeckt */}

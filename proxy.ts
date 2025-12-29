@@ -5,7 +5,7 @@ export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   
   // Überprüfen, ob die URL bereits mit einer Sprache beginnt
-  const pathnameIsMissingLocale = ['/de', '/en'].every(
+  const pathnameIsMissingLocale = ['/de', '/en', '/uk', '/ru', '/tu'].every(
     (locale) => !pathname.startsWith(`${locale}/`) && pathname !== locale
   )
 

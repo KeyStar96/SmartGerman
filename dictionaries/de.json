@@ -1,0 +1,73 @@
+{
+    "meta": {
+      "title": "Deutsch lernen in Hannover | Spezialisiert auf Ukrainer & Russischsprachige | SmartGerman",
+      "description": "Deutschkurse in Hannover mit muttersprachlicher Lehrerin. Für alle, die Deutsch lernen möchten. A1-B2 Kurse, Online & Präsenz. Jetzt anmelden!",
+      "keywords": "Deutschkurse Hannover, Sprachschule Hannover, Deutsch lernen Hannover, muttersprachliche Unterstützung, Integrationskurs Hannover, Deutsch für Ukrainer & Russischsprachige, A1 Kurs Hannover, A2 Kurs Hannover, B1 Kurs Hannover, Online Deutschkurs, Deutsch 50 Plus"
+    },
+    "header": {
+      "banner": {
+        "next_course": "Nächster Kursstart: 03. Februar 2026",
+        "reserve_spot": "Jetzt Platz sichern",
+        "location": "SmartGerman Hannover",
+        "native_teachers": "Muttersprachliche Lehrer",
+        "online_courses": "Online-Kurse"
+      },
+      "nav": {
+        "home": "Home",
+        "courses": "Kurse",
+        "prices": "Preise",
+        "enroll": "Anmelden"
+      },
+      "language_switcher": {
+        "de": "DE",
+        "en": "EN",
+        "uk": "UK",
+        "ru": "RU",
+        "tu": "TU"
+      }
+    },
+    "hero": {
+      "subtitle": "Professionelle Deutschkurse in Hannover.",
+      "subtitle_italic": "Präzise. Modern. Effektiv.",
+      "cta_primary": "Kurs finden",
+      "cta_secondary": "Mehr erfahren"
+    },
+    "sections": {
+      "quality_success": {
+        "title": "Qualität & Erfolg",
+        "description": "Unsere Kurse sind auf maximale Effizienz ausgelegt. Erlebe modernes Lernen in einer inspirierenden Umgebung."
+      },
+      "modern_methods": {
+        "title": "Moderne Methoden",
+        "description": "Innovative Lernmethoden für schnelle Fortschritte. Unser Team begleitet dich auf deinem Weg zum Erfolg."
+      }
+    },
+    "features": {
+      "native_support": "Muttersprachliche Begleitung",
+      "native_desc": "Erklärungen auf Russisch/Ukrainisch bei komplexen Grammatikthemen.",
+      "central_location": "Zentral in Hannover",
+      "location_desc": "Unsere Schule ist perfekt erreichbar, direkt am Hauptbahnhof.",
+      "modern_learning": "Modernes Lernen",
+      "modern_desc": "Kleine Gruppen, modernste Technik und hocheffektive Methoden."
+    },
+    "courses": {
+      "title": "Unsere Kurse",
+      "subtitle": "Vom Anfänger bis zum Profi – wir haben den richtigen Kurs für dich.",
+      "a1": {
+        "name": "A1 Anfänger",
+        "desc": "Der ideale Einstieg ohne Vorkenntnisse."
+      },
+      "b2": {
+        "name": "B2 Fortgeschrittene",
+        "desc": "Sicheres Auftreten im Beruf und Alltag."
+      }
+    },
+    "footer": {
+      "rights": "© 2025 SmartGerman Hannover. Alle Rechte vorbehalten.",
+      "links": {
+        "imprint": "Impressum",
+        "privacy": "Datenschutz",
+        "agb": "AGB"
+      }
+    }
+  }

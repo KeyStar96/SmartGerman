@@ -1,0 +1,74 @@
+{
+    "meta": {
+      "title": "Hannover'de Almanca Öğrenin | Ukraynalılar ve Rusça Konuşanlar İçin Uzmanlaşmış | SmartGerman",
+      "description": "Hannover'de ana dili öğretmen ile Almanca kursları. Almanca öğrenmek isteyen herkes için. A1-B2 kursları, Online ve Yüz yüze. Hemen kaydolun!",
+      "keywords": "Hannover Almanca kursları, Hannover dil okulu, Hannover'de Almanca öğrenin, ana dili desteği, Hannover entegrasyon kursu, Ukraynalılar ve Rusça konuşanlar için Almanca, Hannover A1 kursu, Hannover A2 kursu, Hannover B1 kursu, online Almanca kursu, Almanca 50 Plus"
+    },
+    "header": {
+      "banner": {
+        "next_course": "Sonraki kurs başlangıcı: 3 Şubat 2026",
+        "reserve_spot": "Şimdi yerinizi ayırın",
+        "location": "SmartGerman Hannover",
+        "native_teachers": "Ana dili öğretmenler",
+        "online_courses": "Online kurslar"
+      },
+      "nav": {
+        "home": "Ana Sayfa",
+        "courses": "Kurslar",
+        "prices": "Fiyatlar",
+        "enroll": "Kayıt Ol"
+      },
+      "language_switcher": {
+        "de": "DE",
+        "en": "EN",
+        "uk": "UK",
+        "ru": "RU",
+        "tu": "TU"
+      }
+    },
+    "hero": {
+      "subtitle": "Hannover'de profesyonel Almanca kursları.",
+      "subtitle_italic": "Hassas. Modern. Etkili.",
+      "cta_primary": "Kurs bul",
+      "cta_secondary": "Daha fazla bilgi"
+    },
+    "sections": {
+      "quality_success": {
+        "title": "Kalite ve Başarı",
+        "description": "Kurslarımız maksimum verimlilik için tasarlanmıştır. İlham verici bir ortamda modern öğrenmeyi deneyimleyin."
+      },
+      "modern_methods": {
+        "title": "Modern Yöntemler",
+        "description": "Hızlı ilerleme için yenilikçi öğrenme yöntemleri. Ekibimiz başarı yolculuğunuzda size eşlik eder."
+      }
+    },
+    "features": {
+      "native_support": "Ana Dili Desteği",
+      "native_desc": "Karmaşık dilbilgisi konularında Rusça/Ukraynaca açıklamalar.",
+      "central_location": "Hannover'de Merkezi Konum",
+      "location_desc": "Okulumuz ana tren istasyonunun hemen yanında, mükemmel erişilebilir.",
+      "modern_learning": "Modern Öğrenme",
+      "modern_desc": "Küçük gruplar, son teknoloji ve oldukça etkili yöntemler."
+    },
+    "courses": {
+      "title": "Kurslarımız",
+      "subtitle": "Başlangıçtan profesyonele – sizin için doğru kursa sahibiz.",
+      "a1": {
+        "name": "A1 Başlangıç",
+        "desc": "Ön bilgi olmadan ideal başlangıç."
+      },
+      "b2": {
+        "name": "B2 İleri",
+        "desc": "İş ve günlük yaşamda güvenli performans."
+      }
+    },
+    "footer": {
+      "rights": "© 2025 SmartGerman Hannover. Tüm hakları saklıdır.",
+      "links": {
+        "imprint": "İçindekiler",
+        "privacy": "Gizlilik",
+        "agb": "Şartlar"
+      }
+    }
+  }
+

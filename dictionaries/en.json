@@ -1,0 +1,74 @@
+{
+    "meta": {
+      "title": "Learn German in Hannover | Specialized for Ukrainians & Russian Speakers | SmartGerman",
+      "description": "German courses in Hannover with native teacher. For everyone who wants to learn German. A1-B2 courses, Online & In-person. Sign up now!",
+      "keywords": "German courses Hannover, language school Hannover, learn German Hannover, native support, integration course Hannover, German for Ukrainians & Russian speakers, A1 course Hannover, A2 course Hannover, B1 course Hannover, online German course, German 50 Plus"
+    },
+    "header": {
+      "banner": {
+        "next_course": "Next course start: February 3, 2026",
+        "reserve_spot": "Reserve your spot now",
+        "location": "SmartGerman Hannover",
+        "native_teachers": "Native teachers",
+        "online_courses": "Online courses"
+      },
+      "nav": {
+        "home": "Home",
+        "courses": "Courses",
+        "prices": "Prices",
+        "enroll": "Enroll"
+      },
+      "language_switcher": {
+        "de": "DE",
+        "en": "EN",
+        "uk": "UK",
+        "ru": "RU",
+        "tu": "TU"
+      }
+    },
+    "hero": {
+      "subtitle": "Professional German courses in Hannover.",
+      "subtitle_italic": "Precise. Modern. Effective.",
+      "cta_primary": "Find course",
+      "cta_secondary": "Learn more"
+    },
+    "sections": {
+      "quality_success": {
+        "title": "Quality & Success",
+        "description": "Our courses are designed for maximum efficiency. Experience modern learning in an inspiring environment."
+      },
+      "modern_methods": {
+        "title": "Modern Methods",
+        "description": "Innovative learning methods for rapid progress. Our team accompanies you on your path to success."
+      }
+    },
+    "features": {
+      "native_support": "Native Support",
+      "native_desc": "Explanations in Russian/Ukrainian for complex grammar topics.",
+      "central_location": "Central in Hannover",
+      "location_desc": "Our school is perfectly accessible, right at the main train station.",
+      "modern_learning": "Modern Learning",
+      "modern_desc": "Small groups, cutting-edge technology and highly effective methods."
+    },
+    "courses": {
+      "title": "Our Courses",
+      "subtitle": "From beginner to pro – we have the right course for you.",
+      "a1": {
+        "name": "A1 Beginner",
+        "desc": "The ideal start without prior knowledge."
+      },
+      "b2": {
+        "name": "B2 Advanced",
+        "desc": "Confident performance in work and everyday life."
+      }
+    },
+    "footer": {
+      "rights": "© 2025 SmartGerman Hannover. All rights reserved.",
+      "links": {
+        "imprint": "Imprint",
+        "privacy": "Privacy",
+        "agb": "Terms"
+      }
+    }
+  }
+
