@@ -50,43 +50,41 @@ export function useScrollReveal3D(
       transformStyle: "preserve-3d",
     });
 
-    // Phase 1: Aufstellen beim Erscheinen (von unten kommend)
-    // Element kippt von +90° auf 0° - "stellt sich auf"
-    const revealAnimation = gsap.to(element, {
-      rotateX: 0,
-      z: 0,
-      opacity: 1,
+    // Timeline für die gesamte Scroll-Animation (Würfel-Metapher)
+    // Phase 1: Aufstellen beim Runterscrollen (0-50% des Scroll-Bereichs)
+    // Phase 2: Nach hinten kippen beim Hochscrollen (50-100% des Scroll-Bereichs)
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
         start: "top bottom", // Startet wenn Element von unten in Viewport kommt
-        end: "center center", // Endet wenn Element zentriert ist
-        scrub,
-        refreshPriority: -1,
-      },
-      ease: "none",
-      force3D: true,
-    });
-
-    // Phase 2: Nach hinten kippen beim Verschwinden (nach oben)
-    // Element kippt von 0° auf -90° - "kippt nach hinten weg"
-    const hideAnimation = gsap.to(element, {
-      rotateX: -90,
-      z,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: triggerTarget,
-        start: "top top", // Startet wenn Element oben am Viewport ist
         end: "bottom top", // Endet wenn Element komplett oben raus ist
         scrub,
         refreshPriority: -1,
       },
-      ease: "none",
-      force3D: true,
     });
 
+    // Phase 1: Aufstellen - Würfel dreht sich, untere Fläche kommt nach vorne
+    // Von +90° auf 0° (von Timeline-Position 0 bis 0.5)
+    tl.to(element, {
+      rotateX: 0,
+      z: 0,
+      opacity: 1,
+      ease: "none",
+      force3D: true,
+    }, 0); // Startet bei Position 0
+
+    // Phase 2: Nach hinten kippen - Würfel dreht sich weiter, obere Fläche geht nach hinten
+    // Von 0° auf -90° (von Timeline-Position 0.5 bis 1.0)
+    tl.to(element, {
+      rotateX: -90,
+      z,
+      opacity: 0,
+      ease: "none",
+      force3D: true,
+    }, 0.5); // Startet bei Position 0.5 (Mitte der Timeline)
+
     return () => {
-      revealAnimation.kill();
-      hideAnimation.kill();
+      tl.kill();
     };
   }, [elementRef, trigger, scrub, z, transformOrigin]);
 }
