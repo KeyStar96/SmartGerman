@@ -66,10 +66,10 @@ export function useScrollReveal3D(
     });
 
     // Timeline für die gesamte Scroll-Animation (Würfel-Metapher)
-    // Drei distinct Segmente mit 20/60/20 Timing-Verteilung:
-    // Phase 1 (0.0-0.2): Schnelles Aufstellen beim Runterscrollen
-    // Phase 2 (0.2-0.8): Stabile Lesezone bei 0 Grad (60% der Zeit)
-    // Phase 3 (0.8-1.0): Wegkippen beim Hochscrollen
+    // Drei distinct Segmente mit optimierter Timing-Verteilung:
+    // Phase 1 (0.15-0.30): Einfliegen - startet später für bessere Sichtbarkeit
+    // Phase 2 (0.30-0.85): Stabile Lesezone bei 0 Grad (55% der Zeit)
+    // Phase 3 (0.85-1.0): Ausfliegen - startet später
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
@@ -80,10 +80,10 @@ export function useScrollReveal3D(
       },
     });
 
-    // Phase 1: Schnelles Aufstellen beim Runterscrollen
+    // Phase 1: Einfliegen beim Runterscrollen - startet später (bei 0.15 statt 0.0)
     // Normal: Von +90° auf 0° (von hinten nach vorne)
     // Inverted: Von -90° auf 0° (von unten nach vorne)
-    // Von Timeline-Position 0.0 bis 0.2 - 20% der Timeline
+    // Von Timeline-Position 0.15 bis 0.30 - 15% der Timeline, startet später
     // Verwende .fromTo() um Start- und Endzustand explizit zu definieren
     tl.fromTo(element, 
       {
@@ -98,13 +98,13 @@ export function useScrollReveal3D(
         opacity: 1,
         ease: "none", // Bei scrub muss ease: "none" sein
         force3D: true,
-        duration: 0.2, // Nimmt 20% der Timeline ein
+        duration: 0.15, // Nimmt 15% der Timeline ein
         immediateRender: false, // Wichtig: nicht überschreibt gsap.set()
       }, 
-      0
+      0.15 // Startet später bei Position 0.15
     );
 
-    // Phase 2: Stabile Lesezone bei 0° (von 0.2 bis 0.8) - 60% der Timeline
+    // Phase 2: Stabile Lesezone bei 0° (von 0.30 bis 0.85) - 55% der Timeline
     // Expliziter Haltepunkt für stabile Position während des Lesens
     tl.to(element, {
       rotateX: 0,
@@ -112,13 +112,13 @@ export function useScrollReveal3D(
       opacity: 1,
       ease: "none",
       force3D: true,
-      duration: 0.6, // Nimmt 60% der Timeline ein
-    }, 0.2); // Startet bei Position 0.2, hält bis 0.8
+      duration: 0.55, // Nimmt 55% der Timeline ein
+    }, 0.30); // Startet bei Position 0.30, hält bis 0.85
 
-    // Phase 3: Wegkippen beim Hochscrollen
+    // Phase 3: Ausfliegen beim Hochscrollen - startet später (bei 0.85 statt 0.8)
     // Normal: Von 0° auf -90° (nach hinten weg)
     // Inverted: Von 0° auf +90° (nach oben weg)
-    // Von Timeline-Position 0.8 bis 1.0 - 20% der Timeline
+    // Von Timeline-Position 0.85 bis 1.0 - 15% der Timeline
     const finalRotateX = inverted ? 90 : -90;
     tl.to(element, {
       rotateX: finalRotateX,
@@ -126,8 +126,8 @@ export function useScrollReveal3D(
       opacity: 0,
       ease: "none", // Bei scrub muss ease: "none" sein
       force3D: true,
-      duration: 0.2, // Nimmt 20% der Timeline ein
-    }, 0.8); // Startet bei Position 0.8
+      duration: 0.15, // Nimmt 15% der Timeline ein
+    }, 0.85); // Startet später bei Position 0.85
 
     return () => {
       tl.kill();
