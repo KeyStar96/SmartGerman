@@ -81,7 +81,10 @@ body {
     
     .dark .glass-panel-enhanced {
       border: 1px solid var(--dm-border-slate);
-      background: var(--dm-surface-teal);
+      /* Karten-Hintergrund: Subtiler dunkler Hintergrund, NICHT Teal */
+      background: rgba(13, 13, 13, 0.6); /* Leicht transparent über #0D0D0D */
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
       /* Dezenter Orange-Glow beim Hover (nur Darkmode) */
     }
     
