@@ -32,7 +32,6 @@ export default function Magnifier() {
   // Smooth Spring-Animation für flüssige Cursor-Verfolgung (60fps)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const scrollYValue = useMotionValue(0);
   const springConfig = { damping: 25, stiffness: 300 };
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
@@ -40,8 +39,7 @@ export default function Magnifier() {
   // Lupe-Dimensionen
   const magnifierWidth = 160;
   const magnifierHeight = 160;
-  const magnifierCenterX = magnifierWidth / 2; // 80
-  const magnifierCenterY = magnifierHeight / 2; // 80
+  const radius = magnifierWidth / 2; // 80px - Radius der Lupe
   const scale = 1.5;
 
   // Transform für die Lupe-Position (zentriert am Cursor mit translate(-50%, -50%))
@@ -50,42 +48,30 @@ export default function Magnifier() {
   const magnifierY = useTransform(y, (value) => value);
 
   // Transform für den vergrößerten Inhalt
-  // Formel: x = (LupenBreite / 2) - (MausX * Scale)
-  //         y = (LupenHöhe / 2) - (MausY * Scale)
+  // Mathematisch korrekte Verschiebung: radius - (Mausposition * Skalierung)
   // Der Inhalt muss sich exakt entgegengesetzt zur Mausbewegung bewegen, multipliziert mit dem Skalierungsfaktor
+  // Dies sorgt dafür, dass der Punkt unter der Maus genau in der Mitte der Lupe (radius) landet
   const contentX = useTransform(x, (value) => {
-    return magnifierCenterX - (value * scale);
+    return radius - (value * scale);
   });
-  const contentY = useTransform(
-    [y, scrollYValue],
-    ([yValue, scrollYVal]: [number, number]) => {
-      // Berücksichtige window.scrollY für präzise Positionierung beim Scrollen
-      // Die Maus-Position ist relativ zum Viewport, aber der Inhalt kann gescrollt sein
-      return magnifierCenterY - ((yValue + scrollYVal) * scale);
-    }
-  );
+  const contentY = useTransform(y, (value) => {
+    // Die Mausposition (clientY) ist relativ zum Viewport
+    // Der Klon startet bei top: 0, daher funktioniert die Formel direkt
+    // Das Padding-Top (pt-32) wird durch die Skalierung automatisch ausgeglichen
+    return radius - (value * scale);
+  });
 
-  // Viewport-Größe und Scroll-Position verfolgen
+  // Viewport-Größe verfolgen
   useEffect(() => {
     const updateViewportSize = () => {
       setViewportSize({ width: window.innerWidth, height: window.innerHeight });
     };
     
-    const updateScrollY = () => {
-      const scroll = window.scrollY;
-      setScrollY(scroll);
-      scrollYValue.set(scroll);
-    };
-    
     updateViewportSize();
-    updateScrollY();
-    
     window.addEventListener("resize", updateViewportSize);
-    window.addEventListener("scroll", updateScrollY, { passive: true });
     
     return () => {
       window.removeEventListener("resize", updateViewportSize);
-      window.removeEventListener("scroll", updateScrollY);
     };
   }, []);
 
@@ -106,15 +92,18 @@ export default function Magnifier() {
     };
   }, [isMagnifierActive, toggleMagnifier]);
 
-  // Mouse-Move Handler
+  // Mouse-Move Handler - erweitert um Scroll-Tracking
   useEffect(() => {
     if (!isMagnifierActive) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      // clientX/Y sind relativ zum Viewport
+      // clientX/Y ist die Position im Sichtfeld (Viewport)
+      // pageX/Y wäre die Position im gesamten Dokument (inkl. Scroll)
+      // Wir nutzen clientX/Y, da der Klon bei top: 0 startet und die Viewport-Größe hat
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
       setMousePos({ x: e.clientX, y: e.clientY });
+      setScrollY(window.scrollY);
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
@@ -247,15 +236,15 @@ export default function Magnifier() {
           style={{
             x: contentX,
             y: contentY,
-            width: `${viewportSize.width || window.innerWidth}px`,
-            height: `${viewportSize.height || window.innerHeight}px`,
+            width: viewportSize.width || window.innerWidth,
+            height: viewportSize.height || window.innerHeight,
             scale: scale,
-            transformOrigin: "0 0", // Top Left für konsistente mathematische Verschiebung
+            transformOrigin: "0 0", // WICHTIG: Bezugspunkt oben links - verhindert "Wandern" beim Skalieren
             willChange: "transform",
             background: "transparent",
             overflow: "visible",
-            top: "0",
-            left: "0",
+            top: 0,
+            left: 0,
           }}
         />
 
