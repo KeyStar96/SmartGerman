@@ -246,7 +246,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Badge über dem Markennamen */}
           <div 
             ref={badgeRef}
-            className="mb-6 inline-block px-4 py-2 border border-foreground/50 rounded-full"
+            className="mb-6 inline-block px-4 py-2 border border-black/50 dark:border-white/50 rounded-full"
             style={{ opacity: 0 }}
           >
             <span className="text-xs uppercase tracking-widest text-foreground/70 font-medium">
@@ -311,7 +311,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* CTA-Buttons */}
           <div className="flex flex-wrap gap-6 justify-center items-center">
             {/* Primary CTA: Outline-Button mit 2px Rahmen */}
-            <button className="px-8 py-4 border-2 border-foreground/50 rounded-full font-semibold uppercase tracking-widest text-sm hover:bg-foreground/5 hover:border-foreground/80 transition-all duration-300 gpu-render">
+            <button className="px-8 py-4 border-2 border-black/50 dark:border-white/50 rounded-full font-semibold uppercase tracking-widest text-sm hover:bg-black/5 dark:hover:bg-white/5 hover:border-black/80 dark:hover:border-white/80 transition-all duration-300 gpu-render">
               {dictionary.hero.cta_primary}
             </button>
             
