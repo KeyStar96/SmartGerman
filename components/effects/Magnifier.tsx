@@ -1,21 +1,22 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
 import { useMagnifier } from "@/lib/context/MagnifierContext";
 
 /**
- * Smart Lens (Lupe) für Barrierefreiheit
+ * Smart Lens (Lupe) für Barrierefreiheit - iOS 26 Style
  * - Folgt dem Cursor mit 60fps Performance
- * - iOS Liquid Glass Styling mit backdrop-filter
- * - 1.5x Vergrößerung des Bereichs unter der Maus
+ * - Schwebt 100px über dem Mauszeiger (verhindert Verdeckung)
+ * - 1.6x Vergrößerung des Bereichs unter der Maus
+ * - Solid Background (nicht transparent) für isolierte Ansicht
  * - Performance-optimiert: Keine Layout-Shifts, GPU-beschleunigt
  * - ESC-Taste deaktiviert die Lupe
  * 
  * Technischer Ansatz:
- * - Nutzt einen gespiegelten Body-Layer mit CSS transform
- * - Der gesamte Body-Inhalt wird in einen separaten Layer kopiert und skaliert
- * - Positionierung so, dass der Bereich unter der Maus in der Mitte der Lupe erscheint
+ * - Nutzt einen gespiegelten Main-Layer mit CSS transform
+ * - Berücksichtigt Header-Offset (pt-32) und Scroll-Position
+ * - Die Lupe schwebt über dem Cursor, damit die Hand/Maus den Text nicht verdeckt
  */
 export default function Magnifier() {
   const { isMagnifierActive, toggleMagnifier } = useMagnifier();
@@ -25,41 +26,25 @@ export default function Magnifier() {
     width: typeof window !== "undefined" ? window.innerWidth : 0, 
     height: typeof window !== "undefined" ? window.innerHeight : 0 
   });
-  const magnifierRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const cloneRef = useRef<HTMLElement | null>(null);
 
-  // Smooth Spring-Animation für flüssige Cursor-Verfolgung (60fps)
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springConfig = { damping: 25, stiffness: 300 };
-  const x = useSpring(mouseX, springConfig);
-  const y = useSpring(mouseY, springConfig);
+  // iOS-typische Vergrößerung und Lupe-Dimensionen
+  const scale = 1.6;
+  const lensSize = 180;
+  const offsetUp = 100; // Die Lupe schwebt 100px ÜBER dem Zeiger
+  const radius = lensSize / 2; // 90px - Radius der Lupe
 
-  // Lupe-Dimensionen
-  const magnifierWidth = 160;
-  const magnifierHeight = 160;
-  const radius = magnifierWidth / 2; // 80px - Radius der Lupe
-  const scale = 1.5;
+  // Smooth Motion für die Lupe selbst (schwebend über dem Cursor)
+  const mouseXValue = useMotionValue(0);
+  const mouseYValue = useMotionValue(0);
+  const springConfig = { damping: 25, stiffness: 200 };
+  const lensX = useSpring(mouseXValue, springConfig);
+  const lensY = useSpring(mouseYValue, springConfig);
 
-  // Transform für die Lupe-Position (zentriert am Cursor mit translate(-50%, -50%))
-  // Die Lupe wird mit left/top positioniert und dann mit transform zentriert
-  const magnifierX = useTransform(x, (value) => value);
-  const magnifierY = useTransform(y, (value) => value);
-
-  // Transform für den vergrößerten Inhalt
-  // Mathematisch korrekte Verschiebung: radius - (Mausposition * Skalierung)
-  // Der Inhalt muss sich exakt entgegengesetzt zur Mausbewegung bewegen, multipliziert mit dem Skalierungsfaktor
-  // Dies sorgt dafür, dass der Punkt unter der Maus genau in der Mitte der Lupe (radius) landet
-  const contentX = useTransform(x, (value) => {
-    return radius - (value * scale);
-  });
-  const contentY = useTransform(y, (value) => {
-    // Die Mausposition (clientY) ist relativ zum Viewport
-    // Der Klon startet bei top: 0, daher funktioniert die Formel direkt
-    // Das Padding-Top (pt-32) wird durch die Skalierung automatisch ausgeglichen
-    return radius - (value * scale);
-  });
+  // MotionValues für die Inhalts-Positionierung (nutzen aktuelle Mausposition)
+  const contentXValue = useMotionValue(0);
+  const contentYValue = useMotionValue(0);
 
   // Viewport-Größe verfolgen
   useEffect(() => {
@@ -74,6 +59,31 @@ export default function Magnifier() {
       window.removeEventListener("resize", updateViewportSize);
     };
   }, []);
+
+  // Mouse-Move Handler - erweitert um Scroll-Tracking
+  useEffect(() => {
+    if (!isMagnifierActive) return;
+
+    const handleMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+      setScrollY(window.scrollY);
+      
+      // Update Spring-Values für flüssige Animation
+      mouseXValue.set(e.clientX);
+      mouseYValue.set(e.clientY - offsetUp); // Versatz nach oben
+      
+      // Update Content-Position direkt basierend auf aktueller Mausposition
+      // Die Inhalts-Verschiebung muss exakt den Punkt unter der Maus in die Mitte der Lupe projizieren
+      contentXValue.set(radius - (e.clientX * scale));
+      contentYValue.set(radius - (e.clientY * scale));
+    };
+
+    window.addEventListener("mousemove", handleMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+    };
+  }, [isMagnifierActive, mouseXValue, mouseYValue, contentXValue, contentYValue]);
 
   // ESC-Taste Handler
   useEffect(() => {
@@ -92,28 +102,10 @@ export default function Magnifier() {
     };
   }, [isMagnifierActive, toggleMagnifier]);
 
-  // Mouse-Move Handler - erweitert um Scroll-Tracking
-  useEffect(() => {
-    if (!isMagnifierActive) return;
+  // Die Inhalts-Verschiebung wird direkt in handleMove berechnet
+  // contentXValue und contentYValue werden dort aktualisiert
 
-    const handleMouseMove = (e: MouseEvent) => {
-      // clientX/Y ist die Position im Sichtfeld (Viewport)
-      // pageX/Y wäre die Position im gesamten Dokument (inkl. Scroll)
-      // Wir nutzen clientX/Y, da der Klon bei top: 0 startet und die Viewport-Größe hat
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-      setMousePos({ x: e.clientX, y: e.clientY });
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, [isMagnifierActive, mouseX, mouseY]);
-
-  // Spiegle den gesamten Body-Inhalt für die Vergrößerung
+  // Spiegle den gesamten Main-Inhalt für die Vergrößerung
   useEffect(() => {
     if (!isMagnifierActive) {
       // Entferne den Klon, wenn die Lupe deaktiviert ist
@@ -143,10 +135,6 @@ export default function Magnifier() {
       // Setze Styles für den Klon - nutze aktuelle Viewport-Größe
       const vw = viewportSize.width || window.innerWidth;
       const vh = viewportSize.height || window.innerHeight;
-      
-      // Wichtig: Der Klon muss die gleiche Position wie das Original haben
-      // Das Original startet bei (0, 0) relativ zum Viewport (nach Header-Offset)
-      const mainRect = main.getBoundingClientRect();
       
       clone.style.position = "absolute";
       clone.style.top = "0px";
@@ -194,78 +182,82 @@ export default function Magnifier() {
     };
   }, [isMagnifierActive, viewportSize]);
 
-  if (!isMagnifierActive) return null;
-
   return (
-    <>
-      {/* Overlay: Dunkle Maske außerhalb der Lupe für besseren Kontrast */}
-      <motion.div
-        className="fixed inset-0 pointer-events-none z-[99]"
-        style={{
-          background: `radial-gradient(circle 80px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(0, 0, 0, 0.3) 100%)`,
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-      />
-
-      {/* Magnifier Glass Container - iOS Liquid Glass Styling */}
-      <motion.div
-        ref={magnifierRef}
-        className="fixed pointer-events-none z-[100] will-change-transform"
-        style={{
-          left: magnifierX,
-          top: magnifierY,
-          width: magnifierWidth,
-          height: magnifierHeight,
-          borderRadius: "50%",
-          clipPath: "circle(50% at 50% 50%)",
-          overflow: "hidden", // Zwingend hidden für korrekte Clipping
-          transform: "translate(-50%, -50%) translateZ(0)", // Zentrierung mit translate(-50%, -50%)
-        }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.2 }}
-      >
-        {/* Vergrößerter Inhalt Layer - Skaliert den gesamten Viewport */}
+    <AnimatePresence>
+      {isMagnifierActive && (
         <motion.div
-          ref={contentRef}
-          className="absolute pointer-events-none"
           style={{
-            x: contentX,
-            y: contentY,
-            width: viewportSize.width || window.innerWidth,
-            height: viewportSize.height || window.innerHeight,
-            scale: scale,
-            transformOrigin: "0 0", // WICHTIG: Bezugspunkt oben links - verhindert "Wandern" beim Skalieren
-            willChange: "transform",
-            background: "transparent",
-            overflow: "visible",
-            top: 0,
+            position: "fixed",
             left: 0,
+            top: 0,
+            width: lensSize,
+            height: lensSize,
+            x: useTransform(lensX, (x) => x - radius),
+            y: useTransform(lensY, (y) => y - radius),
+            zIndex: 9999,
+            pointerEvents: "none",
           }}
-        />
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.5 }}
+          transition={{ duration: 0.2 }}
+        >
+          {/* Die Lupe (Liquid Glass mit solid Background) */}
+          <div 
+            className="relative w-full h-full rounded-full overflow-hidden border border-white/30 shadow-2xl"
+            style={{
+              backgroundColor: "var(--background)", // Solid Background für isolierte Ansicht
+            }}
+          >
+            {/* Geklonter Inhalt Layer */}
+            <motion.div
+              ref={contentRef}
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: viewportSize.width || window.innerWidth,
+                height: viewportSize.height || window.innerHeight,
+                x: contentXValue,
+                y: contentYValue,
+                scale: scale,
+                transformOrigin: "0 0",
+                willChange: "transform",
+              }}
+            />
 
-        {/* Glass Overlay - iOS Liquid Glass Effekt */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backdropFilter: "blur(8px) brightness(1.1)",
-            WebkitBackdropFilter: "blur(8px) brightness(1.1)",
-            border: "0.5px solid rgba(255, 255, 255, 0.3)",
-            borderRadius: "50%",
-            boxShadow: `
-              inset 0 0 20px rgba(255, 255, 255, 0.1),
-              inset 0 0 40px rgba(255, 255, 255, 0.05),
-              0 0 0 1px rgba(255, 255, 255, 0.1),
-              0 8px 32px rgba(0, 0, 0, 0.2)
-            `,
-            background: "rgba(255, 255, 255, 0.1)",
-          }}
-        />
-      </motion.div>
-    </>
+            {/* iOS Liquid Glanz-Effekt */}
+            <div 
+              className="absolute inset-0 pointer-events-none rounded-full"
+              style={{
+                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%)",
+                backdropFilter: "blur(8px) brightness(1.1)",
+                WebkitBackdropFilter: "blur(8px) brightness(1.1)",
+                boxShadow: `
+                  inset 0 0 20px rgba(255, 255, 255, 0.1),
+                  inset 0 0 40px rgba(255, 255, 255, 0.05),
+                  0 0 0 1px rgba(255, 255, 255, 0.1),
+                  0 8px 32px rgba(0, 0, 0, 0.2)
+                `,
+              }}
+            />
+          </div>
+          
+          {/* Optional: Kleiner "Stiel" oder Verbindungspunkt zum Cursor (iOS Look) */}
+          <div 
+            className="absolute pointer-events-none"
+            style={{
+              bottom: -10,
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "1px",
+              height: "16px",
+              background: "rgba(255, 255, 255, 0.2)",
+              filter: "blur(1px)",
+            }}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
