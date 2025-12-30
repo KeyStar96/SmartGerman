@@ -19,23 +19,29 @@ export default function ScrollIndicator({ className = "" }: ScrollIndicatorProps
   const dotRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
-    if (!lineRef.current || !dotRef.current) return;
+    if (!lineRef.current || !dotRef.current || !containerRef.current) return;
 
-    // Initial: Dot oben, Line transparent
+    // Initial: Dot oben, Line transparent - mit immediateRender für sofortige Sichtbarkeit
     gsap.set(dotRef.current, {
       y: -40,
       opacity: 0,
       force3D: true,
+      immediateRender: true,
     });
 
     gsap.set(lineRef.current, {
       scaleY: 0,
       transformOrigin: "top center",
       force3D: true,
+      immediateRender: true,
     });
 
-    // Timeline für die Animation
-    const tl = gsap.timeline({ repeat: -1, ease: "none" });
+    // Kurze Verzögerung, damit die Komponente vollständig geladen ist
+    const tl = gsap.timeline({ 
+      repeat: -1, 
+      ease: "none",
+      delay: 0.3, // Kurze Verzögerung für bessere Sichtbarkeit
+    });
 
     // Phase 1: Line wächst von oben nach unten
     tl.to(lineRef.current, {
@@ -98,9 +104,10 @@ export default function ScrollIndicator({ className = "" }: ScrollIndicatorProps
       {/* Bewegender Punkt - absolut positioniert innerhalb des Containers */}
       <div
         ref={dotRef}
-        className="absolute w-2 h-2 rounded-full bg-brand-orange"
+        className="absolute w-2 h-2 rounded-full"
         style={{
           top: "-40px",
+          backgroundColor: "#FF5C00", // Brand Orange direkt als Fallback
           boxShadow: "0 0 8px rgba(255, 92, 0, 0.6)",
         }}
       />

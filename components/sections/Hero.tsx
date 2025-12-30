@@ -210,11 +210,12 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
     // 8. Scroll-Indikator: Sichtbar am Anfang, verschwindet beim Scrollen, erscheint wieder beim Zurückkommen
     if (scrollIndicatorRef.current) {
-      // Initial: Sichtbar
+      // Initial: Sichtbar mit immediateRender
       gsap.set(scrollIndicatorRef.current, {
         opacity: 1,
         y: 0,
         force3D: true,
+        immediateRender: true,
       });
 
       // Verschwindet progressiv beim Runterscrollen basierend auf Scroll-Position
@@ -226,11 +227,13 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         onUpdate: (self) => {
           // Progress von 0 (oben) bis 1 (30% gescrollt)
           const progress = self.progress;
-          gsap.set(scrollIndicatorRef.current, {
-            opacity: 1 - progress,
-            y: progress * 20,
-            force3D: true,
-          });
+          if (scrollIndicatorRef.current) {
+            gsap.set(scrollIndicatorRef.current, {
+              opacity: 1 - progress,
+              y: progress * 20,
+              force3D: true,
+            });
+          }
         },
         markers: false,
       });
@@ -356,8 +359,11 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       {/* Scroll Indikator - Fixiert am unteren Rand des Viewports */}
       <div 
         ref={scrollIndicatorRef}
-        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center pointer-events-none"
-        style={{ opacity: 1 }}
+        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center pointer-events-none"
+        style={{ 
+          opacity: 1,
+          visibility: "visible",
+        }}
       >
         <span className="text-[10px] uppercase tracking-[0.2em] mb-2 text-foreground/60 font-medium">
           {dictionary.hero.scroll_label}
