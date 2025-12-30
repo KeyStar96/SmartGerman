@@ -1,5 +1,6 @@
 import Hero from "@/components/sections/Hero";
 import ScrollReveal3D from "@/components/effects/ScrollReveal3D";
+import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { getDictionary } from "@/lib/dictionary";
 
 export default async function HomePage({
@@ -40,6 +41,20 @@ export default async function HomePage({
             </p>
           </div>
         </ScrollReveal3D>
+      </section>
+
+      {/* 3D-Glas-Würfel Sektion - Beispiel für die neue Komponente */}
+      <section className="h-screen flex flex-col justify-center items-center px-4">
+        <ScrollReveal3DGlass>
+          <div className="glass-panel p-12 max-w-xl text-center">
+            <h2 className="text-3xl font-bold text-brand-blue mb-4">
+              {dictionary.sections.quality_success.title}
+            </h2>
+            <p className="text-white/80 dark:text-white/80">
+              {dictionary.sections.quality_success.description}
+            </p>
+          </div>
+        </ScrollReveal3DGlass>
       </section>
     </div>
   );
