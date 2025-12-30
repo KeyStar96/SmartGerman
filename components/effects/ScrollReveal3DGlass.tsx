@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, ReactNode } from "react";
-import GlassCube3D from "./GlassCube3D";
+import { useScrollReveal3D } from "@/lib/useScrollReveal3D";
 
 interface ScrollReveal3DGlassProps {
   children: ReactNode;
@@ -10,33 +10,34 @@ interface ScrollReveal3DGlassProps {
 }
 
 /**
- * Erweiterte ScrollReveal3D-Komponente mit 3D-Glas-Würfel
- * - Kombiniert die bestehende ScrollReveal3D-Logik mit dem GlassCube3D
- * - Text-Inhalt wird als HTML-Overlay gerendert
- * - Der Webseiten-Hintergrund wird durch das Glas verzerrt
- * - Physikalisch korrekte Lichtbrechung (IOR 1.5, Fresnel-Effekt, chromatische Aberration)
+ * ScrollReveal3D mit erweitertem Glas-Effekt
+ * - Verwendet CSS 3D Transforms für den Würfel-Effekt (wie ScrollReveal3D)
+ * - Zusätzlicher Glassmorphismus-Effekt für mehr Tiefe
+ * - Performance-optimiert mit GPU-Beschleunigung
  */
 export default function ScrollReveal3DGlass({
   children,
   className = "",
   trigger,
 }: ScrollReveal3DGlassProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
+
+  useScrollReveal3D(elementRef, {
+    trigger: trigger || undefined,
+    z: -1200,
+    transformOrigin: "center bottom",
+  });
 
   return (
     <div
-      ref={containerRef}
-      className={`relative w-full h-full min-h-[500px] ${className}`}
+      ref={elementRef}
+      className={`gpu-render ${className}`}
       style={{
         transformStyle: "preserve-3d",
+        transformOrigin: "center bottom",
       }}
     >
-      {/* 3D-Glas-Würfel mit Scroll-Animation */}
-      <GlassCube3D trigger={trigger || containerRef}>
-        {/* Children werden als HTML-Overlay über dem Canvas gerendert */}
-        {children}
-      </GlassCube3D>
+      {children}
     </div>
   );
 }
-

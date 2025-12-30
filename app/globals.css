@@ -34,6 +34,25 @@ body {
       @apply bg-black/[0.02] dark:bg-white/[0.03] backdrop-blur-xl border border-black/[0.05] dark:border-white/10 rounded-2xl shadow-xl transition-all duration-500;
     }
     
+    /* Erweiterter Glas-Effekt für 3D-Glas-Würfel (stärker als normal) */
+    .glass-panel-enhanced {
+      @apply backdrop-blur-2xl border border-black/[0.08] dark:border-white/20 rounded-2xl shadow-2xl;
+      background: rgba(0, 0, 0, 0.03);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 
+                  0 0 0 1px rgba(255, 255, 255, 0.05),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.5s ease;
+    }
+    
+    .dark .glass-panel-enhanced {
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 
+                  0 0 0 1px rgba(255, 255, 255, 0.1),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    
     /* Glassmorphismus für Header */
     .glass-header {
       @apply backdrop-blur-2xl backdrop-saturate-150;

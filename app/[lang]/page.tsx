@@ -43,10 +43,10 @@ export default async function HomePage({
         </ScrollReveal3D>
       </section>
 
-      {/* 3D-Glas-Würfel Sektion - Beispiel für die neue Komponente */}
+      {/* 3D-Glas-Würfel Sektion - CSS-basierte Lösung mit verstärktem Glas-Effekt */}
       <section className="h-screen flex flex-col justify-center items-center px-4">
         <ScrollReveal3DGlassClient>
-          <div className="glass-panel p-12 max-w-xl text-center">
+          <div className="glass-panel glass-panel-enhanced p-12 max-w-xl text-center">
             <h2 className="text-3xl font-bold text-brand-blue mb-4">
               {dictionary.sections.quality_success.title}
             </h2>
