@@ -108,6 +108,7 @@ export default function PlaceholderSection() {
             <ScrollReveal3DGlass 
               key={index}
               trigger={sectionRef}
+              inverted={true}
             >
               <div
                 ref={(el) => {

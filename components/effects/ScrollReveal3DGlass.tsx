@@ -20,7 +20,7 @@ export default function ScrollReveal3DGlass({
   children,
   className = "",
   trigger,
-  inverted = false,
+  inverted = true, // Standard: Invertierte Bewegung (von unten kommend, nach oben weggehend)
 }: ScrollReveal3DGlassProps) {
   const elementRef = useRef<HTMLDivElement>(null);
 
