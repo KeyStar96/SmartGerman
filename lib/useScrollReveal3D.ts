@@ -53,6 +53,8 @@ export function useScrollReveal3D(
     // Inverted: Element startet von unten (rotateX: -90) - unsichtbar
     const initialRotateX = inverted ? -90 : 90;
     
+    // immediateRender: true sorgt dafür, dass der initiale Zustand sofort angewendet wird
+    // verhindert, dass die Karten kurz sichtbar sind, bevor die Animation startet
     gsap.set(element, {
       rotateX: initialRotateX,
       z: z, // Startet tief im Hintergrund (z.B. z: -1200 bedeutet 1200px nach hinten)
@@ -60,6 +62,7 @@ export function useScrollReveal3D(
       transformOrigin,
       force3D: true,
       transformStyle: "preserve-3d",
+      immediateRender: true, // Wichtig: Initialer Zustand wird sofort angewendet
     });
 
     // Timeline für die gesamte Scroll-Animation (Würfel-Metapher)
@@ -81,6 +84,7 @@ export function useScrollReveal3D(
     // Normal: Von +90° auf 0° (von hinten nach vorne)
     // Inverted: Von -90° auf 0° (von unten nach vorne)
     // Von Timeline-Position 0.0 bis 0.2 - 20% der Timeline
+    // Der initiale Zustand wurde bereits mit gsap.set() gesetzt, daher verwenden wir .to()
     tl.to(element, {
       rotateX: 0,
       z: 0,
@@ -88,7 +92,7 @@ export function useScrollReveal3D(
       ease: "none", // Bei scrub muss ease: "none" sein
       force3D: true,
       duration: 0.2, // Nimmt 20% der Timeline ein
-    }, 0); // Startet bei Position 0
+    }, 0); // Startet bei Position 0, animiert vom mit gsap.set() gesetzten Zustand
 
     // Phase 2: Stabile Lesezone bei 0° (von 0.2 bis 0.8) - 60% der Timeline
     // Expliziter Haltepunkt für stabile Position während des Lesens
