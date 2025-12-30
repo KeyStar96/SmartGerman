@@ -81,24 +81,6 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   useGSAP(() => {
     const tl = gsap.timeline();
     
-    // Aggressives Snapping: Überschreibt sofort jedes manuelle Scrolling
-    // Snapped sofort, sobald der Trigger-Bereich erreicht wird
-    if (container.current) {
-      ScrollTrigger.create({
-        trigger: container.current,
-        start: "bottom 98%", // Sehr früher Trigger-Punkt
-        end: "bottom 2%", // Sehr enger Bereich
-        snap: {
-          snapTo: 1, // Zwingt zum Ende des Triggers (Anfang Features)
-          duration: 0.15, // Sehr schnelles Einrasten (150ms)
-          delay: 0, // Keine Verzögerung
-          ease: "power4.out", // Sehr steile Kurve
-          inertia: false, // Kein Weitergleiten
-        },
-        markers: false,
-      });
-    }
-    
     // 1. Vertikaler Reveal-Effekt für Brand-Name - Von unten nach oben (ZUERST)
     if (heroTextWrapper.current) {
       gsap.set(heroTextWrapper.current, {

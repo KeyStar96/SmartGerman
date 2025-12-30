@@ -78,24 +78,7 @@ export default function Features({ dictionary }: FeaturesProps) {
       });
     }
 
-    // ScrollTrigger-Snapping: Aggressives Einrasten - überschreibt sofort jedes manuelle Scrolling
-    // Die Karten sind dann bei 0 Grad Rotation perfekt ausgerichtet
-    ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: "top 98%", // Sehr früher Trigger-Punkt
-      end: "top 2%", // Sehr enger Bereich
-      snap: {
-        snapTo: 0, // Zwingt zum Start-Punkt (Top der Sektion)
-        duration: 0.15, // Sehr schnelles Einrasten (150ms)
-        delay: 0, // Keine Verzögerung
-        ease: "power4.out", // Sehr steile Kurve
-        inertia: false, // Kein Weitergleiten
-      },
-      markers: false, // Setze auf true zum Debuggen
-    });
-
     // Die 3D-Rotation wird von ScrollReveal3DGlass mit sectionRef als Trigger gehandhabt
-    // Wir entfernen die separate Stagger-Animation, da sie mit der 3D-Animation kollidieren würde
   }, { scope: sectionRef });
 
   return (
