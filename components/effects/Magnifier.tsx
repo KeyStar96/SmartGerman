@@ -20,7 +20,10 @@ import { useMagnifier } from "@/lib/context/MagnifierContext";
 export default function Magnifier() {
   const { isMagnifierActive, toggleMagnifier } = useMagnifier();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
+  const [viewportSize, setViewportSize] = useState({ 
+    width: typeof window !== "undefined" ? window.innerWidth : 0, 
+    height: typeof window !== "undefined" ? window.innerHeight : 0 
+  });
   const magnifierRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const cloneRef = useRef<HTMLElement | null>(null);
@@ -37,17 +40,33 @@ export default function Magnifier() {
   const magnifierY = useTransform(y, (value) => value - 80);
 
   // Transform für den vergrößerten Inhalt
+  // Wichtig: Der Punkt bei (x, y) im Original muss bei (80, 80) in der Lupe erscheinen
+  // Bei scale=1.5: Der Punkt bei (x, y) im Original ist bei (x/scale, y/scale) im skalierten Inhalt
+  // Um den Punkt auf (80, 80) zu bringen, muss der Inhalt bei (80 - x/scale, 80 - y/scale) positioniert werden
   const scale = 1.5;
-  // Berechne die Position so, dass der Punkt unter der Maus in der Mitte der Lupe erscheint
-  // Bei scale=1.5: Wenn Maus bei (x, y) ist, muss der Inhalt bei (-x * (scale-1), -y * (scale-1)) starten
   const contentX = useTransform(x, (value) => {
-    // Der Inhalt muss so verschoben werden, dass der Punkt bei (value, y) in der Mitte der Lupe ist
-    // Lupe ist bei (value - 80, y - 80), also muss der Inhalt bei (value - 80 - value * (scale-1), ...) sein
-    return -value * (scale - 1);
+    // Der Inhalt muss so verschoben werden, dass der Punkt bei (value, y) in der Mitte der Lupe (80, 80) erscheint
+    // Im skalierten Inhalt ist der Punkt bei (value/scale, y/scale)
+    // Um ihn auf (80, 80) zu bringen: position = 80 - value/scale
+    return 80 - value / scale;
   });
   const contentY = useTransform(y, (value) => {
-    return -value * (scale - 1);
+    return 80 - value / scale;
   });
+
+  // Viewport-Größe verfolgen
+  useEffect(() => {
+    const updateViewportSize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    
+    updateViewportSize();
+    window.addEventListener("resize", updateViewportSize);
+    
+    return () => {
+      window.removeEventListener("resize", updateViewportSize);
+    };
+  }, []);
 
   // ESC-Taste Handler
   useEffect(() => {
@@ -65,20 +84,6 @@ export default function Magnifier() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isMagnifierActive, toggleMagnifier]);
-
-  // Viewport-Größe verfolgen
-  useEffect(() => {
-    const updateViewportSize = () => {
-      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
-    };
-    
-    updateViewportSize();
-    window.addEventListener("resize", updateViewportSize);
-    
-    return () => {
-      window.removeEventListener("resize", updateViewportSize);
-    };
-  }, []);
 
   // Mouse-Move Handler
   useEffect(() => {
@@ -112,7 +117,6 @@ export default function Magnifier() {
     const timeoutId = setTimeout(() => {
       if (!contentRef.current) return;
 
-      const body = document.body;
       const main = document.querySelector("main");
       if (!main) return;
 
@@ -125,7 +129,7 @@ export default function Magnifier() {
       const clone = main.cloneNode(true) as HTMLElement;
       clone.className = "magnifier-content-clone";
       
-      // Setze Styles für den Klon - wichtig: position absolute, damit er relativ zum Container positioniert wird
+      // Setze Styles für den Klon - nutze aktuelle Viewport-Größe
       const vw = viewportSize.width || window.innerWidth;
       const vh = viewportSize.height || window.innerHeight;
       
@@ -142,11 +146,11 @@ export default function Magnifier() {
       clone.style.zIndex = "1";
       
       // Wichtig: Stelle sicher, dass alle Styles vom Original übernommen werden
-      // Kopiere wichtige Computed Styles
       const computedStyle = window.getComputedStyle(main);
       clone.style.color = computedStyle.color;
       clone.style.fontFamily = computedStyle.fontFamily;
       clone.style.fontSize = computedStyle.fontSize;
+      clone.style.backgroundColor = computedStyle.backgroundColor;
       
       // Entferne alle interaktiven Elemente aus dem Klon
       const interactiveElements = clone.querySelectorAll("button, a, input, select, textarea, [role='button']");
@@ -164,7 +168,7 @@ export default function Magnifier() {
       // Füge den Klon zum contentRef hinzu
       contentRef.current.appendChild(clone);
       cloneRef.current = clone;
-    }, 100);
+    }, 50);
 
     return () => {
       clearTimeout(timeoutId);
