@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { useRef, useEffect } from "react";
+import { gsap } from "@/lib/gsap";
 
 interface ScrollIndicatorProps {
   className?: string;
@@ -18,29 +18,26 @@ export default function ScrollIndicator({ className = "" }: ScrollIndicatorProps
   const lineRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    if (!lineRef.current || !dotRef.current || !containerRef.current) return;
+  useEffect(() => {
+    if (!lineRef.current || !dotRef.current) return;
 
-    // Initial: Dot oben, Line transparent - mit immediateRender für sofortige Sichtbarkeit
+    // Initial: Dot oben, Line sichtbar aber klein
     gsap.set(dotRef.current, {
       y: -40,
       opacity: 0,
       force3D: true,
-      immediateRender: true,
     });
 
     gsap.set(lineRef.current, {
       scaleY: 0,
       transformOrigin: "top center",
       force3D: true,
-      immediateRender: true,
     });
 
-    // Kurze Verzögerung, damit die Komponente vollständig geladen ist
+    // Timeline für die Animation - startet sofort
     const tl = gsap.timeline({ 
       repeat: -1, 
       ease: "none",
-      delay: 0.3, // Kurze Verzögerung für bessere Sichtbarkeit
     });
 
     // Phase 1: Line wächst von oben nach unten
@@ -50,7 +47,7 @@ export default function ScrollIndicator({ className = "" }: ScrollIndicatorProps
       ease: "power2.out",
       force3D: true,
     })
-      // Phase 2: Dot erscheint oben und bewegt sich nach unten (innerhalb des Strichs)
+      // Phase 2: Dot erscheint oben und bewegt sich nach unten
       .to(
         dotRef.current,
         {
@@ -84,34 +81,43 @@ export default function ScrollIndicator({ className = "" }: ScrollIndicatorProps
       )
       // Pause vor Wiederholung
       .to({}, { duration: 0.5 });
-  }, { scope: containerRef });
+
+    return () => {
+      tl.kill();
+    };
+  }, []);
 
   return (
     <div
       ref={containerRef}
       className={`relative flex flex-col items-center justify-center ${className}`}
       aria-hidden="true"
+      style={{
+        minHeight: "80px", // Reserviere Platz für die Animation
+      }}
     >
-      {/* Senkrechter Strich */}
+      {/* Senkrechter Strich - initial sichtbar für Debugging */}
       <div
         ref={lineRef}
         className="relative w-[1px] h-20 bg-gradient-to-b from-foreground/60 via-foreground/40 to-transparent"
         style={{
           transformOrigin: "top center",
+          opacity: 1, // Initial sichtbar
         }}
       />
       
-      {/* Bewegender Punkt - absolut positioniert innerhalb des Containers */}
+      {/* Bewegender Punkt - absolut positioniert */}
       <div
         ref={dotRef}
         className="absolute w-2 h-2 rounded-full"
         style={{
           top: "-40px",
-          backgroundColor: "#FF5C00", // Brand Orange direkt als Fallback
+          left: "50%",
+          transform: "translateX(-50%)",
+          backgroundColor: "#FF5C00",
           boxShadow: "0 0 8px rgba(255, 92, 0, 0.6)",
         }}
       />
     </div>
   );
 }
-
