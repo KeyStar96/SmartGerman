@@ -114,4 +114,11 @@ body {
       perspective: 2000px;
       transform-style: preserve-3d;
     }
+    
+    /* Magnifier: Verhindere Layout-Shifts und optimiere Performance */
+    .magnifier-content-clone {
+      contain: layout style paint;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
   }

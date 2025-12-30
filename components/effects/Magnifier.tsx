@@ -10,17 +10,19 @@ import { useMagnifier } from "@/lib/context/MagnifierContext";
  * - iOS Liquid Glass Styling mit backdrop-filter
  * - 1.5x Vergrößerung des Bereichs unter der Maus
  * - Performance-optimiert: Keine Layout-Shifts, GPU-beschleunigt
+ * - ESC-Taste deaktiviert die Lupe
  * 
  * Technischer Ansatz:
- * - Nutzt CSS transform mit scale(1.5) für die Vergrößerung
- * - Positioniert den vergrößerten Layer so, dass der Bereich unter der Maus in der Lupe erscheint
- * - Für eine perfekte Vergrößerung würde man html2canvas nutzen, aber das ist zu performance-intensiv
- * - Dieser Ansatz nutzt einen visuellen Trick mit CSS transform
+ * - Nutzt einen gespiegelten Body-Layer mit CSS transform
+ * - Skaliert und positioniert den Layer so, dass der Bereich unter der Maus in der Lupe erscheint
+ * - Der gesamte Body-Inhalt wird in einen Layer kopiert und skaliert
  */
 export default function Magnifier() {
-  const { isMagnifierActive } = useMagnifier();
+  const { isMagnifierActive, toggleMagnifier } = useMagnifier();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const magnifierRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const cloneRef = useRef<HTMLElement | null>(null);
 
   // Smooth Spring-Animation für flüssige Cursor-Verfolgung (60fps)
   const mouseX = useMotionValue(0);
@@ -35,15 +37,34 @@ export default function Magnifier() {
 
   // Transform für den vergrößerten Inhalt
   // Berechne die Position so, dass der Bereich unter der Maus in der Lupe erscheint
+  const scale = 1.5;
   const contentX = useTransform(x, (value) => {
-    // Offset: Verschiebe den Inhalt so, dass der Punkt unter der Maus in der Mitte der Lupe ist
-    // Bei 1.5x Skalierung: Verschiebe um -value * (1.5 - 1) / 1.5 = -value * 0.333...
-    return -value * 0.333 + 80;
+    // Verschiebe den Inhalt so, dass der Punkt unter der Maus in der Mitte der Lupe ist
+    // Bei 1.5x Skalierung: Verschiebe um -value * (scale - 1) / scale
+    return -value * (scale - 1) / scale + 80;
   });
   const contentY = useTransform(y, (value) => {
-    return -value * 0.333 + 80;
+    return -value * (scale - 1) / scale + 80;
   });
 
+  // ESC-Taste Handler
+  useEffect(() => {
+    if (!isMagnifierActive) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isMagnifierActive) {
+        toggleMagnifier();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMagnifierActive, toggleMagnifier]);
+
+  // Mouse-Move Handler
   useEffect(() => {
     if (!isMagnifierActive) return;
 
@@ -59,6 +80,62 @@ export default function Magnifier() {
       window.removeEventListener("mousemove", handleMouseMove);
     };
   }, [isMagnifierActive, mouseX, mouseY]);
+
+  // Spiegle den gesamten Body-Inhalt für die Vergrößerung
+  useEffect(() => {
+    if (!isMagnifierActive || !contentRef.current) {
+      // Entferne den Klon, wenn die Lupe deaktiviert ist
+      if (cloneRef.current && cloneRef.current.parentNode) {
+        cloneRef.current.parentNode.removeChild(cloneRef.current);
+        cloneRef.current = null;
+      }
+      return;
+    }
+
+    const main = document.querySelector("main");
+    if (!main) return;
+
+    // Entferne alten Klon, falls vorhanden
+    if (cloneRef.current && cloneRef.current.parentNode) {
+      cloneRef.current.parentNode.removeChild(cloneRef.current);
+    }
+
+    // Erstelle einen Klon des Main-Inhalts
+    const clone = main.cloneNode(true) as HTMLElement;
+    clone.className = "magnifier-content-clone";
+    clone.style.position = "fixed";
+    clone.style.top = "0";
+    clone.style.left = "0";
+    clone.style.width = "100vw";
+    clone.style.height = "100vh";
+    clone.style.pointerEvents = "none";
+    clone.style.zIndex = "-1";
+    clone.style.background = "transparent";
+    clone.style.overflow = "hidden";
+    
+    // Entferne alle interaktiven Elemente aus dem Klon
+    const interactiveElements = clone.querySelectorAll("button, a, input, select, textarea, [role='button']");
+    interactiveElements.forEach((el) => {
+      (el as HTMLElement).style.pointerEvents = "none";
+      (el as HTMLElement).setAttribute("tabindex", "-1");
+    });
+
+    // Entferne Header und andere Overlays aus dem Klon
+    const header = clone.querySelector("header");
+    if (header) {
+      header.remove();
+    }
+
+    contentRef.current.appendChild(clone);
+    cloneRef.current = clone;
+
+    return () => {
+      if (cloneRef.current && cloneRef.current.parentNode) {
+        cloneRef.current.parentNode.removeChild(cloneRef.current);
+        cloneRef.current = null;
+      }
+    };
+  }, [isMagnifierActive]);
 
   if (!isMagnifierActive) return null;
 
@@ -96,21 +173,19 @@ export default function Magnifier() {
         transition={{ duration: 0.2 }}
       >
         {/* Vergrößerter Inhalt Layer - Skaliert den gesamten Viewport */}
-        {/* Dieser Layer wird durch CSS transform skaliert und positioniert */}
         <motion.div
+          ref={contentRef}
           className="fixed inset-0 pointer-events-none"
           style={{
             x: contentX,
             y: contentY,
             width: "100vw",
             height: "100vh",
-            scale: 1.5,
+            scale: scale,
             transformOrigin: "0 0",
             willChange: "transform",
-            // Nutze einen Trick: Erstelle einen Layer, der den gesamten Body-Inhalt spiegelt
-            // Der tatsächliche Inhalt wird durch den Body gerendert
-            // Für eine perfekte Vergrößerung würde man html2canvas nutzen, aber das ist zu performance-intensiv
             background: "transparent",
+            overflow: "hidden",
           }}
         />
 
