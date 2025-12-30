@@ -24,6 +24,10 @@
         "uk": "UK",
         "ru": "RU",
         "tu": "TU"
+      },
+      "magnifier": {
+        "tooltip": "Okuma yardımını etkinleştir",
+        "aria_label": "Okuma yardımını aç/kapat"
       }
     },
     "hero": {

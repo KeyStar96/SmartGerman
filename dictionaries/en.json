@@ -24,6 +24,10 @@
         "uk": "UK",
         "ru": "RU",
         "tu": "TU"
+      },
+      "magnifier": {
+        "tooltip": "Activate reading aid",
+        "aria_label": "Toggle reading aid"
       }
     },
     "hero": {

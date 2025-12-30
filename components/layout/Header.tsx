@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Globe, Sun, Moon, ChevronDown } from "lucide-react";
+import { Globe, Sun, Moon, ChevronDown, ZoomIn } from "lucide-react";
+import { useMagnifier } from "@/lib/context/MagnifierContext";
 
 interface HeaderProps {
   lang: string;
@@ -25,6 +26,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { isMagnifierActive, toggleMagnifier } = useMagnifier();
 
   useEffect(() => {
     // Initialisierung des Themes
@@ -148,6 +150,29 @@ export default function Header({ lang, dictionary }: HeaderProps) {
                 <Sun className="w-5 h-5 text-white" />
               ) : (
                 <Moon className="w-5 h-5 text-[#1A1A1A]" />
+              )}
+            </button>
+
+            {/* Magnifier Toggle Button */}
+            <button
+              onClick={toggleMagnifier}
+              className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 relative ${getTextColor()}`}
+              aria-label={dictionary.header.magnifier.aria_label}
+              title={dictionary.header.magnifier.tooltip}
+            >
+              <ZoomIn 
+                className={`w-5 h-5 transition-all duration-300 ${
+                  isMagnifierActive 
+                    ? isDarkMode 
+                      ? "text-brand-orange animate-pulse" 
+                      : "text-brand-orange"
+                    : isDarkMode 
+                      ? "text-white" 
+                      : "text-[#1A1A1A]"
+                }`}
+              />
+              {isMagnifierActive && (
+                <span className="absolute top-0 right-0 w-2 h-2 bg-brand-orange rounded-full animate-ping" />
               )}
             </button>
 
