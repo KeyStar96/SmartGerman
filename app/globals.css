@@ -118,7 +118,12 @@ body {
     /* Magnifier: Verhindere Layout-Shifts und optimiere Performance */
     .magnifier-content-clone {
       contain: layout style paint;
-      transform: translateZ(0);
+      transform: translate3d(0, 0, 0);
       backface-visibility: hidden;
+      will-change: transform;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      image-rendering: crisp-edges;
     }
   }

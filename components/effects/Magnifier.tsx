@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useLayoutEffect } from "react";
+import { useEffect, useRef, useLayoutEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMagnifier } from "@/lib/context/MagnifierContext";
 import { useLenis } from "lenis/react";
@@ -11,10 +11,10 @@ import { useLenis } from "lenis/react";
  * Technische Spezifikationen:
  * - Mathematisch korrekte Positionierung via getBoundingClientRect()
  * - Scharfer Text durch DOM-Cloning mit größerer Schriftgröße (kein scale())
- * - Dynamische Scroll-Synchronisation mit Lenis
+ * - Dynamische Scroll-Synchronisation mit Lenis (synchrone Updates)
  * - 60fps Performance durch direkte Style-Updates via useRef
  * 
- * @performance: Nutzt requestAnimationFrame für flüssige Updates
+ * @performance: Nutzt requestAnimationFrame für Mousemove, direkte Updates bei Scroll
  * @accessibility: ESC-Taste deaktiviert die Lupe
  */
 export default function Magnifier() {
@@ -24,6 +24,7 @@ export default function Magnifier() {
   const cloneRef = useRef<HTMLElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const containerRectRef = useRef<DOMRect | null>(null);
+  const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // iOS-typische Vergrößerung und Lupe-Dimensionen
   const zoomFactor = 1.6;
@@ -34,26 +35,56 @@ export default function Magnifier() {
   // Aktuelle Mausposition (wird von Mouse-Event gesetzt)
   const mousePosRef = useRef({ x: 0, y: 0 });
 
-  // Lenis Scroll-Position live abgreifen
-  useLenis(({ scroll }) => {
-    if (isMagnifierActive) {
-      // Aktualisiere Container-Rect bei Scroll-Änderungen
-      updateContainerRect();
-      // Trigger Update
-      requestUpdate();
-    }
-  });
-
-  // Aktualisiere Container-Rect (wird bei Scroll und Resize aufgerufen)
-  const updateContainerRect = () => {
+  // ============================================================================
+  // ROBUSTE CONTAINER-SELEKTION
+  // ============================================================================
+  const getContainerElement = (): HTMLElement | null => {
+    // 1. Versuche main-content zu finden
     const mainContent = document.getElementById("main-content");
     if (mainContent) {
-      containerRectRef.current = mainContent.getBoundingClientRect();
+      return mainContent;
     }
+
+    // 2. Fallback: Erstes scrollbares Parent-Element
+    const scrollableParent = document.querySelector('[data-scroll-container]') as HTMLElement;
+    if (scrollableParent) {
+      return scrollableParent;
+    }
+
+    // 3. Fallback: Body
+    return document.body;
   };
 
-  // Haupt-Update-Funktion: Berechnet Position und Content-Offset
-  const updateMagnifier = () => {
+  // ============================================================================
+  // CONTAINER-RECT AKTUALISIERUNG (robust)
+  // ============================================================================
+  const updateContainerRect = useCallback(() => {
+    const container = getContainerElement();
+    if (container) {
+      containerRectRef.current = container.getBoundingClientRect();
+    } else {
+      // Fallback auf viewport
+      containerRectRef.current = new DOMRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+  }, []);
+
+  // ============================================================================
+  // RENDERING-OPTIMIERUNG FÜR SCHARFEN TEXT
+  // ============================================================================
+  const optimizeRendering = useCallback((element: HTMLElement) => {
+    element.style.transform = "translate3d(0, 0, 0)";
+    element.style.backfaceVisibility = "hidden";
+    element.style.willChange = "transform";
+    (element.style as any).webkitFontSmoothing = "antialiased";
+    (element.style as any).MozOsxFontSmoothing = "grayscale";
+    element.style.textRendering = "optimizeLegibility";
+    (element.style as any).imageRendering = "crisp-edges";
+  }, []);
+
+  // ============================================================================
+  // HAUPT-UPDATE-FUNKTION: Berechnet Position und Content-Offset
+  // ============================================================================
+  const updateMagnifier = useCallback(() => {
     if (!isMagnifierActive || !lensRef.current || !contentRef.current || !containerRectRef.current) {
       return;
     }
@@ -68,12 +99,28 @@ export default function Magnifier() {
 
     // Berechne Content-Offset innerhalb der Lupe
     // Formel: pos = -(localCoord * zoomFactor - lensSize / 2)
-    const contentX = -(xLocal * zoomFactor - radius);
-    const contentY = -(yLocal * zoomFactor - radius);
+    // KRITISCH: Runde auf ganze Pixel (verhindert Subpixel-Blur)
+    const contentX = Math.round(-(xLocal * zoomFactor - radius));
+    const contentY = Math.round(-(yLocal * zoomFactor - radius));
 
     // Position der Lupe (schwebt über dem Cursor)
-    const lensX = mouseX - radius;
-    const lensY = mouseY - radius - offsetUp;
+    // KRITISCH: Runde auf ganze Pixel
+    const lensX = Math.round(mouseX - radius);
+    const lensY = Math.round(mouseY - radius - offsetUp);
+
+    // DEBUG-AUSGABE (temporär - hilft Offset-Probleme zu identifizieren)
+    console.table({
+      "Mouse X": mouseX,
+      "Mouse Y": mouseY,
+      "Rect Left": rect.left,
+      "Rect Top": rect.top,
+      "Local X": xLocal,
+      "Local Y": yLocal,
+      "Content X": contentX,
+      "Content Y": contentY,
+      "Lens X": lensX,
+      "Lens Y": lensY,
+    });
 
     // Direkte Style-Updates für 60fps Performance (kein React Re-Render)
     if (lensRef.current) {
@@ -83,10 +130,41 @@ export default function Magnifier() {
     if (contentRef.current) {
       contentRef.current.style.transform = `translate(${contentX}px, ${contentY}px)`;
     }
-  };
+  }, [isMagnifierActive, zoomFactor, radius, offsetUp]);
 
-  // Request Animation Frame Wrapper
-  const requestUpdate = () => {
+  // ============================================================================
+  // DIREKTE UPDATE-FUNKTION (für Scroll-Events, keine RAF)
+  // ============================================================================
+  const updateMagnifierDirect = useCallback(() => {
+    updateContainerRect();
+    // Direkter Aufruf ohne RAF für synchrone Scroll-Updates
+    if (isMagnifierActive && lensRef.current && contentRef.current && containerRectRef.current) {
+      const rect = containerRectRef.current;
+      const { x: mouseX, y: mouseY } = mousePosRef.current;
+
+      const xLocal = mouseX - rect.left;
+      const yLocal = mouseY - rect.top;
+
+      const contentX = Math.round(-(xLocal * zoomFactor - radius));
+      const contentY = Math.round(-(yLocal * zoomFactor - radius));
+
+      const lensX = Math.round(mouseX - radius);
+      const lensY = Math.round(mouseY - radius - offsetUp);
+
+      if (lensRef.current) {
+        lensRef.current.style.transform = `translate(${lensX}px, ${lensY}px)`;
+      }
+
+      if (contentRef.current) {
+        contentRef.current.style.transform = `translate(${contentX}px, ${contentY}px)`;
+      }
+    }
+  }, [isMagnifierActive, updateContainerRect, zoomFactor, radius, offsetUp]);
+
+  // ============================================================================
+  // REQUEST ANIMATION FRAME WRAPPER (für Mousemove, 60fps Performance)
+  // ============================================================================
+  const requestUpdate = useCallback(() => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
     }
@@ -94,15 +172,29 @@ export default function Magnifier() {
       updateMagnifier();
       animationFrameRef.current = null;
     });
-  };
+  }, [updateMagnifier]);
 
-  // Mouse-Move Handler
+  // ============================================================================
+  // LENIS SCROLL-SYNCHRONISATION (synchrone Updates)
+  // ============================================================================
+  useLenis((lenis) => {
+    if (isMagnifierActive && mousePosRef.current.x > 0 && mousePosRef.current.y > 0) {
+      // SOFORT aktualisieren, nicht in RAF (verhindert "Nachhängen")
+      updateMagnifierDirect();
+    }
+  });
+
+  // ============================================================================
+  // MOUSE-MOVE HANDLER (mit Container-Rect Update bei jedem Event)
+  // ============================================================================
   useEffect(() => {
     if (!isMagnifierActive) return;
 
     const handleMove = (e: MouseEvent) => {
       mousePosRef.current = { x: e.clientX, y: e.clientY };
-      updateContainerRect();
+      // KRITISCH: Aktualisiere Container-Rect bei JEDEM mousemove-Event
+      containerRectRef.current = getContainerElement()?.getBoundingClientRect() || null;
+      // RAF für 60fps Performance
       requestUpdate();
     };
 
@@ -112,11 +204,14 @@ export default function Magnifier() {
       window.removeEventListener("mousemove", handleMove);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
     };
-  }, [isMagnifierActive]);
+  }, [isMagnifierActive, requestUpdate]);
 
-  // ESC-Taste Handler
+  // ============================================================================
+  // ESC-TASTE HANDLER
+  // ============================================================================
   useEffect(() => {
     if (!isMagnifierActive) return;
 
@@ -133,25 +228,43 @@ export default function Magnifier() {
     };
   }, [isMagnifierActive, toggleMagnifier]);
 
-  // Resize Handler: Aktualisiere Container-Rect und Viewport-Größe
+  // ============================================================================
+  // RESIZE HANDLER (mit Debounce für Performance)
+  // ============================================================================
   useEffect(() => {
     if (!isMagnifierActive) return;
 
-    const handleResize = () => {
-      updateContainerRect();
-      requestUpdate();
+    const debouncedResize = () => {
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+      resizeTimeoutRef.current = setTimeout(() => {
+        updateContainerRect();
+        updateMagnifierDirect();
+      }, 100);
     };
 
-    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("resize", debouncedResize, { passive: true });
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", debouncedResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+        resizeTimeoutRef.current = null;
+      }
     };
-  }, [isMagnifierActive]);
+  }, [isMagnifierActive, updateContainerRect, updateMagnifierDirect]);
 
-  // DOM-Cloning: Erstelle scharfen Content-Klon mit größerer Schriftgröße
+  // ============================================================================
+  // DOM-CLONING: Erstelle scharfen Content-Klon mit größerer Schriftgröße
+  // ============================================================================
   useLayoutEffect(() => {
     if (!isMagnifierActive) {
+      // Cleanup: Entferne RAF VOR dem Entfernen des DOMs
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
       // Entferne den Klon, wenn die Lupe deaktiviert ist
       if (cloneRef.current && cloneRef.current.parentNode) {
         cloneRef.current.parentNode.removeChild(cloneRef.current);
@@ -162,8 +275,8 @@ export default function Magnifier() {
 
     // Warte kurz, damit der main-content bereit ist
     const timeoutId = setTimeout(() => {
-      const mainContent = document.getElementById("main-content");
-      if (!mainContent || !contentRef.current) return;
+      const container = getContainerElement();
+      if (!container || !contentRef.current) return;
 
       // Initialisiere Container-Rect
       updateContainerRect();
@@ -173,12 +286,12 @@ export default function Magnifier() {
         cloneRef.current.parentNode.removeChild(cloneRef.current);
       }
 
-      // Erstelle einen tiefen Klon des Main-Inhalts
-      const clone = mainContent.cloneNode(true) as HTMLElement;
+      // Erstelle einen tiefen Klon des Container-Inhalts
+      const clone = container.cloneNode(true) as HTMLElement;
       clone.className = "magnifier-content-clone";
       
       // Setze Basis-Styles für den Klon
-      const rect = containerRectRef.current || mainContent.getBoundingClientRect();
+      const rect = containerRectRef.current || container.getBoundingClientRect();
       
       clone.style.position = "absolute";
       clone.style.top = "0px";
@@ -192,15 +305,14 @@ export default function Magnifier() {
       clone.style.padding = "0";
       clone.style.zIndex = "1";
       
-      // GPU-Optimierung für scharfe Schrift
-      clone.style.transform = "translateZ(0)";
-      clone.style.backfaceVisibility = "hidden";
-      clone.style.willChange = "transform";
-      (clone.style as any).webkitFontSmoothing = "antialiased";
-      (clone.style as any).fontSmoothing = "antialiased";
+      // CSS CONTAINMENT für Performance
+      clone.style.contain = "layout style paint";
+      
+      // Rendering-Optimierung für scharfe Schrift
+      optimizeRendering(clone);
       
       // Wichtig: Übernehme Styles vom Original
-      const computedStyle = window.getComputedStyle(mainContent);
+      const computedStyle = window.getComputedStyle(container);
       clone.style.color = computedStyle.color;
       clone.style.fontFamily = computedStyle.fontFamily;
       clone.style.backgroundColor = computedStyle.backgroundColor;
@@ -214,15 +326,12 @@ export default function Magnifier() {
         const fontSize = parseFloat(originalStyle.fontSize);
         
         if (fontSize > 0) {
-          // Erhöhe Schriftgröße um zoomFactor (z.B. 1.6x)
-          element.style.fontSize = `${fontSize * zoomFactor}px`;
+          // KRITISCH: Runde Schriftgröße (verhindert Subpixel-Rendering)
+          element.style.fontSize = `${Math.round(fontSize * zoomFactor)}px`;
         }
 
-        // GPU-Optimierung für alle Elemente
-        element.style.transform = "translateZ(0)";
-        element.style.backfaceVisibility = "hidden";
-        (element.style as any).webkitFontSmoothing = "antialiased";
-        (element.style as any).fontSmoothing = "antialiased";
+        // Rendering-Optimierung für alle Elemente
+        optimizeRendering(element);
       });
       
       // Entferne alle interaktiven Elemente aus dem Klon
@@ -245,12 +354,17 @@ export default function Magnifier() {
 
     return () => {
       clearTimeout(timeoutId);
+      // Cleanup: Entferne RAF VOR dem Entfernen des DOMs
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
       if (cloneRef.current && cloneRef.current.parentNode) {
         cloneRef.current.parentNode.removeChild(cloneRef.current);
         cloneRef.current = null;
       }
     };
-  }, [isMagnifierActive, zoomFactor]);
+  }, [isMagnifierActive, zoomFactor, updateContainerRect, optimizeRendering]);
 
   return (
     <AnimatePresence>
@@ -290,7 +404,7 @@ export default function Magnifier() {
                 transformOrigin: "0 0",
                 willChange: "transform",
                 backfaceVisibility: "hidden",
-                transform: "translateZ(0)",
+                transform: "translate3d(0, 0, 0)",
                 WebkitFontSmoothing: "antialiased",
               }}
               className="origin-top-left"
