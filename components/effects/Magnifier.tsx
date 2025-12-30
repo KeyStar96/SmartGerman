@@ -20,6 +20,7 @@ import { useMagnifier } from "@/lib/context/MagnifierContext";
 export default function Magnifier() {
   const { isMagnifierActive, toggleMagnifier } = useMagnifier();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [scrollY, setScrollY] = useState(0);
   const [viewportSize, setViewportSize] = useState({ 
     width: typeof window !== "undefined" ? window.innerWidth : 0, 
     height: typeof window !== "undefined" ? window.innerHeight : 0 
@@ -31,49 +32,60 @@ export default function Magnifier() {
   // Smooth Spring-Animation für flüssige Cursor-Verfolgung (60fps)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const scrollYValue = useMotionValue(0);
   const springConfig = { damping: 25, stiffness: 300 };
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
 
-  // Transform für die Lupe-Position (zentriert am Cursor)
-  const magnifierX = useTransform(x, (value) => value - 80);
-  const magnifierY = useTransform(y, (value) => value - 80);
+  // Lupe-Dimensionen
+  const magnifierWidth = 160;
+  const magnifierHeight = 160;
+  const magnifierCenterX = magnifierWidth / 2; // 80
+  const magnifierCenterY = magnifierHeight / 2; // 80
+  const scale = 1.5;
+
+  // Transform für die Lupe-Position (zentriert am Cursor mit translate(-50%, -50%))
+  // Die Lupe wird mit left/top positioniert und dann mit transform zentriert
+  const magnifierX = useTransform(x, (value) => value);
+  const magnifierY = useTransform(y, (value) => value);
 
   // Transform für den vergrößerten Inhalt
-  // Die Lupe ist bei (x - 80, y - 80) positioniert (fixed)
-  // Der Inhalt wird um scale skaliert und muss so positioniert werden, dass der Punkt bei (x, y) im Original
-  // bei (80, 80) in der Lupe erscheint (Mitte der Lupe)
-  // 
-  // Mathematische Herleitung:
-  // - Im Original ist der Punkt bei (x, y)
-  // - Nach Skalierung um scale ist der Punkt bei (x/scale, y/scale) im skalierten Koordinatensystem
-  // - Die Lupe ist bei (x - 80, y - 80) positioniert
-  // - Innerhalb der Lupe ist die Mitte bei (80, 80) relativ zur Lupe
-  // - Um den Punkt von (x/scale, y/scale) auf (80, 80) zu bringen:
-  //   positionX = 80 - x/scale
-  //   positionY = 80 - y/scale
-  const scale = 1.5;
+  // Formel: x = (LupenBreite / 2) - (MausX * Scale)
+  //         y = (LupenHöhe / 2) - (MausY * Scale)
+  // Der Inhalt muss sich exakt entgegengesetzt zur Mausbewegung bewegen, multipliziert mit dem Skalierungsfaktor
   const contentX = useTransform(x, (value) => {
-    // Der Inhalt muss so verschoben werden, dass der Punkt bei (value, y) in der Mitte der Lupe (80, 80) erscheint
-    // Im skalierten Inhalt ist der Punkt bei (value/scale, y/scale)
-    // Um ihn auf (80, 80) zu bringen: position = 80 - value/scale
-    return 80 - value / scale;
+    return magnifierCenterX - (value * scale);
   });
-  const contentY = useTransform(y, (value) => {
-    return 80 - value / scale;
-  });
+  const contentY = useTransform(
+    [y, scrollYValue],
+    ([yValue, scrollYVal]: [number, number]) => {
+      // Berücksichtige window.scrollY für präzise Positionierung beim Scrollen
+      // Die Maus-Position ist relativ zum Viewport, aber der Inhalt kann gescrollt sein
+      return magnifierCenterY - ((yValue + scrollYVal) * scale);
+    }
+  );
 
-  // Viewport-Größe verfolgen
+  // Viewport-Größe und Scroll-Position verfolgen
   useEffect(() => {
     const updateViewportSize = () => {
       setViewportSize({ width: window.innerWidth, height: window.innerHeight });
     };
     
+    const updateScrollY = () => {
+      const scroll = window.scrollY;
+      setScrollY(scroll);
+      scrollYValue.set(scroll);
+    };
+    
     updateViewportSize();
+    updateScrollY();
+    
     window.addEventListener("resize", updateViewportSize);
+    window.addEventListener("scroll", updateScrollY, { passive: true });
     
     return () => {
       window.removeEventListener("resize", updateViewportSize);
+      window.removeEventListener("scroll", updateScrollY);
     };
   }, []);
 
@@ -99,6 +111,7 @@ export default function Magnifier() {
     if (!isMagnifierActive) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      // clientX/Y sind relativ zum Viewport
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
       setMousePos({ x: e.clientX, y: e.clientY });
@@ -213,14 +226,14 @@ export default function Magnifier() {
         ref={magnifierRef}
         className="fixed pointer-events-none z-[100] will-change-transform"
         style={{
-          x: magnifierX,
-          y: magnifierY,
-          width: 160,
-          height: 160,
+          left: magnifierX,
+          top: magnifierY,
+          width: magnifierWidth,
+          height: magnifierHeight,
           borderRadius: "50%",
           clipPath: "circle(50% at 50% 50%)",
-          overflow: "hidden",
-          transform: "translateZ(0)", // GPU-Beschleunigung
+          overflow: "hidden", // Zwingend hidden für korrekte Clipping
+          transform: "translate(-50%, -50%) translateZ(0)", // Zentrierung mit translate(-50%, -50%)
         }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -237,7 +250,7 @@ export default function Magnifier() {
             width: `${viewportSize.width || window.innerWidth}px`,
             height: `${viewportSize.height || window.innerHeight}px`,
             scale: scale,
-            transformOrigin: "0 0",
+            transformOrigin: "0 0", // Top Left für konsistente mathematische Verschiebung
             willChange: "transform",
             background: "transparent",
             overflow: "visible",
