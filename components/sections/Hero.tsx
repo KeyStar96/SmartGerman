@@ -126,7 +126,7 @@ export default function Hero({ dictionary }: HeroProps) {
             }}
           >
             {/* 'Smart' - Theme-aware color, NO whitespace before next span */}
-            <span className="inline-block text-foreground select-none">Smart</span><span className="inline-block hero-german-glow select-none">German</span>
+            <span className="inline-block text-foreground select-none">Smart</span><span className="inline-block text-[#FF5C00] select-none">German</span>
           </h1>
         </div>
         
