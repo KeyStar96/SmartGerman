@@ -51,37 +51,42 @@ export function useScrollReveal3D(
     });
 
     // Timeline für die gesamte Scroll-Animation (Würfel-Metapher)
-    // Phase 1: Aufstellen beim Runterscrollen (0-50% des Scroll-Bereichs)
-    // Phase 2: Nach hinten kippen beim Hochscrollen (50-100% des Scroll-Bereichs)
+    // Phase 1: Schnelles Aufstellen beim Runterscrollen (0-25% des Scroll-Bereichs)
+    // Phase 2: Größerer Bereich bei 0 Grad (25-70% des Scroll-Bereichs)
+    // Phase 3: Nach hinten kippen beim Hochscrollen (70-100% des Scroll-Bereichs)
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
         start: "top bottom", // Startet wenn Element von unten in Viewport kommt
-        end: "bottom center", // Endet wenn der Boden der Sektion die Mitte erreicht - gibt mehr Zeit für die Animation
+        end: "bottom top", // Endet wenn der Boden der Sektion oben raus ist - mehr Scroll-Bereich
         scrub,
         refreshPriority: -1,
       },
     });
 
-    // Phase 1: Aufstellen - Würfel dreht sich, untere Fläche kommt nach vorne
-    // Von +90° auf 0° (von Timeline-Position 0 bis 0.5)
+    // Phase 1: Schnelles Aufstellen - Würfel dreht sich schnell, untere Fläche kommt nach vorne
+    // Von +90° auf 0° (von Timeline-Position 0 bis 0.25) - schneller auf 0° kommen
     tl.to(element, {
       rotateX: 0,
       z: 0,
       opacity: 1,
-      ease: "none",
+      ease: "power2.out", // Leicht beschleunigtes Easing für schnelleres Erreichen
       force3D: true,
     }, 0); // Startet bei Position 0
 
-    // Phase 2: Nach hinten kippen - Würfel dreht sich weiter, obere Fläche geht nach hinten
-    // Von 0° auf -90° (von Timeline-Position 0.5 bis 1.0)
+    // Phase 2: Bleibt bei 0° - größerer Bereich wo die Karten frontal sind
+    // Von Timeline-Position 0.25 bis 0.7 bleibt bei 0°
+    // (Keine Animation nötig, da bereits bei 0°)
+
+    // Phase 3: Nach hinten kippen - Würfel dreht sich weiter, obere Fläche geht nach hinten
+    // Von 0° auf -90° (von Timeline-Position 0.7 bis 1.0) - später nach hinten kippen
     tl.to(element, {
       rotateX: -90,
       z,
       opacity: 0,
-      ease: "none",
+      ease: "power2.in", // Leicht verzögertes Easing für sanfteres Kippen
       force3D: true,
-    }, 0.5); // Startet bei Position 0.5 (Mitte der Timeline)
+    }, 0.7); // Startet bei Position 0.7 (später, damit größerer 0-Grad-Bereich)
 
     return () => {
       tl.kill();
