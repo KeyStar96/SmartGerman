@@ -80,8 +80,8 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300">
-      {/* 1. Ankündigungs-Banner - Endless Marquee */}
-      <div className="w-full bg-[#FF5C00] py-2.5 overflow-hidden relative z-[60] shadow-sm border-b border-white/10">
+      {/* 1. Ankündigungs-Banner - Endless Marquee (Primary Orange) */}
+      <div className="w-full bg-primary-orange py-2.5 overflow-hidden relative z-[60] border-b border-white/10">
         <div className="flex whitespace-nowrap animate-marquee">
           {/* Dupliziere den Content für nahtlosen Loop - gleichmäßige Abstände, mittige Punkte */}
           {[1, 2, 3, 4].map((duplicate) => (
@@ -125,15 +125,15 @@ export default function Header({ lang, dictionary }: HeaderProps) {
           <div className="flex items-center gap-4 md:gap-8">
             <div className="hidden md:flex items-center gap-8 mr-4">
               <Link href="#home" 
-                className={`text-sm font-light hover:text-brand-orange transition-colors ${getTextColor()}`}>
+                className={`text-sm font-light hover:text-primary-orange transition-colors ${getTextColor()}`}>
                 {dictionary.header.nav.home}
               </Link>
               <Link href="#courses" 
-                className={`text-sm font-light hover:text-brand-orange transition-colors ${getTextColor()}`}>
+                className={`text-sm font-light hover:text-primary-orange transition-colors ${getTextColor()}`}>
                 {dictionary.header.nav.courses}
               </Link>
               <Link href="#prices" 
-                className={`text-sm font-light hover:text-brand-orange transition-colors ${getTextColor()}`}>
+                className={`text-sm font-light hover:text-primary-orange transition-colors ${getTextColor()}`}>
                 {dictionary.header.nav.prices}
               </Link>
             </div>
@@ -168,15 +168,15 @@ export default function Header({ lang, dictionary }: HeaderProps) {
                     className="fixed inset-0 z-40" 
                     onClick={() => setIsLanguageDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-[#1A1A1A] rounded-lg shadow-xl border border-black/10 dark:border-white/10 z-50 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-dm-surface-teal rounded-lg border border-black/10 dark:border-dm-border-slate z-50 overflow-hidden">
                     {languages.map((language) => (
                       <button
                         key={language.code}
                         onClick={() => switchLanguage(language.code)}
-                        className={`w-full px-4 py-2 text-left text-xs font-medium uppercase tracking-widest transition-colors ${
+                        className={`w-full px-4 py-2 text-left text-xs font-medium uppercase tracking-widest transition-colors border-b border-black/5 dark:border-dm-border-slate/30 last:border-b-0 ${
                           lang === language.code
-                            ? "bg-brand-orange/20 text-brand-orange"
-                            : "text-foreground hover:bg-black/5 dark:hover:bg-white/5"
+                            ? "bg-primary-orange/20 text-primary-orange dark:bg-primary-orange/10"
+                            : "text-foreground hover:bg-black/5 dark:hover:bg-dm-surface-teal"
                         }`}
                       >
                         {language.label}
@@ -189,11 +189,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
             
             <Link 
               href={`/${lang}/anmeldung`}
-              className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
-                !isDarkMode
-                  ? "bg-black text-white hover:bg-brand-orange hover:text-white"
-                  : "bg-[#FF5C00] text-white hover:bg-[#FF6F1A] hover:scale-105"
-              }`}
+              className="btn-primary px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105"
             >
               {dictionary.header.nav.enroll}
             </Link>

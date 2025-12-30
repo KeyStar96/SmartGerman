@@ -10,15 +10,37 @@ const config: Config = {
   theme: {
     extend: {
         colors: {
-            background: "#050505", // Wird via CSS-Variablen überschrieben
+            background: "var(--background)", // Wird via CSS-Variablen überschrieben
+            foreground: "var(--foreground)",
+            // Spaceship UI Color System
+            primary: {
+              orange: "var(--primary-orange)", // hsl(14, 100%, 50%)
+            },
+            accent: {
+              cyan: "var(--accent-cyan)", // hsl(180, 100%, 50%)
+            },
+            // Darkmode Spaceship Colors
+            dm: {
+              "surface-teal": "var(--dm-surface-teal)", // hsl(184, 96%, 9%)
+              "border-slate": "var(--dm-border-slate)", // hsl(225, 17%, 26%)
+              "text-main": "var(--dm-text-main)", // hsl(0, 0%, 95%)
+              "text-muted": "var(--dm-text-muted)", // hsl(225, 10%, 60%)
+            },
+            // Lightmode Organic Scholar Colors
+            lm: {
+              "bg-bone": "var(--lm-bg-bone)", // hsl(45, 33%, 96%)
+              "text-espresso": "var(--lm-text-espresso)", // hsl(0, 10%, 27%)
+              "accent-sage": "var(--lm-accent-sage)", // hsl(158, 55%, 78%)
+            },
+            // Legacy Brand Support
             brand: {
               blue: "#0047FF",    // Das Blau aus deinem Logo
-              orange: "#FF5C00",  // Dein Akzent-Orange
+              orange: "var(--primary-orange)",  // Verwendet jetzt CSS-Variable
               dark: "#001A3D",
             },
             glass: {
-              dark: "rgba(255, 255, 255, 0.03)",
-              light: "rgba(0, 0, 0, 0.03)",
+              dark: "var(--dm-surface-teal)",
+              light: "rgba(255, 255, 255, 0.5)",
             }
           },
       animation: {

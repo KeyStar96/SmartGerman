@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { Instrument_Serif } from "next/font/google";
-import ScrollIndicator from "@/components/effects/ScrollIndicator";
 
 // Instrument Serif für Headline - Awwwards-Look mit hochkontrastigen Serifen
 const instrumentSerif = Instrument_Serif({ 
@@ -76,7 +75,6 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const badgeRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -208,56 +206,6 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       });
     }
 
-    // 8. Scroll-Indikator: Sichtbar am Anfang, verschwindet beim Scrollen, erscheint wieder beim Zurückkommen
-    if (scrollIndicatorRef.current) {
-      // Initial: Sichtbar mit immediateRender - garantiert sichtbar
-      gsap.set(scrollIndicatorRef.current, {
-        opacity: 1,
-        y: 0,
-        force3D: true,
-        immediateRender: true,
-      });
-
-      // Warte kurz, damit der ScrollIndicator gerendert ist
-      const scrollTrigger = ScrollTrigger.create({
-        trigger: container.current,
-        start: "top top",
-        end: "30% top", // Verschwindet nach 30% Scroll der Hero-Section
-        scrub: 0.5,
-        onUpdate: (self) => {
-          // Progress von 0 (oben) bis 1 (30% gescrollt)
-          const progress = self.progress;
-          if (scrollIndicatorRef.current) {
-            gsap.set(scrollIndicatorRef.current, {
-              opacity: Math.max(0, 1 - progress), // Sicherstellen, dass opacity nicht negativ wird
-              y: progress * 20,
-              force3D: true,
-            });
-          }
-        },
-        onEnter: () => {
-          // Beim ersten Scrollen: Progress sollte 0 sein
-          if (scrollIndicatorRef.current) {
-            gsap.set(scrollIndicatorRef.current, {
-              opacity: 1,
-              force3D: true,
-            });
-          }
-        },
-        markers: false,
-      });
-
-      // Sicherstellen, dass der ScrollIndicator initial sichtbar ist
-      requestAnimationFrame(() => {
-        if (scrollIndicatorRef.current) {
-          gsap.set(scrollIndicatorRef.current, {
-            opacity: 1,
-            force3D: true,
-          });
-        }
-      });
-    }
-
   }, { scope: container });
 
   return (
@@ -268,16 +216,16 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         minHeight: 'calc(100vh - 128px)', // 100vh minus pt-32 (128px) vom main-Element
       }}
     >
-      {/* SVG-Punktmuster Hintergrund (wissenschaftliches Millimeterpapier) */}
+      {/* SVG-Punktmuster Hintergrund (Spaceship Instruction Manual Grid) */}
       <div 
         className="absolute inset-0 pointer-events-none"
-        style={{ opacity: 0.05 }}
+        style={{ opacity: 0.03 }}
         aria-hidden="true"
       >
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="grid-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1" fill="currentColor" className="text-foreground" />
+              <circle cx="2" cy="2" r="0.5" fill="currentColor" className="text-foreground dark:text-dm-border-slate" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid-pattern)" />
@@ -294,13 +242,13 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             transformStyle: "preserve-3d"
           }}
         >
-          {/* Badge über dem Markennamen */}
+          {/* Badge über dem Markennamen - Spaceship UI: Präzise Linie */}
           <div 
             ref={badgeRef}
-            className="mb-6 inline-block px-4 py-2 border border-black/50 dark:border-white/50 rounded-full"
+            className="mb-6 inline-block px-4 py-2 border border-black/20 dark:border-dm-border-slate rounded-full"
             style={{ opacity: 0 }}
           >
-            <span className="text-xs uppercase tracking-widest text-foreground/70 font-medium">
+            <span className="text-xs uppercase tracking-widest text-foreground/70 dark:text-dm-text-muted font-medium">
               {dictionary.hero.badge}
             </span>
           </div>
@@ -317,15 +265,15 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             <span className="inline-block text-foreground select-none font-bold" style={{ fontWeight: 700 }}>
               {dictionary.hero.brand_name_part1}
             </span>
-            <span className="inline-block text-[#FF5C00] select-none" style={{ fontWeight: 800 }}>
+            <span className="inline-block text-primary-orange select-none" style={{ fontWeight: 800 }}>
               {dictionary.hero.brand_name_part2}
             </span>
           </h1>
 
-          {/* Wissenschaftliche Headline (Instrument Serif - Awwwards-Look) */}
+          {/* Wissenschaftliche Headline (Instrument Serif - Spaceship UI) */}
           <h2 
             ref={headlineRef}
-            className={`${instrumentSerif.className} text-3xl md:text-4xl lg:text-5xl text-foreground font-medium mb-8 max-w-4xl mx-auto leading-tight`}
+            className={`${instrumentSerif.className} text-3xl md:text-4xl lg:text-5xl font-medium mb-8 max-w-4xl mx-auto leading-tight text-lm-text-espresso dark:text-dm-text-main`}
             style={{ 
               opacity: 0,
               fontFeatureSettings: '"liga" 1, "kern" 1', // Hochkontrast-Serifen für Eleganz
@@ -346,10 +294,10 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             transformOrigin: "center bottom"
           }}
         >
-          {/* Subline in schmalem Container (Inter/Geist Sans - modernes Interface) */}
+          {/* Subline in schmalem Container (Inter/Geist Sans - Spaceship UI) */}
           <p 
             ref={sublineRef}
-            className="text-base md:text-lg text-foreground/70 max-w-2xl mx-auto font-light leading-relaxed mb-12"
+            className="text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-12 text-foreground/70 dark:text-dm-text-muted"
             style={{ 
               opacity: 0,
               letterSpacing: '-0.01em', // Leicht kompakter für modernes Interface-Feeling
@@ -359,36 +307,20 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             {highlightKeywords(dictionary.hero.subline, lang)}
           </p>
 
-          {/* CTA-Buttons */}
+          {/* CTA-Buttons - Spaceship UI: Primär Orange, Sekundär Ghost mit Cyan-Hover */}
           <div className="flex flex-wrap gap-6 justify-center items-center">
-            {/* Primary CTA: Outline-Button mit 2px Rahmen */}
-            <button className="px-8 py-4 border-2 border-black/50 dark:border-white/50 rounded-full font-semibold uppercase tracking-widest text-sm hover:bg-black/5 dark:hover:bg-white/5 hover:border-black/80 dark:hover:border-white/80 transition-all duration-300 gpu-render">
+            {/* Primary CTA: Solid Orange (nur für kritische CTAs) */}
+            <button className="btn-primary px-8 py-4 rounded-full font-semibold uppercase tracking-widest text-sm gpu-render">
               {dictionary.hero.cta_primary}
             </button>
             
-            {/* Secondary CTA: Textlink mit animiertem Underline */}
-            <button className="relative px-4 py-2 font-medium uppercase tracking-widest text-sm text-foreground/70 hover:text-foreground transition-colors duration-300 group">
+            {/* Secondary CTA: Ghost-Button mit Cyan-Hover (Darkmode) / Espresso-Hover (Lightmode) */}
+            <button className="btn-secondary relative px-4 py-2 rounded-full font-medium uppercase tracking-widest text-sm transition-all duration-300 group">
               {dictionary.hero.cta_secondary}
-              <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground/70 group-hover:w-full transition-all duration-300"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-accent-cyan dark:bg-accent-cyan group-hover:w-full transition-all duration-300"></span>
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Scroll Indikator - Fixiert am unteren Rand des Viewports */}
-      <div 
-        ref={scrollIndicatorRef}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center pointer-events-none"
-        style={{ 
-          opacity: 1,
-          visibility: "visible",
-          display: "flex",
-        }}
-      >
-        <span className="text-[10px] uppercase tracking-[0.2em] mb-2 text-foreground/60 font-medium whitespace-nowrap">
-          {dictionary.hero.scroll_label}
-        </span>
-        <ScrollIndicator />
       </div>
     </section>
   );

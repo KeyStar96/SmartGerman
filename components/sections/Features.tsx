@@ -29,25 +29,25 @@ export default function Features({ dictionary }: FeaturesProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Features-Daten aus Dictionary
+  // Features-Daten aus Dictionary - Spaceship UI: Orange für kritische Features, Cyan für technische
   const features: FeatureProps[] = [
     {
       title: dictionary.sections.features.native_speakers.title,
       description: dictionary.sections.features.native_speakers.description,
       Icon: UserCheck,
-      color: "#FF5C00" // Brand Orange
+      color: "#FF5C00" // Primary Orange - kritisches Feature
     },
     {
       title: dictionary.sections.features.flexibility.title,
       description: dictionary.sections.features.flexibility.description,
       Icon: Clock,
-      color: "#0047FF" // Brand Blue
+      color: "cyan" // Accent Cyan - technische Micro-Interaction
     },
     {
       title: dictionary.sections.features.methods.title,
       description: dictionary.sections.features.methods.description,
       Icon: Target,
-      color: "#FF5C00" // Brand Orange
+      color: "#FF5C00" // Primary Orange - kritisches Feature
     }
   ];
 
@@ -87,15 +87,15 @@ export default function Features({ dictionary }: FeaturesProps) {
       className="relative w-full min-h-[120vh] py-24 pt-40 flex flex-col items-center justify-start overflow-visible"
     >
       <div className="container mx-auto px-4 max-w-7xl">
-        {/* Header der Sektion */}
+        {/* Header der Sektion - Spaceship UI Typografie */}
         <div ref={headerRef} className="text-center max-w-3xl mx-auto mb-20">
-          <h2 className="text-4xl md:text-6xl font-medium mb-6 leading-tight">
+          <h2 className="text-4xl md:text-6xl font-medium mb-6 leading-tight text-foreground dark:text-dm-text-main">
             {dictionary.sections.features.title_part1}{" "}
-            <span className={`${instrumentSerif.className} text-brand-orange`}>
+            <span className={`${instrumentSerif.className} text-primary-orange`}>
               {dictionary.sections.features.title_part2}
             </span>
           </h2>
-          <p className="text-lg text-foreground/60 leading-relaxed">
+          <p className="text-lg text-foreground/60 dark:text-dm-text-muted leading-relaxed">
             {dictionary.sections.features.intro}
           </p>
         </div>
@@ -119,18 +119,20 @@ export default function Features({ dictionary }: FeaturesProps) {
                 ref={(el) => {
                   if (el) cardsRef.current[index] = el;
                 }}
-                className="group relative h-full glass-panel-enhanced p-8 md:p-10 flex flex-col items-start transition-all duration-500 hover:bg-white/[0.05] dark:hover:bg-white/[0.08]"
+                className="group relative h-full glass-panel-enhanced p-8 md:p-10 flex flex-col items-start transition-all duration-500"
               >
-                {/* Icon Container mit Glow-Effekt */}
+                {/* Icon Container - Spaceship UI: Präzise Linien, Orange/Cyan für technische Icons */}
                 <div 
-                  className="relative mb-8 p-4 rounded-2xl bg-background/50 border border-white/10 group-hover:scale-110 transition-transform duration-500 shadow-lg overflow-hidden"
-                  style={{ color: feature.color }}
+                  className="relative mb-8 p-4 rounded-2xl bg-background/50 dark:bg-dm-surface-teal border border-black/10 dark:border-dm-border-slate group-hover:scale-110 transition-transform duration-500 overflow-hidden"
+                  style={{ 
+                    color: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)"
+                  }}
                 >
-                  {/* Glow-Hintergrund beim Hover */}
+                  {/* Dezenter Glow-Hintergrund beim Hover (nur Darkmode) */}
                   <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl"
+                    className="absolute inset-0 opacity-0 dark:group-hover:opacity-15 transition-opacity duration-500 blur-xl"
                     style={{ 
-                      backgroundColor: feature.color,
+                      backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)",
                       transform: "scale(1.5)",
                     }}
                   />
@@ -141,18 +143,20 @@ export default function Features({ dictionary }: FeaturesProps) {
                   />
                 </div>
 
-                <h3 className="text-2xl font-bold mb-4 tracking-tight">
+                <h3 className="text-2xl font-bold mb-4 tracking-tight text-foreground dark:text-dm-text-main">
                   {feature.title}
                 </h3>
                 
-                <p className="text-foreground/70 leading-relaxed">
+                <p className="text-foreground/70 dark:text-dm-text-muted leading-relaxed">
                   {feature.description}
                 </p>
 
-                {/* Subtiler Deko-Strich am Boden */}
+                {/* Spaceship UI: Präzise 1px-Linie am Boden beim Hover */}
                 <div 
-                  className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 opacity-50"
-                  style={{ backgroundColor: feature.color }}
+                  className="absolute bottom-0 left-0 h-[1px] w-0 group-hover:w-full transition-all duration-700"
+                  style={{ 
+                    backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)"
+                  }}
                 />
               </div>
             </ScrollReveal3DGlass>
