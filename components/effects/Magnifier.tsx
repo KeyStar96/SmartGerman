@@ -40,9 +40,18 @@ export default function Magnifier() {
   const magnifierY = useTransform(y, (value) => value - 80);
 
   // Transform für den vergrößerten Inhalt
-  // Wichtig: Der Punkt bei (x, y) im Original muss bei (80, 80) in der Lupe erscheinen
-  // Bei scale=1.5: Der Punkt bei (x, y) im Original ist bei (x/scale, y/scale) im skalierten Inhalt
-  // Um den Punkt auf (80, 80) zu bringen, muss der Inhalt bei (80 - x/scale, 80 - y/scale) positioniert werden
+  // Die Lupe ist bei (x - 80, y - 80) positioniert (fixed)
+  // Der Inhalt wird um scale skaliert und muss so positioniert werden, dass der Punkt bei (x, y) im Original
+  // bei (80, 80) in der Lupe erscheint (Mitte der Lupe)
+  // 
+  // Mathematische Herleitung:
+  // - Im Original ist der Punkt bei (x, y)
+  // - Nach Skalierung um scale ist der Punkt bei (x/scale, y/scale) im skalierten Koordinatensystem
+  // - Die Lupe ist bei (x - 80, y - 80) positioniert
+  // - Innerhalb der Lupe ist die Mitte bei (80, 80) relativ zur Lupe
+  // - Um den Punkt von (x/scale, y/scale) auf (80, 80) zu bringen:
+  //   positionX = 80 - x/scale
+  //   positionY = 80 - y/scale
   const scale = 1.5;
   const contentX = useTransform(x, (value) => {
     // Der Inhalt muss so verschoben werden, dass der Punkt bei (value, y) in der Mitte der Lupe (80, 80) erscheint
@@ -132,6 +141,10 @@ export default function Magnifier() {
       // Setze Styles für den Klon - nutze aktuelle Viewport-Größe
       const vw = viewportSize.width || window.innerWidth;
       const vh = viewportSize.height || window.innerHeight;
+      
+      // Wichtig: Der Klon muss die gleiche Position wie das Original haben
+      // Das Original startet bei (0, 0) relativ zum Viewport (nach Header-Offset)
+      const mainRect = main.getBoundingClientRect();
       
       clone.style.position = "absolute";
       clone.style.top = "0px";
