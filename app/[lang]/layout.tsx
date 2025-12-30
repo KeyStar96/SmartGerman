@@ -3,9 +3,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import LiquidBackground from "@/components/effects/LiquidBackground";
-import Magnifier from "@/components/effects/Magnifier";
 import Header from "@/components/layout/Header";
-import { MagnifierProvider } from "@/lib/context/MagnifierContext";
 import { getDictionary } from "@/lib/dictionary";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -39,16 +37,13 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
-        <MagnifierProvider>
-          <Header lang={lang} dictionary={dictionary} />
-          <LiquidBackground />
-          <Magnifier />
-          <SmoothScroll>
-            <main id="main-content" className="pt-32 scroll-3d-container"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
-              {children}
-            </main>
-          </SmoothScroll>
-        </MagnifierProvider>
+        <Header lang={lang} dictionary={dictionary} />
+        <LiquidBackground />
+        <SmoothScroll>
+          <main id="main-content" className="pt-32 scroll-3d-container"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
+            {children}
+          </main>
+        </SmoothScroll>
       </body>
     </html>
   );

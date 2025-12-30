@@ -24,10 +24,6 @@
         "uk": "UK",
         "ru": "RU",
         "tu": "TU"
-      },
-      "magnifier": {
-        "tooltip": "Lesehilfe aktivieren",
-        "aria_label": "Lesehilfe ein/ausschalten"
       }
     },
     "hero": {
