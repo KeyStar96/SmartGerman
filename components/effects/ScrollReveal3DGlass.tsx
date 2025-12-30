@@ -31,11 +31,6 @@ export default function ScrollReveal3DGlass({
     inverted,
   });
 
-  // Initiale Transform-Werte für sofortiges Rendering (bevor GSAP läuft)
-  // Invertiert: startet bei -90° (von unten), Standard: startet bei 90° (von hinten)
-  const initialRotateX = inverted ? -90 : 90;
-  const initialZ = -1200;
-
   return (
     <div
       ref={elementRef}
@@ -44,9 +39,6 @@ export default function ScrollReveal3DGlass({
         transformStyle: "preserve-3d",
         transformOrigin: "center bottom",
         willChange: "transform, opacity", // Performance: GPU-Optimierung für Animation
-        // Initiale Werte für sofortiges Rendering (werden von GSAP überschrieben, aber verhindern FOUC)
-        opacity: 0,
-        transform: `perspective(1000px) rotateX(${initialRotateX}deg) translateZ(${initialZ}px)`,
       }}
     >
       {children}

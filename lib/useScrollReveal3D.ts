@@ -84,15 +84,25 @@ export function useScrollReveal3D(
     // Normal: Von +90° auf 0° (von hinten nach vorne)
     // Inverted: Von -90° auf 0° (von unten nach vorne)
     // Von Timeline-Position 0.0 bis 0.2 - 20% der Timeline
-    // Der initiale Zustand wurde bereits mit gsap.set() gesetzt, daher verwenden wir .to()
-    tl.to(element, {
-      rotateX: 0,
-      z: 0,
-      opacity: 1,
-      ease: "none", // Bei scrub muss ease: "none" sein
-      force3D: true,
-      duration: 0.2, // Nimmt 20% der Timeline ein
-    }, 0); // Startet bei Position 0, animiert vom mit gsap.set() gesetzten Zustand
+    // Verwende .fromTo() um Start- und Endzustand explizit zu definieren
+    tl.fromTo(element, 
+      {
+        rotateX: initialRotateX,
+        z: z,
+        opacity: 0,
+        force3D: true,
+      },
+      {
+        rotateX: 0,
+        z: 0,
+        opacity: 1,
+        ease: "none", // Bei scrub muss ease: "none" sein
+        force3D: true,
+        duration: 0.2, // Nimmt 20% der Timeline ein
+        immediateRender: false, // Wichtig: nicht überschreibt gsap.set()
+      }, 
+      0
+    );
 
     // Phase 2: Stabile Lesezone bei 0° (von 0.2 bis 0.8) - 60% der Timeline
     // Expliziter Haltepunkt für stabile Position während des Lesens
