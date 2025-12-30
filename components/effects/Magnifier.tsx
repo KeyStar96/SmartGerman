@@ -14,12 +14,13 @@ import { useMagnifier } from "@/lib/context/MagnifierContext";
  * 
  * Technischer Ansatz:
  * - Nutzt einen gespiegelten Body-Layer mit CSS transform
- * - Skaliert und positioniert den Layer so, dass der Bereich unter der Maus in der Lupe erscheint
- * - Der gesamte Body-Inhalt wird in einen Layer kopiert und skaliert
+ * - Der gesamte Body-Inhalt wird in einen separaten Layer kopiert und skaliert
+ * - Positionierung so, dass der Bereich unter der Maus in der Mitte der Lupe erscheint
  */
 export default function Magnifier() {
   const { isMagnifierActive, toggleMagnifier } = useMagnifier();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const magnifierRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const cloneRef = useRef<HTMLElement | null>(null);
@@ -36,15 +37,16 @@ export default function Magnifier() {
   const magnifierY = useTransform(y, (value) => value - 80);
 
   // Transform für den vergrößerten Inhalt
-  // Berechne die Position so, dass der Bereich unter der Maus in der Lupe erscheint
   const scale = 1.5;
+  // Berechne die Position so, dass der Punkt unter der Maus in der Mitte der Lupe erscheint
+  // Bei scale=1.5: Wenn Maus bei (x, y) ist, muss der Inhalt bei (-x * (scale-1), -y * (scale-1)) starten
   const contentX = useTransform(x, (value) => {
-    // Verschiebe den Inhalt so, dass der Punkt unter der Maus in der Mitte der Lupe ist
-    // Bei 1.5x Skalierung: Verschiebe um -value * (scale - 1) / scale
-    return -value * (scale - 1) / scale + 80;
+    // Der Inhalt muss so verschoben werden, dass der Punkt bei (value, y) in der Mitte der Lupe ist
+    // Lupe ist bei (value - 80, y - 80), also muss der Inhalt bei (value - 80 - value * (scale-1), ...) sein
+    return -value * (scale - 1);
   });
   const contentY = useTransform(y, (value) => {
-    return -value * (scale - 1) / scale + 80;
+    return -value * (scale - 1);
   });
 
   // ESC-Taste Handler
@@ -63,6 +65,20 @@ export default function Magnifier() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isMagnifierActive, toggleMagnifier]);
+
+  // Viewport-Größe verfolgen
+  useEffect(() => {
+    const updateViewportSize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    
+    updateViewportSize();
+    window.addEventListener("resize", updateViewportSize);
+    
+    return () => {
+      window.removeEventListener("resize", updateViewportSize);
+    };
+  }, []);
 
   // Mouse-Move Handler
   useEffect(() => {
@@ -83,7 +99,7 @@ export default function Magnifier() {
 
   // Spiegle den gesamten Body-Inhalt für die Vergrößerung
   useEffect(() => {
-    if (!isMagnifierActive || !contentRef.current) {
+    if (!isMagnifierActive) {
       // Entferne den Klon, wenn die Lupe deaktiviert ist
       if (cloneRef.current && cloneRef.current.parentNode) {
         cloneRef.current.parentNode.removeChild(cloneRef.current);
@@ -92,50 +108,72 @@ export default function Magnifier() {
       return;
     }
 
-    const main = document.querySelector("main");
-    if (!main) return;
+    // Warte kurz, damit der contentRef bereit ist
+    const timeoutId = setTimeout(() => {
+      if (!contentRef.current) return;
 
-    // Entferne alten Klon, falls vorhanden
-    if (cloneRef.current && cloneRef.current.parentNode) {
-      cloneRef.current.parentNode.removeChild(cloneRef.current);
-    }
+      const body = document.body;
+      const main = document.querySelector("main");
+      if (!main) return;
 
-    // Erstelle einen Klon des Main-Inhalts
-    const clone = main.cloneNode(true) as HTMLElement;
-    clone.className = "magnifier-content-clone";
-    clone.style.position = "fixed";
-    clone.style.top = "0";
-    clone.style.left = "0";
-    clone.style.width = "100vw";
-    clone.style.height = "100vh";
-    clone.style.pointerEvents = "none";
-    clone.style.zIndex = "-1";
-    clone.style.background = "transparent";
-    clone.style.overflow = "hidden";
-    
-    // Entferne alle interaktiven Elemente aus dem Klon
-    const interactiveElements = clone.querySelectorAll("button, a, input, select, textarea, [role='button']");
-    interactiveElements.forEach((el) => {
-      (el as HTMLElement).style.pointerEvents = "none";
-      (el as HTMLElement).setAttribute("tabindex", "-1");
-    });
+      // Entferne alten Klon, falls vorhanden
+      if (cloneRef.current && cloneRef.current.parentNode) {
+        cloneRef.current.parentNode.removeChild(cloneRef.current);
+      }
 
-    // Entferne Header und andere Overlays aus dem Klon
-    const header = clone.querySelector("header");
-    if (header) {
-      header.remove();
-    }
+      // Erstelle einen Klon des Main-Inhalts
+      const clone = main.cloneNode(true) as HTMLElement;
+      clone.className = "magnifier-content-clone";
+      
+      // Setze Styles für den Klon - wichtig: position absolute, damit er relativ zum Container positioniert wird
+      const vw = viewportSize.width || window.innerWidth;
+      const vh = viewportSize.height || window.innerHeight;
+      
+      clone.style.position = "absolute";
+      clone.style.top = "0px";
+      clone.style.left = "0px";
+      clone.style.width = `${vw}px`;
+      clone.style.height = `${vh}px`;
+      clone.style.pointerEvents = "none";
+      clone.style.background = "transparent";
+      clone.style.overflow = "visible";
+      clone.style.margin = "0";
+      clone.style.padding = "0";
+      clone.style.zIndex = "1";
+      
+      // Wichtig: Stelle sicher, dass alle Styles vom Original übernommen werden
+      // Kopiere wichtige Computed Styles
+      const computedStyle = window.getComputedStyle(main);
+      clone.style.color = computedStyle.color;
+      clone.style.fontFamily = computedStyle.fontFamily;
+      clone.style.fontSize = computedStyle.fontSize;
+      
+      // Entferne alle interaktiven Elemente aus dem Klon
+      const interactiveElements = clone.querySelectorAll("button, a, input, select, textarea, [role='button']");
+      interactiveElements.forEach((el) => {
+        (el as HTMLElement).style.pointerEvents = "none";
+        (el as HTMLElement).setAttribute("tabindex", "-1");
+      });
 
-    contentRef.current.appendChild(clone);
-    cloneRef.current = clone;
+      // Entferne Header und andere Overlays aus dem Klon
+      const header = clone.querySelector("header");
+      if (header) {
+        header.remove();
+      }
+
+      // Füge den Klon zum contentRef hinzu
+      contentRef.current.appendChild(clone);
+      cloneRef.current = clone;
+    }, 100);
 
     return () => {
+      clearTimeout(timeoutId);
       if (cloneRef.current && cloneRef.current.parentNode) {
         cloneRef.current.parentNode.removeChild(cloneRef.current);
         cloneRef.current = null;
       }
     };
-  }, [isMagnifierActive]);
+  }, [isMagnifierActive, viewportSize]);
 
   if (!isMagnifierActive) return null;
 
@@ -175,17 +213,19 @@ export default function Magnifier() {
         {/* Vergrößerter Inhalt Layer - Skaliert den gesamten Viewport */}
         <motion.div
           ref={contentRef}
-          className="fixed inset-0 pointer-events-none"
+          className="absolute pointer-events-none"
           style={{
             x: contentX,
             y: contentY,
-            width: "100vw",
-            height: "100vh",
+            width: `${viewportSize.width || window.innerWidth}px`,
+            height: `${viewportSize.height || window.innerHeight}px`,
             scale: scale,
             transformOrigin: "0 0",
             willChange: "transform",
             background: "transparent",
-            overflow: "hidden",
+            overflow: "visible",
+            top: "0",
+            left: "0",
           }}
         />
 
