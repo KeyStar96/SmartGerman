@@ -1,15 +1,7 @@
-import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
 import ScrollReveal3D from "@/components/effects/ScrollReveal3D";
+import ScrollReveal3DGlassClient from "@/components/effects/ScrollReveal3DGlassClient";
 import { getDictionary } from "@/lib/dictionary";
-
-// Dynamischer Import für React Three Fiber Komponente (SSR-kompatibel)
-const ScrollReveal3DGlass = dynamic(
-  () => import("@/components/effects/ScrollReveal3DGlass"),
-  { 
-    ssr: false // WICHTIG: Deaktiviert SSR für React Three Fiber
-  }
-);
 
 export default async function HomePage({
   params,
@@ -53,7 +45,7 @@ export default async function HomePage({
 
       {/* 3D-Glas-Würfel Sektion - Beispiel für die neue Komponente */}
       <section className="h-screen flex flex-col justify-center items-center px-4">
-        <ScrollReveal3DGlass>
+        <ScrollReveal3DGlassClient>
           <div className="glass-panel p-12 max-w-xl text-center">
             <h2 className="text-3xl font-bold text-brand-blue mb-4">
               {dictionary.sections.quality_success.title}
@@ -62,7 +54,7 @@ export default async function HomePage({
               {dictionary.sections.quality_success.description}
             </p>
           </div>
-        </ScrollReveal3DGlass>
+        </ScrollReveal3DGlassClient>
       </section>
     </div>
   );
