@@ -2,11 +2,13 @@
 
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { Playfair_Display } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
 
-const playfairDisplay = Playfair_Display({ 
+// Instrument Serif für Headline - Awwwards-Look mit hochkontrastigen Serifen
+const instrumentSerif = Instrument_Serif({ 
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
 interface HeroProps {
@@ -269,12 +271,13 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             </span>
           </h1>
 
-          {/* Wissenschaftliche Headline (Serif) */}
+          {/* Wissenschaftliche Headline (Instrument Serif - Awwwards-Look) */}
           <h2 
             ref={headlineRef}
-            className={`${playfairDisplay.className} text-3xl md:text-4xl lg:text-5xl text-foreground font-medium mb-8 max-w-4xl mx-auto leading-tight`}
+            className={`${instrumentSerif.className} text-3xl md:text-4xl lg:text-5xl text-foreground font-medium mb-8 max-w-4xl mx-auto leading-tight`}
             style={{ 
-              opacity: 0
+              opacity: 0,
+              fontFeatureSettings: '"liga" 1, "kern" 1', // Hochkontrast-Serifen für Eleganz
             }}
           >
             {dictionary.hero.headline}
@@ -292,11 +295,15 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             transformOrigin: "center bottom"
           }}
         >
-          {/* Subline in schmalem Container */}
+          {/* Subline in schmalem Container (Inter/Geist Sans - modernes Interface) */}
           <p 
             ref={sublineRef}
             className="text-base md:text-lg text-foreground/70 max-w-2xl mx-auto font-light leading-relaxed mb-12"
-            style={{ opacity: 0 }}
+            style={{ 
+              opacity: 0,
+              letterSpacing: '-0.01em', // Leicht kompakter für modernes Interface-Feeling
+              // Inter wird automatisch vom Body übernommen (bereits geladen im Layout)
+            }}
           >
             {highlightKeywords(dictionary.hero.subline, lang)}
           </p>
