@@ -217,28 +217,18 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         force3D: true,
       });
 
-      // Verschwindet, wenn man runter scrollt
+      // Verschwindet progressiv beim Runterscrollen basierend auf Scroll-Position
       ScrollTrigger.create({
         trigger: container.current,
         start: "top top",
-        end: "bottom top",
-        onEnter: () => {
-          // Verschwindet, wenn Hero-Section verlassen wird
-          gsap.to(scrollIndicatorRef.current, {
-            opacity: 0,
-            y: 20,
-            duration: 0.3,
-            ease: "power2.out",
-            force3D: true,
-          });
-        },
-        onLeaveBack: () => {
-          // Erscheint wieder, wenn man zurück zur Hero-Section kommt
-          gsap.to(scrollIndicatorRef.current, {
-            opacity: 1,
-            y: 0,
-            duration: 0.3,
-            ease: "power2.out",
+        end: "30% top", // Verschwindet nach 30% Scroll der Hero-Section
+        scrub: 0.5,
+        onUpdate: (self) => {
+          // Progress von 0 (oben) bis 1 (30% gescrollt)
+          const progress = self.progress;
+          gsap.set(scrollIndicatorRef.current, {
+            opacity: 1 - progress,
+            y: progress * 20,
             force3D: true,
           });
         },
