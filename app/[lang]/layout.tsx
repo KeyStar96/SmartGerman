@@ -44,7 +44,7 @@ export default async function RootLayout({
           <LiquidBackground />
           <Magnifier />
           <SmoothScroll>
-            <main className="pt-32 scroll-3d-container"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
+            <main id="main-content" className="pt-32 scroll-3d-container"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
               {children}
             </main>
           </SmoothScroll>
