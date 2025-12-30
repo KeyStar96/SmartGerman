@@ -11,9 +11,11 @@ export default async function HomePage({
   const dictionary = await getDictionary(lang);
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-full overflow-visible">
       <Hero dictionary={dictionary} lang={lang} />
       <Features dictionary={dictionary} />
+      {/* Spacer am Ende hilft beim Testen des Scroll-Endes */}
+      <div className="h-[20vh] w-full" />
     </div>
   );
 }

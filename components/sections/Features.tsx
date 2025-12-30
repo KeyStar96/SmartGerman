@@ -53,7 +53,7 @@ export default function Features({ dictionary }: FeaturesProps) {
   useGSAP(() => {
     if (!sectionRef.current) return;
 
-    // Header Animation - startet früher, damit es bereits sichtbar ist wenn oben
+    // Header Animation - subtile Fade-in Animation
     if (headerRef.current) {
       gsap.set(headerRef.current, {
         opacity: 0,
@@ -77,43 +77,19 @@ export default function Features({ dictionary }: FeaturesProps) {
       });
     }
 
-    // Stagger Animation für Feature Cards - startet früher
-    // Warte kurz, damit alle refs gesetzt sind
-    const cards = cardsRef.current.filter(Boolean);
-    if (cards.length > 0) {
-      gsap.set(cards, {
-        opacity: 0,
-        y: 40,
-        force3D: true,
-      });
-
-      gsap.to(cards, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-        stagger: {
-          amount: 0.3,
-          from: "start",
-        },
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 85%",
-          end: "top 50%",
-          toggleActions: "play none none none",
-          markers: false,
-        },
-        force3D: true,
-      });
-    }
+    // Die 3D-Rotation wird von ScrollReveal3DGlass mit sectionRef als Trigger gehandhabt
+    // Wir entfernen die separate Stagger-Animation, da sie mit der 3D-Animation kollidieren würde
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative pt-12 md:pt-16 pb-24 md:pb-32 px-6 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto">
+    <section 
+      ref={sectionRef} 
+      className="relative w-full min-h-[120vh] py-24 pt-40 flex flex-col items-center justify-start overflow-visible"
+    >
+      <div className="container mx-auto px-4 max-w-7xl">
         {/* Header der Sektion */}
-        <div ref={headerRef} className="mb-8 md:mb-10 text-center md:text-left md:max-w-2xl">
-          <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-6">
+        <div ref={headerRef} className="text-center max-w-3xl mx-auto mb-20">
+          <h2 className="text-4xl md:text-6xl font-medium mb-6 leading-tight">
             {dictionary.sections.features.title_part1}{" "}
             <span className={`${instrumentSerif.className} text-brand-orange`}>
               {dictionary.sections.features.title_part2}
@@ -125,9 +101,12 @@ export default function Features({ dictionary }: FeaturesProps) {
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <ScrollReveal3DGlass key={index}>
+            <ScrollReveal3DGlass 
+              key={index}
+              trigger={sectionRef}
+            >
               <div
                 ref={(el) => {
                   if (el) cardsRef.current[index] = el;

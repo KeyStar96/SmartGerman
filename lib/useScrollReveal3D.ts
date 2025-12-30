@@ -57,7 +57,7 @@ export function useScrollReveal3D(
       scrollTrigger: {
         trigger: triggerTarget,
         start: "top bottom", // Startet wenn Element von unten in Viewport kommt
-        end: "bottom top", // Endet wenn Element komplett oben raus ist
+        end: "bottom center", // Endet wenn der Boden der Sektion die Mitte erreicht - gibt mehr Zeit für die Animation
         scrub,
         refreshPriority: -1,
       },
