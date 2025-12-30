@@ -1,16 +1,7 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { Mesh, BoxGeometry } from "three";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
-import { useGSAP } from "@gsap/react";
+import { useEffect, useState, ComponentType } from "react";
 import dynamic from "next/dynamic";
-
-// Dynamischer Import der gesamten Canvas-Komponente
-const DynamicCanvas = dynamic(() => import("./GlassCubeCanvas"), { 
-  ssr: false,
-  loading: () => null
-});
 
 interface GlassCube3DProps {
   children?: React.ReactNode;
@@ -20,7 +11,7 @@ interface GlassCube3DProps {
 
 /**
  * Wrapper-Komponente für den 3D-Glas-Würfel
- * - Lädt Canvas nur client-seitig
+ * - Lädt Canvas nur client-seitig nach vollständigem Mount
  * - Text-Inhalt wird als HTML-Overlay gerendert
  * - Der Webseiten-Hintergrund wird durch das Glas verzerrt
  */
@@ -30,9 +21,20 @@ export default function GlassCube3D({
   className = "" 
 }: GlassCube3DProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [DynamicCanvas, setDynamicCanvas] = useState<ComponentType<{ trigger?: React.RefObject<HTMLElement> }> | null>(null);
 
   useEffect(() => {
+    // Warte bis React vollständig gemountet ist
     setIsMounted(true);
+    
+    // Lade React Three Fiber erst nach Mount
+    if (typeof window !== "undefined") {
+      import("./GlassCubeCanvas").then((module) => {
+        setDynamicCanvas(() => module.default);
+      }).catch((error) => {
+        console.error("Failed to load GlassCubeCanvas:", error);
+      });
+    }
   }, []);
 
   return (
@@ -46,8 +48,8 @@ export default function GlassCube3D({
         </div>
       )}
       
-      {/* 3D Canvas - nur im Browser nach Mount */}
-      {isMounted && <DynamicCanvas trigger={trigger} />}
+      {/* 3D Canvas - nur nach vollständigem Mount und geladenem Modul */}
+      {isMounted && DynamicCanvas && <DynamicCanvas trigger={trigger} />}
     </div>
   );
 }
