@@ -34,7 +34,7 @@ body {
       @apply bg-black/[0.02] dark:bg-white/[0.03] backdrop-blur-xl border border-black/[0.05] dark:border-white/10 rounded-2xl shadow-xl transition-all duration-500;
     }
     
-    /* Erweiterter Glas-Effekt für 3D-Glas-Würfel (stärker als normal) */
+    /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards (stärker als normal) */
     .glass-panel-enhanced {
       @apply backdrop-blur-2xl border border-black/[0.08] dark:border-white/20 rounded-2xl shadow-2xl;
       background: rgba(0, 0, 0, 0.03);
@@ -109,7 +109,7 @@ body {
       transition: background-color 0.5s ease;
     }
     
-    /* 3D Perspective Container für Scroll-Animationen */
+    /* 3D Perspective Container für Fluid Reveal Scroll-Animationen */
     .scroll-3d-container {
       perspective: 2000px;
       transform-style: preserve-3d;

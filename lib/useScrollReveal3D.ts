@@ -8,19 +8,22 @@ interface UseScrollReveal3DOptions {
   scrub?: number | boolean;
   z?: number;
   transformOrigin?: string;
-  inverted?: boolean; // Invertierte Würfel-Bewegung: von unten kommend (-90° -> 0°) statt von hinten (90° -> 0°)
+  inverted?: boolean; // Invertierte Bewegung: Entgegengesetzte Neigung beim Ein-/Ausfliegen
 }
 
 /**
- * Hook für elegante 3D-Scroll-Animationen (Würfel-Metapher)
+ * Hook für elegante Fluid 3D Reveal Scroll-Animationen
+ * 
+ * Die Karten bauen sich beim Scrollen sanft aus der Tiefe des Raumes auf
+ * und kommen dem Nutzer entgegen - keine harten Rotationen mehr.
  * 
  * Standard (inverted=false):
- * - Beim Runterscrollen: Kippt von hinten nach vorne (rotateX: 90° -> 0°)
- * - Beim Hochscrollen: Kippt nach hinten weg (rotateX: 0° -> -90°)
+ * - Beim Runterscrollen: Gleitet von unten mit subtiler Neigung (rotateX: 15° -> 0°)
+ * - Beim Hochscrollen: Gleitet nach oben mit leichter Gegen-Neigung (rotateX: 0° -> -10°)
  * 
  * Invertiert (inverted=true):
- * - Beim Runterscrollen: Kippt von unten nach vorne (rotateX: -90° -> 0°)
- * - Beim Hochscrollen: Kippt nach oben weg (rotateX: 0° -> 90°)
+ * - Beim Runterscrollen: Entgegengesetzte Neigung (rotateX: -15° -> 0°)
+ * - Beim Hochscrollen: Gegen-Neigung nach oben (rotateX: 0° -> 10°)
  */
 export function useScrollReveal3D(
   elementRef: RefObject<HTMLElement>,
@@ -28,10 +31,10 @@ export function useScrollReveal3D(
 ) {
   const {
     trigger,
-    scrub = 1,
-    z = -1200,
-    transformOrigin = "center bottom",
-    inverted = false, // Standard: von hinten kommend (90° -> 0°)
+    scrub = 1.5, // Erhöht für maximale Geschmeidigkeit
+    z = -300, // Subtilerer Tiefeneffekt (vorher -1200)
+    transformOrigin = "center center", // Zentriert für harmonische Skalierung
+    inverted = false,
   } = options;
 
   useEffect(() => {
@@ -48,90 +51,95 @@ export function useScrollReveal3D(
       }
     }
 
-    // Initial state basierend auf inverted-Option
-    // Normal: Element startet von hinten (rotateX: 90) - unsichtbar
-    // Inverted: Element startet von unten (rotateX: -90) - unsichtbar
-    const initialRotateX = inverted ? -90 : 90;
+    // Initial state: Subtile Neigung statt harter Rotation
+    // Normal: Element startet mit leichter Neigung nach hinten (rotateX: 15)
+    // Inverted: Element startet mit leichter Neigung nach vorne (rotateX: -15)
+    const initialRotateX = inverted ? -15 : 15;
     
-    // immediateRender: true sorgt dafür, dass der initiale Zustand sofort angewendet wird
-    // verhindert, dass die Karten kurz sichtbar sind, bevor die Animation startet
+    // Initialer Zustand: Element ist unsichtbar, versetzt und skaliert
     gsap.set(element, {
       rotateX: initialRotateX,
-      z: z, // Startet tief im Hintergrund (z.B. z: -1200 bedeutet 1200px nach hinten)
+      y: 100, // Vertikaler Versatz von unten
+      z: z,
+      scale: 0.9, // Leicht verkleinert für Tiefeneffekt
       opacity: 0,
       transformOrigin,
       force3D: true,
       transformStyle: "preserve-3d",
-      immediateRender: true, // Wichtig: Initialer Zustand wird sofort angewendet
+      immediateRender: true,
     });
 
-    // Timeline für die gesamte Scroll-Animation (Würfel-Metapher)
-    // Drei distinct Segmente mit optimierter Timing-Verteilung:
-    // Phase 1 (0.15-0.30): Einfliegen - startet später für bessere Sichtbarkeit
-    // Phase 2 (0.30-0.85): Stabile Lesezone bei 0 Grad (55% der Zeit)
-    // Phase 3 (0.85-1.0): Ausfliegen - startet später
+    // Timeline für die Fluid 3D Reveal Animation
+    // Drei Phasen mit optimierter Timing-Verteilung:
+    // Phase 1 (0.0-0.20): Einblenden und Einfliegen - opacity synchronisiert
+    // Phase 2 (0.20-0.80): Stabile Lesezone (60% der Zeit)
+    // Phase 3 (0.80-1.0): Sanftes Ausfliegen nach oben
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
-        start: "top bottom", // Startet wenn Trigger-Element von unten in Viewport kommt
-        end: "bottom center", // Responsivere Rotation - endet früher
+        start: "top bottom", // Startet wenn Element von unten in Viewport kommt
+        end: "bottom center", // Endet wenn Element-Mitte Viewport-Mitte erreicht
         scrub,
         refreshPriority: -1,
       },
     });
 
-    // Phase 1: Einfliegen beim Runterscrollen - startet später (bei 0.15 statt 0.0)
-    // Normal: Von +90° auf 0° (von hinten nach vorne)
-    // Inverted: Von -90° auf 0° (von unten nach vorne)
-    // Von Timeline-Position 0.15 bis 0.30 - 15% der Timeline, startet später
-    // Verwende .fromTo() um Start- und Endzustand explizit zu definieren
+    // Phase 1: Fluid Reveal - Element gleitet aus der Tiefe heran
+    // Opacity wird während der ersten 20% der Scroll-Strecke eingeblendet
     tl.fromTo(element, 
       {
         rotateX: initialRotateX,
+        y: 100,
         z: z,
+        scale: 0.9,
         opacity: 0,
         force3D: true,
       },
       {
         rotateX: 0,
+        y: 0,
         z: 0,
+        scale: 1,
         opacity: 1,
-        ease: "none", // Bei scrub muss ease: "none" sein
+        ease: "power2.out", // Sanftes Easing für natürliche Bewegung
         force3D: true,
-        duration: 0.15, // Nimmt 15% der Timeline ein
-        immediateRender: false, // Wichtig: nicht überschreibt gsap.set()
+        duration: 0.20, // 20% der Timeline für synchronisiertes Einblenden
+        immediateRender: false,
       }, 
-      0.15 // Startet später bei Position 0.15
+      0 // Startet sofort bei Position 0
     );
 
-    // Phase 2: Stabile Lesezone bei 0° (von 0.30 bis 0.85) - 55% der Timeline
-    // Expliziter Haltepunkt für stabile Position während des Lesens
+    // Phase 2: Stabile Lesezone (von 0.20 bis 0.80) - 60% der Timeline
+    // Element bleibt in der perfekten Leseposition
     tl.to(element, {
       rotateX: 0,
+      y: 0,
       z: 0,
+      scale: 1,
       opacity: 1,
       ease: "none",
       force3D: true,
-      duration: 0.55, // Nimmt 55% der Timeline ein
-    }, 0.30); // Startet bei Position 0.30, hält bis 0.85
+      duration: 0.60, // 60% der Timeline für stabiles Lesen
+    }, 0.20);
 
-    // Phase 3: Ausfliegen beim Hochscrollen - startet später (bei 0.85 statt 0.8)
-    // Normal: Von 0° auf -90° (nach hinten weg)
-    // Inverted: Von 0° auf +90° (nach oben weg)
-    // Von Timeline-Position 0.85 bis 1.0 - 15% der Timeline
-    const finalRotateX = inverted ? 90 : -90;
+    // Phase 3: Sanftes Ausfliegen nach oben
+    // Anstatt harter Rotation: leichtes Gleiten mit minimaler Gegen-Neigung
+    // Normal: Neigt sich leicht zurück (rotateX: -10)
+    // Inverted: Neigt sich leicht nach vorne (rotateX: 10)
+    const finalRotateX = inverted ? 10 : -10;
     tl.to(element, {
       rotateX: finalRotateX,
-      z: z, // Zurück in die Tiefe
+      y: -50, // Gleitet nach oben
+      z: z * 0.5, // Halbe Tiefe für subtileren Exit
+      scale: 0.95, // Minimal geschrumpft
       opacity: 0,
-      ease: "none", // Bei scrub muss ease: "none" sein
+      ease: "power2.in", // Sanftes Beschleunigen beim Verlassen
       force3D: true,
-      duration: 0.15, // Nimmt 15% der Timeline ein
-    }, 0.85); // Startet später bei Position 0.85
+      duration: 0.20, // 20% der Timeline
+    }, 0.80);
 
     return () => {
       tl.kill();
     };
   }, [elementRef, trigger, scrub, z, transformOrigin, inverted]);
 }
-
