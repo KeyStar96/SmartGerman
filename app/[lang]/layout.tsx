@@ -40,7 +40,7 @@ export default async function RootLayout({
         <Header lang={lang} dictionary={dictionary} />
         <LiquidBackground />
         <SmoothScroll>
-          <main id="main-content" className="pt-32 scroll-3d-container"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
+          <main id="main-content" className="pt-32 scroll-3d-container min-h-screen"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
             {children}
           </main>
         </SmoothScroll>

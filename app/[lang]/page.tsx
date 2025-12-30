@@ -11,7 +11,7 @@ export default async function HomePage({
   const dictionary = await getDictionary(lang);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <Hero dictionary={dictionary} lang={lang} />
       <Features dictionary={dictionary} />
     </div>
