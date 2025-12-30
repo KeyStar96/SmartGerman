@@ -76,9 +76,25 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const badgeRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
     const tl = gsap.timeline();
+    
+    // Aggressives Snapping: Rastet zur Features-Sektion ein, sobald der Nutzer leicht nach unten scrollt
+    ScrollTrigger.create({
+      trigger: container.current,
+      start: "bottom top", // Wenn Hero-Bottom den Viewport-Top erreicht
+      end: "+=100", // Pufferbereich
+      snap: {
+        snapTo: 1, // Zwingt zum Ende des Triggers (Anfang Features)
+        duration: 0.4, // Schnelles Einrasten
+        delay: 0, // Sofortiges Snapping ohne Wartezeit
+        ease: "power4.inOut", // Sehr steile Kurve für "Eisrast-Gefühl"
+        inertia: false, // Verhindert unkontrolliertes Weitergleiten
+      },
+      markers: false,
+    });
     
     // 1. Badge fade-in (zuerst)
     if (badgeRef.current) {
@@ -207,6 +223,21 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       });
     }
 
+    // 8. Scroll-Indikator ausblenden, wenn Hero-Sektion verlassen wird
+    if (scrollIndicatorRef.current) {
+      gsap.to(scrollIndicatorRef.current, {
+        opacity: 0,
+        y: 20,
+        scrollTrigger: {
+          trigger: container.current,
+          start: "bottom 80%",
+          end: "bottom top",
+          scrub: true,
+        },
+        force3D: true,
+      });
+    }
+
   }, { scope: container });
 
   return (
@@ -324,8 +355,14 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         </div>
       </div>
 
-      {/* Scroll Indikator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+      {/* Scroll Indikator - Fixiert am unteren Rand des Viewports */}
+      <div 
+        ref={scrollIndicatorRef}
+        className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center pointer-events-none"
+      >
+        <span className="text-[10px] uppercase tracking-[0.2em] mb-2 text-foreground/60 font-medium">
+          {dictionary.hero.scroll_label}
+        </span>
         <ScrollIndicator />
       </div>
     </section>

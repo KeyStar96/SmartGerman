@@ -78,7 +78,7 @@ export default function Features({ dictionary }: FeaturesProps) {
       });
     }
 
-    // ScrollTrigger-Snapping: Rastet ein, wenn die Sektion oben am Viewport ist
+    // ScrollTrigger-Snapping: Aggressives Einrasten, wenn die Sektion oben am Viewport ist
     // Die Karten sind dann bei 0 Grad Rotation perfekt ausgerichtet
     ScrollTrigger.create({
       trigger: sectionRef.current,
@@ -86,9 +86,9 @@ export default function Features({ dictionary }: FeaturesProps) {
       end: "+=100", // Ein kleiner Pufferbereich für den Snap-Bereich
       snap: {
         snapTo: 0, // 0 entspricht dem 'start' Punkt (Top der Sektion)
-        duration: { min: 0.4, max: 0.8 }, // Schnelles, knackiges Einrasten
-        delay: 0.1, // Kurze Pause nach dem Scrollen, bevor er snappt (Lenis-Kompatibilität)
-        ease: "power2.inOut", // Hochwertige Beschleunigungskurve
+        duration: { min: 0.2, max: 0.5 }, // Aggressives, schnelles Einrasten
+        delay: 0, // Keine Verzögerung - sofortiges Snapping
+        ease: "power4.inOut", // Sehr steile Kurve für "Eisrast-Gefühl"
         inertia: false, // Verhindert unkontrolliertes Weitergleiten
       },
       markers: false, // Setze auf true zum Debuggen
