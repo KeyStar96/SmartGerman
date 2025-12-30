@@ -46,6 +46,10 @@ export default function Magnifier() {
   const contentXValue = useMotionValue(0);
   const contentYValue = useMotionValue(0);
 
+  // Transform für die Lupe-Position (muss außerhalb des JSX sein)
+  const lensXTransformed = useTransform(lensX, (x) => x - radius);
+  const lensYTransformed = useTransform(lensY, (y) => y - radius);
+
   // Viewport-Größe verfolgen
   useEffect(() => {
     const updateViewportSize = () => {
@@ -192,8 +196,8 @@ export default function Magnifier() {
             top: 0,
             width: lensSize,
             height: lensSize,
-            x: useTransform(lensX, (x) => x - radius),
-            y: useTransform(lensY, (y) => y - radius),
+            x: lensXTransformed,
+            y: lensYTransformed,
             zIndex: 9999,
             pointerEvents: "none",
           }}
