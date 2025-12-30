@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMagnifier } from "@/lib/context/MagnifierContext";
 import { useLenis } from "lenis/react";
@@ -9,10 +9,10 @@ import { useLenis } from "lenis/react";
  * Smart Lens (Lupe) für Barrierefreiheit - iOS 26 Style
  * 
  * Technische Spezifikationen:
- * - Präzise Viewport-basierte Positionierung (Lenis-kompatibel)
- * - Scharfer Text durch scale() mit GPU-Optimierung
- * - Direkte DOM-Updates für 60fps Performance
- * - Header-Offset-Berücksichtigung (pt-32 = 128px)
+ * - Scharfer Text durch größere Schriftgrößen (KEIN scale())
+ * - Präzise Positionierung relativ zum main-content Element
+ * - Lenis Scroll-Synchronisation
+ * - 60fps Performance durch direkte DOM-Updates
  * 
  * @performance: Direkte style.transform Updates via useRef (kein React Re-Render)
  * @accessibility: ESC-Taste deaktiviert die Lupe
@@ -21,59 +21,96 @@ export default function Magnifier() {
   const { isMagnifierActive, toggleMagnifier } = useMagnifier();
   const lensRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const cloneRef = useRef<HTMLElement | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
   
-  const zoom = 1.6;
-  const size = 180;
-  const offsetUp = 120; 
+  const zoomFactor = 1.6;
+  const lensSize = 180;
+  const radius = lensSize / 2;
+  const offsetUp = 120;
 
-  // Wir tracken die Positionen direkt in Refs für 60fps ohne Re-Renders
-  const pos = useRef({ x: 0, y: 0, scroll: 0 });
+  // Mausposition und Scroll-Offset
+  const mousePosRef = useRef({ x: 0, y: 0 });
+  const scrollYRef = useRef(0);
 
-  const updatePosition = () => {
-    if (!lensRef.current || !contentRef.current || !isMagnifierActive) return;
+  // Rendering-Optimierung für scharfen Text
+  const optimizeRendering = useCallback((element: HTMLElement) => {
+    element.style.transform = "translate3d(0, 0, 0)";
+    element.style.backfaceVisibility = "hidden";
+    element.style.willChange = "transform";
+    (element.style as any).webkitFontSmoothing = "antialiased";
+    (element.style as any).MozOsxFontSmoothing = "grayscale";
+    element.style.textRendering = "optimizeLegibility";
+  }, []);
 
-    const { x, y, scroll } = pos.current;
+  // Haupt-Update-Funktion: Präzise Positionierung
+  const updatePosition = useCallback(() => {
+    if (!isMagnifierActive || !lensRef.current || !contentRef.current) return;
 
-    // 1. Lupe positionieren (schwebend über Cursor)
-    const lensX = x - size / 2;
-    const lensY = y - size / 2 - offsetUp;
+    const { x: mouseX, y: mouseY } = mousePosRef.current;
+    const mainContent = document.getElementById("main-content");
+    
+    if (!mainContent) return;
+
+    // 1. Position der Lupe (schwebt über dem Cursor)
+    const lensX = Math.round(mouseX - radius);
+    const lensY = Math.round(mouseY - radius - offsetUp);
     lensRef.current.style.transform = `translate3d(${lensX}px, ${lensY}px, 0)`;
 
-    // 2. Inhalt im Inneren verschieben
-    // Wir müssen das pt-32 (128px) des Main-Containers berücksichtigen!
-    const headerPadding = 128; 
+    // 2. Berechne Position relativ zum main-content Element
+    const rect = mainContent.getBoundingClientRect();
     
-    // Die Mitte der Lupe soll genau den Punkt (x, y) zeigen
-    const centerX = size / 2;
-    const centerY = size / 2;
+    // Mausposition relativ zum main-content (ohne Header-Offset, da pt-32 bereits im Klon enthalten ist)
+    const relativeX = mouseX - rect.left;
+    const relativeY = mouseY - rect.top;
 
-    // Magische Formel: Fokuspunkt unter der Maus minus skalierten Offset
-    // Berücksichtige Header-Padding für korrekte Y-Position
-    const targetX = centerX - (x * zoom);
-    const targetY = centerY - ((y + headerPadding) * zoom);
+    // 3. Content-Offset: Die Mitte der Lupe soll genau den Punkt unter der Maus zeigen
+    // Formel: contentOffset = centerOfLens - (relativePosition * zoomFactor)
+    const contentX = Math.round(radius - (relativeX * zoomFactor));
+    const contentY = Math.round(radius - (relativeY * zoomFactor));
 
-    contentRef.current.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale(${zoom})`;
-  };
+    // 4. Direktes Update für 60fps
+    contentRef.current.style.transform = `translate3d(${contentX}px, ${contentY}px, 0)`;
+  }, [isMagnifierActive, zoomFactor, radius, offsetUp]);
 
+  // Request Animation Frame Wrapper
+  const requestUpdate = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    animationFrameRef.current = requestAnimationFrame(() => {
+      updatePosition();
+      animationFrameRef.current = null;
+    });
+  }, [updatePosition]);
+
+  // Lenis Scroll-Synchronisation
   useLenis(({ scroll }) => {
     if (isMagnifierActive) {
-      pos.current.scroll = scroll;
+      scrollYRef.current = scroll;
+      // Direktes Update ohne RAF für synchrone Scroll-Updates
       updatePosition();
     }
   });
 
+  // Mouse-Move Handler
   useEffect(() => {
     if (!isMagnifierActive) return;
 
-    const move = (e: MouseEvent) => {
-      pos.current.x = e.clientX;
-      pos.current.y = e.clientY;
-      updatePosition();
+    const handleMove = (e: MouseEvent) => {
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+      requestUpdate();
     };
-    
-    window.addEventListener("mousemove", move, { passive: true });
-    return () => window.removeEventListener("mousemove", move);
-  }, [isMagnifierActive]);
+
+    window.addEventListener("mousemove", handleMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMove);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
+  }, [isMagnifierActive, requestUpdate]);
 
   // ESC-Taste Handler
   useEffect(() => {
@@ -89,32 +126,119 @@ export default function Magnifier() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMagnifierActive, toggleMagnifier]);
 
-  // Aktualisiere Content-Klon wenn sich der Inhalt ändert
-  useEffect(() => {
-    if (!isMagnifierActive || !contentRef.current) return;
-
-    const updateContent = () => {
-      if (!contentRef.current) return;
-      const mainContent = document.getElementById("main-content");
-      if (mainContent) {
-        contentRef.current.innerHTML = mainContent.innerHTML;
+  // DOM-Cloning: Erstelle scharfen Content-Klon mit größeren Schriftgrößen
+  useLayoutEffect(() => {
+    if (!isMagnifierActive) {
+      // Cleanup
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
-    };
-
-    // Initiales Update
-    updateContent();
-
-    // Beobachte Änderungen im main-content (optional, für dynamische Inhalte)
-    const observer = new MutationObserver(updateContent);
-    const mainContent = document.getElementById("main-content");
-    if (mainContent) {
-      observer.observe(mainContent, { childList: true, subtree: true });
+      if (cloneRef.current && cloneRef.current.parentNode) {
+        cloneRef.current.parentNode.removeChild(cloneRef.current);
+        cloneRef.current = null;
+      }
+      return;
     }
 
+    const timeoutId = setTimeout(() => {
+      const mainContent = document.getElementById("main-content");
+      if (!mainContent || !contentRef.current) return;
+
+      // Entferne alten Klon
+      if (cloneRef.current && cloneRef.current.parentNode) {
+        cloneRef.current.parentNode.removeChild(cloneRef.current);
+      }
+
+      // Erstelle tiefen Klon des main-content
+      const clone = mainContent.cloneNode(true) as HTMLElement;
+      clone.className = "magnifier-content-clone";
+      
+      // Setze Basis-Styles
+      const rect = mainContent.getBoundingClientRect();
+      clone.style.position = "absolute";
+      clone.style.top = "0px";
+      clone.style.left = "0px";
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${mainContent.scrollHeight}px`;
+      clone.style.pointerEvents = "none";
+      clone.style.background = "transparent";
+      clone.style.overflow = "visible";
+      clone.style.margin = "0";
+      clone.style.padding = "0";
+      clone.style.zIndex = "1";
+      
+      // CSS Containment für Performance
+      clone.style.contain = "layout style paint";
+      
+      // Rendering-Optimierung
+      optimizeRendering(clone);
+      
+      // KRITISCH: Erhöhe alle Schriftgrößen um zoomFactor (statt scale() für Schärfe)
+      const allTextElements = clone.querySelectorAll("*");
+      allTextElements.forEach((el) => {
+        const element = el as HTMLElement;
+        const computedStyle = window.getComputedStyle(element);
+        const fontSize = parseFloat(computedStyle.fontSize);
+        
+        if (fontSize > 0 && !isNaN(fontSize)) {
+          // Runde auf ganze Pixel für scharfe Schrift
+          element.style.fontSize = `${Math.round(fontSize * zoomFactor)}px`;
+        }
+
+        // Rendering-Optimierung für alle Elemente
+        optimizeRendering(element);
+      });
+      
+      // Entferne interaktive Elemente
+      const interactiveElements = clone.querySelectorAll("button, a, input, select, textarea, [role='button']");
+      interactiveElements.forEach((el) => {
+        (el as HTMLElement).style.pointerEvents = "none";
+        (el as HTMLElement).setAttribute("tabindex", "-1");
+      });
+
+      // Füge Klon hinzu
+      contentRef.current.appendChild(clone);
+      cloneRef.current = clone;
+    }, 50);
+
     return () => {
-      observer.disconnect();
+      clearTimeout(timeoutId);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      if (cloneRef.current && cloneRef.current.parentNode) {
+        cloneRef.current.parentNode.removeChild(cloneRef.current);
+        cloneRef.current = null;
+      }
     };
-  }, [isMagnifierActive]);
+  }, [isMagnifierActive, zoomFactor, optimizeRendering]);
+
+  // Resize Handler
+  useEffect(() => {
+    if (!isMagnifierActive) return;
+
+    let resizeTimeout: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Re-clone bei Resize (Content könnte sich geändert haben)
+        if (cloneRef.current && cloneRef.current.parentNode) {
+          cloneRef.current.parentNode.removeChild(cloneRef.current);
+          cloneRef.current = null;
+        }
+        // Trigger re-clone durch dependency change (wird durch useLayoutEffect gehandelt)
+        updatePosition();
+      }, 100);
+    };
+
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimeout);
+    };
+  }, [isMagnifierActive, updatePosition]);
 
   return (
     <AnimatePresence>
@@ -125,14 +249,14 @@ export default function Magnifier() {
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
-          style={{ width: size, height: size }}
+          style={{ width: lensSize, height: lensSize }}
         >
           <div className="relative w-full h-full rounded-full overflow-hidden border border-white/20 shadow-2xl bg-background">
-            {/* Live-Klon des Contents */}
+            {/* Hochauflösender Content-Klon */}
             <div
               ref={contentRef}
               className="absolute top-0 left-0 origin-top-left will-change-transform"
-              style={{ 
+              style={{
                 width: typeof document !== 'undefined' ? `${document.documentElement.scrollWidth}px` : "100vw",
                 height: typeof document !== 'undefined' ? `${document.documentElement.scrollHeight}px` : window.innerHeight,
                 pointerEvents: "none",
