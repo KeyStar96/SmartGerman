@@ -12,7 +12,7 @@ export default async function HomePage({
 
   return (
     <div className="flex flex-col items-center">
-      <Hero dictionary={dictionary} />
+      <Hero dictionary={dictionary} lang={lang} />
       
       {/* Weitere Sektionen folgen hier */}
       <section className="h-screen flex flex-col justify-center items-center px-4">

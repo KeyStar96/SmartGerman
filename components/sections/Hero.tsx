@@ -11,9 +11,61 @@ const playfairDisplay = Playfair_Display({
 
 interface HeroProps {
   dictionary: any;
+  lang?: string;
 }
 
-export default function Hero({ dictionary }: HeroProps) {
+// Hilfsfunktion zum Hervorheben von Schlüsselwörtern in der Subline
+const highlightKeywords = (text: string, lang: string = 'de') => {
+  // Definiere die Schlüsselwörter für jede Sprache
+  const keywords: { [key: string]: string[] } = {
+    de: ['Gehirn', '50+'],
+    en: ['brain', '50+'],
+    ru: ['мозг', '50+'],
+    uk: ['мозок', '50+'],
+    tu: ['beyin', '50+'],
+  };
+
+  const words = keywords[lang] || keywords['de'];
+  
+  // Erstelle ein Regex-Pattern für alle Schlüsselwörter mit Wortgrenzen
+  // Escape spezielle Regex-Zeichen, außer für "50+" das wir speziell behandeln
+  const escapedWords = words.map(w => {
+    if (w === '50+') {
+      return '50\\+'; // Escape das Plus-Zeichen
+    }
+    return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  });
+  
+  const pattern = new RegExp(`(${escapedWords.join('|')})`, 'gi');
+  
+  // Teile den Text in Teile auf und markiere die Schlüsselwörter
+  const parts = text.split(pattern);
+  
+  return parts.map((part, index) => {
+    // Prüfe, ob der Teil ein Schlüsselwort ist (case-insensitive)
+    const isKeyword = words.some(keyword => {
+      const normalizedPart = part.replace(/\+/g, '+'); // Normalisiere für Vergleich
+      const normalizedKeyword = keyword.replace(/\+/g, '+');
+      return normalizedPart.toLowerCase() === normalizedKeyword.toLowerCase() || 
+             normalizedPart === normalizedKeyword;
+    });
+    
+    if (isKeyword && part.trim() !== '') {
+      return (
+        <span 
+          key={index} 
+          className="font-semibold text-foreground/90"
+          style={{ fontWeight: 600 }}
+        >
+          {part}
+        </span>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
+
+export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const container = useRef<HTMLDivElement>(null);
   const heroTextWrapper = useRef<HTMLHeadingElement>(null);
   const perspectiveContainer = useRef<HTMLDivElement>(null);
@@ -157,7 +209,11 @@ export default function Hero({ dictionary }: HeroProps) {
   return (
     <section 
       ref={container} 
-      className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden z-10"
+      className="relative flex flex-col justify-center items-center overflow-hidden z-10"
+      style={{
+        minHeight: 'calc(100vh - 128px)', // 100vh minus pt-32 (128px) vom main-Element
+        height: 'calc(100vh - 128px)',
+      }}
     >
       {/* SVG-Punktmuster Hintergrund (wissenschaftliches Millimeterpapier) */}
       <div 
@@ -242,7 +298,7 @@ export default function Hero({ dictionary }: HeroProps) {
             className="text-base md:text-lg text-foreground/70 max-w-2xl mx-auto font-light leading-relaxed mb-12"
             style={{ opacity: 0 }}
           >
-            {dictionary.hero.subline}
+            {highlightKeywords(dictionary.hero.subline, lang)}
           </p>
 
           {/* CTA-Buttons */}
