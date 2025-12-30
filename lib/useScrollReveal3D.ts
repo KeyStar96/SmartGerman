@@ -8,12 +8,19 @@ interface UseScrollReveal3DOptions {
   scrub?: number | boolean;
   z?: number;
   transformOrigin?: string;
+  inverted?: boolean; // Invertierte Würfel-Bewegung: von unten kommend (-90° -> 0°) statt von hinten (90° -> 0°)
 }
 
 /**
- * Hook für elegante 3D-Scroll-Animationen
- * - Beim Runterscrollen (Element kommt von unten): Kippt von hinten nach vorne (rotateX: 90 -> 0)
- * - Beim Hochscrollen (Element verschwindet nach oben): Kippt nach hinten weg (rotateX: 0 -> -90)
+ * Hook für elegante 3D-Scroll-Animationen (Würfel-Metapher)
+ * 
+ * Standard (inverted=false):
+ * - Beim Runterscrollen: Kippt von hinten nach vorne (rotateX: 90° -> 0°)
+ * - Beim Hochscrollen: Kippt nach hinten weg (rotateX: 0° -> -90°)
+ * 
+ * Invertiert (inverted=true):
+ * - Beim Runterscrollen: Kippt von unten nach vorne (rotateX: -90° -> 0°)
+ * - Beim Hochscrollen: Kippt nach oben weg (rotateX: 0° -> 90°)
  */
 export function useScrollReveal3D(
   elementRef: RefObject<HTMLElement>,
@@ -24,6 +31,7 @@ export function useScrollReveal3D(
     scrub = 1,
     z = -1200,
     transformOrigin = "center bottom",
+    inverted = false, // Standard: von hinten kommend (90° -> 0°)
   } = options;
 
   useEffect(() => {
@@ -40,10 +48,13 @@ export function useScrollReveal3D(
       }
     }
 
-    // Initial: Element startet von hinten (rotateX: 90) - unsichtbar
-    // z startet tief im Hintergrund (negativer z-Wert bedeutet nach hinten im 3D-Raum)
+    // Initial state basierend auf inverted-Option
+    // Normal: Element startet von hinten (rotateX: 90) - unsichtbar
+    // Inverted: Element startet von unten (rotateX: -90) - unsichtbar
+    const initialRotateX = inverted ? -90 : 90;
+    
     gsap.set(element, {
-      rotateX: 90,
+      rotateX: initialRotateX,
       z: z, // Startet tief im Hintergrund (z.B. z: -1200 bedeutet 1200px nach hinten)
       opacity: 0,
       transformOrigin,
@@ -55,7 +66,7 @@ export function useScrollReveal3D(
     // Drei distinct Segmente mit 20/60/20 Timing-Verteilung:
     // Phase 1 (0.0-0.2): Schnelles Aufstellen beim Runterscrollen
     // Phase 2 (0.2-0.8): Stabile Lesezone bei 0 Grad (60% der Zeit)
-    // Phase 3 (0.8-1.0): Nach hinten kippen beim Hochscrollen
+    // Phase 3 (0.8-1.0): Wegkippen beim Hochscrollen
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
@@ -66,8 +77,10 @@ export function useScrollReveal3D(
       },
     });
 
-    // Phase 1: Schnelles Aufstellen - Würfel dreht sich schnell, untere Fläche kommt nach vorne
-    // Von +90° auf 0° (von Timeline-Position 0.0 bis 0.2) - 20% der Timeline
+    // Phase 1: Schnelles Aufstellen beim Runterscrollen
+    // Normal: Von +90° auf 0° (von hinten nach vorne)
+    // Inverted: Von -90° auf 0° (von unten nach vorne)
+    // Von Timeline-Position 0.0 bis 0.2 - 20% der Timeline
     tl.to(element, {
       rotateX: 0,
       z: 0,
@@ -88,10 +101,13 @@ export function useScrollReveal3D(
       duration: 0.6, // Nimmt 60% der Timeline ein
     }, 0.2); // Startet bei Position 0.2, hält bis 0.8
 
-    // Phase 3: Nach hinten kippen - Würfel dreht sich weiter, obere Fläche geht nach hinten
-    // Von 0° auf -90° (von Timeline-Position 0.8 bis 1.0) - 20% der Timeline
+    // Phase 3: Wegkippen beim Hochscrollen
+    // Normal: Von 0° auf -90° (nach hinten weg)
+    // Inverted: Von 0° auf +90° (nach oben weg)
+    // Von Timeline-Position 0.8 bis 1.0 - 20% der Timeline
+    const finalRotateX = inverted ? 90 : -90;
     tl.to(element, {
-      rotateX: -90,
+      rotateX: finalRotateX,
       z: z, // Zurück in die Tiefe
       opacity: 0,
       ease: "none", // Bei scrub muss ease: "none" sein
@@ -102,6 +118,6 @@ export function useScrollReveal3D(
     return () => {
       tl.kill();
     };
-  }, [elementRef, trigger, scrub, z, transformOrigin]);
+  }, [elementRef, trigger, scrub, z, transformOrigin, inverted]);
 }
 

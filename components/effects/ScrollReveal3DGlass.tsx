@@ -7,6 +7,7 @@ interface ScrollReveal3DGlassProps {
   children: ReactNode;
   className?: string;
   trigger?: React.RefObject<HTMLElement>;
+  inverted?: boolean; // Invertierte Würfel-Bewegung: von unten kommend
 }
 
 /**
@@ -19,6 +20,7 @@ export default function ScrollReveal3DGlass({
   children,
   className = "",
   trigger,
+  inverted = false,
 }: ScrollReveal3DGlassProps) {
   const elementRef = useRef<HTMLDivElement>(null);
 
@@ -26,6 +28,7 @@ export default function ScrollReveal3DGlass({
     trigger: trigger || undefined,
     z: -1200,
     transformOrigin: "center bottom",
+    inverted,
   });
 
   return (

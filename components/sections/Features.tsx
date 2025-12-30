@@ -112,6 +112,7 @@ export default function Features({ dictionary }: FeaturesProps) {
             <ScrollReveal3DGlass 
               key={index}
               trigger={sectionRef}
+              inverted={true}
             >
               <div
                 ref={(el) => {
