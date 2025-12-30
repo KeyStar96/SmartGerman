@@ -82,15 +82,7 @@ export default function GlassCube3D({
       )}
       
       {/* 3D Canvas - nur nach vollständigem Mount und geladenem Modul */}
-      {isMounted && DynamicCanvas && canvasLoaded && <DynamicCanvas trigger={trigger} />}
-      
-      {/* Fallback: Wenn 3D Canvas nicht geladen werden konnte, zeige nur den Text */}
-      {isMounted && !canvasLoaded && !DynamicCanvas && (
-        <div className="absolute inset-0 pointer-events-none opacity-50">
-          {/* Optional: CSS-basierter Glas-Effekt als Fallback */}
-          <div className="absolute inset-0 backdrop-blur-sm bg-white/5 dark:bg-white/10 rounded-lg" />
-        </div>
-      )}
+      {isMounted && DynamicCanvas && <DynamicCanvas trigger={trigger} />}
     </div>
   );
 }
