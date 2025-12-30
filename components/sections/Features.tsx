@@ -53,23 +53,23 @@ export default function Features({ dictionary }: FeaturesProps) {
   useGSAP(() => {
     if (!sectionRef.current) return;
 
-    // Header Animation
+    // Header Animation - startet früher, damit es bereits sichtbar ist wenn oben
     if (headerRef.current) {
       gsap.set(headerRef.current, {
         opacity: 0,
-        y: 40,
+        y: 20,
         force3D: true,
       });
 
       gsap.to(headerRef.current, {
         opacity: 1,
         y: 0,
-        duration: 1,
+        duration: 0.8,
         ease: "power3.out",
         scrollTrigger: {
           trigger: headerRef.current,
-          start: "top 80%",
-          end: "top 50%",
+          start: "top 90%",
+          end: "top 60%",
           toggleActions: "play none none none",
           markers: false,
         },
@@ -77,13 +77,13 @@ export default function Features({ dictionary }: FeaturesProps) {
       });
     }
 
-    // Stagger Animation für Feature Cards
+    // Stagger Animation für Feature Cards - startet früher
     // Warte kurz, damit alle refs gesetzt sind
     const cards = cardsRef.current.filter(Boolean);
     if (cards.length > 0) {
       gsap.set(cards, {
         opacity: 0,
-        y: 60,
+        y: 40,
         force3D: true,
       });
 
@@ -93,13 +93,13 @@ export default function Features({ dictionary }: FeaturesProps) {
         duration: 0.8,
         ease: "power3.out",
         stagger: {
-          amount: 0.4,
+          amount: 0.3,
           from: "start",
         },
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 75%",
-          end: "top 40%",
+          start: "top 85%",
+          end: "top 50%",
           toggleActions: "play none none none",
           markers: false,
         },
@@ -109,10 +109,10 @@ export default function Features({ dictionary }: FeaturesProps) {
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className="relative py-24 md:py-32 px-6 overflow-x-hidden">
+    <section ref={sectionRef} className="relative pt-12 md:pt-16 pb-24 md:pb-32 px-6 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Header der Sektion */}
-        <div ref={headerRef} className="mb-12 md:mb-14 text-center md:text-left md:max-w-2xl">
+        <div ref={headerRef} className="mb-8 md:mb-10 text-center md:text-left md:max-w-2xl">
           <h2 className="text-4xl md:text-6xl font-medium tracking-tight mb-6">
             {dictionary.sections.features.title_part1}{" "}
             <span className={`${instrumentSerif.className} text-brand-orange`}>

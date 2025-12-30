@@ -211,10 +211,9 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   return (
     <section 
       ref={container} 
-      className="relative flex flex-col justify-center items-center overflow-hidden z-10"
+      className="relative flex flex-col justify-center items-center overflow-x-hidden z-10"
       style={{
         minHeight: 'calc(100vh - 128px)', // 100vh minus pt-32 (128px) vom main-Element
-        height: 'calc(100vh - 128px)',
       }}
     >
       {/* SVG-Punktmuster Hintergrund (wissenschaftliches Millimeterpapier) */}
