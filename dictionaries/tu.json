@@ -27,10 +27,13 @@
       }
     },
     "hero": {
-      "subtitle": "Hannover'de profesyonel Almanca kursları.",
-      "subtitle_italic": "Hassas. Modern. Etkili.",
-      "cta_primary": "Kurs bul",
-      "cta_secondary": "Daha fazla bilgi"
+      "brand_name_part1": "Smart",
+      "brand_name_part2": "German",
+      "badge": "Bilimsel Temelli • Uzmanlık",
+      "headline": "Nöro-Didaktik Seviyesinde Dil Edinimi",
+      "subline": "Eski BAMF standartlarından kopuyoruz. Yöntemlerimiz beyin araştırmalarının güncel bulgularına dayanır ve yetişkinlerin (50+ dahil) öğrenme ihtiyaçlarına özel olarak optimize edilmiştir.",
+      "cta_primary": "Yöntemi Keşfet",
+      "cta_secondary": "2026 Kurs Programı"
     },
     "sections": {
       "quality_success": {

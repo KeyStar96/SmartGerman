@@ -27,10 +27,13 @@
       }
     },
     "hero": {
-      "subtitle": "Professionelle Deutschkurse in Hannover.",
-      "subtitle_italic": "Präzise. Modern. Effektiv.",
-      "cta_primary": "Kurs finden",
-      "cta_secondary": "Mehr erfahren"
+      "brand_name_part1": "Smart",
+      "brand_name_part2": "German",
+      "badge": "Wissenschaftlich fundiert • Master-Expertise",
+      "headline": "Spracherwerb auf dem Stand der Neuro-Didaktik",
+      "subline": "Wir brechen mit veralteten BAMF-Standards. Unsere Methoden basieren auf aktuellen Erkenntnissen der Hirnforschung und sind gezielt auf die Lernbedürfnisse von Erwachsenen (auch 50+) optimiert.",
+      "cta_primary": "Die Methode entdecken",
+      "cta_secondary": "Kursplan 2026"
     },
     "sections": {
       "quality_success": {

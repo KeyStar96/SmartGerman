@@ -2,6 +2,12 @@
 
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { Playfair_Display } from "next/font/google";
+
+const playfairDisplay = Playfair_Display({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 interface HeroProps {
   dictionary: any;
@@ -12,15 +18,33 @@ export default function Hero({ dictionary }: HeroProps) {
   const heroTextWrapper = useRef<HTMLHeadingElement>(null);
   const perspectiveContainer = useRef<HTMLDivElement>(null);
   const contentWrapper = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const sublineRef = useRef<HTMLParagraphElement>(null);
 
   useGSAP(() => {
     const tl = gsap.timeline();
     
-    // 1. Vertikaler Reveal-Effekt - Von unten nach oben
-    // Startet als horizontale Linie auf der unteren Kante der Buchstaben
-    // Wächst dann vertikal nach oben und lässt die Worte "SmartGerman" erstrahlen
+    // 1. Badge fade-in (zuerst)
+    if (badgeRef.current) {
+      gsap.set(badgeRef.current, {
+        opacity: 0,
+        y: -20,
+        force3D: true,
+        immediateRender: true
+      });
+      
+      tl.to(badgeRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        force3D: true,
+      }, 0);
+    }
+
+    // 2. Vertikaler Reveal-Effekt für Brand-Name - Von unten nach oben
     if (heroTextWrapper.current) {
-      // Setze initialen Zustand (sollte bereits durch CSS gesetzt sein, aber sicherheitshalber)
       gsap.set(heroTextWrapper.current, {
         clipPath: "inset(100% 0 0 0)",
         transformOrigin: "center bottom",
@@ -28,59 +52,53 @@ export default function Hero({ dictionary }: HeroProps) {
         immediateRender: true
       });
       
-      // Reveal-Animation: Wächst von unten nach oben
-      // to() animiert VON dem aktuellen Wert (inset(100% 0 0 0)) ZU inset(0% 0 0 0)
       tl.to(heroTextWrapper.current, {
-        clipPath: "inset(0% 0 0 0)", // Vollständig sichtbar
+        clipPath: "inset(0% 0 0 0)",
         duration: 1.8,
-        ease: "power3.out", // Sanftes Auslaufen
+        ease: "power3.out",
         force3D: true,
-      }, 0);
+      }, 0.3);
     }
 
-    // 3. 3D Scroll-X Rotation - Umfallen-Effekt für SmartGerman Text
-    if (heroTextWrapper.current) {
-      gsap.to(heroTextWrapper.current, {
-        scrollTrigger: {
-          trigger: container.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1, // Smooth following
-          refreshPriority: 0, // Performance: normale Priorität
-        },
-        rotateX: -90, // Kippt nach hinten (umfallen)
-        z: -1200, // Mehr Tiefe für dramatischeren Effekt
+    // 3. Headline fade-in (nach Brand-Name)
+    if (headlineRef.current) {
+      gsap.set(headlineRef.current, {
         opacity: 0,
-        transformOrigin: "center bottom", // Rotiert um die untere Kante (wie umfallen)
-        ease: "none",
-        force3D: true, // GPU-Beschleunigung
+        y: 20,
+        force3D: true,
+        immediateRender: true
       });
+      
+      tl.to(headlineRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power2.out",
+        force3D: true,
+      }, 1.5);
     }
 
-    // 4. 3D Scroll-X Rotation - Umfallen-Effekt für Content (Text + Buttons)
-    // WICHTIG: opacity bleibt bei 1, damit der Content sichtbar bleibt
-    if (contentWrapper.current) {
-      gsap.to(contentWrapper.current, {
-        scrollTrigger: {
-          trigger: container.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1, // Smooth following
-          refreshPriority: -1, // Performance: niedrigere Priorität
-        },
-        rotateX: -90, // Kippt nach hinten (umfallen)
-        z: -1200, // Mehr Tiefe für dramatischeren Effekt
-        // opacity NICHT animieren - Content soll sichtbar bleiben!
-        transformOrigin: "center bottom", // Rotiert um die untere Kante (wie umfallen)
-        ease: "none",
-        force3D: true, // GPU-Beschleunigung
+    // 4. Subline fade-in (nach Headline)
+    if (sublineRef.current) {
+      gsap.set(sublineRef.current, {
+        opacity: 0,
+        y: 20,
+        force3D: true,
+        immediateRender: true
       });
+      
+      tl.to(sublineRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: "power2.out",
+        force3D: true,
+      }, 2);
     }
 
-    // 2. Content fade-in AFTER reveal
+    // 5. Content (CTAs) fade-in (zuletzt)
     const contentFade = container.current?.querySelector(".hero-content-fade");
     if (contentFade) {
-      // Setze initialen Zustand (sollte bereits durch CSS gesetzt sein, aber sicherheitshalber)
       gsap.set(contentFade, {
         opacity: 0,
         y: 30,
@@ -88,15 +106,50 @@ export default function Hero({ dictionary }: HeroProps) {
         immediateRender: true
       });
       
-      // Fade-in Animation
       tl.to(contentFade, {
         opacity: 1,
         y: 0,
         duration: 1,
-        delay: 1.2, // Appears after reveal completes
         ease: "power2.out",
         force3D: true
-      }, 0);
+      }, 2.5);
+    }
+
+    // 6. 3D Scroll-X Rotation - Umfallen-Effekt für Brand-Name
+    if (heroTextWrapper.current) {
+      gsap.to(heroTextWrapper.current, {
+        scrollTrigger: {
+          trigger: container.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+          refreshPriority: 0,
+        },
+        rotateX: -90,
+        z: -1200,
+        opacity: 0,
+        transformOrigin: "center bottom",
+        ease: "none",
+        force3D: true,
+      });
+    }
+
+    // 7. 3D Scroll-X Rotation - Umfallen-Effekt für Content
+    if (contentWrapper.current) {
+      gsap.to(contentWrapper.current, {
+        scrollTrigger: {
+          trigger: container.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
+          refreshPriority: -1,
+        },
+        rotateX: -90,
+        z: -1200,
+        transformOrigin: "center bottom",
+        ease: "none",
+        force3D: true,
+      });
     }
 
   }, { scope: container });
@@ -106,33 +159,76 @@ export default function Hero({ dictionary }: HeroProps) {
       ref={container} 
       className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden z-10"
     >
-      <div className="text-center w-full px-4">
+      {/* SVG-Punktmuster Hintergrund (wissenschaftliches Millimeterpapier) */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{ opacity: 0.05 }}
+        aria-hidden="true"
+      >
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1" fill="currentColor" className="text-foreground" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+        </svg>
+      </div>
+
+      <div className="text-center w-full px-4 relative z-10">
         {/* 3D Perspective Container */}
         <div 
           ref={perspectiveContainer}
-          className="flex items-center justify-center"
+          className="flex flex-col items-center justify-center"
           style={{ 
             perspective: "2000px",
             transformStyle: "preserve-3d"
           }}
         >
-          {/* H1 with 3D transform */}
+          {/* Badge über dem Markennamen */}
+          <div 
+            ref={badgeRef}
+            className="mb-6 inline-block px-4 py-2 border border-foreground/50 rounded-full"
+            style={{ opacity: 0 }}
+          >
+            <span className="text-xs uppercase tracking-widest text-foreground/70 font-medium">
+              {dictionary.hero.badge}
+            </span>
+          </div>
+
+          {/* Brand-Name: SmartGerman */}
           <h1 
             ref={heroTextWrapper} 
-            className="text-[12vw] md:text-[10vw] font-bold tracking-tighter flex items-center justify-center leading-none gpu-render hero-text-reveal"
+            className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter flex items-center justify-center leading-none gpu-render hero-text-reveal mb-6"
             style={{ 
               transformStyle: "preserve-3d",
-              clipPath: "inset(100% 0 0 0)" // Initial versteckt
+              clipPath: "inset(100% 0 0 0)"
             }}
           >
-            {/* 'Smart' - Theme-aware color, NO whitespace before next span */}
-            <span className="inline-block text-foreground select-none">Smart</span><span className="inline-block text-[#FF5C00] select-none">German</span>
+            <span className="inline-block text-foreground select-none font-bold" style={{ fontWeight: 700 }}>
+              {dictionary.hero.brand_name_part1}
+            </span>
+            <span className="inline-block text-[#FF5C00] select-none" style={{ fontWeight: 800 }}>
+              {dictionary.hero.brand_name_part2}
+            </span>
           </h1>
+
+          {/* Wissenschaftliche Headline (Serif) */}
+          <h2 
+            ref={headlineRef}
+            className={`${playfairDisplay.className} text-3xl md:text-4xl lg:text-5xl text-foreground font-medium mb-8 max-w-4xl mx-auto leading-tight`}
+            style={{ 
+              opacity: 0
+            }}
+          >
+            {dictionary.hero.headline}
+          </h2>
         </div>
         
+        {/* Content Wrapper: Subline + CTAs */}
         <div 
           ref={contentWrapper}
-          className="hero-content-fade mt-12 gpu-render" 
+          className="hero-content-fade gpu-render" 
           style={{ 
             opacity: 0, 
             transform: "translateY(30px)",
@@ -140,24 +236,33 @@ export default function Hero({ dictionary }: HeroProps) {
             transformOrigin: "center bottom"
           }}
         >
-          <p className="text-xl md:text-2xl text-foreground/60 max-w-2xl mx-auto font-light leading-relaxed mb-10">
-            {dictionary.hero.subtitle}
-            <span className="block mt-2 font-medium text-foreground/80 italic">{dictionary.hero.subtitle_italic}</span>
+          {/* Subline in schmalem Container */}
+          <p 
+            ref={sublineRef}
+            className="text-base md:text-lg text-foreground/70 max-w-2xl mx-auto font-light leading-relaxed mb-12"
+            style={{ opacity: 0 }}
+          >
+            {dictionary.hero.subline}
           </p>
 
-          <div className="flex flex-wrap gap-6 justify-center">
-            <button className="px-10 py-5 bg-[#FF5C00] text-white rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-transform btn-glow-orange">
+          {/* CTA-Buttons */}
+          <div className="flex flex-wrap gap-6 justify-center items-center">
+            {/* Primary CTA: Outline-Button mit 2px Rahmen */}
+            <button className="px-8 py-4 border-2 border-foreground/50 rounded-full font-semibold uppercase tracking-widest text-sm hover:bg-foreground/5 hover:border-foreground/80 transition-all duration-300 gpu-render">
               {dictionary.hero.cta_primary}
             </button>
-            <button className="px-10 py-5 border-2 border-foreground/10 backdrop-blur-md rounded-full font-bold uppercase tracking-widest hover:bg-foreground/5 text-foreground transition-all">
+            
+            {/* Secondary CTA: Textlink mit animiertem Underline */}
+            <button className="relative px-4 py-2 font-medium uppercase tracking-widest text-sm text-foreground/70 hover:text-foreground transition-colors duration-300 group">
               {dictionary.hero.cta_secondary}
+              <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground/70 group-hover:w-full transition-all duration-300"></span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Awwwards Scroll Indikator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-20">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-20 z-10">
         <div className="w-[1px] h-20 bg-gradient-to-b from-foreground to-transparent" />
       </div>
     </section>
