@@ -85,11 +85,25 @@ body {
       background: rgba(13, 13, 13, 0.6); /* Leicht transparent über #0D0D0D */
       backdrop-filter: blur(40px) saturate(180%);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
-      /* Dezenter Orange-Glow beim Hover (nur Darkmode) */
     }
     
-    .dark .glass-panel-enhanced:hover {
-      box-shadow: 0 0 20px hsla(14, 100%, 50%, 0.15);
+    /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
+    /* Orange-Glow für kritische Features */
+    .glass-panel-enhanced.card-glow-orange:hover {
+      box-shadow: 0 0 15px rgba(255, 92, 0, 0.1); /* Lightmode: Subtiler Orange-Glow */
+    }
+    
+    .dark .glass-panel-enhanced.card-glow-orange:hover {
+      box-shadow: 0 0 20px rgba(255, 92, 0, 0.15); /* Darkmode: Dezenter Orange-Glow */
+    }
+    
+    /* Cyan-Glow für technische Micro-Interactions */
+    .glass-panel-enhanced.card-glow-cyan:hover {
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); /* Lightmode: Subtiler Cyan-Glow */
+    }
+    
+    .dark .glass-panel-enhanced.card-glow-cyan:hover {
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.15); /* Darkmode: Dezenter Cyan-Glow */
     }
     
     /* Glassmorphismus für Header: Präzise Linien */

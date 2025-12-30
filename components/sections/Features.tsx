@@ -119,7 +119,11 @@ export default function Features({ dictionary }: FeaturesProps) {
                 ref={(el) => {
                   if (el) cardsRef.current[index] = el;
                 }}
-                className="group relative h-full glass-panel-enhanced p-8 md:p-10 flex flex-col items-start transition-all duration-500"
+                className={`group relative h-full glass-panel-enhanced p-8 md:p-10 flex flex-col items-start transition-all duration-500 ${
+                  // Dynamischer Glow-Effekt basierend auf Feature-Farbe
+                  // Orange für kritische Features, Cyan für technische Micro-Interactions
+                  feature.color === "cyan" ? "card-glow-cyan" : "card-glow-orange"
+                }`}
               >
                 {/* Icon Container - Spaceship UI: Präzise Linien, Orange/Cyan für technische Icons */}
                 <div 
