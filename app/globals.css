@@ -126,4 +126,16 @@ body {
       text-rendering: optimizeLegibility;
       image-rendering: crisp-edges;
     }
+    
+    /* Verbessert das Subpixel-Rendering beim Klonen */
+    #main-content {
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    
+    /* Zwingt den Browser, den Klon auf der GPU zu behalten */
+    .will-change-transform {
+      will-change: transform;
+      transform: translateZ(0);
+    }
   }
