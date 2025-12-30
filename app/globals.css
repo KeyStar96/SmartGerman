@@ -70,8 +70,8 @@ body {
     .gpu-render {
       transform: translateZ(0);
       backface-visibility: hidden;
-      /* Performance: will-change nur bei Bedarf, nicht dauerhaft */
-      will-change: transform;
+      /* Performance: will-change für transform und opacity bei 3D-Animationen */
+      will-change: transform, opacity;
     }
     
     /* Performance: Reduziere Re-Paints bei statischen Elementen */

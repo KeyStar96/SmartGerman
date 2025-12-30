@@ -100,8 +100,14 @@ export default function Features({ dictionary }: FeaturesProps) {
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Features Grid - Perspective Container für 3D-Effekt */}
+        <div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          style={{ 
+            perspective: "1000px",
+            transformStyle: "preserve-3d"
+          }}
+        >
           {features.map((feature, index) => (
             <ScrollReveal3DGlass 
               key={index}

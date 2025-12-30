@@ -35,6 +35,7 @@ export default function ScrollReveal3DGlass({
       style={{
         transformStyle: "preserve-3d",
         transformOrigin: "center bottom",
+        willChange: "transform, opacity", // Performance: GPU-Optimierung für Animation
       }}
     >
       {children}
