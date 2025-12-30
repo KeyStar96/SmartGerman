@@ -70,13 +70,13 @@ export function useScrollReveal3D(
       rotateX: 0,
       z: 0,
       opacity: 1,
-      ease: "power2.out", // Leicht beschleunigtes Easing für schnelleres Erreichen
+      ease: "none", // Bei scrub muss ease: "none" sein
       force3D: true,
+      duration: 0.25, // Nimmt 25% der Timeline ein
     }, 0); // Startet bei Position 0
 
-    // Phase 2: Bleibt bei 0° - größerer Bereich wo die Karten frontal sind
-    // Von Timeline-Position 0.25 bis 0.7 bleibt bei 0°
-    // (Keine Animation nötig, da bereits bei 0°)
+    // Phase 2: Bleibt bei 0° - größerer Bereich (von 0.25 bis 0.7)
+    // Keine Animation nötig, da bereits bei 0° - die Timeline bleibt automatisch bei 0°
 
     // Phase 3: Nach hinten kippen - Würfel dreht sich weiter, obere Fläche geht nach hinten
     // Von 0° auf -90° (von Timeline-Position 0.7 bis 1.0) - später nach hinten kippen
@@ -84,9 +84,10 @@ export function useScrollReveal3D(
       rotateX: -90,
       z,
       opacity: 0,
-      ease: "power2.in", // Leicht verzögertes Easing für sanfteres Kippen
+      ease: "none", // Bei scrub muss ease: "none" sein
       force3D: true,
-    }, 0.7); // Startet bei Position 0.7 (später, damit größerer 0-Grad-Bereich)
+      duration: 0.3, // Nimmt 30% der Timeline ein (0.7 bis 1.0)
+    }, 0.7); // Startet bei Position 0.7
 
     return () => {
       tl.kill();
