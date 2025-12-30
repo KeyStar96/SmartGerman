@@ -5,6 +5,7 @@ import { LucideIcon, UserCheck, Clock, Target } from "lucide-react";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { Instrument_Serif } from "next/font/google";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import ScrollIndicator from "@/components/effects/ScrollIndicator";
 
 const instrumentSerif = Instrument_Serif({ 
   subsets: ["latin"],
@@ -76,6 +77,22 @@ export default function Features({ dictionary }: FeaturesProps) {
         force3D: true,
       });
     }
+
+    // ScrollTrigger-Snapping: Rastet ein, wenn die Sektion oben am Viewport ist
+    // Die Karten sind dann bei 0 Grad Rotation perfekt ausgerichtet
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "top top", // Rastet ein, wenn die Sektion oben ankommt
+      end: "+=100", // Ein kleiner Pufferbereich für den Snap-Bereich
+      snap: {
+        snapTo: 0, // 0 entspricht dem 'start' Punkt (Top der Sektion)
+        duration: { min: 0.4, max: 0.8 }, // Schnelles, knackiges Einrasten
+        delay: 0.1, // Kurze Pause nach dem Scrollen, bevor er snappt (Lenis-Kompatibilität)
+        ease: "power2.inOut", // Hochwertige Beschleunigungskurve
+        inertia: false, // Verhindert unkontrolliertes Weitergleiten
+      },
+      markers: false, // Setze auf true zum Debuggen
+    });
 
     // Die 3D-Rotation wird von ScrollReveal3DGlass mit sectionRef als Trigger gehandhabt
     // Wir entfernen die separate Stagger-Animation, da sie mit der 3D-Animation kollidieren würde
@@ -150,6 +167,11 @@ export default function Features({ dictionary }: FeaturesProps) {
             </ScrollReveal3DGlass>
           ))}
         </div>
+      </div>
+
+      {/* Scroll Indikator - zentriert am unteren Rand */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+        <ScrollIndicator />
       </div>
     </section>
   );

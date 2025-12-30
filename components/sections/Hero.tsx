@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { Instrument_Serif } from "next/font/google";
+import ScrollIndicator from "@/components/effects/ScrollIndicator";
 
 // Instrument Serif für Headline - Awwwards-Look mit hochkontrastigen Serifen
 const instrumentSerif = Instrument_Serif({ 
@@ -323,9 +324,9 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         </div>
       </div>
 
-      {/* Awwwards Scroll Indikator */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-20 z-10">
-        <div className="w-[1px] h-20 bg-gradient-to-b from-foreground to-transparent" />
+      {/* Scroll Indikator */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
+        <ScrollIndicator />
       </div>
     </section>
   );
