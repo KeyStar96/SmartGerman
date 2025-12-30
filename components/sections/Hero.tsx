@@ -81,22 +81,42 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   useGSAP(() => {
     const tl = gsap.timeline();
     
-    // Aggressives Snapping: Rastet zur Features-Sektion ein, sobald der Nutzer leicht nach unten scrollt
-    ScrollTrigger.create({
-      trigger: container.current,
-      start: "bottom top", // Wenn Hero-Bottom den Viewport-Top erreicht
-      end: "+=100", // Pufferbereich
-      snap: {
-        snapTo: 1, // Zwingt zum Ende des Triggers (Anfang Features)
-        duration: 0.4, // Schnelles Einrasten
-        delay: 0, // Sofortiges Snapping ohne Wartezeit
-        ease: "power4.inOut", // Sehr steile Kurve für "Eisrast-Gefühl"
-        inertia: false, // Verhindert unkontrolliertes Weitergleiten
-      },
-      markers: false,
-    });
+    // Aggressives Snapping: Überschreibt sofort jedes manuelle Scrolling
+    // Snapped sofort, sobald der Trigger-Bereich erreicht wird
+    if (container.current) {
+      ScrollTrigger.create({
+        trigger: container.current,
+        start: "bottom 98%", // Sehr früher Trigger-Punkt
+        end: "bottom 2%", // Sehr enger Bereich
+        snap: {
+          snapTo: 1, // Zwingt zum Ende des Triggers (Anfang Features)
+          duration: 0.15, // Sehr schnelles Einrasten (150ms)
+          delay: 0, // Keine Verzögerung
+          ease: "power4.out", // Sehr steile Kurve
+          inertia: false, // Kein Weitergleiten
+        },
+        markers: false,
+      });
+    }
     
-    // 1. Badge fade-in (zuerst)
+    // 1. Vertikaler Reveal-Effekt für Brand-Name - Von unten nach oben (ZUERST)
+    if (heroTextWrapper.current) {
+      gsap.set(heroTextWrapper.current, {
+        clipPath: "inset(100% 0 0 0)",
+        transformOrigin: "center bottom",
+        force3D: true,
+        immediateRender: true
+      });
+      
+      tl.to(heroTextWrapper.current, {
+        clipPath: "inset(0% 0 0 0)",
+        duration: 1.8,
+        ease: "power3.out",
+        force3D: true,
+      }, 0); // Startet sofort bei Position 0
+    }
+
+    // 2. Badge fade-in (nach Brand-Name)
     if (badgeRef.current) {
       gsap.set(badgeRef.current, {
         opacity: 0,
@@ -111,27 +131,10 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 0.8,
         ease: "power2.out",
         force3D: true,
-      }, 0);
+      }, 0.5); // Startet nach Brand-Name (bei Position 0.5)
     }
 
-    // 2. Vertikaler Reveal-Effekt für Brand-Name - Von unten nach oben
-    if (heroTextWrapper.current) {
-      gsap.set(heroTextWrapper.current, {
-        clipPath: "inset(100% 0 0 0)",
-        transformOrigin: "center bottom",
-        force3D: true,
-        immediateRender: true
-      });
-      
-      tl.to(heroTextWrapper.current, {
-        clipPath: "inset(0% 0 0 0)",
-        duration: 1.8,
-        ease: "power3.out",
-        force3D: true,
-      }, 0.3);
-    }
-
-    // 3. Headline fade-in (nach Brand-Name)
+    // 3. Headline fade-in (nach Badge)
     if (headlineRef.current) {
       gsap.set(headlineRef.current, {
         opacity: 0,
@@ -146,7 +149,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 1,
         ease: "power2.out",
         force3D: true,
-      }, 1.5);
+      }, 1.7); // Angepasst, da Badge jetzt später kommt
     }
 
     // 4. Subline fade-in (nach Headline)
@@ -223,18 +226,41 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       });
     }
 
-    // 8. Scroll-Indikator ausblenden, wenn Hero-Sektion verlassen wird
+    // 8. Scroll-Indikator: Sichtbar am Anfang, verschwindet beim Scrollen, erscheint wieder beim Zurückkommen
     if (scrollIndicatorRef.current) {
-      gsap.to(scrollIndicatorRef.current, {
-        opacity: 0,
-        y: 20,
-        scrollTrigger: {
-          trigger: container.current,
-          start: "bottom 80%",
-          end: "bottom top",
-          scrub: true,
-        },
+      // Initial: Sichtbar
+      gsap.set(scrollIndicatorRef.current, {
+        opacity: 1,
+        y: 0,
         force3D: true,
+      });
+
+      // Verschwindet, wenn man runter scrollt
+      ScrollTrigger.create({
+        trigger: container.current,
+        start: "top top",
+        end: "bottom top",
+        onEnter: () => {
+          // Verschwindet, wenn Hero-Section verlassen wird
+          gsap.to(scrollIndicatorRef.current, {
+            opacity: 0,
+            y: 20,
+            duration: 0.3,
+            ease: "power2.out",
+            force3D: true,
+          });
+        },
+        onLeaveBack: () => {
+          // Erscheint wieder, wenn man zurück zur Hero-Section kommt
+          gsap.to(scrollIndicatorRef.current, {
+            opacity: 1,
+            y: 0,
+            duration: 0.3,
+            ease: "power2.out",
+            force3D: true,
+          });
+        },
+        markers: false,
       });
     }
 
@@ -359,6 +385,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       <div 
         ref={scrollIndicatorRef}
         className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center pointer-events-none"
+        style={{ opacity: 1 }}
       >
         <span className="text-[10px] uppercase tracking-[0.2em] mb-2 text-foreground/60 font-medium">
           {dictionary.hero.scroll_label}
