@@ -102,32 +102,36 @@ body {
       box-shadow: 0 15px 50px rgba(255, 92, 0, 0.3);
     }
     
-    /* Edler Leuchteffekt für das orange "German" im Hero */
-    /* Multi-Layer Glow für subtile, hochwertige Ausstrahlung */
+    /* Präziser Neon-Leuchteffekt für das orange "German" im Hero */
+    /* Scharfer, definierter Glow direkt an den Buchstabenkanten - wie echter Neon */
     .hero-german-glow {
       color: #FF5C00;
       text-shadow: 
-        0 0 20px rgba(255, 92, 0, 0.4),
-        0 0 40px rgba(255, 92, 0, 0.3),
-        0 0 60px rgba(255, 92, 0, 0.2),
-        0 0 80px rgba(255, 92, 0, 0.1);
-      filter: drop-shadow(0 0 8px rgba(255, 92, 0, 0.5)) 
-              drop-shadow(0 0 16px rgba(255, 92, 0, 0.3))
-              drop-shadow(0 0 24px rgba(255, 92, 0, 0.2));
+        0 0 5px rgba(255, 92, 0, 0.9),
+        0 0 10px rgba(255, 92, 0, 0.8),
+        0 0 15px rgba(255, 92, 0, 0.7),
+        0 0 20px rgba(255, 92, 0, 0.6),
+        0 0 30px rgba(255, 92, 0, 0.5);
+      filter: drop-shadow(0 0 3px rgba(255, 92, 0, 1)) 
+              drop-shadow(0 0 6px rgba(255, 92, 0, 0.9))
+              drop-shadow(0 0 9px rgba(255, 92, 0, 0.8));
       will-change: filter, text-shadow;
       transition: text-shadow 0.3s ease, filter 0.3s ease;
     }
     
-    /* Verstärkter Glow im Dark-Mode für bessere Sichtbarkeit */
+    /* Intensiverer Neon-Glow im Dark-Mode */
     .dark .hero-german-glow {
       text-shadow: 
-        0 0 25px rgba(255, 92, 0, 0.5),
-        0 0 50px rgba(255, 92, 0, 0.4),
-        0 0 75px rgba(255, 92, 0, 0.3),
-        0 0 100px rgba(255, 92, 0, 0.2);
-      filter: drop-shadow(0 0 10px rgba(255, 92, 0, 0.6)) 
-              drop-shadow(0 0 20px rgba(255, 92, 0, 0.4))
-              drop-shadow(0 0 30px rgba(255, 92, 0, 0.3));
+        0 0 5px rgba(255, 92, 0, 1),
+        0 0 10px rgba(255, 92, 0, 0.95),
+        0 0 15px rgba(255, 92, 0, 0.9),
+        0 0 20px rgba(255, 92, 0, 0.8),
+        0 0 30px rgba(255, 92, 0, 0.7),
+        0 0 40px rgba(255, 92, 0, 0.6);
+      filter: drop-shadow(0 0 4px rgba(255, 92, 0, 1)) 
+              drop-shadow(0 0 8px rgba(255, 92, 0, 0.95))
+              drop-shadow(0 0 12px rgba(255, 92, 0, 0.9))
+              drop-shadow(0 0 16px rgba(255, 92, 0, 0.8));
     }
     
     /* Texturierte Oberfläche: Paper-Feel mit weichem Theme-Übergang */
