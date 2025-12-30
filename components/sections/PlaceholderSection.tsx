@@ -4,8 +4,7 @@ import { useRef } from "react";
 import { LucideIcon, Sparkles, BookOpen, TrendingUp } from "lucide-react";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { Instrument_Serif } from "next/font/google";
-import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import ScrollIndicator from "@/components/effects/ScrollIndicator";
+import { gsap, useGSAP } from "@/lib/gsap";
 
 const instrumentSerif = Instrument_Serif({ 
   subsets: ["latin"],
@@ -155,11 +154,6 @@ export default function PlaceholderSection() {
             </ScrollReveal3DGlass>
           ))}
         </div>
-      </div>
-
-      {/* Scroll Indikator - zentriert am unteren Rand */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
-        <ScrollIndicator />
       </div>
     </section>
   );
