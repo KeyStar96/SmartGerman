@@ -1,7 +1,22 @@
+import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
 import ScrollReveal3D from "@/components/effects/ScrollReveal3D";
-import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { getDictionary } from "@/lib/dictionary";
+
+// Dynamischer Import für React Three Fiber Komponente (SSR-kompatibel)
+const ScrollReveal3DGlass = dynamic(
+  () => import("@/components/effects/ScrollReveal3DGlass"),
+  { 
+    ssr: false, // WICHTIG: Deaktiviert SSR für React Three Fiber
+    loading: () => (
+      <div className="h-screen flex items-center justify-center">
+        <div className="glass-panel p-12 max-w-xl text-center">
+          <div className="text-brand-blue">Loading...</div>
+        </div>
+      </div>
+    )
+  }
+);
 
 export default async function HomePage({
   params,

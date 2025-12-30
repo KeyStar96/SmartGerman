@@ -197,6 +197,21 @@ export default function GlassCube3D({
   trigger, 
   className = "" 
 }: GlassCube3DProps) {
+  // Sicherstellen, dass wir nur im Browser rendern
+  if (typeof window === "undefined") {
+    return (
+      <div className={`relative w-full h-full ${className}`} style={{ minHeight: "400px" }}>
+        {children && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="text-center px-8 max-w-xl">
+              {children}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={`relative w-full h-full ${className}`} style={{ minHeight: "400px" }}>
       {/* Text-Inhalt als HTML-Overlay - wird durch das Glas verzerrt (indirekt über Hintergrund-Verzerrung) */}
