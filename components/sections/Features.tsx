@@ -127,7 +127,7 @@ export default function Features({ dictionary }: FeaturesProps) {
               >
                 {/* Icon Container - Spaceship UI: Präzise Linien, Orange/Cyan für technische Icons */}
                 <div 
-                  className="relative mb-8 p-4 rounded-2xl bg-background/50 dark:bg-dm-surface-teal border border-black/10 dark:border-dm-border-slate group-hover:scale-110 transition-transform duration-500 overflow-hidden"
+                  className="relative mb-8 p-4 rounded-2xl bg-background/50 dark:bg-black/20 border border-black/10 dark:border-dm-border-slate group-hover:scale-110 transition-transform duration-500 overflow-hidden"
                   style={{ 
                     color: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)"
                   }}
