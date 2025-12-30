@@ -43,6 +43,23 @@
       "modern_methods": {
         "title": "Modern Yöntemler",
         "description": "Hızlı ilerleme için yenilikçi öğrenme yöntemleri. Ekibimiz başarı yolculuğunuzda size eşlik eder."
+      },
+      "features": {
+        "title_part1": "Bizi",
+        "title_part2": "farklı kılan",
+        "intro": "SmartGerman, size Almanca öğrenmenin modern ve etkili bir yolunu sunar – kalite ve esnekliğe odaklanır.",
+        "native_speakers": {
+          "title": "Ana Dili Öğretmenler",
+          "description": "Nitelikli ana dili öğretmenlerimiz, otantik bir öğrenme deneyimi için profesyonel öğretim deneyimini kültürlerarası yeterlilikle birleştirir."
+        },
+        "flexibility": {
+          "title": "Esnek Kurs Saatleri",
+          "description": "Programınıza uyum sağlayan, günün farklı saatlerinde kurslar sunuyoruz - akşam saatleri dahil."
+        },
+        "methods": {
+          "title": "Pratik Yöntemler",
+          "description": "Etkileşimli ve iletişimsel öğretim yöntemlerimiz, hızlı ve sürdürülebilir öğrenme başarısı için günlük durumlara odaklanır."
+        }
       }
     },
     "features": {

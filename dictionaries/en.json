@@ -43,6 +43,23 @@
       "modern_methods": {
         "title": "Modern Methods",
         "description": "Innovative learning methods for rapid progress. Our team accompanies you on your path to success."
+      },
+      "features": {
+        "title_part1": "What makes us",
+        "title_part2": "stand out",
+        "intro": "SmartGerman offers you a modern and effective way to learn German – focused on quality and flexibility.",
+        "native_speakers": {
+          "title": "Native Teachers",
+          "description": "Our qualified native speakers combine professional teaching experience with intercultural competence for an authentic learning experience."
+        },
+        "flexibility": {
+          "title": "Flexible Course Times",
+          "description": "We offer courses at various times of day that adapt to your schedule - including evenings."
+        },
+        "methods": {
+          "title": "Practical Methods",
+          "description": "Our interactive and communicative teaching methods focus on everyday situations for quick and sustainable learning success."
+        }
       }
     },
     "features": {

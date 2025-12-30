@@ -43,6 +43,23 @@
       "modern_methods": {
         "title": "Moderne Methoden",
         "description": "Innovative Lernmethoden für schnelle Fortschritte. Unser Team begleitet dich auf deinem Weg zum Erfolg."
+      },
+      "features": {
+        "title_part1": "Was uns",
+        "title_part2": "auszeichnet",
+        "intro": "SmartGerman bietet Ihnen einen modernen und effektiven Weg, Deutsch zu lernen – fokussiert auf Qualität und Flexibilität.",
+        "native_speakers": {
+          "title": "Muttersprachliche Lehrer",
+          "description": "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz für ein authentisches Lernerlebnis."
+        },
+        "flexibility": {
+          "title": "Flexible Kurszeiten",
+          "description": "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends."
+        },
+        "methods": {
+          "title": "Praxisnahe Methoden",
+          "description": "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg."
+        }
       }
     },
     "features": {
