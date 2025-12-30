@@ -73,7 +73,7 @@ export function useScrollReveal3D(
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
-        start: "top bottom", // Startet wenn Element von unten in Viewport kommt
+        start: "top bottom", // Startet wenn Trigger-Element von unten in Viewport kommt
         end: "bottom center", // Responsivere Rotation - endet früher
         scrub,
         refreshPriority: -1,

@@ -28,6 +28,7 @@ export default function Features({ dictionary }: FeaturesProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Features-Daten aus Dictionary
   const features: FeatureProps[] = [
@@ -102,6 +103,7 @@ export default function Features({ dictionary }: FeaturesProps) {
 
         {/* Features Grid - Perspective Container für 3D-Effekt */}
         <div 
+          ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
           style={{ 
             perspective: "1000px",
@@ -111,7 +113,7 @@ export default function Features({ dictionary }: FeaturesProps) {
           {features.map((feature, index) => (
             <ScrollReveal3DGlass 
               key={index}
-              trigger={sectionRef}
+              trigger={gridRef}
               inverted={true}
             >
               <div

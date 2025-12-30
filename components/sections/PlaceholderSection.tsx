@@ -24,6 +24,7 @@ export default function PlaceholderSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const headerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Platzhalter-Karten-Daten für Testzwecke
   const cards: CardProps[] = [
@@ -98,6 +99,7 @@ export default function PlaceholderSection() {
 
         {/* Cards Grid - Perspective Container für 3D-Effekt */}
         <div 
+          ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
           style={{ 
             perspective: "1000px",
@@ -107,7 +109,7 @@ export default function PlaceholderSection() {
           {cards.map((card, index) => (
             <ScrollReveal3DGlass 
               key={index}
-              trigger={sectionRef}
+              trigger={gridRef}
               inverted={true}
             >
               <div
