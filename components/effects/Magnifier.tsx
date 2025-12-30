@@ -1,93 +1,120 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useLayoutEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useMagnifier } from "@/lib/context/MagnifierContext";
 import { useLenis } from "lenis/react";
 
 /**
  * Smart Lens (Lupe) für Barrierefreiheit - iOS 26 Style
- * - Folgt dem Cursor mit 60fps Performance
- * - Schwebt 120px über dem Mauszeiger (verhindert Verdeckung)
- * - 1.6x Vergrößerung des Bereichs unter der Maus
- * - Solid Background (nicht transparent) für isolierte Ansicht
- * - Performance-optimiert: GPU-beschleunigt mit backface-hidden
- * - ESC-Taste deaktiviert die Lupe
- * - Live-Scroll-Integration mit Lenis für flüssiges Scrolling
  * 
- * Technischer Ansatz:
- * - Nutzt einen Live-Injektions-Ansatz mit ID-basiertem Klonen
- * - Berücksichtigt Lenis-Scroll-Offset für korrekte Positionierung
- * - GPU-Optimierung via will-change und backface-hidden für scharfe Schrift
- * - Die Lupe schwebt über dem Cursor, damit die Hand/Maus den Text nicht verdeckt
+ * Technische Spezifikationen:
+ * - Mathematisch korrekte Positionierung via getBoundingClientRect()
+ * - Scharfer Text durch DOM-Cloning mit größerer Schriftgröße (kein scale())
+ * - Dynamische Scroll-Synchronisation mit Lenis
+ * - 60fps Performance durch direkte Style-Updates via useRef
+ * 
+ * @performance: Nutzt requestAnimationFrame für flüssige Updates
+ * @accessibility: ESC-Taste deaktiviert die Lupe
  */
 export default function Magnifier() {
   const { isMagnifierActive, toggleMagnifier } = useMagnifier();
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [scrollOffset, setScrollOffset] = useState(0);
-  const [viewportSize, setViewportSize] = useState({ 
-    width: typeof window !== "undefined" ? window.innerWidth : 0, 
-    height: typeof window !== "undefined" ? window.innerHeight : 0 
-  });
+  const lensRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const cloneRef = useRef<HTMLElement | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const containerRectRef = useRef<DOMRect | null>(null);
 
   // iOS-typische Vergrößerung und Lupe-Dimensionen
-  const scale = 1.6;
-  const magnifierSize = 180;
+  const zoomFactor = 1.6;
+  const lensSize = 180;
+  const radius = lensSize / 2;
   const offsetUp = 120; // Die Lupe schwebt 120px ÜBER dem Zeiger
-  const radius = magnifierSize / 2;
+
+  // Aktuelle Mausposition (wird von Mouse-Event gesetzt)
+  const mousePosRef = useRef({ x: 0, y: 0 });
 
   // Lenis Scroll-Position live abgreifen
   useLenis(({ scroll }) => {
     if (isMagnifierActive) {
-      setScrollOffset(scroll);
+      // Aktualisiere Container-Rect bei Scroll-Änderungen
+      updateContainerRect();
+      // Trigger Update
+      requestUpdate();
     }
   });
 
-  // Smooth Motion für die Lupe selbst (schwebend über dem Cursor)
-  const mouseXValue = useMotionValue(0);
-  const mouseYValue = useMotionValue(0);
-  const springConfig = { damping: 25, stiffness: 250, mass: 0.5 };
-  const lensX = useSpring(mouseXValue, springConfig);
-  const lensY = useSpring(mouseYValue, springConfig);
+  // Aktualisiere Container-Rect (wird bei Scroll und Resize aufgerufen)
+  const updateContainerRect = () => {
+    const mainContent = document.getElementById("main-content");
+    if (mainContent) {
+      containerRectRef.current = mainContent.getBoundingClientRect();
+    }
+  };
 
-  // Transform für die Lupe-Position
-  const lensXTransformed = useTransform(lensX, (x) => x - radius);
-  const lensYTransformed = useTransform(lensY, (y) => y - radius);
+  // Haupt-Update-Funktion: Berechnet Position und Content-Offset
+  const updateMagnifier = () => {
+    if (!isMagnifierActive || !lensRef.current || !contentRef.current || !containerRectRef.current) {
+      return;
+    }
 
-  // Viewport-Größe verfolgen
-  useEffect(() => {
-    const updateViewportSize = () => {
-      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
-    };
-    
-    updateViewportSize();
-    window.addEventListener("resize", updateViewportSize);
-    
-    return () => {
-      window.removeEventListener("resize", updateViewportSize);
-    };
-  }, []);
+    const rect = containerRectRef.current;
+    const { x: mouseX, y: mouseY } = mousePosRef.current;
+
+    // Mathematisch korrekte Positionierung: Viewport-relative Koordinaten
+    // getBoundingClientRect() liefert bereits viewport-relative Werte
+    const xLocal = mouseX - rect.left;
+    const yLocal = mouseY - rect.top;
+
+    // Berechne Content-Offset innerhalb der Lupe
+    // Formel: pos = -(localCoord * zoomFactor - lensSize / 2)
+    const contentX = -(xLocal * zoomFactor - radius);
+    const contentY = -(yLocal * zoomFactor - radius);
+
+    // Position der Lupe (schwebt über dem Cursor)
+    const lensX = mouseX - radius;
+    const lensY = mouseY - radius - offsetUp;
+
+    // Direkte Style-Updates für 60fps Performance (kein React Re-Render)
+    if (lensRef.current) {
+      lensRef.current.style.transform = `translate(${lensX}px, ${lensY}px)`;
+    }
+
+    if (contentRef.current) {
+      contentRef.current.style.transform = `translate(${contentX}px, ${contentY}px)`;
+    }
+  };
+
+  // Request Animation Frame Wrapper
+  const requestUpdate = () => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    animationFrameRef.current = requestAnimationFrame(() => {
+      updateMagnifier();
+      animationFrameRef.current = null;
+    });
+  };
 
   // Mouse-Move Handler
   useEffect(() => {
     if (!isMagnifierActive) return;
 
     const handleMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-      
-      // Update Spring-Values für flüssige Animation
-      mouseXValue.set(e.clientX);
-      mouseYValue.set(e.clientY - offsetUp); // Versatz nach oben
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+      updateContainerRect();
+      requestUpdate();
     };
 
     window.addEventListener("mousemove", handleMove, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", handleMove);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-  }, [isMagnifierActive, mouseXValue, mouseYValue, offsetUp]);
+  }, [isMagnifierActive]);
 
   // ESC-Taste Handler
   useEffect(() => {
@@ -106,8 +133,24 @@ export default function Magnifier() {
     };
   }, [isMagnifierActive, toggleMagnifier]);
 
-  // Live-Injektions-Ansatz: Klone den main-content mit ID-Referenz
+  // Resize Handler: Aktualisiere Container-Rect und Viewport-Größe
   useEffect(() => {
+    if (!isMagnifierActive) return;
+
+    const handleResize = () => {
+      updateContainerRect();
+      requestUpdate();
+    };
+
+    window.addEventListener("resize", handleResize, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMagnifierActive]);
+
+  // DOM-Cloning: Erstelle scharfen Content-Klon mit größerer Schriftgröße
+  useLayoutEffect(() => {
     if (!isMagnifierActive) {
       // Entferne den Klon, wenn die Lupe deaktiviert ist
       if (cloneRef.current && cloneRef.current.parentNode) {
@@ -117,32 +160,31 @@ export default function Magnifier() {
       return;
     }
 
-    // Warte kurz, damit der contentRef bereit ist
+    // Warte kurz, damit der main-content bereit ist
     const timeoutId = setTimeout(() => {
-      if (!contentRef.current) return;
-
-      // Nutze die ID-Referenz für präzises Klonen
       const mainContent = document.getElementById("main-content");
-      if (!mainContent) return;
+      if (!mainContent || !contentRef.current) return;
+
+      // Initialisiere Container-Rect
+      updateContainerRect();
 
       // Entferne alten Klon, falls vorhanden
       if (cloneRef.current && cloneRef.current.parentNode) {
         cloneRef.current.parentNode.removeChild(cloneRef.current);
       }
 
-      // Erstelle einen Klon des Main-Inhalts
+      // Erstelle einen tiefen Klon des Main-Inhalts
       const clone = mainContent.cloneNode(true) as HTMLElement;
       clone.className = "magnifier-content-clone";
       
-      // Setze Styles für den Klon - nutze aktuelle Viewport-Größe
-      const vw = viewportSize.width || window.innerWidth;
-      const vh = viewportSize.height || window.innerHeight;
+      // Setze Basis-Styles für den Klon
+      const rect = containerRectRef.current || mainContent.getBoundingClientRect();
       
       clone.style.position = "absolute";
       clone.style.top = "0px";
       clone.style.left = "0px";
-      clone.style.width = `${vw}px`;
-      clone.style.height = `${vh}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
       clone.style.pointerEvents = "none";
       clone.style.background = "transparent";
       clone.style.overflow = "visible";
@@ -154,13 +196,34 @@ export default function Magnifier() {
       clone.style.transform = "translateZ(0)";
       clone.style.backfaceVisibility = "hidden";
       clone.style.willChange = "transform";
+      (clone.style as any).webkitFontSmoothing = "antialiased";
+      (clone.style as any).fontSmoothing = "antialiased";
       
-      // Wichtig: Stelle sicher, dass alle Styles vom Original übernommen werden
+      // Wichtig: Übernehme Styles vom Original
       const computedStyle = window.getComputedStyle(mainContent);
       clone.style.color = computedStyle.color;
       clone.style.fontFamily = computedStyle.fontFamily;
-      clone.style.fontSize = computedStyle.fontSize;
       clone.style.backgroundColor = computedStyle.backgroundColor;
+
+      // SCHARFER TEXT: Erhöhe Schriftgrößen um zoomFactor statt scale()
+      // Dies verhindert Rasterisierung und sorgt für native Schärfe
+      const allTextElements = clone.querySelectorAll("*");
+      allTextElements.forEach((el) => {
+        const element = el as HTMLElement;
+        const originalStyle = window.getComputedStyle(element);
+        const fontSize = parseFloat(originalStyle.fontSize);
+        
+        if (fontSize > 0) {
+          // Erhöhe Schriftgröße um zoomFactor (z.B. 1.6x)
+          element.style.fontSize = `${fontSize * zoomFactor}px`;
+        }
+
+        // GPU-Optimierung für alle Elemente
+        element.style.transform = "translateZ(0)";
+        element.style.backfaceVisibility = "hidden";
+        (element.style as any).webkitFontSmoothing = "antialiased";
+        (element.style as any).fontSmoothing = "antialiased";
+      });
       
       // Entferne alle interaktiven Elemente aus dem Klon
       const interactiveElements = clone.querySelectorAll("button, a, input, select, textarea, [role='button']");
@@ -187,43 +250,19 @@ export default function Magnifier() {
         cloneRef.current = null;
       }
     };
-  }, [isMagnifierActive, viewportSize]);
-
-  // MotionValues für die Content-Positionierung
-  const contentXValue = useMotionValue(0);
-  const contentYValue = useMotionValue(0);
-
-  // Content-Positionierung mit Scroll-Offset-Berücksichtigung
-  // Die magische Formel: Wir müssen den Scroll-Offset berücksichtigen, damit der Inhalt mitfließt
-  useEffect(() => {
-    if (!isMagnifierActive) return;
-
-    const updateContentPosition = () => {
-      // X-Position: Zentriere den Punkt unter der Maus in der Lupe
-      const mx = mousePos.x;
-      contentXValue.set(radius - (mx * scale));
-
-      // Y-Position: Kombiniere Mausposition mit Scroll-Offset für korrekte vertikale Position
-      // Der Scroll-Offset wird von Lenis bereitgestellt und muss in die Berechnung einfließen
-      const my = mousePos.y;
-      contentYValue.set(radius - ((my + scrollOffset) * scale));
-    };
-
-    updateContentPosition();
-  }, [mousePos, scrollOffset, isMagnifierActive, contentXValue, contentYValue, radius, scale]);
+  }, [isMagnifierActive, zoomFactor]);
 
   return (
     <AnimatePresence>
       {isMagnifierActive && (
         <motion.div
+          ref={lensRef}
           style={{
             position: "fixed",
             left: 0,
             top: 0,
-            width: magnifierSize,
-            height: magnifierSize,
-            x: lensXTransformed,
-            y: lensYTransformed,
+            width: lensSize,
+            height: lensSize,
             zIndex: 9999,
             pointerEvents: "none",
           }}
@@ -240,21 +279,19 @@ export default function Magnifier() {
             }}
           >
             {/* Hochauflösender Content-Klon mit GPU-Optimierung */}
-            <motion.div
+            <div
               ref={contentRef}
               style={{
                 position: "absolute",
                 left: 0,
                 top: 0,
-                width: viewportSize.width || window.innerWidth,
-                height: viewportSize.height || window.innerHeight,
-                x: contentXValue,
-                y: contentYValue,
-                scale: scale,
+                width: containerRectRef.current?.width || window.innerWidth,
+                height: containerRectRef.current?.height || window.innerHeight,
                 transformOrigin: "0 0",
                 willChange: "transform",
                 backfaceVisibility: "hidden",
                 transform: "translateZ(0)",
+                WebkitFontSmoothing: "antialiased",
               }}
               className="origin-top-left"
             />
