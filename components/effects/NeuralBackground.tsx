@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 const CONFIG = {
   neuronDensity: 0.00007,     // Etwas mehr Neuronen für Fülle
   baseSpeed: 0.15,
-  signalSpeed: 8,
+  signalSpeed: 0.04,          // Langsamere Signal-Propagation für visuelle Klarheit (~25 Frames pro Hop)
   maxConnections: 6,          // Erhöht für komplexeres Geflecht
   maxPulses: 80,              // Limit erhöht
   connectionMaxDist: 160,     // Größere Reichweite für Verbindungen
@@ -181,20 +181,33 @@ export default function NeuralBackground() {
 
     const handleMouseClick = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      // Canvas ist fixed, also viewport-relativ
-      // Aber Neuronen leben im globalen Dokument-Koordinatensystem (inkl. Scroll)
-      // Daher müssen wir window.scrollY berücksichtigen
-      const mouseX = e.clientX - rect.left;
-      const mouseY = (e.clientY - rect.top) + window.scrollY;
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Viewport-Koordinaten (relativ zum sichtbaren Bereich)
+      const viewportX = e.clientX - rect.left;
+      const viewportY = e.clientY - rect.top;
+      
+      // Canvas-Koordinaten (inkl. Scroll-Offset für globales Dokument-Koordinatensystem)
+      // Neuronen werden im Canvas-Koordinatensystem gespeichert (nach DPR-Skalierung)
+      // Da Canvas fixed ist, müssen wir scrollY berücksichtigen
+      const clickX = viewportX;
+      const clickY = viewportY + window.scrollY;
+      
+      // Console Debugging
+      console.log(`[Click Detect] Mouse Viewport: (${viewportX.toFixed(1)}, ${viewportY.toFixed(1)})`);
+      console.log(`[Click Detect] Calculated Canvas Space (incl. Scroll): (${clickX.toFixed(1)}, ${clickY.toFixed(1)}), ScrollY: ${window.scrollY}`);
 
       // NEURAL IGNITE: Finde alle Neuronen im Click-Radius
       neurons.forEach((n, index) => {
-        const dx = n.x - mouseX;
-        const dy = n.y - mouseY;
+        const dx = n.x - clickX;
+        const dy = n.y - clickY;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         // Klick trifft Neuron im Radius
         if (dist < CONFIG.clickRadius) {
+          // Console Debugging für aktivierte Neuronen
+          console.log(`[Neuron Activated] ID: ${index}, Pos: (x: ${n.x.toFixed(1)}, y: ${n.y.toFixed(1)}, z: ${n.z.toFixed(2)}), Dist to Click: ${dist.toFixed(1)}`);
+          
           // Ursprungs-Neuron aktivieren
           n.intensity = 1.0;
           n.chargeTimer = CONFIG.chargeFrames;
@@ -352,8 +365,7 @@ export default function NeuralBackground() {
                            n.intensity > 0.15 || target.intensity > 0.15;
             
             if (isActive) {
-              // Glow-Path für aktive Verbindungen
-              ctx.save();
+              // Glow-Path für aktive Verbindungen (kein save/restore nötig - nur strokeStyle ändern)
               ctx.strokeStyle = isDark 
                 ? `rgba(255, 255, 255, ${0.25 * zAvg})` 
                 : `rgba(0, 0, 0, ${0.25 * zAvg})`;
@@ -363,21 +375,18 @@ export default function NeuralBackground() {
               ctx.moveTo(n.x, n.y);
               ctx.lineTo(target.x, target.y);
               ctx.stroke();
-              ctx.restore();
             } else {
               // Sichtbare Basis-Verbindungen mit technischem Look + "Atmung"
               const breathAlpha = Math.max(0, Math.min(1, (connectionAlpha * zAvg) + breathOffset));
-              ctx.save();
-              ctx.beginPath();
               ctx.strokeStyle = isDark 
                 ? `rgba(255, 255, 255, ${breathAlpha})` 
                 : `rgba(0, 0, 0, ${breathAlpha})`;
               ctx.lineWidth = 0.5; // Delikater, technischer Look
               ctx.setLineDash([2, 4]); // Gestrichelte Linie für inaktive Verbindungen
+              ctx.beginPath();
               ctx.moveTo(n.x, n.y);
               ctx.lineTo(target.x, target.y);
               ctx.stroke();
-              ctx.restore();
             }
           }
         });
@@ -448,7 +457,10 @@ export default function NeuralBackground() {
       }
 
       pulses = pulses.filter((p) => {
-        p.progress += (CONFIG.signalSpeed / 1000) * (p.z + 0.5);
+        // Langsamere Signal-Propagation: ~20-30 Frames pro Hop für visuelle Klarheit
+        // signalSpeed ist jetzt 0.04, also: 0.04 * (z + 0.5) ≈ 0.02-0.06 pro Frame
+        // Bei progress 0→1 braucht das ~17-50 Frames (mit z-Skalierung: ~20-30 Frames für typische z-Werte)
+        p.progress += CONFIG.signalSpeed * (p.z + 0.5);
         
         if (p.progress >= 1) {
           // Pulse erreicht Ziel: Trigger Neuron mit Signal-Abschwächung
@@ -506,27 +518,22 @@ export default function NeuralBackground() {
         }
 
         // CORE & HALO: High-End Glow mit Intensität-basierter Opacity
-        ctx.save();
+        // Visuelle Verbesserung: Core heller, Halo kleiner für bessere Sichtbarkeit
+        const pulseColorStr = isDark ? "255, 255, 255" : "0, 0, 0";
         
-        // Halo: Größerer, semi-transparenter Kreis (skaliert mit Intensität)
+        // Halo: Kleinerer, semi-transparenter Kreis (für subtileren Hintergrund)
         ctx.beginPath();
-        const haloAlpha = 0.3 * p.z * p.intensity;
-        ctx.fillStyle = isDark 
-          ? `rgba(255, 255, 255, ${haloAlpha})` 
-          : `rgba(0, 0, 0, ${haloAlpha})`;
-        ctx.arc(curX, curY, 4 * p.z * p.intensity, 0, Math.PI * 2);
+        const haloAlpha = 0.25 * p.z * p.intensity;
+        ctx.fillStyle = `rgba(${pulseColorStr}, ${haloAlpha})`;
+        ctx.arc(curX, curY, 2.5 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
         
-        // Core: Kleiner, heller Punkt (skaliert mit Intensität)
+        // Core: Hellerer, größerer Punkt für bessere Sichtbarkeit der Bewegung
         ctx.beginPath();
-        const coreAlpha = 0.95 * p.z * p.intensity;
-        ctx.fillStyle = isDark 
-          ? `rgba(255, 255, 255, ${coreAlpha})` 
-          : `rgba(0, 0, 0, ${coreAlpha})`;
-        ctx.arc(curX, curY, 1.5 * p.z * p.intensity, 0, Math.PI * 2);
+        const coreAlpha = Math.min(1.0, 0.98 * p.z * p.intensity); // Helles Core
+        ctx.fillStyle = `rgba(${pulseColorStr}, ${coreAlpha})`;
+        ctx.arc(curX, curY, 2.0 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
-        
-        ctx.restore();
 
         return true;
       });
