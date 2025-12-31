@@ -60,8 +60,15 @@ export default function NeuralBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    // Stelle sicher, dass Canvas die richtige Größe hat (für runde Neuronen)
+    const dpr = window.devicePixelRatio || 1;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.scale(dpr, dpr);
 
     // Berechne erweiterten Bereich für Neuronen (außerhalb des sichtbaren Bereichs)
     const paddingX = width * CONFIG.viewportPadding;
@@ -118,8 +125,14 @@ export default function NeuralBackground() {
 
     // Resize Handler
     const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.scale(dpr, dpr);
       // Aktualisiere auch den erweiterten Bereich
       const newPaddingX = width * CONFIG.viewportPadding;
       const newPaddingY = height * CONFIG.viewportPadding;
@@ -134,24 +147,42 @@ export default function NeuralBackground() {
       ctx.clearRect(0, 0, width, height);
       frameCount++;
 
+      // Hilfsfunktion: Prüft ob Neuron innerhalb des sichtbaren Bereichs ist
+      const isNeuronInViewport = (p: Point): boolean => {
+        return p.x >= 0 && p.x <= width && p.y >= 0 && p.y <= height;
+      };
+
       // A. State-Management für Signal-System
       if (signalState === 'initial_delay') {
         stateTimer--;
         if (stateTimer <= 0) {
-          // Starte neues Signal: Wähle zufälliges Neuron
-          const randomIndex = Math.floor(Math.random() * particles.length);
-          const firingNeuron = particles[randomIndex];
-          firingNeuron.chargeTimer = CONFIG.chargeDuration;
-          firingNeuron.intensity = 1.0;
-          neuronsThatReceivedSignal.clear();
-          neuronsThatReceivedSignal.add(randomIndex);
-          signalState = 'charging';
+          // Starte neues Signal: Wähle zufälliges Neuron NUR innerhalb des sichtbaren Bereichs
+          const visibleNeurons = particles
+            .map((p, idx) => ({ neuron: p, index: idx }))
+            .filter(({ neuron }) => isNeuronInViewport(neuron));
+          
+          if (visibleNeurons.length > 0) {
+            const randomVisible = visibleNeurons[Math.floor(Math.random() * visibleNeurons.length)];
+            const firingNeuron = randomVisible.neuron;
+            const firingIndex = randomVisible.index;
+            firingNeuron.chargeTimer = CONFIG.chargeDuration;
+            firingNeuron.intensity = 1.0;
+            neuronsThatReceivedSignal.clear();
+            neuronsThatReceivedSignal.add(firingIndex);
+            signalState = 'charging';
+          }
         }
       } else if (signalState === 'charging') {
-        // Prüfe ob alle Neuronen fertig aufgeladen haben
-        const allCharged = particles.every(p => p.chargeTimer === 0 || p.intensity === 0);
-        if (allCharged) {
+        // Prüfe ob das erste Neuron fertig aufgeladen hat und Signale gesendet wurden
+        // Wechsle zu 'signaling' sobald Signale existieren
+        if (signals.length > 0) {
           signalState = 'signaling';
+        } else {
+          // Prüfe ob alle Neuronen fertig aufgeladen haben (falls keine Signale gesendet wurden)
+          const allCharged = particles.every(p => p.chargeTimer === 0 || p.intensity === 0);
+          if (allCharged) {
+            signalState = 'signaling';
+          }
         }
       } else if (signalState === 'signaling') {
         // Prüfe ob alle Signale abgeklungen sind
@@ -164,14 +195,21 @@ export default function NeuralBackground() {
       } else if (signalState === 'waiting') {
         stateTimer--;
         if (stateTimer <= 0) {
-          // Starte neues Signal
-          const randomIndex = Math.floor(Math.random() * particles.length);
-          const firingNeuron = particles[randomIndex];
-          firingNeuron.chargeTimer = CONFIG.chargeDuration;
-          firingNeuron.intensity = 1.0;
-          neuronsThatReceivedSignal.clear();
-          neuronsThatReceivedSignal.add(randomIndex);
-          signalState = 'charging';
+          // Starte neues Signal: Wähle zufälliges Neuron NUR innerhalb des sichtbaren Bereichs
+          const visibleNeurons = particles
+            .map((p, idx) => ({ neuron: p, index: idx }))
+            .filter(({ neuron }) => isNeuronInViewport(neuron));
+          
+          if (visibleNeurons.length > 0) {
+            const randomVisible = visibleNeurons[Math.floor(Math.random() * visibleNeurons.length)];
+            const firingNeuron = randomVisible.neuron;
+            const firingIndex = randomVisible.index;
+            firingNeuron.chargeTimer = CONFIG.chargeDuration;
+            firingNeuron.intensity = 1.0;
+            neuronsThatReceivedSignal.clear();
+            neuronsThatReceivedSignal.add(firingIndex);
+            signalState = 'charging';
+          }
         }
       }
 
@@ -191,8 +229,8 @@ export default function NeuralBackground() {
         if (p.chargeTimer > 0) {
           p.chargeTimer--;
           
-          // Wenn Aufladung abgeschlossen ist, sende Signale
-          if (p.chargeTimer === 0 && p.intensity > 0 && signalState === 'charging') {
+          // Wenn Aufladung abgeschlossen ist, sende Signale (im charging oder signaling State)
+          if (p.chargeTimer === 0 && p.intensity > 0 && (signalState === 'charging' || signalState === 'signaling')) {
             // Sende Signale an alle verbundenen Neuronen (außer die, die bereits Signale empfangen haben)
             p.connections.forEach((connectedIndex) => {
               // Überspringe Neuronen, die bereits Signale empfangen haben (verhindert Rückwärts-Signale)
@@ -254,12 +292,12 @@ export default function NeuralBackground() {
             const activeSignal = signals.find(sig => sig.connectionKey === connectionKey);
             
             // Zeichne zuerst die Basis-Linie (ganze Strecke, dezent)
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = CONFIG.colors.line;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = CONFIG.colors.line;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
             
             // Wenn Signal aktiv ist, zeichne leuchtende Linie HINTER dem Signal
             if (activeSignal) {
@@ -313,11 +351,13 @@ export default function NeuralBackground() {
           ? p.intensity * chargeProgress * 0.5 // Maximal 0.5 beim Aufladen (dezenter)
           : 0.3; // Sehr dezente Basis-Opazität (reduziert von 0.6)
 
-        // Basis-Neuron
+        // Basis-Neuron (perfekter Kreis)
+        ctx.save();
         ctx.beginPath();
         ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${finalR}, ${finalG}, ${finalB}, ${finalOpacity})`;
         ctx.fill();
+        ctx.restore();
 
         // Weicher Glow-Effekt wenn aufladend (weiß, mit weichem Übergang) - dezenter
         if (isCharging) {
@@ -388,11 +428,13 @@ export default function NeuralBackground() {
           ctx.lineCap = 'round';
           ctx.stroke();
           
-          // Zusätzlich: Zeichne einen hellen Kern in der Mitte
+          // Zusätzlich: Zeichne einen hellen Kern in der Mitte (perfekter Kreis)
+          ctx.save();
           ctx.beginPath();
           ctx.arc(currentX, currentY, 2, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255, 255, 255, ${signalOpacity * 0.8})`;
           ctx.fill();
+          ctx.restore();
         }
 
         // Wenn Signal das Ziel erreicht hat
