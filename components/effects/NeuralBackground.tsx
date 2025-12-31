@@ -3,13 +3,13 @@
 import { useEffect, useRef } from "react";
 
 const CONFIG = {
-  neuronDensity: 0.00005,     // Reduziert für Performance
+  neuronDensity: 0.00007,     // Etwas mehr Neuronen für Fülle
   baseSpeed: 0.15,
   signalSpeed: 8,
-  maxConnections: 3,          // Reduziert für Performance
-  maxPulses: 50,              // Limit für Memory Management
-  connectionMaxDist: 100,     // Maximale Distanz für Verbindungen
-  chargeFrames: 25,
+  maxConnections: 6,          // Erhöht für komplexeres Geflecht
+  maxPulses: 80,              // Limit erhöht
+  connectionMaxDist: 160,     // Größere Reichweite für Verbindungen
+  chargeFrames: 30,
   mouseRadius: 250,           // Magnetischer Radius
   mouseForce: 0.8,            // Stärke der magnetischen Anziehung/Abstoßung
   parallaxFactor: 0.15,       // Parallaxe-Stärke (subtiler für Eleganz)
@@ -18,7 +18,7 @@ const CONFIG = {
   floatSpeed: 0.0003,         // Geschwindigkeit der Floating-Bewegung
   wakeDecay: 0.92,            // Wie schnell Wake-Turbulenzen verschwinden
   damping: 0.05,              // Damping-Faktor für flüssige Bewegung (Lerp)
-  clickRadius: 150,           // Radius für Click-to-Pulse
+  clickRadius: 120,           // Fokusierterer Klick-Bereich
   brownianStrength: 0.08,     // Stärke der Brownian Motion
   brownianChangeRate: 0.02,   // Wie oft die Brownian-Richtung ändert
   physicsUpdateInterval: 2,   // Physics nur jeden 2. Frame
@@ -26,6 +26,8 @@ const CONFIG = {
   propagationChance: 0.3,     // 30% Chance für weitere Pulse-Propagation
   pulseCooldownFrames: 10,    // Cooldown für Neuron nach Propagation
   baseLineOpacity: 0.08,      // Basis-Opazität für Linien (Dark Mode)
+  lineBreathSpeed: 0.002,    // Geschwindigkeit der Linien-"Atmung"
+  lineBreathAmplitude: 0.02,  // Amplitude der Opacity-Schwankung
 };
 
 interface Neuron {
@@ -175,41 +177,36 @@ export default function NeuralBackground() {
     };
 
     const handleMouseClick = (e: MouseEvent) => {
-      const clickX = e.clientX;
-      const clickY = e.clientY;
+      const dpr = window.devicePixelRatio || 1;
+      // WICHTIG: Die Maus-Position muss mit dem DPR skaliert werden
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = (e.clientX - rect.left) * dpr;
+      const mouseY = (e.clientY - rect.top) * dpr;
 
       // NEURAL IGNITE: Finde alle Neuronen im Click-Radius
-      const affectedNeurons: number[] = [];
-      neurons.forEach((n, idx) => {
-        const dx = n.x - clickX;
-        const dy = n.y - clickY;
-        const dist = Math.hypot(dx, dy);
+      neurons.forEach((n, index) => {
+        const dx = n.x - mouseX;
+        const dy = n.y - mouseY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < CONFIG.clickRadius) {
-          // Trigger Neuron: Setze Intensität und Charge
+        // Klick trifft Neuron im Radius
+        if (dist < CONFIG.clickRadius * dpr) {
           n.intensity = 1.0;
           n.chargeTimer = CONFIG.chargeFrames;
-          affectedNeurons.push(idx);
-        }
-      });
-
-      // Erstelle Pulses von allen betroffenen Neuronen zu ihren Verbindungen
-      // Memory Management: Limit auf maxPulses
-      affectedNeurons.forEach((neuronIdx) => {
-        if (pulses.length >= CONFIG.maxPulses) return; // Stop wenn Limit erreicht
-        
-        const neuron = neurons[neuronIdx];
-        neuron.connections.forEach((targetIdx) => {
-          if (pulses.length >= CONFIG.maxPulses) return; // Stop wenn Limit erreicht
           
-          pulses.push({
-            from: neuronIdx,
-            to: targetIdx,
-            progress: 0,
-            z: neuron.z,
-            depth: 0, // Start-Tiefe für Propagation
+          // Sende Pulse an alle verbundenen Nachbarn
+          n.connections.forEach((targetIdx) => {
+            if (pulses.length < CONFIG.maxPulses) {
+              pulses.push({
+                from: index,
+                to: targetIdx,
+                progress: 0,
+                z: n.z,
+                depth: 0, // Start-Tiefe für Propagation
+              });
+            }
           });
-        });
+        }
       });
     };
 
@@ -229,6 +226,9 @@ export default function NeuralBackground() {
 
       // 1. ORGANIC FLOW: Sine-Wave Floating für alle Neuronen
       const time = timeRef.current * CONFIG.floatSpeed;
+      
+      // Linien-"Atmung": Subtile Opacity-Schwankung für organischen Look
+      const breathOffset = Math.sin(timeRef.current * CONFIG.lineBreathSpeed) * CONFIG.lineBreathAmplitude;
 
       // 2. Parallaxe: Maus-basierte Verschiebung
       const parallaxOffsetX = (mouseRef.current.x - width / 2) * CONFIG.parallaxFactor;
@@ -359,12 +359,13 @@ export default function NeuralBackground() {
               ctx.stroke();
               ctx.restore();
             } else {
-              // Sichtbare Basis-Verbindungen mit technischem Look
+              // Sichtbare Basis-Verbindungen mit technischem Look + "Atmung"
+              const breathAlpha = Math.max(0, Math.min(1, (connectionAlpha * zAvg) + breathOffset));
               ctx.save();
               ctx.beginPath();
               ctx.strokeStyle = isDark 
-                ? `rgba(255, 255, 255, ${connectionAlpha * zAvg})` 
-                : `rgba(0, 0, 0, ${connectionAlpha * zAvg})`;
+                ? `rgba(255, 255, 255, ${breathAlpha})` 
+                : `rgba(0, 0, 0, ${breathAlpha})`;
               ctx.lineWidth = 0.5; // Delikater, technischer Look
               ctx.setLineDash([2, 4]); // Gestrichelte Linie für inaktive Verbindungen
               ctx.moveTo(n.x, n.y);
