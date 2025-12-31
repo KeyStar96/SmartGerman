@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { gsap } from "@/lib/gsap";
 
 const CONFIG = {
   neuronDensity: 0.00006,
@@ -42,7 +43,9 @@ const getColors = (isDark: boolean) => {
 
 export default function NeuralBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isDark, setIsDark] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   // Prüfe ob Darkmode aktiv ist
   const checkDarkMode = () => {
@@ -64,6 +67,24 @@ export default function NeuralBackground() {
     });
 
     return () => observer.disconnect();
+  }, []);
+
+  // Einblend-Animation nach Hero-Animationen
+  useEffect(() => {
+    // Hero-Animationen enden bei ca. 3.5s (letzte Animation: CTAs bei 2.5s + 1s Dauer)
+    // Wir warten 4s für einen kleinen Buffer, dann blenden wir ein
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+      if (containerRef.current) {
+        gsap.to(containerRef.current, {
+          opacity: 1,
+          duration: 1.5,
+          ease: "power2.out",
+        });
+      }
+    }, 4000); // 4 Sekunden nach Seitenladung
+
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -264,9 +285,15 @@ export default function NeuralBackground() {
   }, [isDark]); // Re-render wenn Theme wechselt
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
+      ref={containerRef}
       className="fixed inset-0 -z-10 w-full h-full pointer-events-none"
-    />
+      style={{ opacity: 0 }}
+    >
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+      />
+    </div>
   );
 }
