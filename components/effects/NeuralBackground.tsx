@@ -8,7 +8,7 @@ import { gsap } from "@/lib/gsap";
  */
 const CONFIG = {
   // Gitter & Dichte
-  neuronDensity: 0.00008,     
+  neuronDensity: 0.0008,     
   connectionDistance: 120,    // Etwas erhöht, da sie sich mehr bewegen
   viewportPadding: 200,       // Padding außerhalb des Viewports für Neuronen
   gridCellSize: 150,          // Größe der Grid-Zellen für gleichmäßige Verteilung
