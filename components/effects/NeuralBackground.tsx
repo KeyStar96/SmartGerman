@@ -109,6 +109,9 @@ export default function NeuralBackground() {
     let animationFrameId: number;
     let width = 0;
     let height = 0;
+    let lastResizeWidth = 0;
+    let lastResizeHeight = 0;
+    let resizeTimeout: NodeJS.Timeout | null = null;
 
     // --- 0. Theme Detection ---
     const updateTheme = () => {
@@ -370,7 +373,30 @@ export default function NeuralBackground() {
       animationFrameId = requestAnimationFrame(loop);
     };
 
-    const handleResize = () => initNetwork();
+    const handleResize = () => {
+      // Debounce: Warte 250ms, bevor wir reagieren
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      
+      resizeTimeout = setTimeout(() => {
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+        
+        // Nur neu initialisieren, wenn sich die Größe signifikant geändert hat
+        // (mehr als 50px Unterschied in Breite oder Höhe)
+        // Dies verhindert Neuinitialisierung bei kleinen Viewport-Änderungen
+        // wie beim Scrollen auf mobilen Geräten oder Pull-to-Refresh
+        const widthDiff = Math.abs(newWidth - lastResizeWidth);
+        const heightDiff = Math.abs(newHeight - lastResizeHeight);
+        
+        if (widthDiff > 50 || heightDiff > 50 || lastResizeWidth === 0) {
+          lastResizeWidth = newWidth;
+          lastResizeHeight = newHeight;
+          initNetwork();
+        }
+      }, 250);
+    };
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY, active: true };
     };
@@ -404,6 +430,9 @@ export default function NeuralBackground() {
     };
 
     initNetwork();
+    // Speichere die initiale Größe
+    lastResizeWidth = window.innerWidth;
+    lastResizeHeight = window.innerHeight;
     loop();
 
     window.addEventListener("resize", handleResize);
@@ -412,6 +441,9 @@ export default function NeuralBackground() {
     window.addEventListener("click", handleClick);
 
     return () => {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseleave", handleMouseLeave);
