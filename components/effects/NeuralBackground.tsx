@@ -344,7 +344,10 @@ export default function NeuralBackground() {
             // Weitere Verbindungen = dünner und transparenter
             // Vordere Verbindungen = dicker und opaker
             const lineOpacity = theme.lineOpacity * (0.5 + zNormalized * 0.5);
-            const lineWidth = 0.5 + zNormalized * 0.5;
+            const baseLineWidth = 0.5 + zNormalized * 0.5;
+            
+            // Z-abhängige Linienstärke für beide Modi (gleiche Dicke wie Lightmode)
+            const lineWidth = baseLineWidth * 1.4;
             
             ctx.strokeStyle = `rgba(${theme.neuron}, ${lineOpacity})`;
             ctx.lineWidth = lineWidth;
