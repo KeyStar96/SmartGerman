@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 // Konfiguration passend zu Ihrem globals.css
 const CONFIG = {
-  neuronsPerSquarePixel: 0.00015, // Dichte: Neuronen pro Quadratpixel (für konsistente Dichte)
+  neuronsPerSquarePixel: 0.000075, // Dichte: Neuronen pro Quadratpixel (für konsistente Dichte) - halbiert
   baseSpeed: 0.3, // Bewegungsgeschwindigkeit der Neuronen
   signalSpeedCmPerSec: 8, // Signalgeschwindigkeit in cm/s
   pixelsPerCm: 37.8, // Pixel pro cm (bei 96 DPI)
