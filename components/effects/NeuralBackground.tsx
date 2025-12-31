@@ -25,8 +25,8 @@ const CONFIG = {
   
   // Signale
   signalSpeed: 4.0,           
-  signalLength: 100,          // Längerer Lichtschweif
-  signalDecay: 0.5,           // Schnelleres Abklingen
+  signalLength: 140,          // Längerer Lichtschweif
+  signalDecay: 0.7,           // Schnelleres Abklingen
   minSignalStrength: 0.15,    
   
   // Optik Basis
