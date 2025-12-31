@@ -211,26 +211,34 @@ body {
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
     .laser-text {
       position: relative;
-      /* Grundfarbe: Orange (wird durch background-clip überschrieben) */
-      color: var(--primary-orange);
+      display: inline-block;
       
-      /* Der magische Teil: Der Gradient wird auf den Text begrenzt */
+      /* Das Orange als Basis-Hintergrund hinter dem Laser */
       background: linear-gradient(
-        45deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.8) 50%,
-        transparent 70%
+        90deg,
+        #FF5C00 0%,
+        #FF5C00 35%,
+        #ffffff 50%,
+        #FF5C00 65%,
+        #FF5C00 100%
       );
-      background-size: 200% 100%;
+      
+      background-size: 250% 100%;
+      
+      /* Magie: Den Gradienten in die Buchstaben schneiden */
       -webkit-background-clip: text;
       background-clip: text;
+      
+      /* WICHTIG: Die Buchstaben-Füllung MUSS transparent sein, 
+         damit man den animierten Hintergrund sieht */
       -webkit-text-fill-color: transparent;
+      color: transparent;
       
-      /* Leichter Neon-Schein, nur für diese Buchstaben */
-      filter: drop-shadow(0 0 8px rgba(255, 92, 0, 0.3));
+      /* Animation: Der Laser bewegt sich durch das Orange */
+      animation: text-laser-sweep 3.5s infinite linear;
       
-      /* Animation: Laser bewegt sich durch den Text */
-      animation: text-laser-sweep 4s infinite linear;
+      /* Subtiler Glow-Effekt nach außen */
+      filter: drop-shadow(0 0 12px rgba(255, 92, 0, 0.4));
       
       /* GPU-Beschleunigung für flüssige Animation */
       transform: translateZ(0);
@@ -240,10 +248,10 @@ body {
     /* Keyframes für Laser-Sweep-Animation */
     @keyframes text-laser-sweep {
       0% {
-        background-position: 200% 0;
+        background-position: 120% 0;
       }
       100% {
-        background-position: -200% 0;
+        background-position: -120% 0;
       }
     }
   }
