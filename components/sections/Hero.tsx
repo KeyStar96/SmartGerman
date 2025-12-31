@@ -2,14 +2,6 @@
 
 import { useRef } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { Instrument_Serif } from "next/font/google";
-
-// Instrument Serif für Headline - Awwwards-Look mit hochkontrastigen Serifen
-const instrumentSerif = Instrument_Serif({ 
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-});
 
 interface HeroProps {
   dictionary: any;
@@ -270,13 +262,12 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             </span>
           </h1>
 
-          {/* Wissenschaftliche Headline (Instrument Serif - Spaceship UI) */}
+          {/* Wissenschaftliche Headline */}
           <h2 
             ref={headlineRef}
-            className={`${instrumentSerif.className} text-3xl md:text-4xl lg:text-5xl font-medium mb-8 max-w-4xl mx-auto leading-tight text-lm-text-espresso dark:text-dm-text-main`}
+            className="text-3xl md:text-4xl lg:text-5xl font-medium mb-8 max-w-4xl mx-auto leading-tight text-lm-text-espresso dark:text-dm-text-main"
             style={{ 
               opacity: 0,
-              fontFeatureSettings: '"liga" 1, "kern" 1', // Hochkontrast-Serifen für Eleganz
             }}
           >
             {dictionary.hero.headline}
