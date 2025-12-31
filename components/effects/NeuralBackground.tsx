@@ -4,10 +4,10 @@ import { useEffect, useRef } from "react";
 
 // Konfiguration passend zu Ihrem globals.css
 const CONFIG = {
-  particleCount: 50, // Anzahl der Neuronen
+  particleCount: 65, // Anzahl der Neuronen (leicht erhöht)
   baseSpeed: 0.3, // Bewegungsgeschwindigkeit der Neuronen
   signalSpeed: 0.02, // Wie schnell das Lichtsignal reist (0.0 bis 1.0 pro Frame)
-  signalFrequency: 0.02, // Wahrscheinlichkeit eines Signals pro Frame
+  signalFrequency: 0.008, // Wahrscheinlichkeit eines Signals pro Frame (reduziert)
   chargeDuration: 60, // Frames für 1 Sekunde Aufladung (bei 60fps)
   connectionsPerNeuron: 5, // Anzahl der Verbindungen pro Neuron
   viewportPadding: 0.2, // 20% Padding außerhalb des sichtbaren Bereichs
@@ -76,7 +76,7 @@ export default function NeuralBackground() {
         chargeTimer: 0, // Startet ohne Aufladung
         intensity: 0, // Startet ohne Leuchtkraft
         connections: [], // Wird nach Initialisierung gefüllt
-        colorValue: Math.random(), // Zufällige Farbe zwischen Cyan (0) und Orange (1)
+        colorValue: 1, // Immer weiß (1 = weiß)
       });
     }
 
@@ -192,8 +192,8 @@ export default function NeuralBackground() {
             
             // Basis-Linienfarbe (dezent)
             const baseOpacity = 0.15;
-            // Wenn die Linie aufleuchtet, wird sie heller (weiß-orange)
-            const glowOpacity = glowIntensity * 0.7; // Maximal 0.7 Opazität beim Aufleuchten
+            // Wenn die Linie aufleuchtet, wird sie heller (weiß-orange) - dezenter
+            const glowOpacity = glowIntensity * 0.4; // Maximal 0.4 Opazität beim Aufleuchten (reduziert)
             
             // Interpoliere zwischen Basis-Farbe und Weiß-Glow
             const finalOpacity = baseOpacity + glowOpacity * (1 - baseOpacity);
@@ -251,23 +251,14 @@ export default function NeuralBackground() {
         const isCharging = p.chargeTimer > 0;
         const chargeProgress = isCharging ? 1 - (p.chargeTimer / CONFIG.chargeDuration) : 0;
         
-        // Berechne Neuron-Farbe basierend auf colorValue (Interpolation zwischen Cyan und Orange)
-        const cyanR = 0;
-        const cyanG = 200;
-        const cyanB = 220;
-        const orangeR = 255;
-        const orangeG = 92;
-        const orangeB = 0;
-        
-        const r = Math.round(cyanR + (orangeR - cyanR) * p.colorValue);
-        const g = Math.round(cyanG + (orangeG - cyanG) * p.colorValue);
-        const b = Math.round(cyanB + (orangeB - cyanB) * p.colorValue);
-        
-        // Wenn das Neuron auflädt, wird es weiß (mit weichem Übergang)
-        const finalR = isCharging ? 255 : r;
-        const finalG = isCharging ? 255 : g;
-        const finalB = isCharging ? 255 : b;
-        const finalOpacity = isCharging ? p.intensity * chargeProgress : 0.6;
+        // Alle Neuronen sind initial weiß
+        const finalR = 255;
+        const finalG = 255;
+        const finalB = 255;
+        // Dezente Opazität: beim Aufladen etwas heller, sonst sehr dezent
+        const finalOpacity = isCharging 
+          ? p.intensity * chargeProgress * 0.5 // Maximal 0.5 beim Aufladen (dezenter)
+          : 0.3; // Sehr dezente Basis-Opazität (reduziert von 0.6)
 
         // Basis-Neuron
         ctx.beginPath();
@@ -275,11 +266,11 @@ export default function NeuralBackground() {
         ctx.fillStyle = `rgba(${finalR}, ${finalG}, ${finalB}, ${finalOpacity})`;
         ctx.fill();
 
-        // Weicher Glow-Effekt wenn aufladend (weiß, mit weichem Übergang)
+        // Weicher Glow-Effekt wenn aufladend (weiß, mit weichem Übergang) - dezenter
         if (isCharging) {
           // Mehrere konzentrische Kreise für weichen Übergang
-          const glowRadius = 2 + chargeProgress * 6; // Radius wächst von 2 bis 8
-          const glowOpacity = p.intensity * chargeProgress * 0.4;
+          const glowRadius = 2 + chargeProgress * 5; // Radius wächst von 2 bis 7 (etwas kleiner)
+          const glowOpacity = p.intensity * chargeProgress * 0.25; // Dezenter (reduziert von 0.4)
           
           // Äußerer Glow (größer, transparenter)
           const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
@@ -305,10 +296,10 @@ export default function NeuralBackground() {
         // Berechne zurückgelegte Distanz
         const traveledDistance = sig.progress * sig.totalDistance;
         
-        // Opazität nimmt mit der Distanz ab (Fade-out basierend auf Signal-Intensität)
+        // Opazität nimmt mit der Distanz ab (Fade-out basierend auf Signal-Intensität) - dezenter
         const maxFadeDistance = sig.totalDistance;
         const fadeProgress = Math.min(traveledDistance / maxFadeDistance, 1);
-        const signalOpacity = sig.intensity * (1 - fadeProgress) * 0.8; // Startet bei intensity*0.8, endet bei 0
+        const signalOpacity = sig.intensity * (1 - fadeProgress) * 0.5; // Startet bei intensity*0.5, endet bei 0 (reduziert von 0.8)
 
         // Signal nur zeichnen wenn noch sichtbar
         if (signalOpacity > 0.01) {
