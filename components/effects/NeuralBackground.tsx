@@ -9,7 +9,8 @@ const CONFIG = {
   signalSpeedCmPerSec: 5, // Signalgeschwindigkeit in cm/s
   pixelsPerCm: 37.8, // Pixel pro cm (bei 96 DPI)
   fps: 60, // Frames pro Sekunde
-  signalFrequency: 0.004, // Wahrscheinlichkeit eines Signals pro Frame (weiter reduziert)
+  initialDelay: 300, // 5 Sekunden Startverzögerung (300 Frames bei 60fps)
+  pauseBetweenSignals: 300, // 5 Sekunden Pause zwischen Signalen
   chargeDuration: 60, // Frames für 1 Sekunde Aufladung (bei 60fps)
   maxConnectionsPerNeuron: 5, // Maximale Anzahl der Verbindungen pro Neuron
   viewportPadding: 0.2, // 20% Padding außerhalb des sichtbaren Bereichs
@@ -43,8 +44,9 @@ interface Signal {
   progress: number; // 0.0 bis 1.0
   totalDistance: number; // Gesamtdistanz in Pixeln
   connectionKey: string; // Eindeutiger Key für die Verbindung (z.B. "0-5")
-  intensity: number; // Leuchtkraft des Signals (0.0 bis 1.0)
+  intensity: number; // Leuchtkraft des Signals (0.0 bis 1.0) - wird auf der Strecke reduziert
   targetIndex: number; // Index des Ziel-Neurons
+  sourceIndex: number; // Index des Quell-Neurons (um Rückwärts-Signale zu vermeiden)
   progressPerFrame: number; // Berechnete Progress-Erhöhung pro Frame (basierend auf 5cm/s)
 }
 
@@ -103,11 +105,15 @@ export default function NeuralBackground() {
     // Array für aktive Lichtsignale
     let signals: Signal[] = [];
     
-    // Map für leuchtende Verbindungen: Key ist "index1-index2" (immer kleinerer Index zuerst)
-    // Wert ist die aktuelle Leuchtkraft (0.0 bis 1.0)
-    const connectionGlowIntensities: Map<string, number> = new Map();
+    // State-Management für Signal-System
+    type SignalState = 'initial_delay' | 'charging' | 'signaling' | 'waiting';
+    let signalState: SignalState = 'initial_delay';
+    let stateTimer = CONFIG.initialDelay; // Startet mit 5 Sekunden Verzögerung
     
-    // Frame-Counter für seltene Signal-Generierung
+    // Set der Neuronen, die bereits Signale empfangen haben (um Rückwärts-Signale zu vermeiden)
+    const neuronsThatReceivedSignal = new Set<number>();
+    
+    // Frame-Counter
     let frameCount = 0;
 
     // Resize Handler
@@ -128,7 +134,48 @@ export default function NeuralBackground() {
       ctx.clearRect(0, 0, width, height);
       frameCount++;
 
-      // A. Neuronen bewegen und Signal-Logik verarbeiten
+      // A. State-Management für Signal-System
+      if (signalState === 'initial_delay') {
+        stateTimer--;
+        if (stateTimer <= 0) {
+          // Starte neues Signal: Wähle zufälliges Neuron
+          const randomIndex = Math.floor(Math.random() * particles.length);
+          const firingNeuron = particles[randomIndex];
+          firingNeuron.chargeTimer = CONFIG.chargeDuration;
+          firingNeuron.intensity = 1.0;
+          neuronsThatReceivedSignal.clear();
+          neuronsThatReceivedSignal.add(randomIndex);
+          signalState = 'charging';
+        }
+      } else if (signalState === 'charging') {
+        // Prüfe ob alle Neuronen fertig aufgeladen haben
+        const allCharged = particles.every(p => p.chargeTimer === 0 || p.intensity === 0);
+        if (allCharged) {
+          signalState = 'signaling';
+        }
+      } else if (signalState === 'signaling') {
+        // Prüfe ob alle Signale abgeklungen sind
+        const allSignalsDone = signals.length === 0 && 
+          particles.every(p => p.chargeTimer === 0 && p.intensity === 0);
+        if (allSignalsDone) {
+          signalState = 'waiting';
+          stateTimer = CONFIG.pauseBetweenSignals;
+        }
+      } else if (signalState === 'waiting') {
+        stateTimer--;
+        if (stateTimer <= 0) {
+          // Starte neues Signal
+          const randomIndex = Math.floor(Math.random() * particles.length);
+          const firingNeuron = particles[randomIndex];
+          firingNeuron.chargeTimer = CONFIG.chargeDuration;
+          firingNeuron.intensity = 1.0;
+          neuronsThatReceivedSignal.clear();
+          neuronsThatReceivedSignal.add(randomIndex);
+          signalState = 'charging';
+        }
+      }
+
+      // B. Neuronen bewegen und Signal-Logik verarbeiten
       particles.forEach((p, index) => {
         p.x += p.vx;
         p.y += p.vy;
@@ -145,9 +192,14 @@ export default function NeuralBackground() {
           p.chargeTimer--;
           
           // Wenn Aufladung abgeschlossen ist, sende Signale
-          if (p.chargeTimer === 0 && p.intensity > 0) {
-            // Sende Signale an alle verbundenen Neuronen
+          if (p.chargeTimer === 0 && p.intensity > 0 && signalState === 'charging') {
+            // Sende Signale an alle verbundenen Neuronen (außer die, die bereits Signale empfangen haben)
             p.connections.forEach((connectedIndex) => {
+              // Überspringe Neuronen, die bereits Signale empfangen haben (verhindert Rückwärts-Signale)
+              if (neuronsThatReceivedSignal.has(connectedIndex)) {
+                return;
+              }
+              
               const target = particles[connectedIndex];
               const dx = target.x - p.x;
               const dy = target.y - p.y;
@@ -158,18 +210,12 @@ export default function NeuralBackground() {
                 ? `${index}-${connectedIndex}` 
                 : `${connectedIndex}-${index}`;
               
-              // Berechne reduzierte Leuchtkraft (Signal verliert auf dem Weg)
-              const signalIntensity = p.intensity * (1 - CONFIG.signalDecayRate);
-              
-              // Setze Glow-Intensität für diese Verbindung
-              connectionGlowIntensities.set(connectionKey, signalIntensity);
-              
               // Berechne Signalgeschwindigkeit: 5 cm/s = 189 Pixel/s bei 60fps = 3.15 Pixel/Frame
               // Progress pro Frame = (Signalgeschwindigkeit in Pixel/Frame) / Gesamtdistanz
               const signalSpeedPixelsPerFrame = (CONFIG.signalSpeedCmPerSec * CONFIG.pixelsPerCm) / CONFIG.fps;
               const progressPerFrame = signalSpeedPixelsPerFrame / dist;
               
-              // Erstelle Signal
+              // Erstelle Signal mit voller Intensität (wird auf der Strecke reduziert)
               signals.push({
                 startX: p.x,
                 startY: p.y,
@@ -178,10 +224,14 @@ export default function NeuralBackground() {
                 progress: 0,
                 totalDistance: dist,
                 connectionKey: connectionKey,
-                intensity: signalIntensity,
+                intensity: p.intensity, // Startet mit voller Intensität
                 targetIndex: connectedIndex,
+                sourceIndex: index,
                 progressPerFrame: progressPerFrame,
               });
+              
+              // Markiere Ziel-Neuron als Empfänger
+              neuronsThatReceivedSignal.add(connectedIndex);
             });
             
             // Neuron hat Signal gesendet, Leuchtkraft zurücksetzen
@@ -190,7 +240,7 @@ export default function NeuralBackground() {
         }
       });
 
-      // B. Verbindungen zeichnen (nur die definierten Verbindungen pro Neuron)
+      // C. Verbindungen zeichnen (nur die definierten Verbindungen pro Neuron)
       particles.forEach((p1, i) => {
         p1.connections.forEach((connectedIndex) => {
           // Zeichne nur einmal pro Verbindung (vermeide Duplikate)
@@ -200,55 +250,45 @@ export default function NeuralBackground() {
             // Eindeutiger Key für diese Verbindung
             const connectionKey = `${i}-${connectedIndex}`;
             
-            // Prüfe ob diese Verbindung gerade aufleuchtet
-            const glowIntensity = connectionGlowIntensities.get(connectionKey) || 0;
+            // Finde aktives Signal auf dieser Verbindung
+            const activeSignal = signals.find(sig => sig.connectionKey === connectionKey);
             
-            // Basis-Linienfarbe (dezent)
-            const baseOpacity = 0.15;
-            // Wenn die Linie aufleuchtet, wird sie heller (weiß-orange) - dezenter
-            const glowOpacity = glowIntensity * 0.4; // Maximal 0.4 Opazität beim Aufleuchten (reduziert)
-            
-            // Interpoliere zwischen Basis-Farbe und Weiß-Glow
-            const finalOpacity = baseOpacity + glowOpacity * (1 - baseOpacity);
-            const finalColor = glowIntensity > 0 
-              ? `rgba(255, 255, 255, ${finalOpacity})` // Weiß wenn aufleuchtend
-              : CONFIG.colors.line; // Normale Farbe wenn nicht
-            
-            // Linienbreite erhöht sich beim Aufleuchten
-            const lineWidth = 0.5 + glowIntensity * 1.5;
-            
-            // Verbindungslinie zeichnen
+            // Zeichne zuerst die Basis-Linie (ganze Strecke, dezent)
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = finalColor;
-            ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = CONFIG.colors.line;
+            ctx.lineWidth = 0.5;
             ctx.stroke();
+            
+            // Wenn Signal aktiv ist, zeichne leuchtende Linie HINTER dem Signal
+            if (activeSignal) {
+              // Berechne aktuelle Signal-Intensität (wird auf der Strecke reduziert)
+              const traveledDistance = activeSignal.progress * activeSignal.totalDistance;
+              const fadeProgress = Math.min(traveledDistance / activeSignal.totalDistance, 1);
+              const currentIntensity = activeSignal.intensity * (1 - fadeProgress);
+              
+              // Berechne Signal-Position
+              const signalX = activeSignal.startX + (activeSignal.endX - activeSignal.startX) * activeSignal.progress;
+              const signalY = activeSignal.startY + (activeSignal.endY - activeSignal.startY) * activeSignal.progress;
+              
+              // Linie leuchtet nur HINTER dem Signal (von Start bis Signal-Position)
+              const glowOpacity = currentIntensity * 0.4;
+              const baseOpacity = 0.15;
+              const finalOpacity = baseOpacity + glowOpacity * (1 - baseOpacity);
+              
+              // Zeichne leuchtende Linie nur bis zur Signal-Position
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(signalX, signalY);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${finalOpacity})`;
+              ctx.lineWidth = 0.5 + currentIntensity * 1.5;
+              ctx.stroke();
+            }
           }
         });
       });
-      
-      // Glow-Intensität für Verbindungen reduzieren (langsames Abdunkeln)
-      connectionGlowIntensities.forEach((intensity, key) => {
-        if (intensity > 0.01) {
-          connectionGlowIntensities.set(key, intensity * 0.95); // Langsames Abdunkeln
-        } else {
-          connectionGlowIntensities.delete(key);
-        }
-      });
 
-      // C. Zufälliges Feuern eines Neurons (nur wenn nicht bereits aktiv)
-      if (Math.random() < CONFIG.signalFrequency) {
-        // Wähle ein zufälliges Neuron, das nicht bereits auflädt
-        const availableNeurons = particles.filter(p => p.chargeTimer === 0);
-        if (availableNeurons.length > 0) {
-          const firingNeuron = availableNeurons[Math.floor(Math.random() * availableNeurons.length)];
-          
-          // Neuron beginnt aufzuladen (1 Sekunde = 60 Frames)
-          firingNeuron.chargeTimer = CONFIG.chargeDuration;
-          firingNeuron.intensity = 1.0; // Volle Leuchtkraft
-        }
-      }
 
       // D. Neuronen zeichnen (mit Glow-Effekt wenn aktiv)
       // Nur Neuronen zeichnen, die im sichtbaren Bereich oder nahe dran sind
@@ -298,7 +338,7 @@ export default function NeuralBackground() {
         }
       });
 
-      // E. Signale aktualisieren und zeichnen (als Lichtstrahl)
+      // D. Signale aktualisieren und zeichnen (als Lichtstrahl)
       signals = signals.filter((sig) => {
         // Verwende die berechnete Progress-Erhöhung basierend auf 5cm/s
         sig.progress += sig.progressPerFrame;
@@ -315,10 +355,10 @@ export default function NeuralBackground() {
         // Berechne zurückgelegte Distanz
         const traveledDistance = sig.progress * sig.totalDistance;
         
-        // Opazität nimmt mit der Distanz ab (Fade-out basierend auf Signal-Intensität) - dezenter
-        const maxFadeDistance = sig.totalDistance;
-        const fadeProgress = Math.min(traveledDistance / maxFadeDistance, 1);
-        const signalOpacity = sig.intensity * (1 - fadeProgress) * 0.6; // Etwas heller für bessere Sichtbarkeit
+        // Signal wird auf der Strecke dunkler (Intensität nimmt mit der Distanz ab)
+        const fadeProgress = Math.min(traveledDistance / sig.totalDistance, 1);
+        const currentIntensity = sig.intensity * (1 - fadeProgress);
+        const signalOpacity = currentIntensity * 0.6;
 
         // Signal nur zeichnen wenn noch sichtbar
         if (signalOpacity > 0.01) {
@@ -344,7 +384,7 @@ export default function NeuralBackground() {
           ctx.moveTo(beamStartX, beamStartY);
           ctx.lineTo(beamEndX, beamEndY);
           ctx.strokeStyle = gradient;
-          ctx.lineWidth = 2.5; // Etwas dicker für bessere Sichtbarkeit
+          ctx.lineWidth = 2.5;
           ctx.lineCap = 'round';
           ctx.stroke();
           
@@ -359,11 +399,15 @@ export default function NeuralBackground() {
         if (sig.progress >= 1) {
           const targetNeuron = particles[sig.targetIndex];
           
-          // Nur aktivieren wenn Ziel-Neuron nicht bereits aktiv ist
-          if (targetNeuron.chargeTimer === 0) {
-            // Ziel-Neuron beginnt aufzuladen mit der verbleibenden Leuchtkraft
+          // Berechne finale Intensität: Signal verliert beim Empfang signalDecayRate
+          // (Die visuelle Reduktion auf der Strecke ist nur für die Darstellung)
+          const finalIntensity = sig.intensity * (1 - CONFIG.signalDecayRate);
+          
+          // Nur aktivieren wenn Ziel-Neuron nicht bereits aktiv ist und wir im Signaling-State sind
+          if (targetNeuron.chargeTimer === 0 && signalState === 'signaling') {
+            // Ziel-Neuron beginnt aufzuladen mit der reduzierten Leuchtkraft
             targetNeuron.chargeTimer = CONFIG.chargeDuration;
-            targetNeuron.intensity = sig.intensity; // Verwendet die reduzierte Leuchtkraft
+            targetNeuron.intensity = finalIntensity;
           }
           
           return false; // Entferne Signal
