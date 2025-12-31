@@ -161,6 +161,12 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       }, 2.5);
     }
 
+    // Signalisiere, dass die Hero-Animation abgeschlossen ist
+    // Die Timeline endet bei ~3.5 Sekunden (2.5 + 1.0)
+    tl.call(() => {
+      window.dispatchEvent(new CustomEvent('hero-animation-complete'));
+    }, [], 3.5);
+
     // 6. 3D Scroll-X Rotation - Umfallen-Effekt für Brand-Name
     if (heroTextWrapper.current) {
       gsap.to(heroTextWrapper.current, {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { gsap } from "@/lib/gsap";
 
 /**
  * CONFIG: Physics & Grid
@@ -68,6 +69,7 @@ interface Pulse {
 
 export default function NeuralBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Refs für State, der nicht neu rendern soll
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
@@ -77,6 +79,25 @@ export default function NeuralBackground() {
   
   // Ref für das aktuelle Farb-Theme (Mutable, damit Animation Loop zugreifen kann)
   const themeRef = useRef(THEME_COLORS.dark);
+
+  // Fade-in nach Hero-Animation
+  useEffect(() => {
+    const handleHeroComplete = () => {
+      if (containerRef.current) {
+        gsap.to(containerRef.current, {
+          opacity: 1,
+          duration: 1.5,
+          ease: "power2.out",
+        });
+      }
+    };
+
+    window.addEventListener('hero-animation-complete', handleHeroComplete);
+    
+    return () => {
+      window.removeEventListener('hero-animation-complete', handleHeroComplete);
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -401,13 +422,21 @@ export default function NeuralBackground() {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 -z-10 transition-opacity duration-1000"
+    <div
+      ref={containerRef}
+      className="fixed inset-0 -z-10"
       style={{
-        opacity: 0.6,
-        pointerEvents: "auto",
+        opacity: 0, // Startet unsichtbar, wird nach Hero-Animation eingeblendet
       }}
-    />
+    >
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+        style={{
+          opacity: 0.6,
+          pointerEvents: "auto",
+        }}
+      />
+    </div>
   );
 }
