@@ -213,32 +213,36 @@ body {
       position: relative;
       display: inline-block;
       
-      /* Das Orange als Basis-Hintergrund hinter dem Laser */
+      /* Wir nutzen ein schärferes Weiß für den Laser-Kern */
       background: linear-gradient(
         90deg,
         #FF5C00 0%,
-        #FF5C00 35%,
-        #ffffff 50%,
-        #FF5C00 65%,
+        #FF5C00 40%,
+        #ffffff 48%,
+        #ffffff 52%,
+        #FF5C00 60%,
         #FF5C00 100%
       );
       
-      background-size: 250% 100%;
+      background-size: 300% 100%;
       
-      /* Magie: Den Gradienten in die Buchstaben schneiden */
+      /* Maskierung auf den Text */
       -webkit-background-clip: text;
       background-clip: text;
       
-      /* WICHTIG: Die Buchstaben-Füllung MUSS transparent sein, 
-         damit man den animierten Hintergrund sieht */
+      /* Füllung komplett weg, damit nur der Gradient-Background zählt */
       -webkit-text-fill-color: transparent;
       color: transparent;
       
-      /* Animation: Der Laser bewegt sich durch das Orange */
-      animation: text-laser-sweep 3.5s infinite linear;
+      /* WICHTIG: Kein drop-shadow hier, da dieser AUSSERHALB leuchtet */
+      filter: none;
       
-      /* Subtiler Glow-Effekt nach außen */
-      filter: drop-shadow(0 0 12px rgba(255, 92, 0, 0.4));
+      /* Animation */
+      animation: text-laser-sweep 3s infinite linear;
+      
+      /* Verhindert Rendering-Artefakte an den Rändern */
+      -webkit-font-smoothing: antialiased;
+      backface-visibility: hidden;
       
       /* GPU-Beschleunigung für flüssige Animation */
       transform: translateZ(0);
@@ -248,10 +252,10 @@ body {
     /* Keyframes für Laser-Sweep-Animation */
     @keyframes text-laser-sweep {
       0% {
-        background-position: 120% 0;
+        background-position: 150% 0;
       }
       100% {
-        background-position: -120% 0;
+        background-position: -50% 0;
       }
     }
   }
