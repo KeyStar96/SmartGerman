@@ -11,6 +11,7 @@ const CONFIG = {
   neuronDensity: 0.00008,     
   connectionDistance: 120,    // Etwas erhöht, da sie sich mehr bewegen
   viewportPadding: 200,       // Padding außerhalb des Viewports für Neuronen
+  gridCellSize: 150,          // Größe der Grid-Zellen für gleichmäßige Verteilung
   
   // "Freies Schwimmen" (Viereck vergrößert)
   wanderRadius: 1,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
@@ -31,6 +32,11 @@ const CONFIG = {
   // Optik Basis
   particleSize: 1.8,
   flashDecay: 0.04,
+  
+  // Auto-Impulse
+  autoPulseEnabled: true,     // Automatische Impulse aktivieren
+  autoPulseMinDelay: 2000,    // Mindestverzögerung zwischen Impulsen (ms)
+  autoPulseMaxDelay: 4000,    // Maximale Verzögerung zwischen Impulsen (ms)
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -141,13 +147,36 @@ export default function NeuralBackground() {
       const extendedWidth = width + (CONFIG.viewportPadding * 2);
       const extendedHeight = height + (CONFIG.viewportPadding * 2);
       const area = width * height; // Berechne Dichte basierend auf sichtbarem Bereich
-      const numNeurons = Math.floor(area * CONFIG.neuronDensity);
+      const baseNumNeurons = Math.floor(area * CONFIG.neuronDensity);
       
       const newNeurons: Neuron[] = [];
 
-      // Platziere Neuronen im erweiterten Bereich (inkl. außerhalb des Viewports)
-      for (let i = 0; i < numNeurons; i++) {
-        // Neuronen können von -padding bis width+padding (und height+padding) platziert werden
+      // Grid-basierte Verteilung für gleichmäßige Abdeckung
+      const gridCols = Math.ceil(extendedWidth / CONFIG.gridCellSize);
+      const gridRows = Math.ceil(extendedHeight / CONFIG.gridCellSize);
+      
+      // Platziere mindestens ein Neuron pro Grid-Zelle
+      for (let row = 0; row < gridRows; row++) {
+        for (let col = 0; col < gridCols; col++) {
+          const cellX = (col * CONFIG.gridCellSize) - CONFIG.viewportPadding + (Math.random() * CONFIG.gridCellSize);
+          const cellY = (row * CONFIG.gridCellSize) - CONFIG.viewportPadding + (Math.random() * CONFIG.gridCellSize);
+          newNeurons.push({
+            x: cellX,
+            y: cellY,
+            baseX: cellX,
+            baseY: cellY,
+            vx: 0,
+            vy: 0,
+            wanderAngle: Math.random() * Math.PI * 2,
+            flash: 0,
+            connections: [],
+          });
+        }
+      }
+      
+      // Füge zusätzliche Neuronen hinzu, um die gewünschte Dichte zu erreichen
+      const additionalNeurons = baseNumNeurons - newNeurons.length;
+      for (let i = 0; i < additionalNeurons; i++) {
         const x = (Math.random() * extendedWidth) - CONFIG.viewportPadding;
         const y = (Math.random() * extendedHeight) - CONFIG.viewportPadding;
         newNeurons.push({
@@ -163,6 +192,7 @@ export default function NeuralBackground() {
       }
 
       // Jedes Neuron bekommt genau 3 Verbindungen zu den 3 nächsten Nachbarn
+      const numNeurons = newNeurons.length;
       for (let i = 0; i < numNeurons; i++) {
         const distances: Array<{ index: number; dist: number }> = [];
         
@@ -409,6 +439,18 @@ export default function NeuralBackground() {
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
     };
+    // Funktion zum Aktivieren eines Neurons (wird von Click und Auto-Pulse verwendet)
+    const activateNeuron = (neuronIdx: number) => {
+      const neurons = neuronsRef.current;
+      if (neuronIdx < 0 || neuronIdx >= neurons.length) return;
+      
+      const startNode = neurons[neuronIdx];
+      startNode.flash = 1.0;
+      startNode.connections.forEach(targetIdx => {
+        spawnPulse(neuronIdx, targetIdx, 1.0);
+      });
+    };
+
     const handleClick = (e: MouseEvent) => {
       const clickX = e.clientX;
       const clickY = e.clientY;
@@ -427,11 +469,69 @@ export default function NeuralBackground() {
       }
 
       if (closestIdx !== -1 && minDist < 150 * 150) {
-        const startNode = neurons[closestIdx];
-        startNode.flash = 1.0;
-        startNode.connections.forEach(targetIdx => {
-          spawnPulse(closestIdx, targetIdx, 1.0);
-        });
+        activateNeuron(closestIdx);
+      }
+    };
+
+    // Automatischer Impuls-Handler
+    let autoPulseTimeout: NodeJS.Timeout | null = null;
+    let isAutoPulseActive = false;
+
+    const checkAndTriggerAutoPulse = () => {
+      if (!CONFIG.autoPulseEnabled || isAutoPulseActive) return;
+      
+      const neurons = neuronsRef.current;
+      const pulses = pulsesRef.current;
+      
+      // Prüfe, ob alle Pulse abgeklungen sind (keine aktiven Pulse und keine Flashes)
+      const hasActivePulses = pulses.length > 0;
+      const hasActiveFlashes = neurons.some(n => n.flash > 0.01);
+      
+      if (!hasActivePulses && !hasActiveFlashes) {
+        // Wähle ein zufälliges Neuron aus
+        const randomIdx = Math.floor(Math.random() * neurons.length);
+        activateNeuron(randomIdx);
+        isAutoPulseActive = true;
+        
+        // Warte, bis der Impuls komplett abgeklungen ist
+        const checkComplete = () => {
+          const currentPulses = pulsesRef.current;
+          const currentNeurons = neuronsRef.current;
+          const stillHasPulses = currentPulses.length > 0;
+          const stillHasFlashes = currentNeurons.some(n => n.flash > 0.01);
+          
+          if (!stillHasPulses && !stillHasFlashes) {
+            isAutoPulseActive = false;
+            // Warte eine zufällige Zeit, bevor der nächste Impuls kommt
+            const delay = CONFIG.autoPulseMinDelay + 
+              Math.random() * (CONFIG.autoPulseMaxDelay - CONFIG.autoPulseMinDelay);
+            autoPulseTimeout = setTimeout(() => {
+              checkAndTriggerAutoPulse();
+            }, delay);
+          } else {
+            // Prüfe erneut nach kurzer Zeit
+            requestAnimationFrame(checkComplete);
+          }
+        };
+        
+        // Starte die Überwachung nach kurzer Verzögerung
+        setTimeout(() => {
+          requestAnimationFrame(checkComplete);
+        }, 100);
+      } else {
+        // Prüfe erneut nach kurzer Zeit
+        autoPulseTimeout = setTimeout(checkAndTriggerAutoPulse, 500);
+      }
+    };
+
+    // Starte automatische Impulse nach einer initialen Verzögerung
+    const startAutoPulses = () => {
+      if (CONFIG.autoPulseEnabled) {
+        const initialDelay = CONFIG.autoPulseMinDelay + 
+          Math.random() * (CONFIG.autoPulseMaxDelay - CONFIG.autoPulseMinDelay);
+        autoPulseTimeout = setTimeout(() => {
+          checkAndTriggerAutoPulse();
+        }, initialDelay);
       }
     };
 
@@ -440,6 +540,7 @@ export default function NeuralBackground() {
     lastResizeWidth = window.innerWidth;
     lastResizeHeight = window.innerHeight;
     loop();
+    startAutoPulses();
 
     window.addEventListener("resize", handleResize);
     window.addEventListener("mousemove", handleMouseMove);
@@ -449,6 +550,9 @@ export default function NeuralBackground() {
     return () => {
       if (resizeTimeout) {
         clearTimeout(resizeTimeout);
+      }
+      if (autoPulseTimeout) {
+        clearTimeout(autoPulseTimeout);
       }
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
