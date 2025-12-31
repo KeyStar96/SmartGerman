@@ -25,8 +25,8 @@ const CONFIG = {
   
   // Signale
   signalSpeed: 4.0,           
-  signalLength: 70,           
-  signalDecay: 0.65,          
+  signalLength: 100,          // Längerer Lichtschweif
+  signalDecay: 0.5,           // Schnelleres Abklingen
   minSignalStrength: 0.15,    
   
   // Optik Basis
@@ -332,6 +332,7 @@ export default function NeuralBackground() {
           if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
             const newStrength = p.strength * CONFIG.signalDecay;
             nB.connections.forEach(neighborIdx => {
+              // Verhindere Rücksignal zum ursprünglichen Sender
               if (neighborIdx !== p.fromIndex) {
                 spawnPulse(p.toIndex, neighborIdx, newStrength);
               }
