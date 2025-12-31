@@ -132,9 +132,9 @@ export default function Features({ dictionary }: FeaturesProps) {
                     color: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)"
                   }}
                 >
-                  {/* Dezenter Glow-Hintergrund beim Hover (nur Darkmode) */}
+                  {/* Dezenter Glow-Hintergrund beim Hover (Lightmode & Darkmode) */}
                   <div
-                    className="absolute inset-0 opacity-0 dark:group-hover:opacity-15 transition-opacity duration-500 blur-xl"
+                    className="absolute inset-0 opacity-0 group-hover:opacity-10 dark:group-hover:opacity-15 transition-opacity duration-500 blur-xl"
                     style={{ 
                       backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)",
                       transform: "scale(1.5)",
