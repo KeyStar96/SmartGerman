@@ -3,24 +3,28 @@
 import { useEffect, useRef } from "react";
 
 const CONFIG = {
-  neuronDensity: 0.00012, // Erhöht für mehr Dichte
+  neuronDensity: 0.00005,     // Reduziert für Performance
   baseSpeed: 0.15,
   signalSpeed: 8,
-  maxConnections: 5,
+  maxConnections: 3,          // Reduziert für Performance
+  maxPulses: 50,              // Limit für Memory Management
+  connectionMaxDist: 100,     // Maximale Distanz für Verbindungen
   chargeFrames: 25,
   mouseRadius: 250,           // Magnetischer Radius
   mouseForce: 0.8,            // Stärke der magnetischen Anziehung/Abstoßung
   parallaxFactor: 0.15,       // Parallaxe-Stärke (subtiler für Eleganz)
-  bloomIntensity: 0.6,        // Bloom-Effekt Stärke
+  bloomIntensity: 0.6,         // Bloom-Effekt Stärke
   floatAmplitude: 0.5,        // Amplitude der Sine-Wave "Floating"-Bewegung
   floatSpeed: 0.0003,         // Geschwindigkeit der Floating-Bewegung
   wakeDecay: 0.92,            // Wie schnell Wake-Turbulenzen verschwinden
   damping: 0.05,              // Damping-Faktor für flüssige Bewegung (Lerp)
   clickRadius: 150,           // Radius für Click-to-Pulse
-  brownianStrength: 0.08,    // Stärke der Brownian Motion
+  brownianStrength: 0.08,     // Stärke der Brownian Motion
   brownianChangeRate: 0.02,   // Wie oft die Brownian-Richtung ändert
   shockwaveSpeed: 12,         // Geschwindigkeit der Shockwave
   shockwaveMaxRadius: 300,    // Maximale Shockwave-Radius
+  physicsUpdateInterval: 2,   // Physics nur jeden 2. Frame
+  viewportPadding: 100,       // Padding für Viewport-Culling
 };
 
 interface Neuron {
@@ -75,6 +79,8 @@ export default function NeuralBackground() {
     let pulses: Pulse[] = [];
     let shockwaves: Shockwave[] = [];
     let animationFrameId: number;
+    let frameCount = 0; // Für Physics-Throttling
+    let rafScheduled = false; // Für Mouse-Move Throttling
 
     const init = () => {
       const dpr = window.devicePixelRatio || 1;
@@ -127,7 +133,7 @@ export default function NeuralBackground() {
         });
       }
 
-      // Verbindungen: Nur auf ähnlichen Z-Ebenen (3D-Logik)
+      // Verbindungen: Nur auf ähnlichen Z-Ebenen (3D-Logik) + Distanz-Check
       neurons.forEach((n1, i) => {
         const potentialIndices = neurons
           .map((_, idx) => idx)
@@ -135,7 +141,9 @@ export default function NeuralBackground() {
             if (idx === i) return false;
             const n2 = neurons[idx];
             const zDiff = Math.abs(n2.z - n1.z);
-            return zDiff < 0.35; // Verbindungen nur in ähnlicher Tiefe
+            const dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
+            // Verbindungen nur in ähnlicher Tiefe UND innerhalb der Max-Distanz
+            return zDiff < 0.35 && dist < CONFIG.connectionMaxDist;
           })
           .sort((a, b) => {
             const distA = Math.hypot(n1.x - neurons[a].x, n1.y - neurons[a].y);
@@ -143,24 +151,31 @@ export default function NeuralBackground() {
             return distA - distB;
           });
 
-        n1.connections = potentialIndices.slice(0, Math.floor(Math.random() * 3) + 2);
+        n1.connections = potentialIndices.slice(0, CONFIG.maxConnections);
       });
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      const prevX = mouseRef.current.x;
-      const prevY = mouseRef.current.y;
-      const dx = e.clientX - prevX;
-      const dy = e.clientY - prevY;
-      const speed = Math.hypot(dx, dy);
-      
-      mouseRef.current = {
-        x: e.clientX,
-        y: e.clientY,
-        prevX,
-        prevY,
-        speed: Math.min(speed, 50), // Cap für Stabilität
-      };
+      // Throttle mit requestAnimationFrame
+      if (!rafScheduled) {
+        rafScheduled = true;
+        requestAnimationFrame(() => {
+          const prevX = mouseRef.current.x;
+          const prevY = mouseRef.current.y;
+          const dx = e.clientX - prevX;
+          const dy = e.clientY - prevY;
+          const speed = Math.hypot(dx, dy);
+          
+          mouseRef.current = {
+            x: e.clientX,
+            y: e.clientY,
+            prevX,
+            prevY,
+            speed: Math.min(speed, 50), // Cap für Stabilität
+          };
+          rafScheduled = false;
+        });
+      }
     };
 
     const handleMouseClick = (e: MouseEvent) => {
@@ -191,9 +206,14 @@ export default function NeuralBackground() {
       });
 
       // Erstelle Pulses von allen betroffenen Neuronen zu ihren Verbindungen
+      // Memory Management: Limit auf maxPulses
       affectedNeurons.forEach((neuronIdx) => {
+        if (pulses.length >= CONFIG.maxPulses) return; // Stop wenn Limit erreicht
+        
         const neuron = neurons[neuronIdx];
         neuron.connections.forEach((targetIdx) => {
+          if (pulses.length >= CONFIG.maxPulses) return; // Stop wenn Limit erreicht
+          
           pulses.push({
             from: neuronIdx,
             to: targetIdx,
@@ -206,6 +226,7 @@ export default function NeuralBackground() {
 
     const update = () => {
       timeRef.current += 16; // ~60fps
+      frameCount++;
       ctx.clearRect(0, 0, width, height);
       const isDark = document.documentElement.classList.contains("dark");
       
@@ -214,6 +235,9 @@ export default function NeuralBackground() {
       const connectionAlpha = isDark ? 0.02 : 0.04;
       const pulseColor = isDark ? "255, 255, 255" : "0, 0, 0";
 
+      // THROTTLE: Physics nur jeden 2. Frame
+      const shouldUpdatePhysics = frameCount % CONFIG.physicsUpdateInterval === 0;
+
       // 1. ORGANIC FLOW: Sine-Wave Floating für alle Neuronen
       const time = timeRef.current * CONFIG.floatSpeed;
 
@@ -221,71 +245,88 @@ export default function NeuralBackground() {
       const parallaxOffsetX = (mouseRef.current.x - width / 2) * CONFIG.parallaxFactor;
       const parallaxOffsetY = (mouseRef.current.y - height / 2) * CONFIG.parallaxFactor;
 
-      // 3. Neuronen Update & Physik
+      // 3. Neuronen Update & Physik (nur wenn shouldUpdatePhysics)
       neurons.forEach((n) => {
-        // Organic Floating: Sine-Wave Bewegung
-        n.baseX += Math.sin(time + n.timeOffset) * CONFIG.floatAmplitude * (n.z + 0.3) * 0.01;
-        n.baseY += Math.cos(time * 0.7 + n.timeOffset) * CONFIG.floatAmplitude * (n.z + 0.3) * 0.01;
-
-        // BROWNIAN MOTION: Organische, zufällige Drift
-        n.brownianTimer++;
-        if (n.brownianTimer > 100 / CONFIG.brownianChangeRate) {
-          n.brownianAngle = Math.random() * Math.PI * 2;
-          n.brownianTimer = 0;
+        // Viewport Culling: Skip Neuronen außerhalb des Viewports
+        const viewportPadding = CONFIG.viewportPadding;
+        if (n.x < -viewportPadding || n.x > width + viewportPadding ||
+            n.y < -viewportPadding || n.y > height + viewportPadding) {
+          // Nur Position updaten, nicht zeichnen
+          if (shouldUpdatePhysics) {
+            // Minimales Update für Screen Wrap
+            if (n.baseX < -50) n.baseX = width + 50;
+            if (n.baseX > width + 50) n.baseX = -50;
+            if (n.baseY < -50) n.baseY = height + 50;
+            if (n.baseY > height + 50) n.baseY = -50;
+          }
+          return; // Skip rest of update
         }
-        
-        const brownianSpeed = CONFIG.brownianStrength * (n.z * 0.5 + 0.5);
-        n.baseX += Math.cos(n.brownianAngle) * brownianSpeed;
-        n.baseY += Math.sin(n.brownianAngle) * brownianSpeed;
 
-        // Parallaxe: Tiefe-basierte Verschiebung (auf Base-Position)
-        const parallaxBaseX = n.baseX + parallaxOffsetX * n.z;
-        const parallaxBaseY = n.baseY + parallaxOffsetY * n.z;
+        if (shouldUpdatePhysics) {
+          // Organic Floating: Sine-Wave Bewegung
+          n.baseX += Math.sin(time + n.timeOffset) * CONFIG.floatAmplitude * (n.z + 0.3) * 0.01;
+          n.baseY += Math.cos(time * 0.7 + n.timeOffset) * CONFIG.floatAmplitude * (n.z + 0.3) * 0.01;
 
-        // MOUSE INTERACTION: Berechne Ziel-Position mit Damping
-        const mouseDx = parallaxBaseX - mouseRef.current.x;
-        const mouseDy = parallaxBaseY - mouseRef.current.y;
-        const mouseDist = Math.hypot(mouseDx, mouseDy);
-
-        if (mouseDist < CONFIG.mouseRadius && mouseDist > 0) {
-          const force = (1 - mouseDist / CONFIG.mouseRadius) * CONFIG.mouseForce;
-          const angle = Math.atan2(mouseDy, mouseDx);
+          // BROWNIAN MOTION: Organische, zufällige Drift
+          n.brownianTimer++;
+          if (n.brownianTimer > 100 / CONFIG.brownianChangeRate) {
+            n.brownianAngle = Math.random() * Math.PI * 2;
+            n.brownianTimer = 0;
+          }
           
-          // Setze Ziel-Position (Abstoßung) - flieht von Maus
-          n.targetX = parallaxBaseX + Math.cos(angle) * force * 3 * n.z;
-          n.targetY = parallaxBaseY + Math.sin(angle) * force * 3 * n.z;
-        } else {
-          // Keine Maus-Interaktion: Ziel = Base-Position mit Parallaxe
-          n.targetX = parallaxBaseX;
-          n.targetY = parallaxBaseY;
+          const brownianSpeed = CONFIG.brownianStrength * (n.z * 0.5 + 0.5);
+          n.baseX += Math.cos(n.brownianAngle) * brownianSpeed;
+          n.baseY += Math.sin(n.brownianAngle) * brownianSpeed;
+
+          // Parallaxe: Tiefe-basierte Verschiebung (auf Base-Position)
+          const parallaxBaseX = n.baseX + parallaxOffsetX * n.z;
+          const parallaxBaseY = n.baseY + parallaxOffsetY * n.z;
+
+          // MOUSE INTERACTION: Berechne Ziel-Position mit Damping
+          const mouseDx = parallaxBaseX - mouseRef.current.x;
+          const mouseDy = parallaxBaseY - mouseRef.current.y;
+          const mouseDist = Math.hypot(mouseDx, mouseDy);
+
+          if (mouseDist < CONFIG.mouseRadius && mouseDist > 0) {
+            const force = (1 - mouseDist / CONFIG.mouseRadius) * CONFIG.mouseForce;
+            const angle = Math.atan2(mouseDy, mouseDx);
+            
+            // Setze Ziel-Position (Abstoßung) - flieht von Maus
+            n.targetX = parallaxBaseX + Math.cos(angle) * force * 3 * n.z;
+            n.targetY = parallaxBaseY + Math.sin(angle) * force * 3 * n.z;
+          } else {
+            // Keine Maus-Interaktion: Ziel = Base-Position mit Parallaxe
+            n.targetX = parallaxBaseX;
+            n.targetY = parallaxBaseY;
+          }
+
+          // Wake-Effekt: Wenn Maus sich schnell bewegt, erzeuge Turbulenzen
+          const wakeDx = n.x - mouseRef.current.x;
+          const wakeDy = n.y - mouseRef.current.y;
+          const wakeDist = Math.hypot(wakeDx, wakeDy);
+
+          if (wakeDist < CONFIG.mouseRadius && wakeDist > 0 && mouseRef.current.speed > 5) {
+            const force = (1 - wakeDist / CONFIG.mouseRadius) * CONFIG.mouseForce;
+            const angle = Math.atan2(wakeDy, wakeDx);
+            const wakeForce = (mouseRef.current.speed / 50) * (1 - wakeDist / CONFIG.mouseRadius);
+            // Perpendicular Wake (wie Boot-Wake)
+            const perpAngle = angle + Math.PI / 2;
+            n.wakeX += Math.cos(perpAngle) * wakeForce * 0.5;
+            n.wakeY += Math.sin(perpAngle) * wakeForce * 0.5;
+
+            // Intensität für Glow
+            n.intensity = Math.max(n.intensity, force * 0.8 * n.z);
+          }
+
+          // Wake-Decay
+          n.wakeX *= CONFIG.wakeDecay;
+          n.wakeY *= CONFIG.wakeDecay;
         }
 
-        // DAMPING: Flüssige Bewegung zu Ziel-Position (Lerp)
+        // DAMPING: Flüssige Bewegung zu Ziel-Position (Lerp) - IMMER updaten für smoothness
         const dampingFactor = CONFIG.damping * (n.z * 0.5 + 0.5); // Vorne = schnelleres Damping
         n.x += (n.targetX - n.x) * dampingFactor;
         n.y += (n.targetY - n.y) * dampingFactor;
-
-        // Wake-Effekt: Wenn Maus sich schnell bewegt, erzeuge Turbulenzen
-        const wakeDx = n.x - mouseRef.current.x;
-        const wakeDy = n.y - mouseRef.current.y;
-        const wakeDist = Math.hypot(wakeDx, wakeDy);
-
-        if (wakeDist < CONFIG.mouseRadius && wakeDist > 0 && mouseRef.current.speed > 5) {
-          const force = (1 - wakeDist / CONFIG.mouseRadius) * CONFIG.mouseForce;
-          const angle = Math.atan2(wakeDy, wakeDx);
-          const wakeForce = (mouseRef.current.speed / 50) * (1 - wakeDist / CONFIG.mouseRadius);
-          // Perpendicular Wake (wie Boot-Wake)
-          const perpAngle = angle + Math.PI / 2;
-          n.wakeX += Math.cos(perpAngle) * wakeForce * 0.5;
-          n.wakeY += Math.sin(perpAngle) * wakeForce * 0.5;
-
-          // Intensität für Glow
-          n.intensity = Math.max(n.intensity, force * 0.8 * n.z);
-        }
-
-        // Wake-Decay
-        n.wakeX *= CONFIG.wakeDecay;
-        n.wakeY *= CONFIG.wakeDecay;
         n.x += n.wakeX;
         n.y += n.wakeY;
 
@@ -296,14 +337,22 @@ export default function NeuralBackground() {
         if (n.baseY > height + 50) n.baseY = -50;
       });
 
-      // 4. BLOOM & GLOW: Aktive Neuronen mit radialem Gradient
+      // 4. BLOOM & GLOW: Aktive Neuronen (OHNE shadowBlur für Performance)
       neurons.forEach((n) => {
+        // Viewport Culling: Skip Neuronen außerhalb
+        const viewportPadding = CONFIG.viewportPadding;
+        if (n.x < -viewportPadding || n.x > width + viewportPadding ||
+            n.y < -viewportPadding || n.y > height + viewportPadding) {
+          // Minimales Update auch außerhalb
+          if (n.chargeTimer > 0) n.chargeTimer--;
+          n.intensity *= 0.93;
+          return;
+        }
+
         const isActive = n.chargeTimer > 0 || n.intensity > 0.1;
         
         if (isActive) {
-          // Bloom-Effekt: Radialer Gradient mit Screen-Blend für Glow
-          ctx.save();
-          ctx.globalCompositeOperation = 'screen';
+          // Bloom-Effekt: Radialer Gradient OHNE Screen-Blend (Performance)
           const gradient = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius * 3);
           const bloomAlpha = n.intensity * CONFIG.bloomIntensity * n.z;
           gradient.addColorStop(0, isDark 
@@ -318,7 +367,6 @@ export default function NeuralBackground() {
           ctx.beginPath();
           ctx.arc(n.x, n.y, n.radius * 3, 0, Math.PI * 2);
           ctx.fill();
-          ctx.restore();
         }
 
         // Neuron Core
@@ -334,29 +382,32 @@ export default function NeuralBackground() {
         n.intensity *= 0.93;
       });
 
-      // 5. GLOW-PATHS: Verbindungen mit Shadow-Blur für Energie-Pulse
+      // 5. GLOW-PATHS: Verbindungen OHNE shadowBlur (Performance)
       neurons.forEach((n) => {
+        // Viewport Culling: Skip wenn Neuron außerhalb
+        const viewportPadding = CONFIG.viewportPadding;
+        if (n.x < -viewportPadding || n.x > width + viewportPadding ||
+            n.y < -viewportPadding || n.y > height + viewportPadding) {
+          return;
+        }
+
         n.connections.forEach((targetIdx) => {
           const target = neurons[targetIdx];
           const dist = Math.hypot(n.x - target.x, n.y - target.y);
           
-          if (dist < 180) {
+          // Distanz-Check: Nur zeichnen wenn innerhalb connectionMaxDist
+          if (dist < CONFIG.connectionMaxDist) {
             const zAvg = (n.z + target.z) / 2;
             const isActive = n.chargeTimer > 0 || target.chargeTimer > 0 || 
                            n.intensity > 0.15 || target.intensity > 0.15;
             
             if (isActive) {
-              // Glow-Path für aktive Verbindungen mit Screen-Blend
+              // Glow-Path für aktive Verbindungen OHNE shadowBlur
               ctx.save();
-              ctx.globalCompositeOperation = 'screen';
               ctx.strokeStyle = isDark 
-                ? `rgba(255, 255, 255, ${0.15 * zAvg})` 
-                : `rgba(0, 0, 0, ${0.15 * zAvg})`;
-              ctx.shadowBlur = 8 * zAvg;
-              ctx.shadowColor = isDark 
-                ? `rgba(255, 255, 255, ${0.6 * zAvg})` 
-                : `rgba(0, 0, 0, ${0.6 * zAvg})`;
-              ctx.lineWidth = 0.5 + zAvg * 0.5;
+                ? `rgba(255, 255, 255, ${0.25 * zAvg})` 
+                : `rgba(0, 0, 0, ${0.25 * zAvg})`;
+              ctx.lineWidth = 0.8 + zAvg * 0.5;
               ctx.setLineDash([]); // Solide Linie für aktive Signale
               ctx.beginPath();
               ctx.moveTo(n.x, n.y);
@@ -381,7 +432,7 @@ export default function NeuralBackground() {
         });
       });
 
-      // 6. SHOCKWAVES: Expandierende Ringe bei Klick
+      // 6. SHOCKWAVES: Expandierende Ringe bei Klick (OHNE Screen-Blend für Performance)
       shockwaves = shockwaves.filter((sw) => {
         sw.radius += CONFIG.shockwaveSpeed;
         sw.intensity *= 0.95;
@@ -390,10 +441,15 @@ export default function NeuralBackground() {
           return false;
         }
 
-        // Zeichne Shockwave (unsichtbar, aber triggert Neuronen)
-        // Optional: Visueller Ring (sehr subtil)
+        // Viewport Culling für Shockwaves
+        const viewportPadding = CONFIG.viewportPadding;
+        if (sw.x + sw.radius < -viewportPadding || sw.x - sw.radius > width + viewportPadding ||
+            sw.y + sw.radius < -viewportPadding || sw.y - sw.radius > height + viewportPadding) {
+          return true; // Weiter updaten, aber nicht zeichnen
+        }
+
+        // Zeichne Shockwave (sehr subtil, OHNE Screen-Blend)
         ctx.save();
-        ctx.globalCompositeOperation = 'screen';
         ctx.strokeStyle = isDark 
           ? `rgba(255, 255, 255, ${sw.intensity * 0.1})` 
           : `rgba(0, 0, 0, ${sw.intensity * 0.1})`;
@@ -403,26 +459,28 @@ export default function NeuralBackground() {
         ctx.stroke();
         ctx.restore();
 
-        // Trigger Neuronen, die von Shockwave getroffen werden
-        neurons.forEach((n) => {
-          const dx = n.x - sw.x;
-          const dy = n.y - sw.y;
-          const dist = Math.hypot(dx, dy);
-          const shockwaveThickness = 20;
+        // Trigger Neuronen, die von Shockwave getroffen werden (nur wenn shouldUpdatePhysics)
+        if (shouldUpdatePhysics) {
+          neurons.forEach((n) => {
+            const dx = n.x - sw.x;
+            const dy = n.y - sw.y;
+            const dist = Math.hypot(dx, dy);
+            const shockwaveThickness = 20;
 
-          if (Math.abs(dist - sw.radius) < shockwaveThickness && sw.intensity > 0.3) {
-            n.intensity = Math.max(n.intensity, sw.intensity * 0.5);
-            if (n.chargeTimer < 5) {
-              n.chargeTimer = 5;
+            if (Math.abs(dist - sw.radius) < shockwaveThickness && sw.intensity > 0.3) {
+              n.intensity = Math.max(n.intensity, sw.intensity * 0.5);
+              if (n.chargeTimer < 5) {
+                n.chargeTimer = 5;
+              }
             }
-          }
-        });
+          });
+        }
 
         return true;
       });
 
-      // 7. SIGNALE / PULSE mit Glow-Effekt
-      if (Math.random() < 0.04) {
+      // 7. SIGNALE / PULSE mit Glow-Effekt (nur Screen-Blend, OHNE shadowBlur)
+      if (Math.random() < 0.04 && pulses.length < CONFIG.maxPulses) {
         const start = Math.floor(Math.random() * neurons.length);
         const connections = neurons[start].connections;
         if (connections.length > 0) {
@@ -454,13 +512,16 @@ export default function NeuralBackground() {
         const curX = n1.x + (n2.x - n1.x) * p.progress;
         const curY = n1.y + (n2.y - n1.y) * p.progress;
 
-        // Glowing Pulse mit Screen-Blend
+        // Viewport Culling für Pulses
+        const viewportPadding = CONFIG.viewportPadding;
+        if (curX < -viewportPadding || curX > width + viewportPadding ||
+            curY < -viewportPadding || curY > height + viewportPadding) {
+          return true; // Weiter updaten, aber nicht zeichnen
+        }
+
+        // Glowing Pulse mit Screen-Blend (NUR für Pulses, OHNE shadowBlur)
         ctx.save();
         ctx.globalCompositeOperation = 'screen';
-        ctx.shadowBlur = 12 * p.z;
-        ctx.shadowColor = isDark 
-          ? `rgba(255, 255, 255, ${0.8 * p.z})` 
-          : `rgba(0, 0, 0, ${0.8 * p.z})`;
         ctx.beginPath();
         ctx.fillStyle = `rgba(${pulseColor}, ${0.9 * p.z})`;
         ctx.arc(curX, curY, 1.5 * p.z + 0.8, 0, Math.PI * 2);
