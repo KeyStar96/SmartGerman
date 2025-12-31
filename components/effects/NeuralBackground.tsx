@@ -11,7 +11,7 @@ const CONFIG = {
   connectionDistance: 190,    // Etwas erhöht, da sie sich mehr bewegen
   
   // "Freies Schwimmen" (Viereck vergrößert)
-  wanderRadius: 2.5,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
+  wanderRadius: 1,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
   wanderSpeed: 0.015,         // Langsamerer, eleganter Richtungswechsel
   springStiffness: 0.002,     // Sehr weiche Feder (war 0.008) -> Lässt weite Wege zu
   
