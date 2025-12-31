@@ -6,9 +6,11 @@ import { useEffect, useRef } from "react";
 const CONFIG = {
   particleCount: 50, // Anzahl der Neuronen
   baseSpeed: 0.3, // Bewegungsgeschwindigkeit der Neuronen
-  signalSpeed: 0.03, // Wie schnell das Lichtsignal reist (0.0 bis 1.0 pro Frame)
-  signalFrequency: 0.001, // Wahrscheinlichkeit eines Signals pro Frame (sehr selten)
-  neuronGlowDuration: 15, // Frames, wie lange ein Neuron nach dem Feuern leuchtet
+  signalSpeed: 0.015, // Wie schnell das Lichtsignal reist (0.0 bis 1.0 pro Frame) - langsamer für angenehmere Wahrnehmung
+  signalFrequency: 0.008, // Wahrscheinlichkeit eines Signals pro Frame (häufiger)
+  neuronGlowDuration: 50, // Frames, wie lange ein Neuron nach dem Feuern leuchtet (länger für sanfteren Effekt)
+  connectionsPerNeuron: 5, // Anzahl der Verbindungen pro Neuron
+  viewportPadding: 0.2, // 20% Padding außerhalb des sichtbaren Bereichs
   colors: {
     base: "rgba(1, 42, 46, 0.6)", // --dm-surface-teal (abgedunkelt)
     line: "rgba(56, 62, 78, 0.15)", // --dm-border-slate (sehr dezent)
@@ -24,6 +26,7 @@ interface Point {
   vx: number;
   vy: number;
   glowTimer: number; // Timer für das Aufleuchten (0 = nicht aktiv)
+  connections: number[]; // Indizes der verbundenen Neuronen
 }
 
 interface Signal {
@@ -48,17 +51,39 @@ export default function NeuralBackground() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // 1. Neuronen initialisieren
+    // Berechne erweiterten Bereich für Neuronen (außerhalb des sichtbaren Bereichs)
+    const paddingX = width * CONFIG.viewportPadding;
+    const paddingY = height * CONFIG.viewportPadding;
+    const minX = -paddingX;
+    const maxX = width + paddingX;
+    const minY = -paddingY;
+    const maxY = height + paddingY;
+
+    // 1. Neuronen initialisieren (auch außerhalb des sichtbaren Bereichs)
     const particles: Point[] = [];
     for (let i = 0; i < CONFIG.particleCount; i++) {
       particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
+        x: minX + Math.random() * (maxX - minX),
+        y: minY + Math.random() * (maxY - minY),
         vx: (Math.random() - 0.5) * CONFIG.baseSpeed,
         vy: (Math.random() - 0.5) * CONFIG.baseSpeed,
         glowTimer: 0, // Startet ohne Glow
+        connections: [], // Wird nach Initialisierung gefüllt
       });
     }
+
+    // 2. Verbindungen erstellen: Jedes Neuron bekommt genau CONFIG.connectionsPerNeuron Verbindungen
+    particles.forEach((particle, index) => {
+      const availableIndices = particles
+        .map((_, i) => i)
+        .filter((i) => i !== index);
+      
+      // Mische die verfügbaren Indizes zufällig
+      const shuffled = availableIndices.sort(() => Math.random() - 0.5);
+      
+      // Wähle die ersten CONFIG.connectionsPerNeuron aus
+      particle.connections = shuffled.slice(0, CONFIG.connectionsPerNeuron);
+    });
 
     // Array für aktive Lichtsignale
     let signals: Signal[] = [];
@@ -70,6 +95,10 @@ export default function NeuralBackground() {
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      // Aktualisiere auch den erweiterten Bereich
+      const newPaddingX = width * CONFIG.viewportPadding;
+      const newPaddingY = height * CONFIG.viewportPadding;
+      // Neuronen können weiterhin außerhalb existieren, keine Neuinitialisierung nötig
     };
     window.addEventListener("resize", handleResize);
 
@@ -85,9 +114,12 @@ export default function NeuralBackground() {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Bounce an den Rändern
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
+        // Erweiterte Bounce-Logik: Neuronen können außerhalb des sichtbaren Bereichs existieren
+        // Bounce nur an den erweiterten Rändern
+        const paddingX = width * CONFIG.viewportPadding;
+        const paddingY = height * CONFIG.viewportPadding;
+        if (p.x < -paddingX || p.x > width + paddingX) p.vx *= -1;
+        if (p.y < -paddingY || p.y > height + paddingY) p.vy *= -1;
 
         // Glow-Timer reduzieren
         if (p.glowTimer > 0) {
@@ -95,21 +127,23 @@ export default function NeuralBackground() {
         }
       });
 
-      // B. ALLE Verbindungen zeichnen (alle Neuronen sind miteinander verbunden)
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const p1 = particles[i];
-          const p2 = particles[j];
-
-          // Verbindungslinie zeichnen (sehr dezent)
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = CONFIG.colors.line;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
+      // B. Verbindungen zeichnen (nur die definierten Verbindungen pro Neuron)
+      particles.forEach((p1, i) => {
+        p1.connections.forEach((connectedIndex) => {
+          // Zeichne nur einmal pro Verbindung (vermeide Duplikate)
+          if (connectedIndex > i) {
+            const p2 = particles[connectedIndex];
+            
+            // Verbindungslinie zeichnen (sehr dezent)
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = CONFIG.colors.line;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        });
+      });
 
       // C. Zufälliges Feuern eines Neurons (sehr selten)
       if (Math.random() < CONFIG.signalFrequency) {
@@ -119,27 +153,35 @@ export default function NeuralBackground() {
         // Neuron leuchtet auf
         firingNeuron.glowTimer = CONFIG.neuronGlowDuration;
         
-        // Sende Signale an ALLE anderen Neuronen
-        particles.forEach((target) => {
-          if (target !== firingNeuron) {
-            const dx = target.x - firingNeuron.x;
-            const dy = target.y - firingNeuron.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            signals.push({
-              startX: firingNeuron.x,
-              startY: firingNeuron.y,
-              endX: target.x,
-              endY: target.y,
-              progress: 0,
-              totalDistance: dist,
-            });
-          }
+        // Sende Signale nur an die verbundenen Neuronen (nicht an alle)
+        firingNeuron.connections.forEach((connectedIndex) => {
+          const target = particles[connectedIndex];
+          const dx = target.x - firingNeuron.x;
+          const dy = target.y - firingNeuron.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          signals.push({
+            startX: firingNeuron.x,
+            startY: firingNeuron.y,
+            endX: target.x,
+            endY: target.y,
+            progress: 0,
+            totalDistance: dist,
+          });
         });
       }
 
       // D. Neuronen zeichnen (mit Glow-Effekt wenn aktiv)
+      // Nur Neuronen zeichnen, die im sichtbaren Bereich oder nahe dran sind
       particles.forEach((p) => {
+        // Zeichne Neuron auch wenn es leicht außerhalb ist (für sanfte Übergänge)
+        const paddingX = width * 0.1;
+        const paddingY = height * 0.1;
+        if (p.x < -paddingX || p.x > width + paddingX || 
+            p.y < -paddingY || p.y > height + paddingY) {
+          return; // Überspringe Neuronen, die zu weit außerhalb sind
+        }
+
         const isGlowing = p.glowTimer > 0;
         const glowIntensity = isGlowing ? p.glowTimer / CONFIG.neuronGlowDuration : 0;
 
@@ -151,7 +193,7 @@ export default function NeuralBackground() {
           : CONFIG.colors.base;
         ctx.fill();
 
-        // Glow-Effekt wenn aktiv
+        // Glow-Effekt wenn aktiv (sanfter Fade-out)
         if (isGlowing) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
