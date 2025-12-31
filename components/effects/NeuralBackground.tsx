@@ -4,16 +4,17 @@ import { useEffect, useRef } from "react";
 
 // Konfiguration passend zu Ihrem globals.css
 const CONFIG = {
-  particleCount: 60, // Anzahl der Neuronen
-  connectionDistance: 150, // Max Distanz für Verbindungen
-  baseSpeed: 0.5, // Bewegungsgeschwindigkeit der Neuronen
-  signalSpeed: 4.0, // Wie schnell das Lichtsignal reist
-  signalFrequency: 0.02, // Wahrscheinlichkeit eines Signals pro Frame (Feuerrate)
+  particleCount: 50, // Anzahl der Neuronen
+  baseSpeed: 0.3, // Bewegungsgeschwindigkeit der Neuronen
+  signalSpeed: 0.03, // Wie schnell das Lichtsignal reist (0.0 bis 1.0 pro Frame)
+  signalFrequency: 0.001, // Wahrscheinlichkeit eines Signals pro Frame (sehr selten)
+  neuronGlowDuration: 15, // Frames, wie lange ein Neuron nach dem Feuern leuchtet
   colors: {
-    base: "rgba(1, 42, 46, 0.8)", // --dm-surface-teal (abgedunkelt)
-    line: "rgba(56, 62, 78, 0.3)", // --dm-border-slate (transparent)
-    signal: "#FF5C00", // --primary-orange
-    glow: "rgba(255, 92, 0, 0.4)", // Orange Glow
+    base: "rgba(1, 42, 46, 0.6)", // --dm-surface-teal (abgedunkelt)
+    line: "rgba(56, 62, 78, 0.15)", // --dm-border-slate (sehr dezent)
+    signal: "rgba(255, 255, 255, 0.4)", // Weiß, sehr dezent
+    neuronActive: "#FF5C00", // --primary-orange für aktive Neuronen
+    neuronGlow: "rgba(255, 92, 0, 0.3)", // Orange Glow für aktive Neuronen
   },
 };
 
@@ -22,12 +23,16 @@ interface Point {
   y: number;
   vx: number;
   vy: number;
+  glowTimer: number; // Timer für das Aufleuchten (0 = nicht aktiv)
 }
 
 interface Signal {
-  start: Point;
-  end: Point;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
   progress: number; // 0.0 bis 1.0
+  totalDistance: number; // Gesamtdistanz für Fade-out
 }
 
 export default function NeuralBackground() {
@@ -51,11 +56,15 @@ export default function NeuralBackground() {
         y: Math.random() * height,
         vx: (Math.random() - 0.5) * CONFIG.baseSpeed,
         vy: (Math.random() - 0.5) * CONFIG.baseSpeed,
+        glowTimer: 0, // Startet ohne Glow
       });
     }
 
     // Array für aktive Lichtsignale
     let signals: Signal[] = [];
+    
+    // Frame-Counter für seltene Signal-Generierung
+    let frameCount = 0;
 
     // Resize Handler
     const handleResize = () => {
@@ -69,8 +78,9 @@ export default function NeuralBackground() {
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
+      frameCount++;
 
-      // A. Neuronen bewegen & zeichnen
+      // A. Neuronen bewegen
       particles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
@@ -79,69 +89,102 @@ export default function NeuralBackground() {
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        // Neuron zeichnen (Punkt)
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = CONFIG.colors.base;
-        ctx.fill();
+        // Glow-Timer reduzieren
+        if (p.glowTimer > 0) {
+          p.glowTimer--;
+        }
       });
 
-      // B. Verbindungen & Signale verwalten
-      // Wir iterieren durch alle Paare
+      // B. ALLE Verbindungen zeichnen (alle Neuronen sind miteinander verbunden)
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const p1 = particles[i];
           const p2 = particles[j];
 
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < CONFIG.connectionDistance) {
-            // 1. Statische Verbindungslinie zeichnen
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            // Opazität basierend auf Distanz (näher = sichtbarer)
-            const opacity = 1 - dist / CONFIG.connectionDistance;
-            ctx.strokeStyle = `rgba(56, 62, 78, ${opacity * 0.4})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            // 2. Zufälliges "Feuern" von Signalen (Neuronale Aktivität)
-            if (Math.random() < CONFIG.signalFrequency * 0.05) {
-                // Nur feuern, wenn noch nicht zu viele Signale unterwegs sind
-                // Zufällige Richtung: p1 -> p2 oder p2 -> p1
-                if (Math.random() > 0.5) {
-                    signals.push({ start: p1, end: p2, progress: 0 });
-                } else {
-                    signals.push({ start: p2, end: p1, progress: 0 });
-                }
-            }
-          }
+          // Verbindungslinie zeichnen (sehr dezent)
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = CONFIG.colors.line;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
         }
       }
 
-      // C. Signale aktualisieren und zeichnen
-      // Wir filtern Signale heraus, die angekommen sind (progress >= 1)
+      // C. Zufälliges Feuern eines Neurons (sehr selten)
+      if (Math.random() < CONFIG.signalFrequency) {
+        // Wähle ein zufälliges Neuron
+        const firingNeuron = particles[Math.floor(Math.random() * particles.length)];
+        
+        // Neuron leuchtet auf
+        firingNeuron.glowTimer = CONFIG.neuronGlowDuration;
+        
+        // Sende Signale an ALLE anderen Neuronen
+        particles.forEach((target) => {
+          if (target !== firingNeuron) {
+            const dx = target.x - firingNeuron.x;
+            const dy = target.y - firingNeuron.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            signals.push({
+              startX: firingNeuron.x,
+              startY: firingNeuron.y,
+              endX: target.x,
+              endY: target.y,
+              progress: 0,
+              totalDistance: dist,
+            });
+          }
+        });
+      }
+
+      // D. Neuronen zeichnen (mit Glow-Effekt wenn aktiv)
+      particles.forEach((p) => {
+        const isGlowing = p.glowTimer > 0;
+        const glowIntensity = isGlowing ? p.glowTimer / CONFIG.neuronGlowDuration : 0;
+
+        // Basis-Neuron
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = isGlowing 
+          ? CONFIG.colors.neuronActive 
+          : CONFIG.colors.base;
+        ctx.fill();
+
+        // Glow-Effekt wenn aktiv
+        if (isGlowing) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 92, 0, ${glowIntensity * 0.2})`;
+          ctx.fill();
+        }
+      });
+
+      // E. Signale aktualisieren und zeichnen
       signals = signals.filter((sig) => {
-        sig.progress += CONFIG.signalSpeed / 100; // Geschwindigkeit anpassen
+        sig.progress += CONFIG.signalSpeed;
 
         // Position des Signals interpolieren
-        const currentX = sig.start.x + (sig.end.x - sig.start.x) * sig.progress;
-        const currentY = sig.start.y + (sig.end.y - sig.start.y) * sig.progress;
+        const currentX = sig.startX + (sig.endX - sig.startX) * sig.progress;
+        const currentY = sig.startY + (sig.endY - sig.startY) * sig.progress;
 
-        // Signal zeichnen (Glowing Orb)
-        ctx.beginPath();
-        ctx.arc(currentX, currentY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = CONFIG.colors.signal;
-        // Glow Effekt
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = CONFIG.colors.glow;
-        ctx.fill();
+        // Berechne zurückgelegte Distanz
+        const traveledDistance = sig.progress * sig.totalDistance;
         
-        // Reset Shadow für Performance
-        ctx.shadowBlur = 0;
+        // Opazität nimmt mit der Distanz ab (Fade-out)
+        // Maximal sichtbar bei 0, komplett unsichtbar bei totalDistance
+        const maxFadeDistance = sig.totalDistance;
+        const fadeProgress = Math.min(traveledDistance / maxFadeDistance, 1);
+        const signalOpacity = (1 - fadeProgress) * 0.4; // Startet bei 0.4, endet bei 0
+
+        // Signal nur zeichnen wenn noch sichtbar
+        if (signalOpacity > 0.01) {
+          // Sehr dezentes weißes Lichtsignal
+          ctx.beginPath();
+          ctx.arc(currentX, currentY, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${signalOpacity})`;
+          ctx.fill();
+        }
 
         return sig.progress < 1;
       });
