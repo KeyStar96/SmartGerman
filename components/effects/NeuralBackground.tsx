@@ -33,6 +33,12 @@ const CONFIG = {
   particleSize: 1.8,
   flashDecay: 0.04,
   
+  // 3D Z-Dimension
+  zDepthRange: 400,           // Z-Tiefe Bereich (-zDepthRange/2 bis +zDepthRange/2)
+  zBaseOffset: 0,             // Basis-Z-Position (0 = Mitte)
+  zSizeScale: 0.8,            // Größenänderung pro Z-Einheit (größer = mehr Unterschied)
+  zBlurLayers: 3,             // Anzahl überlagerter Kreise für Blur-Effekt
+  
   // Auto-Impulse
   autoPulseEnabled: true,     // Automatische Impulse aktivieren
   autoPulseMinDelay: 2000,    // Mindestverzögerung zwischen Impulsen (ms)
@@ -56,10 +62,13 @@ const THEME_COLORS = {
 interface Neuron {
   x: number;
   y: number;
+  z: number;
   baseX: number;
   baseY: number;
+  baseZ: number;
   vx: number;
   vy: number;
+  vz: number;
   wanderAngle: number;
   flash: number;
   connections: number[];
@@ -160,13 +169,17 @@ export default function NeuralBackground() {
         for (let col = 0; col < gridCols; col++) {
           const cellX = (col * CONFIG.gridCellSize) - CONFIG.viewportPadding + (Math.random() * CONFIG.gridCellSize);
           const cellY = (row * CONFIG.gridCellSize) - CONFIG.viewportPadding + (Math.random() * CONFIG.gridCellSize);
+          const cellZ = (Math.random() - 0.5) * CONFIG.zDepthRange + CONFIG.zBaseOffset;
           newNeurons.push({
             x: cellX,
             y: cellY,
+            z: cellZ,
             baseX: cellX,
             baseY: cellY,
+            baseZ: cellZ,
             vx: 0,
             vy: 0,
+            vz: 0,
             wanderAngle: Math.random() * Math.PI * 2,
             flash: 0,
             connections: [],
@@ -179,12 +192,15 @@ export default function NeuralBackground() {
       for (let i = 0; i < additionalNeurons; i++) {
         const x = (Math.random() * extendedWidth) - CONFIG.viewportPadding;
         const y = (Math.random() * extendedHeight) - CONFIG.viewportPadding;
+        const z = (Math.random() - 0.5) * CONFIG.zDepthRange + CONFIG.zBaseOffset;
         newNeurons.push({
-          x, y,
+          x, y, z,
           baseX: x,
           baseY: y,
+          baseZ: z,
           vx: 0,
           vy: 0,
+          vz: 0,
           wanderAngle: Math.random() * Math.PI * 2,
           flash: 0,
           connections: [],
@@ -259,8 +275,10 @@ export default function NeuralBackground() {
         // B. Sehr weiche Rückfederung
         const dxBase = n.baseX - n.x;
         const dyBase = n.baseY - n.y;
+        const dzBase = n.baseZ - n.z;
         n.vx += dxBase * CONFIG.springStiffness;
         n.vy += dyBase * CONFIG.springStiffness;
+        n.vz += dzBase * CONFIG.springStiffness;
 
         // C. Subtile Maus-Interaktion
         if (mouse.active) {
@@ -277,8 +295,10 @@ export default function NeuralBackground() {
 
         n.vx *= CONFIG.damping;
         n.vy *= CONFIG.damping;
+        n.vz *= CONFIG.damping;
         n.x += n.vx;
         n.y += n.vy;
+        n.z += n.vz;
 
         if (n.flash > 0) {
           n.flash -= CONFIG.flashDecay;
@@ -288,6 +308,12 @@ export default function NeuralBackground() {
     };
 
     // --- 3. Rendering ---
+    // Hilfsfunktion: Normalisiere Z-Position zu einem 0-1 Wert (0 = ganz hinten, 1 = ganz vorne)
+    const normalizeZ = (z: number): number => {
+      const normalized = (z - CONFIG.zBaseOffset + CONFIG.zDepthRange / 2) / CONFIG.zDepthRange;
+      return Math.max(0, Math.min(1, normalized));
+    };
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       
@@ -295,21 +321,40 @@ export default function NeuralBackground() {
       const pulses = pulsesRef.current;
       const theme = themeRef.current; // Aktuelles Farbschema nutzen
 
-      // 1. Verbindungen (Farbe je nach Theme)
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = `rgba(${theme.neuron}, ${theme.lineOpacity})`;
-      ctx.beginPath();
+      // Erstelle eine sortierte Kopie der Neuronen (hinten zuerst für korrektes Z-Buffering)
+      const sortedNeurons = [...neurons].sort((a, b) => a.z - b.z);
+
+      // 1. Verbindungen (mit Z-abhängiger Opacity und Linienstärke)
+      
+      // Zeichne Verbindungen basierend auf durchschnittlicher Z-Position
+      const connectionsDrawn = new Set<string>();
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
         for (const targetIdx of n.connections) {
           if (targetIdx > i) {
             const target = neurons[targetIdx];
+            const connectionKey = `${Math.min(i, targetIdx)}-${Math.max(i, targetIdx)}`;
+            if (connectionsDrawn.has(connectionKey)) continue;
+            connectionsDrawn.add(connectionKey);
+            
+            // Durchschnittliche Z-Position für diese Verbindung
+            const avgZ = (n.z + target.z) / 2;
+            const zNormalized = normalizeZ(avgZ);
+            
+            // Weitere Verbindungen = dünner und transparenter
+            // Vordere Verbindungen = dicker und opaker
+            const lineOpacity = theme.lineOpacity * (0.5 + zNormalized * 0.5);
+            const lineWidth = 0.5 + zNormalized * 0.5;
+            
+            ctx.strokeStyle = `rgba(${theme.neuron}, ${lineOpacity})`;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
             ctx.moveTo(n.x, n.y);
             ctx.lineTo(target.x, target.y);
+            ctx.stroke();
           }
         }
       }
-      ctx.stroke();
 
       // 2. Signale
       ctx.globalCompositeOperation = "lighter";
@@ -362,38 +407,64 @@ export default function NeuralBackground() {
         ctx.stroke();
       }
 
-      // 3. Neuronen
-      // Im Lightmode nutzen wir 'source-over' statt 'lighter' für die Punkte, 
-      // damit sie dunkel und solide wirken, nicht leuchtend weiß.
+      // 3. Neuronen (sortiert nach Z: hinten zuerst, damit vordere über hinten gezeichnet werden)
       const isDark = theme === THEME_COLORS.dark;
       ctx.globalCompositeOperation = isDark ? "lighter" : "source-over";
 
-      for (let i = 0; i < neurons.length; i++) {
-        const n = neurons[i];
+      // Rendere Neuronen von hinten nach vorne (depth sorting)
+      for (let i = 0; i < sortedNeurons.length; i++) {
+        const n = sortedNeurons[i];
+        const zNormalized = normalizeZ(n.z);
         
-        // Basis Punkt (reduzierte Opazität für subtileres Netzwerk)
-        const alpha = isDark 
-          ? 0.15 + n.flash * 0.5   // Reduziert von 0.3 + flash * 0.7
-          : 0.1 + n.flash * 0.35;   // Reduziert von 0.2 + flash * 0.5
-          
-        ctx.fillStyle = `rgba(${theme.neuron}, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, CONFIG.particleSize, 0, Math.PI * 2);
-        ctx.fill();
+        // Größe basierend auf Z-Position: weiter vorne = größer
+        // zNormalized: 0 (hinten) bis 1 (vorne)
+        const sizeMultiplier = 1 + (zNormalized - 0.5) * CONFIG.zSizeScale;
+        const particleSize = CONFIG.particleSize * sizeMultiplier;
+        
+        // Opacity: weiter hinten = etwas transparenter, weiter vorne = etwas opaker
+        const baseAlpha = isDark 
+          ? 0.15 + n.flash * 0.5
+          : 0.1 + n.flash * 0.35;
+        const zAlphaModifier = 0.7 + zNormalized * 0.3; // 0.7-1.0 Range
+        const alpha = baseAlpha * zAlphaModifier;
+        
+        // Blur-Effekt für vordere Neuronen: mehrere überlagerte Kreise mit abnehmender Opacity
+        // weiter vorne (zNormalized näher bei 1) = mehr Blur-Layers
+        const blurIntensity = zNormalized; // 0 = kein Blur, 1 = maximaler Blur
+        
+        if (blurIntensity > 0.1) {
+          // Zeichne mehrere überlagerte Kreise für Blur-Effekt
+          const numBlurLayers = Math.ceil(blurIntensity * CONFIG.zBlurLayers);
+          for (let layer = numBlurLayers; layer >= 1; layer--) {
+            const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; // Abnehmende Opacity pro Layer
+            const layerSize = particleSize * (1 + (numBlurLayers - layer + 1) * 0.3);
+            
+            ctx.fillStyle = `rgba(${theme.neuron}, ${layerAlpha})`;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, layerSize, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          // Kein Blur für hinten liegende Neuronen - scharfe Darstellung
+          ctx.fillStyle = `rgba(${theme.neuron}, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, particleSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
-        // Flash Glow (Immer die Signalfarbe)
+        // Flash Glow (Immer die Signalfarbe, auch Z-abhängig)
         if (n.flash > 0.01) {
-          // Im Lightmode muss der Glow etwas intensiver sein, um gegen das Schwarz anzukommen
-          // oder wir nutzen Composite Lighter NUR für den Glow
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           
-          // Subtilerer Glow: Etwas reduziert für weniger aufdringliches Netzwerk
-          const glowRadius = CONFIG.particleSize * 3 + (n.flash * 15);
+          // Glow-Größe basierend auf Z-Position
+          const glowRadius = particleSize * 3 + (n.flash * 15 * sizeMultiplier);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
-          // Reduzierte Alpha-Werte für subtileren Effekt
-          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash * 0.9})`);
-          glow.addColorStop(0.4, `rgba(${theme.signal}, ${n.flash * 0.45})`);
+          
+          // Glow-Intensität basierend auf Z-Position
+          const glowIntensity = zNormalized * 0.9 + 0.1;
+          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash * 0.9 * glowIntensity})`);
+          glow.addColorStop(0.4, `rgba(${theme.signal}, ${n.flash * 0.45 * glowIntensity})`);
           glow.addColorStop(1, `rgba(${theme.signal}, 0)`);
           
           ctx.fillStyle = glow;
