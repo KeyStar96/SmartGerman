@@ -21,7 +21,7 @@ export default function NeuralBackground() {
       fpsLimit: 60,
       particles: {
         number: {
-          value: 30, // Minimale Partikel für 60fps Performance
+          value: 40, // Leicht erhöht für mehr Verbindungen und Signale
           density: {
             enable: true,
             area: 800,
@@ -38,10 +38,10 @@ export default function NeuralBackground() {
           type: "circle",
         },
         opacity: {
-          value: { min: 0.3, max: 0.6 }, // Dezente Sichtbarkeit
+          value: { min: 0.4, max: 0.7 }, // Leicht erhöht für bessere Sichtbarkeit
           animation: {
             enable: true,
-            speed: 0.5,
+            speed: 0.8,
             sync: false,
           },
         },
@@ -68,11 +68,24 @@ export default function NeuralBackground() {
             rotateY: 1200,
           },
         },
-        // Firing-Effekt: Gelegentliche Orange-Impulse
+        // Trail-Effekt: Wandernde Signale zwischen Neuronen
+        trail: {
+          enable: true,
+          length: 5, // Längere Spur für sichtbare Signal-Übertragung
+          fill: {
+            color: {
+              value: "hsl(14, 100%, 50%)", // Orange für Signal-Spur
+            },
+          },
+          delay: {
+            value: 0.1,
+          },
+        },
+        // Firing-Effekt: Gelegentliche Orange-Impulse mit Aufleuchten
         twinkle: {
           particles: {
             enable: true,
-            frequency: 0.05, // Sehr seltene Firing-Events
+            frequency: 0.12, // Häufigere Firing-Events für sichtbare Signale
             opacity: 1,
             color: {
               value: "hsl(14, 100%, 50%)", // Primary Orange
@@ -105,29 +118,41 @@ export default function NeuralBackground() {
           value: [
             "hsl(184, 96%, 12%)", // Sehr dunkles Teal
             "hsl(225, 17%, 25%)", // Dunkles Slate
-            "hsl(14, 100%, 50%)", // Primary Orange für Firing-Effekte
+            "hsl(14, 100%, 50%)", // Primary Orange für Firing-Signale
           ],
         },
         distance: 120, // Maximale Verbindungsdistanz
         enable: true,
         opacity: {
-          value: 0.08, // Extrem dezente Opazität (0.05-0.1 wie gefordert)
+          value: { min: 0.1, max: 0.2 }, // Leicht erhöht für bessere Sichtbarkeit der Verbindungen
           animation: {
             enable: true,
-            speed: 1,
+            speed: 2, // Schnellere Animation für dynamische Signale
             sync: false,
             destroy: "none",
             startValue: "random",
           },
         },
-        width: 0.5, // Feine Linien
+        width: {
+          value: { min: 0.3, max: 1 }, // Variable Linienstärke für dynamischeren Effekt
+          animation: {
+            enable: true,
+            speed: 3,
+            sync: false,
+            destroy: "none",
+            startValue: "random",
+          },
+        },
         triangles: {
           enable: false,
         },
-        // Firing-Effekt: Gelegentliche Orange-Impulse auf Links
+        // Firing-Effekt: Dynamische Orange-Signale auf Links
         shadow: {
           enable: false,
         },
+        // Konsistente Verbindungen zwischen nahen Neuronen
+        consent: false,
+        warp: false,
       },
       detectRetina: true,
     }),
