@@ -20,6 +20,9 @@
   /* Legacy Support - wird via Lightmode-Variablen überschrieben */
   --background: var(--lm-bg-bone);
   --foreground: var(--lm-text-espresso);
+  
+  /* Laser-Effekt: Warmes Hellgelb für Lightmode (sichtbar auf hellem Hintergrund) */
+  --laser-core: #FFF5E6;
 }
 
 .dark {
@@ -34,6 +37,9 @@
   
   /* Legacy Support */
   --foreground: var(--dm-text-main);
+  
+  /* Laser-Effekt: Gleißendes Weiß für Darkmode */
+  --laser-core: #ffffff;
 }
 
 body {
@@ -213,18 +219,17 @@ body {
       position: relative;
       display: inline-block;
       
-      /* Wir nutzen ein schärferes Weiß für den Laser-Kern */
+      /* Basis-Gradient: Wir nutzen CSS-Variablen für den Laser-Kern */
       background: linear-gradient(
         90deg,
         #FF5C00 0%,
-        #FF5C00 40%,
-        #ffffff 48%,
-        #ffffff 52%,
-        #FF5C00 60%,
+        #FF5C00 42%,
+        var(--laser-core) 50%,
+        #FF5C00 58%,
         #FF5C00 100%
       );
       
-      background-size: 300% 100%;
+      background-size: 200% 100%;
       
       /* Maskierung auf den Text */
       -webkit-background-clip: text;
@@ -234,15 +239,14 @@ body {
       -webkit-text-fill-color: transparent;
       color: transparent;
       
-      /* WICHTIG: Kein drop-shadow hier, da dieser AUSSERHALB leuchtet */
-      filter: none;
+      /* Animation: Schneller und linearer für mehr "Energie" */
+      animation: text-laser-sweep 2.5s infinite linear;
       
-      /* Animation */
-      animation: text-laser-sweep 3s infinite linear;
+      /* Kein Filter außen, um die Buchstabenkanten sauber zu halten */
+      filter: none;
       
       /* Verhindert Rendering-Artefakte an den Rändern */
       -webkit-font-smoothing: antialiased;
-      backface-visibility: hidden;
       
       /* GPU-Beschleunigung für flüssige Animation */
       transform: translateZ(0);
@@ -252,10 +256,10 @@ body {
     /* Keyframes für Laser-Sweep-Animation */
     @keyframes text-laser-sweep {
       0% {
-        background-position: 200% 0;
+        background-position: 150% 0;
       }
       100% {
-        background-position: -100% 0;
+        background-position: -50% 0;
       }
     }
   }
