@@ -1,7 +1,6 @@
 import Hero from "@/components/sections/Hero";
 import Features from "@/components/sections/Features";
 import PlaceholderSection from "@/components/sections/PlaceholderSection";
-import NeuralBackground from "@/components/effects/NeuralBackground";
 import { getDictionary } from "@/lib/dictionary";
 
 export default async function HomePage({
@@ -13,8 +12,7 @@ export default async function HomePage({
   const dictionary = await getDictionary(lang);
 
   return (
-    <div className="flex flex-col items-center w-full overflow-visible relative">
-      <NeuralBackground />
+    <div className="flex flex-col items-center w-full overflow-visible relative bg-transparent">
       <Hero dictionary={dictionary} lang={lang} />
       <Features dictionary={dictionary} />
       <PlaceholderSection />

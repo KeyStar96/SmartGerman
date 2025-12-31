@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import LiquidBackground from "@/components/effects/LiquidBackground";
+import NeuralBackground from "@/components/effects/NeuralBackground";
 import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 
@@ -37,6 +38,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
+        <NeuralBackground />
         <Header lang={lang} dictionary={dictionary} />
         <LiquidBackground />
         <SmoothScroll>
