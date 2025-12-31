@@ -6,12 +6,15 @@ import { useEffect, useRef } from "react";
 const CONFIG = {
   particleCount: 65, // Anzahl der Neuronen (leicht erhöht)
   baseSpeed: 0.3, // Bewegungsgeschwindigkeit der Neuronen
-  signalSpeed: 0.02, // Wie schnell das Lichtsignal reist (0.0 bis 1.0 pro Frame)
-  signalFrequency: 0.008, // Wahrscheinlichkeit eines Signals pro Frame (reduziert)
+  signalSpeedCmPerSec: 5, // Signalgeschwindigkeit in cm/s
+  pixelsPerCm: 37.8, // Pixel pro cm (bei 96 DPI)
+  fps: 60, // Frames pro Sekunde
+  signalFrequency: 0.004, // Wahrscheinlichkeit eines Signals pro Frame (weiter reduziert)
   chargeDuration: 60, // Frames für 1 Sekunde Aufladung (bei 60fps)
-  connectionsPerNeuron: 5, // Anzahl der Verbindungen pro Neuron
+  maxConnectionsPerNeuron: 5, // Maximale Anzahl der Verbindungen pro Neuron
   viewportPadding: 0.2, // 20% Padding außerhalb des sichtbaren Bereichs
   signalDecayRate: 0.15, // Leuchtkraft-Verlust pro Verbindung (15% pro Hop)
+  beamLength: 30, // Länge des Lichtstrahls in Pixeln
   colors: {
     base: "rgba(1, 42, 46, 0.6)", // --dm-surface-teal (abgedunkelt)
     line: "rgba(56, 62, 78, 0.15)", // --dm-border-slate (sehr dezent)
@@ -38,10 +41,11 @@ interface Signal {
   endX: number;
   endY: number;
   progress: number; // 0.0 bis 1.0
-  totalDistance: number; // Gesamtdistanz für Fade-out
+  totalDistance: number; // Gesamtdistanz in Pixeln
   connectionKey: string; // Eindeutiger Key für die Verbindung (z.B. "0-5")
   intensity: number; // Leuchtkraft des Signals (0.0 bis 1.0)
   targetIndex: number; // Index des Ziel-Neurons
+  progressPerFrame: number; // Berechnete Progress-Erhöhung pro Frame (basierend auf 5cm/s)
 }
 
 export default function NeuralBackground() {
@@ -80,7 +84,7 @@ export default function NeuralBackground() {
       });
     }
 
-    // 2. Verbindungen erstellen: Jedes Neuron bekommt genau CONFIG.connectionsPerNeuron Verbindungen
+    // 2. Verbindungen erstellen: Jedes Neuron bekommt 1-5 zufällige Verbindungen
     particles.forEach((particle, index) => {
       const availableIndices = particles
         .map((_, i) => i)
@@ -89,8 +93,11 @@ export default function NeuralBackground() {
       // Mische die verfügbaren Indizes zufällig
       const shuffled = availableIndices.sort(() => Math.random() - 0.5);
       
-      // Wähle die ersten CONFIG.connectionsPerNeuron aus
-      particle.connections = shuffled.slice(0, CONFIG.connectionsPerNeuron);
+      // Zufällige Anzahl zwischen 1 und maxConnectionsPerNeuron
+      const numConnections = Math.floor(Math.random() * CONFIG.maxConnectionsPerNeuron) + 1;
+      
+      // Wähle die ersten numConnections aus
+      particle.connections = shuffled.slice(0, numConnections);
     });
 
     // Array für aktive Lichtsignale
@@ -157,6 +164,11 @@ export default function NeuralBackground() {
               // Setze Glow-Intensität für diese Verbindung
               connectionGlowIntensities.set(connectionKey, signalIntensity);
               
+              // Berechne Signalgeschwindigkeit: 5 cm/s = 189 Pixel/s bei 60fps = 3.15 Pixel/Frame
+              // Progress pro Frame = (Signalgeschwindigkeit in Pixel/Frame) / Gesamtdistanz
+              const signalSpeedPixelsPerFrame = (CONFIG.signalSpeedCmPerSec * CONFIG.pixelsPerCm) / CONFIG.fps;
+              const progressPerFrame = signalSpeedPixelsPerFrame / dist;
+              
               // Erstelle Signal
               signals.push({
                 startX: p.x,
@@ -168,6 +180,7 @@ export default function NeuralBackground() {
                 connectionKey: connectionKey,
                 intensity: signalIntensity,
                 targetIndex: connectedIndex,
+                progressPerFrame: progressPerFrame,
               });
             });
             
@@ -285,13 +298,19 @@ export default function NeuralBackground() {
         }
       });
 
-      // E. Signale aktualisieren und zeichnen
+      // E. Signale aktualisieren und zeichnen (als Lichtstrahl)
       signals = signals.filter((sig) => {
-        sig.progress += CONFIG.signalSpeed;
+        // Verwende die berechnete Progress-Erhöhung basierend auf 5cm/s
+        sig.progress += sig.progressPerFrame;
 
-        // Position des Signals interpolieren
+        // Aktuelle Position des Signal-Starts (Mitte des Strahls)
         const currentX = sig.startX + (sig.endX - sig.startX) * sig.progress;
         const currentY = sig.startY + (sig.endY - sig.startY) * sig.progress;
+
+        // Berechne Richtungsvektor der Verbindung
+        const dx = sig.endX - sig.startX;
+        const dy = sig.endY - sig.startY;
+        const angle = Math.atan2(dy, dx);
 
         // Berechne zurückgelegte Distanz
         const traveledDistance = sig.progress * sig.totalDistance;
@@ -299,14 +318,40 @@ export default function NeuralBackground() {
         // Opazität nimmt mit der Distanz ab (Fade-out basierend auf Signal-Intensität) - dezenter
         const maxFadeDistance = sig.totalDistance;
         const fadeProgress = Math.min(traveledDistance / maxFadeDistance, 1);
-        const signalOpacity = sig.intensity * (1 - fadeProgress) * 0.5; // Startet bei intensity*0.5, endet bei 0 (reduziert von 0.8)
+        const signalOpacity = sig.intensity * (1 - fadeProgress) * 0.6; // Etwas heller für bessere Sichtbarkeit
 
         // Signal nur zeichnen wenn noch sichtbar
         if (signalOpacity > 0.01) {
-          // Weißes Lichtsignal
+          // Zeichne Lichtstrahl entlang der Verbindungslinie
+          const beamHalfLength = CONFIG.beamLength / 2;
+          
+          // Start- und Endpunkt des Strahls (entlang der Verbindungslinie)
+          const beamStartX = currentX - Math.cos(angle) * beamHalfLength;
+          const beamStartY = currentY - Math.sin(angle) * beamHalfLength;
+          const beamEndX = currentX + Math.cos(angle) * beamHalfLength;
+          const beamEndY = currentY + Math.sin(angle) * beamHalfLength;
+          
+          // Erstelle Gradient für weichen Übergang (heller in der Mitte, transparenter an den Rändern)
+          const gradient = ctx.createLinearGradient(beamStartX, beamStartY, beamEndX, beamEndY);
+          gradient.addColorStop(0, `rgba(255, 255, 255, 0)`);
+          gradient.addColorStop(0.3, `rgba(255, 255, 255, ${signalOpacity * 0.6})`);
+          gradient.addColorStop(0.5, `rgba(255, 255, 255, ${signalOpacity})`);
+          gradient.addColorStop(0.7, `rgba(255, 255, 255, ${signalOpacity * 0.6})`);
+          gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+          
+          // Zeichne den Lichtstrahl
           ctx.beginPath();
-          ctx.arc(currentX, currentY, 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${signalOpacity})`;
+          ctx.moveTo(beamStartX, beamStartY);
+          ctx.lineTo(beamEndX, beamEndY);
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = 2.5; // Etwas dicker für bessere Sichtbarkeit
+          ctx.lineCap = 'round';
+          ctx.stroke();
+          
+          // Zusätzlich: Zeichne einen hellen Kern in der Mitte
+          ctx.beginPath();
+          ctx.arc(currentX, currentY, 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${signalOpacity * 0.8})`;
           ctx.fill();
         }
 
