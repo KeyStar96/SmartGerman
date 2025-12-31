@@ -363,42 +363,42 @@ export default function NeuralBackground() {
             const isActive = n.chargeTimer > 0 || target.chargeTimer > 0 || 
                            n.intensity > 0.15 || target.intensity > 0.15;
             
-            // Prüfe ob ein Pulse auf dieser Verbindung läuft (Visual Trail)
+            // Prüfe ob ein Pulse auf dieser Verbindung läuft
+            // Wenn ja, wird die Linie beim Pulse-Rendering gezeichnet (Follow-the-Signal)
             let hasActivePulse = false;
-            let pulseIntensity = 0;
             pulses.forEach((p) => {
               if ((p.from === nIndex && p.to === targetIdx) ||
                   (p.from === targetIdx && p.to === nIndex)) {
                 hasActivePulse = true;
-                pulseIntensity = Math.max(pulseIntensity, p.intensity);
               }
             });
             
-            if (isActive || hasActivePulse) {
-              // Glow-Path für aktive Verbindungen oder Pulse-Trail
-              // Wenn Pulse aktiv: Leicht intensiveres Glow
-              const trailBoost = hasActivePulse ? pulseIntensity * 0.15 : 0;
-              ctx.strokeStyle = isDark 
-                ? `rgba(255, 255, 255, ${Math.min(0.4, (0.25 + trailBoost) * zAvg)})` 
-                : `rgba(0, 0, 0, ${Math.min(0.4, (0.25 + trailBoost) * zAvg)})`;
-              ctx.lineWidth = 0.8 + zAvg * 0.5;
-              ctx.setLineDash([]); // Solide Linie für aktive Signale
-              ctx.beginPath();
-              ctx.moveTo(n.x, n.y);
-              ctx.lineTo(target.x, target.y);
-              ctx.stroke();
-            } else {
-              // Sehr dimme Basis-Verbindungen (0.05 opacity) für subtilen Look
-              const breathAlpha = Math.max(0, Math.min(0.05, (connectionAlpha * zAvg) + breathOffset));
-              ctx.strokeStyle = isDark 
-                ? `rgba(255, 255, 255, ${breathAlpha})` 
-                : `rgba(0, 0, 0, ${breathAlpha})`;
-              ctx.lineWidth = 0.5; // Delikater, technischer Look
-              ctx.setLineDash([2, 4]); // Gestrichelte Linie für inaktive Verbindungen
-              ctx.beginPath();
-              ctx.moveTo(n.x, n.y);
-              ctx.lineTo(target.x, target.y);
-              ctx.stroke();
+            // Nur statische Verbindungen zeichnen (Pulse-Linien werden separat gerendert)
+            if (!hasActivePulse) {
+              if (isActive) {
+                // Glow-Path für aktive Verbindungen (ohne Pulse)
+                ctx.strokeStyle = isDark 
+                  ? `rgba(255, 255, 255, ${0.25 * zAvg})` 
+                  : `rgba(0, 0, 0, ${0.25 * zAvg})`;
+                ctx.lineWidth = 0.8 + zAvg * 0.5;
+                ctx.setLineDash([]); // Solide Linie für aktive Signale
+                ctx.beginPath();
+                ctx.moveTo(n.x, n.y);
+                ctx.lineTo(target.x, target.y);
+                ctx.stroke();
+              } else {
+                // Sehr dimme Basis-Verbindungen (0.05 opacity) für subtilen Look
+                const breathAlpha = Math.max(0, Math.min(0.05, (connectionAlpha * zAvg) + breathOffset));
+                ctx.strokeStyle = isDark 
+                  ? `rgba(255, 255, 255, ${breathAlpha})` 
+                  : `rgba(0, 0, 0, ${breathAlpha})`;
+                ctx.lineWidth = 0.5; // Delikater, technischer Look
+                ctx.setLineDash([2, 4]); // Gestrichelte Linie für inaktive Verbindungen
+                ctx.beginPath();
+                ctx.moveTo(n.x, n.y);
+                ctx.lineTo(target.x, target.y);
+                ctx.stroke();
+              }
             }
           }
         });
@@ -527,10 +527,33 @@ export default function NeuralBackground() {
           return true; // Weiter updaten, aber nicht zeichnen
         }
 
-        // CORE & HALO: High-End Glow mit Screen Composite für additive light
+        // FOLLOW-THE-SIGNAL: Zeichne Linie nur vom Start bis zur aktuellen Pulse-Position
         const pulseColorStr = isDark ? "255, 255, 255" : "0, 0, 0";
         
-        // Screen Composite Operation für additive light effect
+        // Gradient Trace: Helles Ende (hinter dem Pulse) zu dunklem Start
+        const traceAlpha = p.intensity * p.z;
+        const startAlpha = traceAlpha * 0.3; // Dunkler am Start
+        const endAlpha = traceAlpha * 0.8;   // Heller am Ende (hinter dem Pulse)
+        
+        // Linearer Gradient vom Start zum aktuellen Pulse
+        const gradient = ctx.createLinearGradient(n1.x, n1.y, curX, curY);
+        gradient.addColorStop(0, isDark 
+          ? `rgba(255, 255, 255, ${startAlpha})` 
+          : `rgba(0, 0, 0, ${startAlpha})`);
+        gradient.addColorStop(1, isDark 
+          ? `rgba(255, 255, 255, ${endAlpha})` 
+          : `rgba(0, 0, 0, ${endAlpha})`);
+        
+        // Trace-Linie: Dünn und mit Gradient
+        ctx.beginPath();
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 1.0 + p.z * 0.5; // 1.0 bis 1.5px
+        ctx.setLineDash([]); // Solide Linie
+        ctx.moveTo(n1.x, n1.y);
+        ctx.lineTo(curX, curY);
+        ctx.stroke();
+
+        // CORE & HALO: High-End Glow mit Screen Composite für additive light
         ctx.save();
         ctx.globalCompositeOperation = 'screen';
         
