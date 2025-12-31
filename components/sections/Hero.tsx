@@ -211,14 +211,14 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   return (
     <section 
       ref={container} 
-      className="relative flex flex-col justify-center items-center overflow-x-hidden z-10"
+      className="relative flex flex-col justify-center items-center overflow-x-hidden z-10 bg-transparent"
       style={{
         minHeight: 'calc(100vh - 128px)', // 100vh minus pt-32 (128px) vom main-Element
       }}
     >
       {/* SVG-Punktmuster Hintergrund (Spaceship Instruction Manual Grid) */}
       <div 
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none bg-transparent"
         style={{ opacity: 0.03 }}
         aria-hidden="true"
       >

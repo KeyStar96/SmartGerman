@@ -381,6 +381,20 @@ export default function NeuralBackground() {
               const lineStartX = signalGoesFromStart ? startNeuron.x : endNeuron.x;
               const lineStartY = signalGoesFromStart ? startNeuron.y : endNeuron.y;
               
+              // Dezenter Glow-Effekt um die Linie (abstrahlt in die Umgebung)
+              // Zeichne zuerst den Glow (größer, transparenter)
+              ctx.save();
+              ctx.shadowBlur = 8 + currentIntensity * 12; // Blur-Radius von 8 bis 20
+              ctx.shadowColor = `rgba(255, 255, 255, ${currentIntensity * 0.15})`; // Sehr dezenter weißer Glow
+              ctx.beginPath();
+              ctx.moveTo(lineStartX, lineStartY);
+              ctx.lineTo(signalX, signalY);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${finalOpacity * 0.3})`; // Transparenter für Glow
+              ctx.lineWidth = 0.5 + currentIntensity * 1.5;
+              ctx.stroke();
+              ctx.restore();
+              
+              // Zeichne die eigentliche leuchtende Linie (ohne Shadow)
               ctx.beginPath();
               ctx.moveTo(lineStartX, lineStartY);
               ctx.lineTo(signalX, signalY);
