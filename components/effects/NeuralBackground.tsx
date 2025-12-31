@@ -21,7 +21,7 @@ export default function NeuralBackground() {
       fpsLimit: 60,
       particles: {
         number: {
-          value: 40, // Leicht erhöht für mehr Verbindungen und Signale
+          value: 50, // Mehr Partikel für mehr Verbindungen
           density: {
             enable: true,
             area: 800,
@@ -31,31 +31,35 @@ export default function NeuralBackground() {
           value: [
             "hsl(184, 96%, 15%)", // Dunkles Teal für Basis-Neuronen
             "hsl(225, 17%, 35%)", // Slate für Variation
-            "hsl(14, 100%, 50%)", // Primary Orange für Firing-Effekte
+            "hsl(14, 100%, 50%)", // Primary Orange für Firing-Signale
           ],
         },
         shape: {
           type: "circle",
         },
         opacity: {
-          value: { min: 0.4, max: 0.7 }, // Leicht erhöht für bessere Sichtbarkeit
+          value: { min: 0.4, max: 0.9 }, // Variable Opazität
           animation: {
             enable: true,
-            speed: 0.8,
+            speed: 1,
             sync: false,
+            destroy: "none",
+            startValue: "random",
           },
         },
         size: {
-          value: { min: 1, max: 2 }, // Winzige Neuronen
+          value: { min: 1, max: 3 }, // Variable Größe
           animation: {
             enable: true,
             speed: 2,
             sync: false,
+            destroy: "none",
+            startValue: "random",
           },
         },
         move: {
           enable: true,
-          speed: 0.3, // Langsame, subtile Bewegung
+          speed: { min: 0.3, max: 1 }, // Variable Geschwindigkeit
           direction: "none",
           random: true,
           straight: false,
@@ -67,25 +71,16 @@ export default function NeuralBackground() {
             rotateX: 600,
             rotateY: 1200,
           },
-        },
-        // Trail-Effekt: Wandernde Signale zwischen Neuronen
-        trail: {
-          enable: true,
-          length: 5, // Längere Spur für sichtbare Signal-Übertragung
-          fill: {
-            color: {
-              value: "hsl(14, 100%, 50%)", // Orange für Signal-Spur
-            },
-          },
-          delay: {
-            value: 0.1,
+          // Partikel bewegen sich aufeinander zu, wenn sie verbunden sind
+          path: {
+            enable: false,
           },
         },
-        // Firing-Effekt: Gelegentliche Orange-Impulse mit Aufleuchten
+        // Firing-Effekt: Neuronen leuchten orange auf
         twinkle: {
           particles: {
             enable: true,
-            frequency: 0.12, // Häufigere Firing-Events für sichtbare Signale
+            frequency: 0.2, // Häufigere Firing-Events
             opacity: 1,
             color: {
               value: "hsl(14, 100%, 50%)", // Primary Orange
@@ -112,32 +107,32 @@ export default function NeuralBackground() {
           },
         },
       },
-      // Verbindungslinien zwischen Neuronen
+      // Verbindungslinien zwischen Neuronen mit dynamischen Signalen
       links: {
         color: {
           value: [
-            "hsl(184, 96%, 12%)", // Sehr dunkles Teal
+            "hsl(184, 96%, 12%)", // Sehr dunkles Teal für Basis-Links
             "hsl(225, 17%, 25%)", // Dunkles Slate
             "hsl(14, 100%, 50%)", // Primary Orange für Firing-Signale
           ],
         },
-        distance: 120, // Maximale Verbindungsdistanz
+        distance: 150, // Maximale Verbindungsdistanz
         enable: true,
         opacity: {
-          value: { min: 0.1, max: 0.2 }, // Leicht erhöht für bessere Sichtbarkeit der Verbindungen
+          value: { min: 0.1, max: 0.4 }, // Dynamische Opazität für Signal-Effekt
           animation: {
             enable: true,
-            speed: 2, // Schnellere Animation für dynamische Signale
+            speed: 3, // Schnelle Animation für wandernde Signale
             sync: false,
             destroy: "none",
             startValue: "random",
           },
         },
         width: {
-          value: { min: 0.3, max: 1 }, // Variable Linienstärke für dynamischeren Effekt
+          value: { min: 0.3, max: 1.2 }, // Variable Breite für Signal-Effekt
           animation: {
             enable: true,
-            speed: 3,
+            speed: 4, // Schnelle Animation
             sync: false,
             destroy: "none",
             startValue: "random",
@@ -146,11 +141,6 @@ export default function NeuralBackground() {
         triangles: {
           enable: false,
         },
-        // Firing-Effekt: Dynamische Orange-Signale auf Links
-        shadow: {
-          enable: false,
-        },
-        // Konsistente Verbindungen zwischen nahen Neuronen
         consent: false,
         warp: false,
       },
@@ -173,4 +163,5 @@ export default function NeuralBackground() {
     </div>
   );
 }
+
 
