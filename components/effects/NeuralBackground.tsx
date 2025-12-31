@@ -18,7 +18,7 @@ const CONFIG = {
   floatSpeed: 0.0003,         // Geschwindigkeit der Floating-Bewegung
   wakeDecay: 0.92,            // Wie schnell Wake-Turbulenzen verschwinden
   damping: 0.05,              // Damping-Faktor für flüssige Bewegung (Lerp)
-  clickRadius: 120,           // Fokusierterer Klick-Bereich
+  clickRadius: 150,           // Klick-Bereich (erhöht für bessere Trefferquote)
   brownianStrength: 0.08,     // Stärke der Brownian Motion
   brownianChangeRate: 0.02,   // Wie oft die Brownian-Richtung ändert
   physicsUpdateInterval: 2,   // Physics nur jeden 2. Frame
@@ -28,6 +28,8 @@ const CONFIG = {
   baseLineOpacity: 0.08,      // Basis-Opazität für Linien (Dark Mode)
   lineBreathSpeed: 0.002,    // Geschwindigkeit der Linien-"Atmung"
   lineBreathAmplitude: 0.02,  // Amplitude der Opacity-Schwankung
+  signalDecay: 0.35,          // 35% Signal-Verlust pro Hop (Awwwards-Level)
+  minIntensity: 0.1,          // Minimale Intensität - ab hier stirbt das Signal
 };
 
 interface Neuron {
@@ -58,6 +60,7 @@ interface Pulse {
   progress: number;
   z: number;
   depth: number;          // Propagation-Tiefe (verhindert endlose Loops)
+  intensity: number;      // Signal-Intensität (für Distance Decay)
 }
 
 export default function NeuralBackground() {
@@ -177,11 +180,12 @@ export default function NeuralBackground() {
     };
 
     const handleMouseClick = (e: MouseEvent) => {
-      const dpr = window.devicePixelRatio || 1;
-      // WICHTIG: Die Maus-Position muss mit dem DPR skaliert werden
       const rect = canvas.getBoundingClientRect();
-      const mouseX = (e.clientX - rect.left) * dpr;
-      const mouseY = (e.clientY - rect.top) * dpr;
+      // Canvas ist fixed, also viewport-relativ
+      // Aber Neuronen leben im globalen Dokument-Koordinatensystem (inkl. Scroll)
+      // Daher müssen wir window.scrollY berücksichtigen
+      const mouseX = e.clientX - rect.left;
+      const mouseY = (e.clientY - rect.top) + window.scrollY;
 
       // NEURAL IGNITE: Finde alle Neuronen im Click-Radius
       neurons.forEach((n, index) => {
@@ -190,11 +194,12 @@ export default function NeuralBackground() {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         // Klick trifft Neuron im Radius
-        if (dist < CONFIG.clickRadius * dpr) {
+        if (dist < CONFIG.clickRadius) {
+          // Ursprungs-Neuron aktivieren
           n.intensity = 1.0;
           n.chargeTimer = CONFIG.chargeFrames;
           
-          // Sende Pulse an alle verbundenen Nachbarn
+          // Pulse starten mit voller Intensität
           n.connections.forEach((targetIdx) => {
             if (pulses.length < CONFIG.maxPulses) {
               pulses.push({
@@ -203,6 +208,7 @@ export default function NeuralBackground() {
                 progress: 0,
                 z: n.z,
                 depth: 0, // Start-Tiefe für Propagation
+                intensity: 1.0, // Start-Intensität (100%)
               });
             }
           });
@@ -436,6 +442,7 @@ export default function NeuralBackground() {
             progress: 0,
             z: neurons[start].z,
             depth: 0, // Start-Tiefe
+            intensity: 1.0, // Zufällige Pulse starten mit voller Intensität
           });
         }
       }
@@ -444,33 +451,39 @@ export default function NeuralBackground() {
         p.progress += (CONFIG.signalSpeed / 1000) * (p.z + 0.5);
         
         if (p.progress >= 1) {
-          // Pulse erreicht Ziel: Trigger Neuron und mögliche Propagation
+          // Pulse erreicht Ziel: Trigger Neuron mit Signal-Abschwächung
           const target = neurons[p.to];
           if (target) {
-            target.chargeTimer = CONFIG.chargeFrames;
-            target.intensity = 1;
+            // Signal-Abschwächung anwenden (Distance Decay)
+            const nextIntensity = p.intensity * (1 - CONFIG.signalDecay);
             
-            // ORGANISCHE PROPAGATION: 30% Chance für weitere Pulses
-            if (target.pulseCooldown === 0 && 
-                p.depth < 5 && // Max-Tiefe verhindert endlose Loops
-                Math.random() < CONFIG.propagationChance &&
-                pulses.length < CONFIG.maxPulses) {
+            // Nur weiterleiten, wenn Intensität über Minimum liegt
+            if (nextIntensity > CONFIG.minIntensity) {
+              target.chargeTimer = CONFIG.chargeFrames;
+              target.intensity = nextIntensity;
               
-              // Setze Cooldown
-              target.pulseCooldown = CONFIG.pulseCooldownFrames;
-              
-              // Erstelle Pulses zu allen Verbindungen
-              target.connections.forEach((targetIdx) => {
-                if (pulses.length >= CONFIG.maxPulses) return;
+              // AUTOMATISCHE KETTENREAKTION: Signal weiterleiten an alle Nachbarn
+              if (target.pulseCooldown === 0 && 
+                  p.depth < 5 && // Max-Tiefe verhindert endlose Loops
+                  pulses.length < CONFIG.maxPulses) {
                 
-                pulses.push({
-                  from: p.to,
-                  to: targetIdx,
-                  progress: 0,
-                  z: target.z,
-                  depth: p.depth + 1, // Erhöhe Tiefe
+                // Setze Cooldown
+                target.pulseCooldown = CONFIG.pulseCooldownFrames;
+                
+                // Erstelle Pulses zu allen Verbindungen mit abgeschwächter Intensität
+                target.connections.forEach((targetIdx) => {
+                  if (pulses.length >= CONFIG.maxPulses) return;
+                  
+                  pulses.push({
+                    from: p.to,
+                    to: targetIdx,
+                    progress: 0,
+                    z: target.z,
+                    depth: p.depth + 1, // Erhöhe Tiefe
+                    intensity: nextIntensity, // Weiterleiten mit abgeschwächter Intensität
+                  });
                 });
-              });
+              }
             }
           }
           return false; // Entferne Pulse sofort (Performance)
@@ -483,30 +496,34 @@ export default function NeuralBackground() {
         const curX = n1.x + (n2.x - n1.x) * p.progress;
         const curY = n1.y + (n2.y - n1.y) * p.progress;
 
-        // Viewport Culling für Pulses
+        // Viewport Culling für Pulses (berücksichtige Scroll-Offset)
         const viewportPadding = CONFIG.viewportPadding;
+        const scrollY = window.scrollY;
+        const visibleY = curY - scrollY;
         if (curX < -viewportPadding || curX > width + viewportPadding ||
-            curY < -viewportPadding || curY > height + viewportPadding) {
+            visibleY < -viewportPadding || visibleY > height + viewportPadding) {
           return true; // Weiter updaten, aber nicht zeichnen
         }
 
-        // CORE & HALO: High-End Glow ohne shadowBlur
+        // CORE & HALO: High-End Glow mit Intensität-basierter Opacity
         ctx.save();
         
-        // Halo: Größerer, semi-transparenter Kreis (4px)
+        // Halo: Größerer, semi-transparenter Kreis (skaliert mit Intensität)
         ctx.beginPath();
+        const haloAlpha = 0.3 * p.z * p.intensity;
         ctx.fillStyle = isDark 
-          ? `rgba(255, 255, 255, ${0.3 * p.z})` 
-          : `rgba(0, 0, 0, ${0.3 * p.z})`;
-        ctx.arc(curX, curY, 4 * p.z, 0, Math.PI * 2);
+          ? `rgba(255, 255, 255, ${haloAlpha})` 
+          : `rgba(0, 0, 0, ${haloAlpha})`;
+        ctx.arc(curX, curY, 4 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
         
-        // Core: Kleiner, heller weißer Punkt (1.5px)
+        // Core: Kleiner, heller Punkt (skaliert mit Intensität)
         ctx.beginPath();
+        const coreAlpha = 0.95 * p.z * p.intensity;
         ctx.fillStyle = isDark 
-          ? `rgba(255, 255, 255, ${0.95 * p.z})` 
-          : `rgba(0, 0, 0, ${0.95 * p.z})`;
-        ctx.arc(curX, curY, 1.5 * p.z, 0, Math.PI * 2);
+          ? `rgba(255, 255, 255, ${coreAlpha})` 
+          : `rgba(0, 0, 0, ${coreAlpha})`;
+        ctx.arc(curX, curY, 1.5 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.restore();
