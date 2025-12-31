@@ -252,10 +252,10 @@ body {
     /* Keyframes für Laser-Sweep-Animation */
     @keyframes text-laser-sweep {
       0% {
-        background-position: 150% 0;
+        background-position: 200% 0;
       }
       100% {
-        background-position: -50% 0;
+        background-position: -100% 0;
       }
     }
   }

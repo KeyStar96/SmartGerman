@@ -288,7 +288,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Subline in schmalem Container (Inter/Geist Sans - Spaceship UI) */}
           <p 
             ref={sublineRef}
-            className="text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-12 text-white"
+            className="text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-12 text-lm-text-espresso dark:text-dm-text-main"
             style={{ 
               opacity: 0,
               letterSpacing: '-0.01em', // Leicht kompakter für modernes Interface-Feeling
