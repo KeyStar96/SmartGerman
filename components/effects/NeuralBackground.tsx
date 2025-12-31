@@ -386,9 +386,12 @@ export default function NeuralBackground() {
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           
-          const glowRadius = CONFIG.particleSize * 2 + (n.flash * 8);
+          // Stärkerer Glow: Größerer Radius und intensivere Alpha-Werte
+          const glowRadius = CONFIG.particleSize * 3 + (n.flash * 15);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
-          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash})`);
+          // Intensiveres Leuchten mit höherem Alpha
+          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash * 1.2})`);
+          glow.addColorStop(0.4, `rgba(${theme.signal}, ${n.flash * 0.6})`);
           glow.addColorStop(1, `rgba(${theme.signal}, 0)`);
           
           ctx.fillStyle = glow;
