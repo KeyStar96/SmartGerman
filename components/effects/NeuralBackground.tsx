@@ -132,16 +132,36 @@ export default function NeuralBackground() {
         });
       }
 
+      // Jedes Neuron bekommt genau 3 Verbindungen zu den 3 nächsten Nachbarn
       for (let i = 0; i < numNeurons; i++) {
-        for (let j = i + 1; j < numNeurons; j++) {
+        const distances: Array<{ index: number; dist: number }> = [];
+        
+        // Berechne Distanzen zu allen anderen Neuronen
+        for (let j = 0; j < numNeurons; j++) {
+          if (i === j) continue;
           const dx = newNeurons[i].x - newNeurons[j].x;
           const dy = newNeurons[i].y - newNeurons[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < CONFIG.connectionDistance) {
-            newNeurons[i].connections.push(j);
-            newNeurons[j].connections.push(i);
+          distances.push({ index: j, dist });
+        }
+        
+        // Sortiere nach Distanz
+        distances.sort((a, b) => a.dist - b.dist);
+        
+        // Finde die 3 nächsten verfügbaren Nachbarn (die noch nicht voll sind)
+        let connectionsAdded = 0;
+        for (const neighbor of distances) {
+          if (connectionsAdded >= 3) break;
+          
+          // Prüfe ob bereits verbunden
+          if (newNeurons[i].connections.includes(neighbor.index)) continue;
+          
+          // Erstelle bidirektionale Verbindung
+          newNeurons[i].connections.push(neighbor.index);
+          if (!newNeurons[neighbor.index].connections.includes(i)) {
+            newNeurons[neighbor.index].connections.push(i);
           }
+          connectionsAdded++;
         }
       }
 
