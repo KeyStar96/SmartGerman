@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 const CONFIG = {
   neuronDensity: 0.00007,     // Etwas mehr Neuronen für Fülle
   baseSpeed: 0.15,
-  signalSpeed: 0.016,         // Langsamere Signal-Propagation: 0.8-1.2 Sekunden pro Hop (48-72 Frames bei 60fps)
+  signalSpeed: 0.0167,       // ~1 Sekunde pro Hop (60 Frames bei 60fps: 1/60 ≈ 0.0167)
   maxConnections: 6,          // Erhöht für komplexeres Geflecht
   maxPulses: 80,              // Limit erhöht
   connectionMaxDist: 160,     // Größere Reichweite für Verbindungen
@@ -18,18 +18,19 @@ const CONFIG = {
   floatSpeed: 0.0003,         // Geschwindigkeit der Floating-Bewegung
   wakeDecay: 0.92,            // Wie schnell Wake-Turbulenzen verschwinden
   damping: 0.05,              // Damping-Faktor für flüssige Bewegung (Lerp)
-  clickRadius: 150,           // Klick-Bereich (erhöht für bessere Trefferquote)
+  clickRadius: 100,           // Max-Distanz für Nearest-Neighbor Activation (verhindert "ghost" activations)
   brownianStrength: 0.08,     // Stärke der Brownian Motion
   brownianChangeRate: 0.02,   // Wie oft die Brownian-Richtung ändert
   physicsUpdateInterval: 2,   // Physics nur jeden 2. Frame
   viewportPadding: 100,       // Padding für Viewport-Culling
-  propagationChance: 0.6,     // 60% Chance für Chain Reaction (Awwwards-Effekt)
+  propagationChance: 0.7,     // 70% Chance für Recursive Chain Reaction
   pulseCooldownFrames: 10,    // Cooldown für Neuron nach Propagation
   baseLineOpacity: 0.05,      // Sehr dimme Linien für subtilen Look
   lineBreathSpeed: 0.002,    // Geschwindigkeit der Linien-"Atmung"
   lineBreathAmplitude: 0.02,  // Amplitude der Opacity-Schwankung
-  signalDecay: 0.3,           // 30% Signal-Verlust pro Hop (0.7 Multiplikator)
-  minIntensity: 0.1,          // Minimale Intensität - ab hier stirbt das Signal
+  signalDecay: 0.35,          // 35% Signal-Verlust pro Hop (0.65 Multiplikator)
+  minIntensity: 0.15,         // Minimale Intensität - ab hier stirbt das Signal (erhöht für frühere Termination)
+  maxPropagationDepth: 4,      // Max 4 Hops verhindert, dass der ganze Screen aufleuchtet
 };
 
 interface Neuron {
@@ -183,45 +184,48 @@ export default function NeuralBackground() {
       const rect = canvas.getBoundingClientRect();
       
       // Fixed Canvas: Neuronen leben im Viewport-Koordinatensystem (0 bis width/height)
-      // Kein window.scrollY nötig, da Canvas fixed ist und sich nicht mit dem Scroll bewegt
-      // Neuronen werden in "logical pixels" gespeichert (nach ctx.scale(dpr, dpr))
-      // Maus-Koordinaten sind bereits in Viewport-Koordinaten (e.clientX/Y relativ zum Viewport)
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
-      
-      // Console Debugging
-      console.log(`Fixed Canvas Click: (${mouseX.toFixed(1)}, ${mouseY.toFixed(1)})`);
 
-      // NEURAL IGNITE: Finde alle Neuronen im Click-Radius
+      // NEAREST-NEIGHBOR ACTIVATION: Finde nur das nächste Neuron (Präzision)
+      let nearestNeuron: Neuron | null = null;
+      let nearestIndex = -1;
+      let minDist = Infinity;
+
       neurons.forEach((n, index) => {
         const dx = n.x - mouseX;
         const dy = n.y - mouseY;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // Klick trifft Neuron im Radius
-        if (dist < CONFIG.clickRadius) {
-          // Console Debugging für aktivierte Neuronen
-          console.log(`Neuron Hit Distance: ${dist.toFixed(1)} at z: ${n.z.toFixed(2)}, ID: ${index}, Pos: (${n.x.toFixed(1)}, ${n.y.toFixed(1)})`);
-          
-          // Ursprungs-Neuron aktivieren
-          n.intensity = 1.0;
-          n.chargeTimer = CONFIG.chargeFrames;
-          
-          // Pulse starten mit voller Intensität
-          n.connections.forEach((targetIdx) => {
-            if (pulses.length < CONFIG.maxPulses) {
-              pulses.push({
-                from: index,
-                to: targetIdx,
-                progress: 0,
-                z: n.z,
-                depth: 0, // Start-Tiefe für Propagation
-                intensity: 1.0, // Start-Intensität (100%)
-              });
-            }
-          });
+        if (dist < minDist) {
+          minDist = dist;
+          nearestNeuron = n;
+          nearestIndex = index;
         }
       });
+
+      // Nur aktivieren wenn Neuron innerhalb von 100px (verhindert "ghost" activations)
+      if (nearestNeuron && minDist < CONFIG.clickRadius) {
+        console.log("Triggering Chain from Neuron:", nearestIndex, "Dist:", minDist.toFixed(1));
+        
+        // Ursprungs-Neuron aktivieren
+        nearestNeuron.intensity = 1.0;
+        nearestNeuron.chargeTimer = CONFIG.chargeFrames;
+        
+        // Pulse starten mit voller Intensität
+        nearestNeuron.connections.forEach((targetIdx) => {
+          if (pulses.length < CONFIG.maxPulses) {
+            pulses.push({
+              from: nearestIndex,
+              to: targetIdx,
+              progress: 0,
+              z: nearestNeuron!.z,
+              depth: 0, // Start-Tiefe für Propagation
+              intensity: 1.0, // Start-Intensität (100%)
+            });
+          }
+        });
+      }
     };
 
     const update = () => {
@@ -341,7 +345,7 @@ export default function NeuralBackground() {
       });
 
       // 4. GLOW-PATHS: Verbindungen UNTER den Neuronen (sichtbare Architektur)
-      neurons.forEach((n) => {
+      neurons.forEach((n, nIndex) => {
         // Viewport Culling: Skip wenn Neuron außerhalb
         const viewportPadding = CONFIG.viewportPadding;
         if (n.x < -viewportPadding || n.x > width + viewportPadding ||
@@ -359,11 +363,24 @@ export default function NeuralBackground() {
             const isActive = n.chargeTimer > 0 || target.chargeTimer > 0 || 
                            n.intensity > 0.15 || target.intensity > 0.15;
             
-            if (isActive) {
-              // Glow-Path für aktive Verbindungen (kein save/restore nötig - nur strokeStyle ändern)
+            // Prüfe ob ein Pulse auf dieser Verbindung läuft (Visual Trail)
+            let hasActivePulse = false;
+            let pulseIntensity = 0;
+            pulses.forEach((p) => {
+              if ((p.from === nIndex && p.to === targetIdx) ||
+                  (p.from === targetIdx && p.to === nIndex)) {
+                hasActivePulse = true;
+                pulseIntensity = Math.max(pulseIntensity, p.intensity);
+              }
+            });
+            
+            if (isActive || hasActivePulse) {
+              // Glow-Path für aktive Verbindungen oder Pulse-Trail
+              // Wenn Pulse aktiv: Leicht intensiveres Glow
+              const trailBoost = hasActivePulse ? pulseIntensity * 0.15 : 0;
               ctx.strokeStyle = isDark 
-                ? `rgba(255, 255, 255, ${0.25 * zAvg})` 
-                : `rgba(0, 0, 0, ${0.25 * zAvg})`;
+                ? `rgba(255, 255, 255, ${Math.min(0.4, (0.25 + trailBoost) * zAvg)})` 
+                : `rgba(0, 0, 0, ${Math.min(0.4, (0.25 + trailBoost) * zAvg)})`;
               ctx.lineWidth = 0.8 + zAvg * 0.5;
               ctx.setLineDash([]); // Solide Linie für aktive Signale
               ctx.beginPath();
@@ -452,26 +469,25 @@ export default function NeuralBackground() {
       }
 
       pulses = pulses.filter((p) => {
-        // Langsamere Signal-Propagation: 0.8-1.2 Sekunden pro Hop (48-72 Frames bei 60fps)
-        // signalSpeed ist jetzt 0.016, also: 0.016 * (z + 0.5) ≈ 0.008-0.024 pro Frame
-        // Bei progress 0→1 braucht das ~42-125 Frames (mit z-Skalierung: ~48-72 Frames für typische z-Werte)
+        // Langsamere Signal-Propagation: ~1 Sekunde pro Hop (60 Frames bei 60fps)
+        // signalSpeed ist jetzt 0.0167, also: 0.0167 * (z + 0.5) ≈ 0.008-0.025 pro Frame
         p.progress += CONFIG.signalSpeed * (p.z + 0.5);
         
         if (p.progress >= 1) {
           // Pulse erreicht Ziel: Trigger Neuron mit Signal-Abschwächung
           const target = neurons[p.to];
           if (target) {
-            // Signal-Abschwächung: 30% Verlust pro Hop (0.7 Multiplikator)
-            const nextIntensity = p.intensity * 0.7;
+            // Signal-Abschwächung: 35% Verlust pro Hop (0.65 Multiplikator)
+            const nextIntensity = p.intensity * 0.65;
             
             // Nur weiterleiten, wenn Intensität über Minimum liegt
             if (nextIntensity > CONFIG.minIntensity) {
               target.chargeTimer = CONFIG.chargeFrames;
               target.intensity = nextIntensity;
               
-              // NEURAL CHAIN REACTION (Awwwards-Effekt): 60% Wahrscheinlichkeit für Propagation
+              // RECURSIVE CHAIN REACTION: 70% Wahrscheinlichkeit für Propagation
               if (target.pulseCooldown === 0 && 
-                  p.depth < 5 && // Max-Tiefe verhindert endlose Loops
+                  p.depth < CONFIG.maxPropagationDepth && // Max 4 Hops
                   Math.random() < CONFIG.propagationChance &&
                   pulses.length < CONFIG.maxPulses) {
                 
@@ -488,7 +504,7 @@ export default function NeuralBackground() {
                     progress: 0,
                     z: target.z,
                     depth: p.depth + 1, // Erhöhe Tiefe
-                    intensity: nextIntensity, // Weiterleiten mit 0.7 Intensitäts-Decay
+                    intensity: nextIntensity, // Weiterleiten mit 0.65 Intensitäts-Decay
                   });
                 });
               }
@@ -511,24 +527,28 @@ export default function NeuralBackground() {
           return true; // Weiter updaten, aber nicht zeichnen
         }
 
-        // CORE & HALO: High-End Glow mit höherem Kontrast
-        // Core: Fast solid (0.95+ opacity) für maximale Sichtbarkeit
-        // Halo: Subtiler Hintergrund
+        // CORE & HALO: High-End Glow mit Screen Composite für additive light
         const pulseColorStr = isDark ? "255, 255, 255" : "0, 0, 0";
+        
+        // Screen Composite Operation für additive light effect
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
         
         // Halo: Kleinerer, semi-transparenter Kreis
         ctx.beginPath();
-        const haloAlpha = 0.2 * p.z * p.intensity;
+        const haloAlpha = 0.25 * p.z * p.intensity;
         ctx.fillStyle = `rgba(${pulseColorStr}, ${haloAlpha})`;
         ctx.arc(curX, curY, 2.0 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
         
-        // Core: Fast solid, größerer Punkt für maximale Sichtbarkeit der Bewegung
+        // Core: Sharp und bright für maximale Sichtbarkeit der Bewegung
         ctx.beginPath();
         const coreAlpha = Math.min(0.98, 0.95 * p.z * p.intensity + 0.03); // Fast solid Core
         ctx.fillStyle = `rgba(${pulseColorStr}, ${coreAlpha})`;
         ctx.arc(curX, curY, 2.5 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
+        
+        ctx.restore();
 
         return true;
       });
