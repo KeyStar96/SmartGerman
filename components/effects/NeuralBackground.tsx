@@ -3,35 +3,46 @@
 import { useEffect, useRef } from "react";
 
 /**
- * CONFIG: Awwwards-Level Tuning
+ * CONFIG: Physics & Grid
  */
 const CONFIG = {
   // Gitter & Dichte
-  neuronDensity: 0.00008,     // Dichte (Punkte pro Pixel)
-  connectionDistance: 170,    // Wie weit reichen Verbindungen?
+  neuronDensity: 0.00008,     
+  connectionDistance: 190,    // Etwas erhöht, da sie sich mehr bewegen
   
-  // Eigenbewegung (Das "Schwimmen" im Quadrat)
-  wanderRadius: 0.5,          // Wie stark wollen sie sich von selbst bewegen?
-  wanderSpeed: 0.02,          // Wie schnell ändern sie die Richtung?
-  springStiffness: 0.008,     // Hält sie an der Basisposition (niedriger = lockerer)
+  // "Freies Schwimmen" (Viereck vergrößert)
+  wanderRadius: 2.5,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
+  wanderSpeed: 0.015,         // Langsamerer, eleganter Richtungswechsel
+  springStiffness: 0.002,     // Sehr weiche Feder (war 0.008) -> Lässt weite Wege zu
   
-  // Maus-Interaktion
-  mouseInteractionRadius: 200, 
-  mouseForce: 0.02,           // VIEL schwächer als vorher (subtiler Magnet)
-  damping: 0.94,              // Höhere Dämpfung = "öligeres" Gefühl
+  // Sanfte Maus-Interaktion
+  mouseInteractionRadius: 250, 
+  mouseForce: 0.003,          // GANZ sanft (war 0.02) -> Nur eine Ahnung von Bewegung
+  damping: 0.95,              // Sehr ölig/gleitend
   
-  // Signale (Kettenreaktion)
-  signalSpeed: 3.5,           // Pixel pro Frame
-  signalLength: 40,           // Länge des Schweifs
-  signalColor: "255, 92, 0",  // Primary Orange
-  signalDecay: 0.60,          // Signalstärke nach jedem Hop (60% bleibt übrig)
-  minSignalStrength: 0.15,    // Unter diesem Wert stirbt das Signal (verhindert unendliche Loops)
+  // Signale
+  signalSpeed: 3.0,           
+  signalLength: 50,           
+  signalDecay: 0.65,          
+  minSignalStrength: 0.15,    
   
-  // Optik
-  baseColor: "255, 255, 255", 
-  baseOpacity: 0.12,          // Ruhezustand fast unsichtbar
-  flashDecay: 0.05,           // Wie schnell das Aufleuchten verblasst
+  // Optik Basis
   particleSize: 1.8,
+  flashDecay: 0.04,
+};
+
+// Farb-Konfigurationen für Light/Dark
+const THEME_COLORS = {
+  dark: {
+    neuron: "255, 255, 255", // Weiß
+    signal: "255, 92, 0",    // Leuchtendes Orange
+    lineOpacity: 0.12,
+  },
+  light: {
+    neuron: "10, 10, 10",    // Fast Schwarz (Tinte)
+    signal: "235, 80, 0",    // Etwas dunkleres Orange für Kontrast auf Weiß
+    lineOpacity: 0.08,       // Etwas zarter im Lightmode
+  }
 };
 
 interface Neuron {
@@ -41,26 +52,31 @@ interface Neuron {
   baseY: number;
   vx: number;
   vy: number;
-  wanderAngle: number; // Für die zufällige Bewegung
-  flash: number;       // Helligkeit des Aufleuchtens (0.0 - 1.0)
+  wanderAngle: number;
+  flash: number;
   connections: number[];
 }
 
 interface Pulse {
-  id: number;        // Eindeutige ID für Performance-Tracking
+  id: number;
   fromIndex: number;
   toIndex: number;
   progress: number;
   totalDist: number;
-  strength: number;  // Stärke des Signals (1.0 = Start, wird schwächer)
+  strength: number;
 }
 
 export default function NeuralBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Refs für State, der nicht neu rendern soll
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const neuronsRef = useRef<Neuron[]>([]);
   const pulsesRef = useRef<Pulse[]>([]);
-  const pulseIdCounter = useRef(0); // Um Pulse eindeutig zu identifizieren
+  const pulseIdCounter = useRef(0);
+  
+  // Ref für das aktuelle Farb-Theme (Mutable, damit Animation Loop zugreifen kann)
+  const themeRef = useRef(THEME_COLORS.dark);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -73,7 +89,18 @@ export default function NeuralBackground() {
     let width = 0;
     let height = 0;
 
-    // --- 1. Netzwerk erstellen ---
+    // --- 0. Theme Detection ---
+    const updateTheme = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      themeRef.current = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+    };
+
+    // Observer, der auf Klassenänderungen am HTML-Tag achtet (Light/Dark Switch)
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    updateTheme(); // Initial call
+
+    // --- 1. Init Network ---
     const initNetwork = () => {
       width = window.innerWidth;
       height = window.innerHeight;
@@ -105,7 +132,6 @@ export default function NeuralBackground() {
         });
       }
 
-      // Verbindungen knüpfen
       for (let i = 0; i < numNeurons; i++) {
         for (let j = i + 1; j < numNeurons; j++) {
           const dx = newNeurons[i].x - newNeurons[j].x;
@@ -123,19 +149,18 @@ export default function NeuralBackground() {
       pulsesRef.current = [];
     };
 
-    // --- Helper: Neuen Impuls starten ---
     const spawnPulse = (fromIdx: number, toIdx: number, strength: number) => {
       pulsesRef.current.push({
         id: pulseIdCounter.current++,
         fromIndex: fromIdx,
         toIndex: toIdx,
         progress: 0,
-        totalDist: 0, // Wird im Draw berechnet
+        totalDist: 0,
         strength: strength
       });
     };
 
-    // --- 2. Physik Update ---
+    // --- 2. Physik ---
     const updatePhysics = () => {
       const neurons = neuronsRef.current;
       const mouse = mouseRef.current;
@@ -143,8 +168,7 @@ export default function NeuralBackground() {
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
 
-        // A. Wander-Verhalten (Das "freie Schwimmen")
-        // Wir ändern den Winkel langsam zufällig -> organische Kurven
+        // A. Weiträumiges Wandern (Größeres Viereck)
         n.wanderAngle += (Math.random() - 0.5) * CONFIG.wanderSpeed;
         const wanderX = Math.cos(n.wanderAngle) * CONFIG.wanderRadius;
         const wanderY = Math.sin(n.wanderAngle) * CONFIG.wanderRadius;
@@ -152,13 +176,13 @@ export default function NeuralBackground() {
         n.vx += wanderX;
         n.vy += wanderY;
 
-        // B. Federkraft zum Ursprung (Der "Käfig")
+        // B. Sehr weiche Rückfederung
         const dxBase = n.baseX - n.x;
         const dyBase = n.baseY - n.y;
         n.vx += dxBase * CONFIG.springStiffness;
         n.vy += dyBase * CONFIG.springStiffness;
 
-        // C. Maus-Interaktion (Sanftes Wegschieben oder Anziehen)
+        // C. Subtile Maus-Interaktion
         if (mouse.active) {
           const dxMouse = mouse.x - n.x;
           const dyMouse = mouse.y - n.y;
@@ -166,19 +190,16 @@ export default function NeuralBackground() {
 
           if (distMouse < CONFIG.mouseInteractionRadius) {
             const force = (1 - distMouse / CONFIG.mouseInteractionRadius) * CONFIG.mouseForce;
-            // Wir ziehen an (positiv) - für Abstoßen einfach Vorzeichen drehen
             n.vx += dxMouse * force; 
             n.vy += dyMouse * force;
           }
         }
 
-        // D. Physik anwenden
         n.vx *= CONFIG.damping;
         n.vy *= CONFIG.damping;
         n.x += n.vx;
         n.y += n.vy;
 
-        // E. Flash Decay (Aufleuchten abklingen lassen)
         if (n.flash > 0) {
           n.flash -= CONFIG.flashDecay;
           if (n.flash < 0) n.flash = 0;
@@ -186,20 +207,20 @@ export default function NeuralBackground() {
       }
     };
 
-    // --- 3. Rendering & Signal Logik ---
+    // --- 3. Rendering ---
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       
       const neurons = neuronsRef.current;
       const pulses = pulsesRef.current;
+      const theme = themeRef.current; // Aktuelles Farbschema nutzen
 
-      // --- Layer 1: Statische Verbindungen ---
+      // 1. Verbindungen (Farbe je nach Theme)
       ctx.lineWidth = 1;
-      ctx.strokeStyle = `rgba(${CONFIG.baseColor}, ${CONFIG.baseOpacity})`;
+      ctx.strokeStyle = `rgba(${theme.neuron}, ${theme.lineOpacity})`;
       ctx.beginPath();
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
-        // Optimierung: Nur Verbindungen zu höheren Indices zeichnen (vermeidet doppelte Linien)
         for (const targetIdx of n.connections) {
           if (targetIdx > i) {
             const target = neurons[targetIdx];
@@ -210,10 +231,9 @@ export default function NeuralBackground() {
       }
       ctx.stroke();
 
-      // --- Layer 2: Signale & Kettenreaktion ---
-      ctx.globalCompositeOperation = "lighter"; // Licht-Effekt
+      // 2. Signale
+      ctx.globalCompositeOperation = "lighter";
       
-      // Wir iterieren rückwärts, um Elemente sicher zu löschen
       for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i];
         const nA = neurons[p.fromIndex];
@@ -225,20 +245,12 @@ export default function NeuralBackground() {
         
         p.progress += CONFIG.signalSpeed;
 
-        // --- HIER PASSIERT DIE MAGIE: Ziel erreicht? ---
         if (p.progress >= dist) {
-          // 1. Impuls entfernen
           pulses.splice(i, 1);
-          
-          // 2. Ziel-Neuron aufleuchten lassen (Flash)
-          nB.flash = 1.0 * p.strength; // Flash-Intensität basiert auf Signalstärke
+          nB.flash = 1.0 * p.strength;
 
-          // 3. Kettenreaktion: Neue Impulse aussenden?
-          // Nur wenn das Signal noch stark genug ist
           if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
             const newStrength = p.strength * CONFIG.signalDecay;
-            
-            // An alle Nachbarn weiterleiten (außer an den Absender)
             nB.connections.forEach(neighborIdx => {
               if (neighborIdx !== p.fromIndex) {
                 spawnPulse(p.toIndex, neighborIdx, newStrength);
@@ -248,54 +260,67 @@ export default function NeuralBackground() {
           continue;
         }
 
-        // Zeichnen des Impulses
         const t = p.progress / dist;
         const headX = nA.x + dx * t;
         const headY = nA.y + dy * t;
         
-        // Schweif-Länge berechnen
         const tailLen = Math.min(CONFIG.signalLength / dist, t);
         const tailX = nA.x + dx * (t - tailLen);
         const tailY = nA.y + dy * (t - tailLen);
 
         const gradient = ctx.createLinearGradient(tailX, tailY, headX, headY);
-        // Alpha basiert auf der Signalstärke (strength)
-        gradient.addColorStop(0, `rgba(${CONFIG.signalColor}, 0)`);
-        gradient.addColorStop(1, `rgba(${CONFIG.signalColor}, ${p.strength})`);
+        gradient.addColorStop(0, `rgba(${theme.signal}, 0)`);
+        gradient.addColorStop(1, `rgba(${theme.signal}, ${p.strength})`);
 
         ctx.strokeStyle = gradient;
-        ctx.lineWidth = 2 * p.strength; // Stärkere Signale sind dicker
+        ctx.lineWidth = 2 * p.strength;
         ctx.beginPath();
         ctx.moveTo(tailX, tailY);
         ctx.lineTo(headX, headY);
         ctx.stroke();
       }
 
-      // --- Layer 3: Neuronen & Flashes ---
+      // 3. Neuronen
+      // Im Lightmode nutzen wir 'source-over' statt 'lighter' für die Punkte, 
+      // damit sie dunkel und solide wirken, nicht leuchtend weiß.
+      const isDark = theme === THEME_COLORS.dark;
+      ctx.globalCompositeOperation = isDark ? "lighter" : "source-over";
+
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
         
-        // Basis-Punkt
-        ctx.fillStyle = `rgba(${CONFIG.baseColor}, ${0.3 + n.flash * 0.7})`; // Heller wenn Flash aktiv
+        // Basis Punkt
+        const alpha = isDark 
+          ? 0.3 + n.flash * 0.7 
+          : 0.2 + n.flash * 0.5; // Im Lightmode etwas weniger Deckkraft-Schwankung
+          
+        ctx.fillStyle = `rgba(${theme.neuron}, ${alpha})`;
         ctx.beginPath();
         ctx.arc(n.x, n.y, CONFIG.particleSize, 0, Math.PI * 2);
         ctx.fill();
 
-        // Flash-Glow (der "Halo" um den Punkt beim Aufleuchten)
+        // Flash Glow (Immer die Signalfarbe)
         if (n.flash > 0.01) {
-          const glowRadius = CONFIG.particleSize * 2 + (n.flash * 6);
+          // Im Lightmode muss der Glow etwas intensiver sein, um gegen das Schwarz anzukommen
+          // oder wir nutzen Composite Lighter NUR für den Glow
+          ctx.save();
+          ctx.globalCompositeOperation = "lighter";
+          
+          const glowRadius = CONFIG.particleSize * 2 + (n.flash * 8);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
-          glow.addColorStop(0, `rgba(${CONFIG.signalColor}, ${n.flash})`);
-          glow.addColorStop(1, `rgba(${CONFIG.signalColor}, 0)`);
+          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash})`);
+          glow.addColorStop(1, `rgba(${theme.signal}, 0)`);
           
           ctx.fillStyle = glow;
           ctx.beginPath();
           ctx.arc(n.x, n.y, glowRadius, 0, Math.PI * 2);
           ctx.fill();
+          
+          ctx.restore();
         }
       }
 
-      ctx.globalCompositeOperation = "source-over"; // Reset
+      ctx.globalCompositeOperation = "source-over";
     };
 
     const loop = () => {
@@ -304,22 +329,16 @@ export default function NeuralBackground() {
       animationFrameId = requestAnimationFrame(loop);
     };
 
-    // --- Events ---
     const handleResize = () => initNetwork();
-    
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY, active: true };
     };
-
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
     };
-
     const handleClick = (e: MouseEvent) => {
       const clickX = e.clientX;
       const clickY = e.clientY;
-      
-      // Finde das nächste Neuron
       let closestIdx = -1;
       let minDist = Infinity;
       const neurons = neuronsRef.current;
@@ -328,20 +347,17 @@ export default function NeuralBackground() {
         const dx = neurons[i].x - clickX;
         const dy = neurons[i].y - clickY;
         const dist = dx * dx + dy * dy;
-        
         if (dist < minDist) {
           minDist = dist;
           closestIdx = i;
         }
       }
 
-      // Starte die Initial-Welle
       if (closestIdx !== -1 && minDist < 150 * 150) {
         const startNode = neurons[closestIdx];
-        startNode.flash = 1.0; // Sofortiges Feedback am Klick
-        
+        startNode.flash = 1.0;
         startNode.connections.forEach(targetIdx => {
-          spawnPulse(closestIdx, targetIdx, 1.0); // Volle Stärke (1.0)
+          spawnPulse(closestIdx, targetIdx, 1.0);
         });
       }
     };
@@ -360,6 +376,7 @@ export default function NeuralBackground() {
       window.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("click", handleClick);
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect(); // Observer aufräumen
     };
   }, []);
 
