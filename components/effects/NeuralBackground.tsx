@@ -10,16 +10,16 @@ const CONFIG = {
   maxPulses: 80,
   connectionMaxDist: 160,
   chargeFrames: 30,
-  mouseRadius: 250,
-  mouseForce: 0.8,
-  parallaxFactor: 0.15,
+  mouseRadius: 200,           // Reduziert von 250 → weniger "Flucht"
+  mouseForce: 0.4,            // Reduziert von 0.8 → sanftere Bewegung
+  parallaxFactor: 0.08,       // Reduziert von 0.15 → weniger Verschiebung
   bloomIntensity: 0.6,
-  floatAmplitude: 0.5,
+  floatAmplitude: 0.3,        // Reduziert von 0.5 → weniger Drift
   floatSpeed: 0.0003,
   wakeDecay: 0.92,
   damping: 0.05,
-  clickRadius: 100,
-  brownianStrength: 0.08,
+  clickRadius: 80,            // Reduziert von 100 → präzisere Treffer
+  brownianStrength: 0.05,     // Reduziert von 0.08 → weniger Zufalls-Bewegung
   brownianChangeRate: 0.02,
   physicsUpdateInterval: 2,
   viewportPadding: 100,
@@ -96,9 +96,10 @@ export default function NeuralBackground() {
       const count = Math.floor(area * CONFIG.neuronDensity);
 
       for (let i = 0; i < count; i++) {
-        const z = Math.random();
-        const isForeground = z > 0.8;
-        const isBackground = z < 0.3;
+        // Z-Werte zwischen 0.2-0.9 statt 0-1 für weniger extreme Parallaxe
+        const z = 0.2 + Math.random() * 0.7;
+        const isForeground = z > 0.75;
+        const isBackground = z < 0.4;
         const baseX = Math.random() * width;
         const baseY = Math.random() * height;
         
@@ -189,7 +190,8 @@ export default function NeuralBackground() {
       let minDist = CONFIG.clickRadius;
     
       neurons.forEach((n, index) => {
-        // KRITISCH: Wir berechnen die VISUELLE Position (wie das Neuron gezeichnet wird)
+        // Die Neuronen werden mit ihrer FINALEN Position gezeichnet (nach Damping/Parallaxe)
+        // Wir müssen die EXAKT GLEICHE Position wie beim Zeichnen verwenden
         const visualY = n.y - scrollY;
     
         const dx = n.x - mouseX;
@@ -204,7 +206,7 @@ export default function NeuralBackground() {
     
       if (nearestNeuronIndex !== -1) {
         const n = neurons[nearestNeuronIndex];
-        console.log(`🎯 Neuron aktiviert: ${nearestNeuronIndex}, Distanz: ${minDist.toFixed(1)}px, Position: (${n.x.toFixed(0)}, ${n.y.toFixed(0)})`);
+        console.log(`🎯 Treffer! Neuron ${nearestNeuronIndex} bei (${n.x.toFixed(0)}, ${n.y.toFixed(0)}), Distanz: ${minDist.toFixed(1)}px`);
         
         // Ursprungs-Neuron aktivieren
         n.intensity = 1.0;
@@ -223,8 +225,6 @@ export default function NeuralBackground() {
             });
           }
         });
-      } else {
-        console.log(`❌ Kein Treffer. Nächstes Neuron war ${minDist.toFixed(1)}px entfernt`);
       }
     };
 
