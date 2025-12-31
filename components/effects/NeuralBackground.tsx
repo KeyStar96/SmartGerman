@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 // Konfiguration passend zu Ihrem globals.css
 const CONFIG = {
-  particleCount: 65, // Anzahl der Neuronen (leicht erhöht)
+  neuronsPerSquarePixel: 0.00015, // Dichte: Neuronen pro Quadratpixel (für konsistente Dichte)
   baseSpeed: 0.3, // Bewegungsgeschwindigkeit der Neuronen
   signalSpeedCmPerSec: 8, // Signalgeschwindigkeit in cm/s
   pixelsPerCm: 37.8, // Pixel pro cm (bei 96 DPI)
@@ -73,16 +73,22 @@ export default function NeuralBackground() {
     ctx.scale(dpr, dpr);
 
     // Berechne erweiterten Bereich für Neuronen (außerhalb des sichtbaren Bereichs)
-    const paddingX = width * CONFIG.viewportPadding;
-    const paddingY = height * CONFIG.viewportPadding;
-    const minX = -paddingX;
-    const maxX = width + paddingX;
-    const minY = -paddingY;
-    const maxY = height + paddingY;
+    let paddingX = width * CONFIG.viewportPadding;
+    let paddingY = height * CONFIG.viewportPadding;
+    let minX = -paddingX;
+    let maxX = width + paddingX;
+    let minY = -paddingY;
+    let maxY = height + paddingY;
+    
+    // Berechne Fläche für Neuronen-Verteilung (inkl. Padding)
+    const totalArea = (maxX - minX) * (maxY - minY);
+    
+    // Berechne Anzahl der Neuronen basierend auf Dichte (konsistente Dichte auf gesamter Fläche)
+    const particleCount = Math.max(50, Math.floor(totalArea * CONFIG.neuronsPerSquarePixel));
 
     // 1. Neuronen initialisieren (auch außerhalb des sichtbaren Bereichs)
     const particles: Point[] = [];
-    for (let i = 0; i < CONFIG.particleCount; i++) {
+    for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: minX + Math.random() * (maxX - minX),
         y: minY + Math.random() * (maxY - minY),
@@ -170,6 +176,43 @@ export default function NeuralBackground() {
         // Skaliere wieder
         ctx.scale(dpr, dpr);
         ctx.restore();
+        
+        // Aktualisiere Neuronen-Dichte wenn sich die Höhe ändert
+        paddingY = height * CONFIG.viewportPadding;
+        minY = -paddingY;
+        maxY = height + paddingY;
+        const newTotalArea = (maxX - minX) * (maxY - minY);
+        const newParticleCount = Math.max(50, Math.floor(newTotalArea * CONFIG.neuronsPerSquarePixel));
+        
+        // Füge neue Neuronen hinzu wenn nötig (nur wenn Höhe zunimmt)
+        if (newParticleCount > particles.length) {
+          const additionalNeurons = newParticleCount - particles.length;
+          for (let i = 0; i < additionalNeurons; i++) {
+            particles.push({
+              x: minX + Math.random() * (maxX - minX),
+              y: minY + Math.random() * (maxY - minY),
+              vx: (Math.random() - 0.5) * CONFIG.baseSpeed,
+              vy: (Math.random() - 0.5) * CONFIG.baseSpeed,
+              chargeTimer: 0,
+              intensity: 0,
+              connections: [],
+              colorValue: 1,
+            });
+          }
+          
+          // Erstelle neue Verbindungen für alle Neuronen (inkl. neue)
+          particles.forEach((particle, index) => {
+            if (particle.connections.length === 0) {
+              const availableIndices = particles
+                .map((_, i) => i)
+                .filter((i) => i !== index);
+              
+              const shuffled = availableIndices.sort(() => Math.random() - 0.5);
+              const numConnections = Math.floor(Math.random() * CONFIG.maxConnectionsPerNeuron) + 1;
+              particle.connections = shuffled.slice(0, numConnections);
+            }
+          });
+        }
       }
       
       ctx.clearRect(0, 0, width, height);
