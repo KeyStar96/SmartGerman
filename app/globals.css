@@ -207,4 +207,43 @@ body {
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
+    
+    /* Laser-Glow-Effekt für "German" im Hero-Titel */
+    .laser-text {
+      position: relative;
+      /* Grundfarbe: Orange (wird durch background-clip überschrieben) */
+      color: var(--primary-orange);
+      
+      /* Der magische Teil: Der Gradient wird auf den Text begrenzt */
+      background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.8) 50%,
+        transparent 70%
+      );
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      
+      /* Leichter Neon-Schein, nur für diese Buchstaben */
+      filter: drop-shadow(0 0 8px rgba(255, 92, 0, 0.3));
+      
+      /* Animation: Laser bewegt sich durch den Text */
+      animation: text-laser-sweep 4s infinite linear;
+      
+      /* GPU-Beschleunigung für flüssige Animation */
+      transform: translateZ(0);
+      will-change: background-position;
+    }
+    
+    /* Keyframes für Laser-Sweep-Animation */
+    @keyframes text-laser-sweep {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
   }

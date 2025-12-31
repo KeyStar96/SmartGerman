@@ -48,7 +48,7 @@ const highlightKeywords = (text: string, lang: string = 'de') => {
       return (
         <span 
           key={index} 
-          className="font-semibold text-foreground/90"
+          className="font-semibold text-white"
           style={{ fontWeight: 600 }}
         >
           {part}
@@ -257,7 +257,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             <span className="inline-block text-foreground select-none font-bold" style={{ fontWeight: 700 }}>
               {dictionary.hero.brand_name_part1}
             </span>
-            <span className="inline-block text-primary-orange select-none" style={{ fontWeight: 800 }}>
+            <span className="inline-block text-primary-orange select-none laser-text" style={{ fontWeight: 800 }}>
               {dictionary.hero.brand_name_part2}
             </span>
           </h1>
@@ -288,7 +288,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Subline in schmalem Container (Inter/Geist Sans - Spaceship UI) */}
           <p 
             ref={sublineRef}
-            className="text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-12 text-foreground/70 dark:text-dm-text-muted"
+            className="text-base md:text-lg max-w-2xl mx-auto font-light leading-relaxed mb-12 text-white"
             style={{ 
               opacity: 0,
               letterSpacing: '-0.01em', // Leicht kompakter für modernes Interface-Feeling
