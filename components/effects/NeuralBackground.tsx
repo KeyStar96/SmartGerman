@@ -10,6 +10,7 @@ const CONFIG = {
   // Gitter & Dichte
   neuronDensity: 0.00008,     
   connectionDistance: 120,    // Etwas erhöht, da sie sich mehr bewegen
+  viewportPadding: 200,       // Padding außerhalb des Viewports für Neuronen
   
   // "Freies Schwimmen" (Viereck vergrößert)
   wanderRadius: 1,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
@@ -136,14 +137,19 @@ export default function NeuralBackground() {
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
 
-      const area = width * height;
+      // Erweiterte Bereiche für Neuronen-Platzierung (inkl. Padding außerhalb des Viewports)
+      const extendedWidth = width + (CONFIG.viewportPadding * 2);
+      const extendedHeight = height + (CONFIG.viewportPadding * 2);
+      const area = width * height; // Berechne Dichte basierend auf sichtbarem Bereich
       const numNeurons = Math.floor(area * CONFIG.neuronDensity);
       
       const newNeurons: Neuron[] = [];
 
+      // Platziere Neuronen im erweiterten Bereich (inkl. außerhalb des Viewports)
       for (let i = 0; i < numNeurons; i++) {
-        const x = Math.random() * width;
-        const y = Math.random() * height;
+        // Neuronen können von -padding bis width+padding (und height+padding) platziert werden
+        const x = (Math.random() * extendedWidth) - CONFIG.viewportPadding;
+        const y = (Math.random() * extendedHeight) - CONFIG.viewportPadding;
         newNeurons.push({
           x, y,
           baseX: x,
