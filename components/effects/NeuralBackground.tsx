@@ -62,9 +62,10 @@ export default function NeuralBackground() {
     if (!ctx) return;
 
     // Stelle sicher, dass Canvas die richtige Größe hat (für runde Neuronen)
+    // Verwende die gesamte Dokument-Höhe für Scroll-Unterstützung
     const dpr = window.devicePixelRatio || 1;
     let width = window.innerWidth;
-    let height = window.innerHeight;
+    let height = Math.max(window.innerHeight, document.documentElement.scrollHeight);
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = `${width}px`;
@@ -131,12 +132,19 @@ export default function NeuralBackground() {
     const handleResize = () => {
       const dpr = window.devicePixelRatio || 1;
       width = window.innerWidth;
-      height = window.innerHeight;
+      // Verwende die gesamte Dokument-Höhe für Scroll-Unterstützung
+      height = Math.max(window.innerHeight, document.documentElement.scrollHeight);
+      // Speichere aktuelle Transformation
+      ctx.save();
+      // Setze Transformation zurück
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
+      // Skaliere wieder
       ctx.scale(dpr, dpr);
+      ctx.restore();
       // Aktualisiere auch den erweiterten Bereich
       const newPaddingX = width * CONFIG.viewportPadding;
       const newPaddingY = height * CONFIG.viewportPadding;
@@ -148,6 +156,22 @@ export default function NeuralBackground() {
     let animationFrameId: number;
 
     const render = () => {
+      // Aktualisiere Höhe basierend auf Dokument-Höhe (für Scroll-Unterstützung)
+      const currentDocHeight = Math.max(window.innerHeight, document.documentElement.scrollHeight);
+      if (currentDocHeight !== height) {
+        height = currentDocHeight;
+        const dpr = window.devicePixelRatio || 1;
+        // Speichere aktuelle Transformation
+        ctx.save();
+        // Setze Transformation zurück
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        canvas.height = height * dpr;
+        canvas.style.height = `${height}px`;
+        // Skaliere wieder
+        ctx.scale(dpr, dpr);
+        ctx.restore();
+      }
+      
       ctx.clearRect(0, 0, width, height);
       frameCount++;
 
@@ -192,13 +216,16 @@ export default function NeuralBackground() {
       } else if (signalState === 'signaling') {
         // Prüfe ob ALLES abgeklungen ist: keine Signale, keine aufladenden Neuronen, keine Intensitäten
         // WICHTIG: Warte bis wirklich ALLES fertig ist, bevor ein neues Signal gestartet wird
+        // Zusätzlich: Prüfe ob alle Neuronen ihre Intensität auf 0 haben UND keine Signale mehr unterwegs sind
         const noActiveSignals = signals.length === 0;
         const noChargingNeurons = particles.every(p => p.chargeTimer === 0);
-        const noIntensities = particles.every(p => p.intensity === 0);
+        const noIntensities = particles.every(p => Math.abs(p.intensity) < 0.001); // Verwende Epsilon für Float-Vergleich
         
+        // Zusätzliche Sicherheitsprüfung: Warte eine Frame länger, um sicherzustellen, dass wirklich alles abgeklungen ist
         const allSignalsDone = noActiveSignals && noChargingNeurons && noIntensities;
         if (allSignalsDone) {
           originNeuronIndex = null; // Reset für nächstes Signal
+          neuronsThatReceivedSignal.clear(); // Reset für nächstes Signal
           signalState = 'waiting';
           stateTimer = CONFIG.pauseBetweenSignals;
         }
@@ -244,12 +271,23 @@ export default function NeuralBackground() {
           if (p.chargeTimer === 0 && p.intensity > 0 && (signalState === 'charging' || signalState === 'signaling')) {
             // Sende Signale an alle verbundenen Neuronen (außer die, die bereits Signale empfangen haben)
             p.connections.forEach((connectedIndex) => {
+              // WICHTIG: Prüfe ob die Verbindung wirklich existiert
+              // Eine Verbindung existiert nur, wenn beide Neuronen sich gegenseitig verbunden haben
+              // ODER wenn das Quell-Neuron das Ziel-Neuron in seiner connections-Liste hat
+              const target = particles[connectedIndex];
+              if (!target) {
+                return; // Sicherheitsprüfung
+              }
+              
+              // Prüfe ob die Verbindung wirklich existiert (Quell-Neuron muss Ziel-Neuron in connections haben)
+              if (!p.connections.includes(connectedIndex)) {
+                return; // Verbindung existiert nicht
+              }
+              
               // Überspringe Neuronen, die bereits Signale empfangen haben (verhindert Rückwärts-Signale)
               if (neuronsThatReceivedSignal.has(connectedIndex)) {
                 return;
               }
-              
-              const target = particles[connectedIndex];
               const dx = target.x - p.x;
               const dy = target.y - p.y;
               const dist = Math.sqrt(dx * dx + dy * dy);
@@ -507,10 +545,11 @@ export default function NeuralBackground() {
 
   return (
     <div
-      className="fixed inset-0 -z-[1] pointer-events-none overflow-hidden bg-background transition-colors duration-500"
+      className="fixed inset-0 -z-[1] pointer-events-none bg-background transition-colors duration-500"
+      style={{ height: '100vh' }}
       aria-hidden="true"
     >
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-60 dark:opacity-80" />
+      <canvas ref={canvasRef} className="absolute top-0 left-0 w-full opacity-60 dark:opacity-80" />
     </div>
   );
 }
