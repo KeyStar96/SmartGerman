@@ -8,20 +8,20 @@ import { gsap } from "@/lib/gsap";
  */
 const CONFIG = {
   // Gitter & Dichte
-  neuronDensity: 0.00012,     // Etwas geringer für mehr Fokus (Kino-Feeling)
-  connectionDistance: 120,    // Kürzere Verbindungen = technischer
+  neuronDensity: 0.0008,     
+  connectionDistance: 120,    // Etwas erhöht, da sie sich mehr bewegen
   viewportPadding: 200,       // Padding außerhalb des Viewports für Neuronen
   gridCellSize: 150,          // Größe der Grid-Zellen für gleichmäßige Verteilung
   
   // "Freies Schwimmen" (Viereck vergrößert)
-  wanderRadius: 5.0,          // Viel Bewegung (Kino-Feeling)
-  wanderSpeed: 0.005,         // Aber extrem langsam (wie unter Wasser)
+  wanderRadius: 1,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
+  wanderSpeed: 0.015,         // Langsamerer, eleganter Richtungswechsel
   springStiffness: 0.04,     // Sehr weiche Feder (war 0.008) -> Lässt weite Wege zu
   
   // Sanfte Maus-Interaktion
   mouseInteractionRadius: 250, 
-  mouseForce: 0.0015,         // Fast unmerkliche Interaktion (Kino-Feeling)
-  damping: 0.98,              // Extrem weiches Auslaufen (Kino-Feeling)
+  mouseForce: 0.003,          // GANZ sanft (war 0.02) -> Nur eine Ahnung von Bewegung
+  damping: 0.95,              // Sehr ölig/gleitend
   
   // Signale
   signalSpeed: 4.0,           
@@ -30,7 +30,7 @@ const CONFIG = {
   minSignalStrength: 0.15,    
   
   // Optik Basis
-  particleSize: 1.0,          // Winzige Partikel (Subpixel-Look) - Kino-Feeling
+  particleSize: 2,
   flashDecay: 0.04,
   
   // 3D Z-Dimension
