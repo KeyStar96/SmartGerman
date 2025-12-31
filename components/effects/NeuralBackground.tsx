@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 const CONFIG = {
   neuronDensity: 0.00007,     // Etwas mehr Neuronen für Fülle
   baseSpeed: 0.15,
-  signalSpeed: 0.04,          // Langsamere Signal-Propagation für visuelle Klarheit (~25 Frames pro Hop)
+  signalSpeed: 0.016,         // Langsamere Signal-Propagation: 0.8-1.2 Sekunden pro Hop (48-72 Frames bei 60fps)
   maxConnections: 6,          // Erhöht für komplexeres Geflecht
   maxPulses: 80,              // Limit erhöht
   connectionMaxDist: 160,     // Größere Reichweite für Verbindungen
@@ -23,12 +23,12 @@ const CONFIG = {
   brownianChangeRate: 0.02,   // Wie oft die Brownian-Richtung ändert
   physicsUpdateInterval: 2,   // Physics nur jeden 2. Frame
   viewportPadding: 100,       // Padding für Viewport-Culling
-  propagationChance: 0.3,     // 30% Chance für weitere Pulse-Propagation
+  propagationChance: 0.6,     // 60% Chance für Chain Reaction (Awwwards-Effekt)
   pulseCooldownFrames: 10,    // Cooldown für Neuron nach Propagation
-  baseLineOpacity: 0.08,      // Basis-Opazität für Linien (Dark Mode)
+  baseLineOpacity: 0.05,      // Sehr dimme Linien für subtilen Look
   lineBreathSpeed: 0.002,    // Geschwindigkeit der Linien-"Atmung"
   lineBreathAmplitude: 0.02,  // Amplitude der Opacity-Schwankung
-  signalDecay: 0.35,          // 35% Signal-Verlust pro Hop (Awwwards-Level)
+  signalDecay: 0.3,           // 30% Signal-Verlust pro Hop (0.7 Multiplikator)
   minIntensity: 0.1,          // Minimale Intensität - ab hier stirbt das Signal
 };
 
@@ -181,32 +181,27 @@ export default function NeuralBackground() {
 
     const handleMouseClick = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
       
-      // Viewport-Koordinaten (relativ zum sichtbaren Bereich)
-      const viewportX = e.clientX - rect.left;
-      const viewportY = e.clientY - rect.top;
-      
-      // Canvas-Koordinaten (inkl. Scroll-Offset für globales Dokument-Koordinatensystem)
-      // Neuronen werden im Canvas-Koordinatensystem gespeichert (nach DPR-Skalierung)
-      // Da Canvas fixed ist, müssen wir scrollY berücksichtigen
-      const clickX = viewportX;
-      const clickY = viewportY + window.scrollY;
+      // Fixed Canvas: Neuronen leben im Viewport-Koordinatensystem (0 bis width/height)
+      // Kein window.scrollY nötig, da Canvas fixed ist und sich nicht mit dem Scroll bewegt
+      // Neuronen werden in "logical pixels" gespeichert (nach ctx.scale(dpr, dpr))
+      // Maus-Koordinaten sind bereits in Viewport-Koordinaten (e.clientX/Y relativ zum Viewport)
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
       
       // Console Debugging
-      console.log(`[Click Detect] Mouse Viewport: (${viewportX.toFixed(1)}, ${viewportY.toFixed(1)})`);
-      console.log(`[Click Detect] Calculated Canvas Space (incl. Scroll): (${clickX.toFixed(1)}, ${clickY.toFixed(1)}), ScrollY: ${window.scrollY}`);
+      console.log(`Fixed Canvas Click: (${mouseX.toFixed(1)}, ${mouseY.toFixed(1)})`);
 
       // NEURAL IGNITE: Finde alle Neuronen im Click-Radius
       neurons.forEach((n, index) => {
-        const dx = n.x - clickX;
-        const dy = n.y - clickY;
+        const dx = n.x - mouseX;
+        const dy = n.y - mouseY;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         // Klick trifft Neuron im Radius
         if (dist < CONFIG.clickRadius) {
           // Console Debugging für aktivierte Neuronen
-          console.log(`[Neuron Activated] ID: ${index}, Pos: (x: ${n.x.toFixed(1)}, y: ${n.y.toFixed(1)}, z: ${n.z.toFixed(2)}), Dist to Click: ${dist.toFixed(1)}`);
+          console.log(`Neuron Hit Distance: ${dist.toFixed(1)} at z: ${n.z.toFixed(2)}, ID: ${index}, Pos: (${n.x.toFixed(1)}, ${n.y.toFixed(1)})`);
           
           // Ursprungs-Neuron aktivieren
           n.intensity = 1.0;
@@ -237,7 +232,7 @@ export default function NeuralBackground() {
       
       // Subtile Farben für Transparenz
       const neuronAlpha = isDark ? 0.08 : 0.12;
-      const connectionAlpha = isDark ? CONFIG.baseLineOpacity : 0.04;
+      const connectionAlpha = isDark ? CONFIG.baseLineOpacity : 0.05; // Sehr dimme Linien (0.05 opacity)
       const pulseColor = isDark ? "255, 255, 255" : "0, 0, 0";
 
       // THROTTLE: Physics nur jeden 2. Frame
@@ -376,8 +371,8 @@ export default function NeuralBackground() {
               ctx.lineTo(target.x, target.y);
               ctx.stroke();
             } else {
-              // Sichtbare Basis-Verbindungen mit technischem Look + "Atmung"
-              const breathAlpha = Math.max(0, Math.min(1, (connectionAlpha * zAvg) + breathOffset));
+              // Sehr dimme Basis-Verbindungen (0.05 opacity) für subtilen Look
+              const breathAlpha = Math.max(0, Math.min(0.05, (connectionAlpha * zAvg) + breathOffset));
               ctx.strokeStyle = isDark 
                 ? `rgba(255, 255, 255, ${breathAlpha})` 
                 : `rgba(0, 0, 0, ${breathAlpha})`;
@@ -457,26 +452,27 @@ export default function NeuralBackground() {
       }
 
       pulses = pulses.filter((p) => {
-        // Langsamere Signal-Propagation: ~20-30 Frames pro Hop für visuelle Klarheit
-        // signalSpeed ist jetzt 0.04, also: 0.04 * (z + 0.5) ≈ 0.02-0.06 pro Frame
-        // Bei progress 0→1 braucht das ~17-50 Frames (mit z-Skalierung: ~20-30 Frames für typische z-Werte)
+        // Langsamere Signal-Propagation: 0.8-1.2 Sekunden pro Hop (48-72 Frames bei 60fps)
+        // signalSpeed ist jetzt 0.016, also: 0.016 * (z + 0.5) ≈ 0.008-0.024 pro Frame
+        // Bei progress 0→1 braucht das ~42-125 Frames (mit z-Skalierung: ~48-72 Frames für typische z-Werte)
         p.progress += CONFIG.signalSpeed * (p.z + 0.5);
         
         if (p.progress >= 1) {
           // Pulse erreicht Ziel: Trigger Neuron mit Signal-Abschwächung
           const target = neurons[p.to];
           if (target) {
-            // Signal-Abschwächung anwenden (Distance Decay)
-            const nextIntensity = p.intensity * (1 - CONFIG.signalDecay);
+            // Signal-Abschwächung: 30% Verlust pro Hop (0.7 Multiplikator)
+            const nextIntensity = p.intensity * 0.7;
             
             // Nur weiterleiten, wenn Intensität über Minimum liegt
             if (nextIntensity > CONFIG.minIntensity) {
               target.chargeTimer = CONFIG.chargeFrames;
               target.intensity = nextIntensity;
               
-              // AUTOMATISCHE KETTENREAKTION: Signal weiterleiten an alle Nachbarn
+              // NEURAL CHAIN REACTION (Awwwards-Effekt): 60% Wahrscheinlichkeit für Propagation
               if (target.pulseCooldown === 0 && 
                   p.depth < 5 && // Max-Tiefe verhindert endlose Loops
+                  Math.random() < CONFIG.propagationChance &&
                   pulses.length < CONFIG.maxPulses) {
                 
                 // Setze Cooldown
@@ -492,7 +488,7 @@ export default function NeuralBackground() {
                     progress: 0,
                     z: target.z,
                     depth: p.depth + 1, // Erhöhe Tiefe
-                    intensity: nextIntensity, // Weiterleiten mit abgeschwächter Intensität
+                    intensity: nextIntensity, // Weiterleiten mit 0.7 Intensitäts-Decay
                   });
                 });
               }
@@ -508,31 +504,30 @@ export default function NeuralBackground() {
         const curX = n1.x + (n2.x - n1.x) * p.progress;
         const curY = n1.y + (n2.y - n1.y) * p.progress;
 
-        // Viewport Culling für Pulses (berücksichtige Scroll-Offset)
+        // Viewport Culling für Pulses (Canvas ist fixed, kein scrollY nötig)
         const viewportPadding = CONFIG.viewportPadding;
-        const scrollY = window.scrollY;
-        const visibleY = curY - scrollY;
         if (curX < -viewportPadding || curX > width + viewportPadding ||
-            visibleY < -viewportPadding || visibleY > height + viewportPadding) {
+            curY < -viewportPadding || curY > height + viewportPadding) {
           return true; // Weiter updaten, aber nicht zeichnen
         }
 
-        // CORE & HALO: High-End Glow mit Intensität-basierter Opacity
-        // Visuelle Verbesserung: Core heller, Halo kleiner für bessere Sichtbarkeit
+        // CORE & HALO: High-End Glow mit höherem Kontrast
+        // Core: Fast solid (0.95+ opacity) für maximale Sichtbarkeit
+        // Halo: Subtiler Hintergrund
         const pulseColorStr = isDark ? "255, 255, 255" : "0, 0, 0";
         
-        // Halo: Kleinerer, semi-transparenter Kreis (für subtileren Hintergrund)
+        // Halo: Kleinerer, semi-transparenter Kreis
         ctx.beginPath();
-        const haloAlpha = 0.25 * p.z * p.intensity;
+        const haloAlpha = 0.2 * p.z * p.intensity;
         ctx.fillStyle = `rgba(${pulseColorStr}, ${haloAlpha})`;
-        ctx.arc(curX, curY, 2.5 * p.z * p.intensity, 0, Math.PI * 2);
+        ctx.arc(curX, curY, 2.0 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
         
-        // Core: Hellerer, größerer Punkt für bessere Sichtbarkeit der Bewegung
+        // Core: Fast solid, größerer Punkt für maximale Sichtbarkeit der Bewegung
         ctx.beginPath();
-        const coreAlpha = Math.min(1.0, 0.98 * p.z * p.intensity); // Helles Core
+        const coreAlpha = Math.min(0.98, 0.95 * p.z * p.intensity + 0.03); // Fast solid Core
         ctx.fillStyle = `rgba(${pulseColorStr}, ${coreAlpha})`;
-        ctx.arc(curX, curY, 2.0 * p.z * p.intensity, 0, Math.PI * 2);
+        ctx.arc(curX, curY, 2.5 * p.z * p.intensity, 0, Math.PI * 2);
         ctx.fill();
 
         return true;
