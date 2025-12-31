@@ -44,12 +44,12 @@ const THEME_COLORS = {
   dark: {
     neuron: "255, 255, 255", // Weiß
     signal: "255, 92, 0",    // Leuchtendes Orange
-    lineOpacity: 0.12,
+    lineOpacity: 0.06,       // Reduziert von 0.12 für subtileres Netzwerk
   },
   light: {
     neuron: "10, 10, 10",    // Fast Schwarz (Tinte)
     signal: "235, 80, 0",    // Etwas dunkleres Orange für Kontrast auf Weiß
-    lineOpacity: 0.08,       // Etwas zarter im Lightmode
+    lineOpacity: 0.04,         // Reduziert von 0.08 für subtileres Netzwerk
   }
 };
 
@@ -350,7 +350,8 @@ export default function NeuralBackground() {
 
         const gradient = ctx.createLinearGradient(tailX, tailY, headX, headY);
         gradient.addColorStop(0, `rgba(${theme.signal}, 0)`);
-        gradient.addColorStop(1, `rgba(${theme.signal}, ${p.strength})`);
+        // Reduzierte Signal-Intensität für subtilere Effekte
+        gradient.addColorStop(1, `rgba(${theme.signal}, ${p.strength * 0.7})`);
 
         ctx.strokeStyle = gradient;
         ctx.lineWidth = 2 * p.strength;
@@ -369,10 +370,10 @@ export default function NeuralBackground() {
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
         
-        // Basis Punkt
+        // Basis Punkt (reduzierte Opazität für subtileres Netzwerk)
         const alpha = isDark 
-          ? 0.3 + n.flash * 0.7 
-          : 0.2 + n.flash * 0.5; // Im Lightmode etwas weniger Deckkraft-Schwankung
+          ? 0.15 + n.flash * 0.5   // Reduziert von 0.3 + flash * 0.7
+          : 0.1 + n.flash * 0.35;   // Reduziert von 0.2 + flash * 0.5
           
         ctx.fillStyle = `rgba(${theme.neuron}, ${alpha})`;
         ctx.beginPath();
@@ -386,12 +387,12 @@ export default function NeuralBackground() {
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           
-          // Stärkerer Glow: Größerer Radius und intensivere Alpha-Werte
+          // Subtilerer Glow: Etwas reduziert für weniger aufdringliches Netzwerk
           const glowRadius = CONFIG.particleSize * 3 + (n.flash * 15);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
-          // Intensiveres Leuchten mit höherem Alpha
-          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash * 1.2})`);
-          glow.addColorStop(0.4, `rgba(${theme.signal}, ${n.flash * 0.6})`);
+          // Reduzierte Alpha-Werte für subtileren Effekt
+          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash * 0.9})`);
+          glow.addColorStop(0.4, `rgba(${theme.signal}, ${n.flash * 0.45})`);
           glow.addColorStop(1, `rgba(${theme.signal}, 0)`);
           
           ctx.fillStyle = glow;
@@ -578,7 +579,7 @@ export default function NeuralBackground() {
         ref={canvasRef}
         className="w-full h-full"
         style={{
-          opacity: 0.6,
+          opacity: 0.4,  // Reduziert von 0.6 für subtileres Netzwerk
           pointerEvents: "auto",
         }}
       />
