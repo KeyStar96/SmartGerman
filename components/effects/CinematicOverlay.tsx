@@ -6,9 +6,8 @@ import { useMemo, useState, useEffect } from "react";
  * CinematicOverlay - Awwwards-Standard optische Effekte (Performance-optimiert)
  * 
  * Kombiniert:
- * - Radiale Vignette mit Blur (Cinematic Bokeh)
+ * - Radiale Vignette mit Blur (Cinematic Bokeh) - dunkle, unscharfe Ränder
  * - CSS-basiertes Film Grain (GPU-beschleunigt, kein Canvas-Rendering)
- * - Subtile chromatische Aberration an den Rändern
  * - Dark/Light Mode Support
  * 
  * Performance-Optimierungen:
@@ -54,26 +53,34 @@ export default function CinematicOverlay() {
         willChange: "opacity",
       }}
     >
-      {/* 1. Kombinierte Vignette: Farbverlauf + reduzierter Blur */}
+      {/* 1. Dunkle Vignette: Schwarze Abdunkelung an den Rändern */}
       <div
         className="absolute inset-0"
         style={{
           background: isDark
-            ? // Darkmode: Extrem tiefes Blau-Grau (#050505) an den Rändern
-              "radial-gradient(circle at center, transparent 0%, rgba(5, 5, 5, 0.5) 70%, rgba(5, 5, 5, 0.75) 100%)"
-            : // Lightmode: Papier-Vignette (warmes Braun)
-              "radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.06) 70%, rgba(0, 0, 0, 0.12) 100%)",
-          // Reduzierter Blur nur an den Rändern (via mask)
-          maskImage: "radial-gradient(circle, black 60%, transparent 95%)",
-          WebkitMaskImage: "radial-gradient(circle, black 60%, transparent 95%)",
-          backdropFilter: "blur(4px)",
-          WebkitBackdropFilter: "blur(4px)",
-          opacity: isDark ? 0.6 : 0.3,
+            ? // Darkmode: Schwarze Vignette (stärker an den Rändern)
+              "radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.7) 85%, rgba(0, 0, 0, 0.95) 100%)"
+            : // Lightmode: Subtile dunkle Vignette
+              "radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.08) 70%, rgba(0, 0, 0, 0.2) 100%)",
           transform: "translateZ(0)",
         }}
       />
 
-      {/* 2. Performance-optimiertes Film Grain (SVG + CSS Animation) */}
+      {/* 2. Unscharfe Ränder: Blur-Effekt an den äußeren Bereichen */}
+      <div
+        className="absolute inset-0"
+        style={{
+          // Maskiert nur die Ränder (äußere 15%)
+          maskImage: "radial-gradient(circle, transparent 75%, black 100%)",
+          WebkitMaskImage: "radial-gradient(circle, transparent 75%, black 100%)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          opacity: isDark ? 0.8 : 0.4,
+          transform: "translateZ(0)",
+        }}
+      />
+
+      {/* 3. Performance-optimiertes Film Grain (SVG + CSS Animation) */}
       <div
         className="absolute inset-0"
         style={{
@@ -87,24 +94,6 @@ export default function CinematicOverlay() {
           animation: "grain-shift 8s linear infinite",
         }}
       />
-
-      {/* 3. Subtile chromatische Aberration an den Rändern (nur wenn nötig) */}
-      {isDark && (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to right, 
-              rgba(255, 0, 0, 0.02) 0%, 
-              transparent 5%, 
-              transparent 95%, 
-              rgba(0, 0, 255, 0.02) 100%
-            )`,
-            mixBlendMode: "screen",
-            transform: "translateZ(0)",
-            pointerEvents: "none",
-          }}
-        />
-      )}
     </div>
   );
 }
