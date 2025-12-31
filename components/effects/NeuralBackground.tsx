@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CONFIG = {
   neuronDensity: 0.00006,
@@ -11,15 +11,60 @@ const CONFIG = {
   spreadProbability: 0.5,   // Nur 50% Chance, dass ein zweiter Pfad entsteht
   minIntensity: 0.1,        // Unter 10% stirbt das Signal
   chargeFrames: 20,         // Schnellere Reaktionszeit der Neuronen
-  colors: {
-    neuron: "rgba(255, 255, 255, 0.15)",
-    line: "rgba(255, 255, 255, 0.03)",
-    pulse: "rgba(255, 255, 255, 1)"
+};
+
+// Farben basierend auf Theme
+const getColors = (isDark: boolean) => {
+  if (isDark) {
+    return {
+      neuron: "rgba(255, 255, 255, 0.15)",
+      line: "rgba(255, 255, 255, 0.03)",
+      pulseR: 255,
+      pulseG: 255,
+      pulseB: 255,
+      activeNeuronR: 255,
+      activeNeuronG: 255,
+      activeNeuronB: 255,
+    };
+  } else {
+    return {
+      neuron: "rgba(0, 0, 0, 0.25)", // Dezentes Schwarz für Neuronen
+      line: "rgba(0, 0, 0, 0.08)", // Sehr dezentes Grau für Linien
+      pulseR: 75, // Graues Licht für Pulse
+      pulseG: 75,
+      pulseB: 75,
+      activeNeuronR: 0, // Schwarze aktive Neuronen
+      activeNeuronG: 0,
+      activeNeuronB: 0,
+    };
   }
 };
 
 export default function NeuralBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDark, setIsDark] = useState(true);
+
+  // Prüfe ob Darkmode aktiv ist
+  const checkDarkMode = () => {
+    return document.documentElement.classList.contains("dark");
+  };
+
+  useEffect(() => {
+    // Initialisiere Darkmode-Status
+    setIsDark(checkDarkMode());
+
+    // Observer für Theme-Änderungen
+    const observer = new MutationObserver(() => {
+      setIsDark(checkDarkMode());
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -145,9 +190,12 @@ export default function NeuralBackground() {
     const draw = (scrollY: number) => {
       ctx.clearRect(0, 0, width, height);
 
+      // Hole aktuelle Farben basierend auf Theme
+      const colors = getColors(checkDarkMode());
+
       // 1. Linien (sehr schwach)
       ctx.beginPath();
-      ctx.strokeStyle = CONFIG.colors.line;
+      ctx.strokeStyle = colors.line;
       ctx.lineWidth = 0.5;
       neurons.forEach((n, i) => {
         const dy = n.y - scrollY;
@@ -175,14 +223,14 @@ export default function NeuralBackground() {
         const currentAlpha = p.intensity * (1 - p.progress * 0.5);
 
         ctx.beginPath();
-        ctx.strokeStyle = `rgba(255, 255, 255, ${currentAlpha * 0.6})`;
+        ctx.strokeStyle = `rgba(${colors.pulseR}, ${colors.pulseG}, ${colors.pulseB}, ${currentAlpha * 0.6})`;
         ctx.lineWidth = 1.5;
         ctx.moveTo(from.x, sY);
         ctx.lineTo(curX, curY);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.fillStyle = `rgba(255, 255, 255, ${currentAlpha})`;
+        ctx.fillStyle = `rgba(${colors.pulseR}, ${colors.pulseG}, ${colors.pulseB}, ${currentAlpha})`;
         ctx.arc(curX, curY, 1.2, 0, Math.PI * 2);
         ctx.fill();
       });
@@ -194,12 +242,12 @@ export default function NeuralBackground() {
         
         if (n.chargeTimer > 0) {
           ctx.beginPath();
-          ctx.fillStyle = `rgba(255, 255, 255, ${n.intensity})`;
+          ctx.fillStyle = `rgba(${colors.activeNeuronR}, ${colors.activeNeuronG}, ${colors.activeNeuronB}, ${n.intensity})`;
           ctx.arc(n.x, dy, 2, 0, Math.PI * 2);
           ctx.fill();
         } else {
           ctx.beginPath();
-          ctx.fillStyle = CONFIG.colors.neuron;
+          ctx.fillStyle = colors.neuron;
           ctx.arc(n.x, dy, 1, 0, Math.PI * 2);
           ctx.fill();
         }
@@ -213,7 +261,7 @@ export default function NeuralBackground() {
       window.removeEventListener("resize", init);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [isDark]); // Re-render wenn Theme wechselt
 
   return (
     <canvas
