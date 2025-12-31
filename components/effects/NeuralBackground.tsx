@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 
 const CONFIG = {
-  neuronDensity: 0.00006,
-  signalSpeed: 0.018,          // ~55 Frames pro Hop
+  neuronDensity: 0.00007,
+  signalSpeed: 0.018,         // ~55 Frames pro Hop
   maxConnections: 5,
   maxPulses: 120,
   connectionMaxDist: 180,
@@ -15,8 +15,8 @@ const CONFIG = {
   floatAmplitude: 0.2,
   floatSpeed: 0.0002,
   damping: 0.03,
-  baseLineOpacity: 0.06,       // Sehr dimme Basis-Linien
-  signalDecayPerHop: 0.7,      // 70% der Intensität bleiben pro Hop
+  baseLineOpacity: 0.06,      // Sehr dimme Basis-Linien
+  signalDecayPerHop: 0.8,      // 80% bleiben pro Hop (20% Verlust)
   minIntensity: 0.12,          // Minimale Intensität für Weiterleitung
   autoSpawnChance: 0.025,      // Chance für zufälligen Pulse pro Frame
 };
@@ -68,7 +68,6 @@ export default function NeuralBackground() {
       ctx.scale(dpr, dpr);
 
       neurons = [];
-      pulses = [];
       const area = width * height;
       const count = Math.floor(area * CONFIG.neuronDensity);
 
@@ -79,8 +78,8 @@ export default function NeuralBackground() {
         neurons.push({
           x: baseX,
           y: baseY,
-          baseX,
-          baseY,
+          baseX: baseX,
+          baseY: baseY,
           targetX: baseX,
           targetY: baseY,
           radius: 1.2 + Math.random() * 1.3,
@@ -91,7 +90,6 @@ export default function NeuralBackground() {
         });
       }
 
-      // Verbindungen basierend auf Distanz
       neurons.forEach((n1, i) => {
         const sorted = neurons
           .map((n2, idx) => ({ idx, dist: Math.hypot(n1.x - n2.x, n1.y - n2.y) }))
@@ -103,27 +101,31 @@ export default function NeuralBackground() {
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Canvas ist fixed, also direkte Viewport-Koordinaten
       mouseRef.current = { x: e.clientX, y: e.clientY };
     };
 
     const handleMouseClick = (e: MouseEvent) => {
+      // Canvas ist fixed, also direkte Viewport-Koordinaten
       const mouseX = e.clientX;
       const mouseY = e.clientY;
-
-      // Finde nächstes Neuron
-      let nearestIdx = -1;
+    
+      let nearestNeuronIndex = -1;
       let minDist = CONFIG.clickRadius;
-
+    
       neurons.forEach((n, index) => {
-        const dist = Math.hypot(n.x - mouseX, n.y - mouseY);
+        const dx = n.x - mouseX;
+        const dy = n.y - mouseY;
+        const dist = Math.hypot(dx, dy);
+    
         if (dist < minDist) {
           minDist = dist;
-          nearestIdx = index;
+          nearestNeuronIndex = index;
         }
       });
-
-      if (nearestIdx !== -1) {
-        triggerNeuron(nearestIdx, 1.0);
+    
+      if (nearestNeuronIndex !== -1) {
+        triggerNeuron(nearestNeuronIndex, 1.0);
       }
     };
 
@@ -135,7 +137,7 @@ export default function NeuralBackground() {
       n.intensity = intensity;
       n.chargeTimer = CONFIG.chargeFrames;
 
-      // Pulse zu allen Verbindungen starten
+      // Pulse zu allen Verbindungen starten (1:n Beziehung)
       n.connections.forEach((targetIdx) => {
         if (pulses.length < CONFIG.maxPulses) {
           // Prüfe ob bereits ein Pulse auf dieser Verbindung läuft
@@ -158,12 +160,15 @@ export default function NeuralBackground() {
     const update = () => {
       timeRef.current += 16;
       ctx.clearRect(0, 0, width, height);
-      
       const isDark = document.documentElement.classList.contains("dark");
-      const baseColor = isDark ? "255, 255, 255" : "0, 0, 0";
+      
+      const neuronAlpha = isDark ? 0.08 : 0.12;
+      const connectionAlpha = isDark ? CONFIG.baseLineOpacity : 0.05;
+      const pulseColor = isDark ? "255, 255, 255" : "0, 0, 0";
+
       const time = timeRef.current * CONFIG.floatSpeed;
 
-      // === 1. NEURONEN PHYSICS ===
+      // === NEURONEN PHYSICS (2D) ===
       neurons.forEach((n) => {
         // Organisches Floating
         const floatX = Math.sin(time + n.timeOffset) * CONFIG.floatAmplitude;
@@ -191,7 +196,7 @@ export default function NeuralBackground() {
         n.x += (n.targetX - n.x) * CONFIG.damping;
         n.y += (n.targetY - n.y) * CONFIG.damping;
 
-        // Screen Wrap für baseX/baseY
+        // Screen Wrap
         if (n.baseX < -50) n.baseX = width + 50;
         if (n.baseX > width + 50) n.baseX = -50;
         if (n.baseY < -50) n.baseY = height + 50;
@@ -202,7 +207,7 @@ export default function NeuralBackground() {
         if (n.chargeTimer > 0) n.chargeTimer--;
       });
 
-      // === 2. VERBINDUNGEN ZEICHNEN (nur Basis-Linien, keine aktiven Pulses) ===
+      // === VERBINDUNGEN ZEICHNEN (nur Basis-Linien, keine aktiven Pulses) ===
       // Sammle alle Verbindungen mit aktivem Pulse
       const activePulseConnections = new Set<string>();
       pulses.forEach(p => {
@@ -223,7 +228,7 @@ export default function NeuralBackground() {
             // Nur Basis-Linien zeichnen wenn KEIN Pulse aktiv ist
             if (!activePulseConnections.has(key)) {
               ctx.beginPath();
-              ctx.strokeStyle = `rgba(${baseColor}, ${CONFIG.baseLineOpacity})`;
+              ctx.strokeStyle = `rgba(${pulseColor}, ${CONFIG.baseLineOpacity})`;
               ctx.lineWidth = 0.5;
               ctx.setLineDash([2, 4]);
               ctx.moveTo(n.x, n.y);
@@ -234,7 +239,35 @@ export default function NeuralBackground() {
         });
       });
 
-      // === 3. PULSES VERARBEITEN & ZEICHNEN ===
+      // === NEURONEN ZEICHNEN ===
+      neurons.forEach((n) => {
+        const isActive = n.chargeTimer > 0 || n.intensity > 0.1;
+        
+        if (isActive) {
+          // Glow für aktive Neuronen
+          const gradient = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius * 4);
+          const glowAlpha = n.intensity * 0.4;
+          gradient.addColorStop(0, `rgba(${pulseColor}, ${glowAlpha})`);
+          gradient.addColorStop(0.5, `rgba(${pulseColor}, ${glowAlpha * 0.3})`);
+          gradient.addColorStop(1, "transparent");
+          
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.radius * 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Neuron Core
+        ctx.beginPath();
+        const alpha = isActive 
+          ? Math.min(n.intensity + 0.25, 0.7)
+          : neuronAlpha;
+        ctx.fillStyle = `rgba(${pulseColor}, ${alpha})`;
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // === PULSES VERARBEITEN & ZEICHNEN ===
       // Zufällige neue Pulses spawnen
       if (Math.random() < CONFIG.autoSpawnChance && pulses.length < CONFIG.maxPulses / 2) {
         const startIdx = Math.floor(Math.random() * neurons.length);
@@ -263,8 +296,8 @@ export default function NeuralBackground() {
         const endAlpha = traceAlpha * 0.7;
         
         const gradient = ctx.createLinearGradient(n1.x, n1.y, curX, curY);
-        gradient.addColorStop(0, `rgba(${baseColor}, ${startAlpha})`);
-        gradient.addColorStop(1, `rgba(${baseColor}, ${endAlpha})`);
+        gradient.addColorStop(0, `rgba(${pulseColor}, ${startAlpha})`);
+        gradient.addColorStop(1, `rgba(${pulseColor}, ${endAlpha})`);
         
         ctx.beginPath();
         ctx.strokeStyle = gradient;
@@ -277,13 +310,13 @@ export default function NeuralBackground() {
         // Pulse-Kopf (der leuchtende Punkt)
         ctx.beginPath();
         const coreAlpha = Math.min(0.95, p.intensity * 0.9);
-        ctx.fillStyle = `rgba(${baseColor}, ${coreAlpha})`;
+        ctx.fillStyle = `rgba(${pulseColor}, ${coreAlpha})`;
         ctx.arc(curX, curY, 2 + p.intensity * 1.5, 0, Math.PI * 2);
         ctx.fill();
 
         // Halo um den Pulse
         ctx.beginPath();
-        ctx.fillStyle = `rgba(${baseColor}, ${p.intensity * 0.15})`;
+        ctx.fillStyle = `rgba(${pulseColor}, ${p.intensity * 0.15})`;
         ctx.arc(curX, curY, 4 + p.intensity * 3, 0, Math.PI * 2);
         ctx.fill();
 
@@ -297,7 +330,7 @@ export default function NeuralBackground() {
             targetNeuron.intensity = nextIntensity;
             targetNeuron.chargeTimer = CONFIG.chargeFrames;
 
-            // Pulses zu allen Verbindungen des Ziel-Neurons starten
+            // Pulses zu allen Verbindungen des Ziel-Neurons starten (1:n)
             targetNeuron.connections.forEach((nextTargetIdx) => {
               // Nicht zurück zum Ursprung senden
               if (nextTargetIdx !== p.from && newPulses.length + pulses.length < CONFIG.maxPulses) {
@@ -330,48 +363,19 @@ export default function NeuralBackground() {
       // Neue Pulses hinzufügen
       pulses.push(...newPulses);
 
-      // === 4. NEURONEN ZEICHNEN ===
-      neurons.forEach((n) => {
-        const isActive = n.chargeTimer > 0 || n.intensity > 0.1;
-        
-        if (isActive) {
-          // Glow für aktive Neuronen
-          const gradient = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius * 4);
-          const glowAlpha = n.intensity * 0.4;
-          gradient.addColorStop(0, `rgba(${baseColor}, ${glowAlpha})`);
-          gradient.addColorStop(0.5, `rgba(${baseColor}, ${glowAlpha * 0.3})`);
-          gradient.addColorStop(1, "transparent");
-          
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(n.x, n.y, n.radius * 4, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Neuron Core
-        ctx.beginPath();
-        const alpha = isActive 
-          ? Math.min(n.intensity + 0.25, 0.7)
-          : 0.12;
-        ctx.fillStyle = `rgba(${baseColor}, ${alpha})`;
-        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
       animationFrameId = requestAnimationFrame(update);
     };
 
     init();
     update();
-    
     window.addEventListener("resize", init);
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("click", handleMouseClick);
+    window.addEventListener("mousedown", handleMouseClick);
 
     return () => {
       window.removeEventListener("resize", init);
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("click", handleMouseClick);
+      window.removeEventListener("mousedown", handleMouseClick);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -379,10 +383,11 @@ export default function NeuralBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10"
+      className="fixed inset-0 -z-10 transition-opacity duration-1000"
       style={{
         opacity: 1,
         willChange: "transform",
+        imageRendering: "crisp-edges",
         pointerEvents: "auto",
       }}
     />
