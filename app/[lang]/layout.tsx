@@ -4,6 +4,7 @@ import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import LiquidBackground from "@/components/effects/LiquidBackground";
 import NeuralBackground from "@/components/effects/NeuralBackground";
+import CinematicOverlay from "@/components/effects/CinematicOverlay";
 import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 
@@ -47,6 +48,9 @@ export default async function RootLayout({
         <div style={{ zIndex: -1 }} className="fixed inset-0">
           <NeuralBackground />
         </div>
+
+        {/* 2.5. Cinematic Overlay: Vignette, Blur, Grain & Chromatische Aberration */}
+        <CinematicOverlay />
 
         {/* 3. Die oberste Ebene: Dein Content */}
         <Header lang={lang} dictionary={dictionary} />
