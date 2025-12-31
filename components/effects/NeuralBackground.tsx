@@ -8,12 +8,12 @@ import { useEffect, useRef } from "react";
 const CONFIG = {
   // Gitter & Dichte
   neuronDensity: 0.00008,     
-  connectionDistance: 190,    // Etwas erhöht, da sie sich mehr bewegen
+  connectionDistance: 120,    // Etwas erhöht, da sie sich mehr bewegen
   
   // "Freies Schwimmen" (Viereck vergrößert)
   wanderRadius: 1,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
   wanderSpeed: 0.015,         // Langsamerer, eleganter Richtungswechsel
-  springStiffness: 0.002,     // Sehr weiche Feder (war 0.008) -> Lässt weite Wege zu
+  springStiffness: 0.04,     // Sehr weiche Feder (war 0.008) -> Lässt weite Wege zu
   
   // Sanfte Maus-Interaktion
   mouseInteractionRadius: 250, 
@@ -21,8 +21,8 @@ const CONFIG = {
   damping: 0.95,              // Sehr ölig/gleitend
   
   // Signale
-  signalSpeed: 3.0,           
-  signalLength: 50,           
+  signalSpeed: 4.0,           
+  signalLength: 70,           
   signalDecay: 0.65,          
   minSignalStrength: 0.15,    
   
