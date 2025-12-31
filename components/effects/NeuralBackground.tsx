@@ -1,167 +1,168 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import Particles from "react-tsparticles";
-import { loadSlim } from "tsparticles-slim";
-import type { Engine, ISourceOptions } from "tsparticles-engine";
+import { useEffect, useRef } from "react";
+
+// Konfiguration passend zu Ihrem globals.css
+const CONFIG = {
+  particleCount: 60, // Anzahl der Neuronen
+  connectionDistance: 150, // Max Distanz für Verbindungen
+  baseSpeed: 0.5, // Bewegungsgeschwindigkeit der Neuronen
+  signalSpeed: 4.0, // Wie schnell das Lichtsignal reist
+  signalFrequency: 0.02, // Wahrscheinlichkeit eines Signals pro Frame (Feuerrate)
+  colors: {
+    base: "rgba(1, 42, 46, 0.8)", // --dm-surface-teal (abgedunkelt)
+    line: "rgba(56, 62, 78, 0.3)", // --dm-border-slate (transparent)
+    signal: "#FF5C00", // --primary-orange
+    glow: "rgba(255, 92, 0, 0.4)", // Orange Glow
+  },
+};
+
+interface Point {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+}
+
+interface Signal {
+  start: Point;
+  end: Point;
+  progress: number; // 0.0 bis 1.0
+}
 
 export default function NeuralBackground() {
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadSlim(engine);
-  }, []);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Konfiguration für neuronale Aktivität
-  const particlesOptions: ISourceOptions = useMemo(
-    () => ({
-      background: {
-        color: {
-          value: "transparent",
-        },
-      },
-      fpsLimit: 60,
-      particles: {
-        number: {
-          value: 50, // Mehr Partikel für mehr Verbindungen
-          density: {
-            enable: true,
-            area: 800,
-          },
-        },
-        color: {
-          value: [
-            "hsl(184, 96%, 15%)", // Dunkles Teal für Basis-Neuronen
-            "hsl(225, 17%, 35%)", // Slate für Variation
-            "hsl(14, 100%, 50%)", // Primary Orange für Firing-Signale
-          ],
-        },
-        shape: {
-          type: "circle",
-        },
-        opacity: {
-          value: { min: 0.4, max: 0.9 }, // Variable Opazität
-          animation: {
-            enable: true,
-            speed: 1,
-            sync: false,
-            destroy: "none",
-            startValue: "random",
-          },
-        },
-        size: {
-          value: { min: 1, max: 3 }, // Variable Größe
-          animation: {
-            enable: true,
-            speed: 2,
-            sync: false,
-            destroy: "none",
-            startValue: "random",
-          },
-        },
-        move: {
-          enable: true,
-          speed: { min: 0.3, max: 1 }, // Variable Geschwindigkeit
-          direction: "none",
-          random: true,
-          straight: false,
-          outModes: {
-            default: "out",
-          },
-          attract: {
-            enable: true,
-            rotateX: 600,
-            rotateY: 1200,
-          },
-          // Partikel bewegen sich aufeinander zu, wenn sie verbunden sind
-          path: {
-            enable: false,
-          },
-        },
-        // Firing-Effekt: Neuronen leuchten orange auf
-        twinkle: {
-          particles: {
-            enable: true,
-            frequency: 0.2, // Häufigere Firing-Events
-            opacity: 1,
-            color: {
-              value: "hsl(14, 100%, 50%)", // Primary Orange
-            },
-          },
-        },
-      },
-      interactivity: {
-        detectsOn: "window",
-        events: {
-          onHover: {
-            enable: true,
-            mode: "attract", // Leichte Anziehung zur Maus
-          },
-          resize: true,
-        },
-        modes: {
-          attract: {
-            distance: 150,
-            duration: 0.4,
-            easing: "ease-out-quad",
-            factor: 1,
-            speed: 0.5,
-          },
-        },
-      },
-      // Verbindungslinien zwischen Neuronen mit dynamischen Signalen
-      links: {
-        color: {
-          value: [
-            "hsl(184, 96%, 12%)", // Sehr dunkles Teal für Basis-Links
-            "hsl(225, 17%, 25%)", // Dunkles Slate
-            "hsl(14, 100%, 50%)", // Primary Orange für Firing-Signale
-          ],
-        },
-        distance: 150, // Maximale Verbindungsdistanz
-        enable: true,
-        opacity: {
-          value: { min: 0.1, max: 0.4 }, // Dynamische Opazität für Signal-Effekt
-          animation: {
-            enable: true,
-            speed: 3, // Schnelle Animation für wandernde Signale
-            sync: false,
-            destroy: "none",
-            startValue: "random",
-          },
-        },
-        width: {
-          value: { min: 0.3, max: 1.2 }, // Variable Breite für Signal-Effekt
-          animation: {
-            enable: true,
-            speed: 4, // Schnelle Animation
-            sync: false,
-            destroy: "none",
-            startValue: "random",
-          },
-        },
-        triangles: {
-          enable: false,
-        },
-        consent: false,
-        warp: false,
-      },
-      detectRetina: true,
-    }),
-    []
-  );
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    // 1. Neuronen initialisieren
+    const particles: Point[] = [];
+    for (let i = 0; i < CONFIG.particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * CONFIG.baseSpeed,
+        vy: (Math.random() - 0.5) * CONFIG.baseSpeed,
+      });
+    }
+
+    // Array für aktive Lichtsignale
+    let signals: Signal[] = [];
+
+    // Resize Handler
+    const handleResize = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    // Animation Loop
+    let animationFrameId: number;
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      // A. Neuronen bewegen & zeichnen
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Bounce an den Rändern
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        // Neuron zeichnen (Punkt)
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = CONFIG.colors.base;
+        ctx.fill();
+      });
+
+      // B. Verbindungen & Signale verwalten
+      // Wir iterieren durch alle Paare
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < CONFIG.connectionDistance) {
+            // 1. Statische Verbindungslinie zeichnen
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            // Opazität basierend auf Distanz (näher = sichtbarer)
+            const opacity = 1 - dist / CONFIG.connectionDistance;
+            ctx.strokeStyle = `rgba(56, 62, 78, ${opacity * 0.4})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // 2. Zufälliges "Feuern" von Signalen (Neuronale Aktivität)
+            if (Math.random() < CONFIG.signalFrequency * 0.05) {
+                // Nur feuern, wenn noch nicht zu viele Signale unterwegs sind
+                // Zufällige Richtung: p1 -> p2 oder p2 -> p1
+                if (Math.random() > 0.5) {
+                    signals.push({ start: p1, end: p2, progress: 0 });
+                } else {
+                    signals.push({ start: p2, end: p1, progress: 0 });
+                }
+            }
+          }
+        }
+      }
+
+      // C. Signale aktualisieren und zeichnen
+      // Wir filtern Signale heraus, die angekommen sind (progress >= 1)
+      signals = signals.filter((sig) => {
+        sig.progress += CONFIG.signalSpeed / 100; // Geschwindigkeit anpassen
+
+        // Position des Signals interpolieren
+        const currentX = sig.start.x + (sig.end.x - sig.start.x) * sig.progress;
+        const currentY = sig.start.y + (sig.end.y - sig.start.y) * sig.progress;
+
+        // Signal zeichnen (Glowing Orb)
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = CONFIG.colors.signal;
+        // Glow Effekt
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = CONFIG.colors.glow;
+        ctx.fill();
+        
+        // Reset Shadow für Performance
+        ctx.shadowBlur = 0;
+
+        return sig.progress < 1;
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
 
   return (
     <div
-      className="fixed inset-0 -z-[1] pointer-events-none overflow-hidden"
+      className="fixed inset-0 -z-[1] pointer-events-none overflow-hidden bg-background transition-colors duration-500"
       aria-hidden="true"
     >
-      <Particles
-        id="neural-background"
-        init={particlesInit}
-        options={particlesOptions}
-        className="absolute inset-0 w-full h-full"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-60 dark:opacity-80" />
     </div>
   );
 }
-
-
