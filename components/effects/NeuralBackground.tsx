@@ -57,7 +57,7 @@ export default function NeuralBackground() {
       neurons.forEach((n, i) => {
         const neighbors = neurons
           .map((other, idx) => ({ idx, dist: Math.hypot(n.x - other.x, n.y - other.y) }))
-          .filter((item) => item.idx !== i && item.dist < 180)
+          .filter((item) => item.idx !== i && item.dist < 250) // Von 180 auf 250 erhöht für bessere Verbindungen
           .sort((a, b) => a.dist - b.dist)
           .slice(0, CONFIG.maxConnections);
         n.connections = neighbors.map((nh) => nh.idx);
@@ -126,12 +126,14 @@ export default function NeuralBackground() {
         return true;
       });
 
-      if (!hasActiveElements && isCycleActive) {
-        isCycleActive = false;
-        // Kleiner Timeout für visuelle Pause
-        setTimeout(triggerNewCycle, 1500);
-      } else if (!isCycleActive) {
-        triggerNewCycle(); // Notstart falls nichts passiert
+      if (!hasActiveElements) {
+        // Wenn nichts mehr leuchtet, erzwinge nach einer Sekunde einen Neustart
+        if (!isCycleActive) {
+          triggerNewCycle();
+        } else {
+          // Falls ein Zyklus als aktiv gilt, aber nichts passiert -> Reset
+          isCycleActive = false;
+        }
       }
 
       // Draw
@@ -209,7 +211,8 @@ export default function NeuralBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 w-full h-full pointer-events-none bg-[#000b0d]"
+      className="fixed inset-0 w-full h-full pointer-events-none"
+      style={{ backgroundColor: 'transparent' }}
     />
   );
 }

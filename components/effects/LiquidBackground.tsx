@@ -10,7 +10,7 @@ export default function LiquidBackground() {
   );
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none textured-surface">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none textured-surface">
       {/* Basis-Hintergrund */}
       <div className="absolute inset-0 bg-background transition-colors duration-500" />
 

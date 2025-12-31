@@ -38,11 +38,20 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
-        <NeuralBackground />
+        {/* 1. Die unterste Ebene: Der Liquid Noise/Vignette */}
+        <div style={{ zIndex: -2 }} className="fixed inset-0">
+          <LiquidBackground />
+        </div>
+
+        {/* 2. Die mittlere Ebene: Das Neuronale Netz */}
+        <div style={{ zIndex: -1 }} className="fixed inset-0">
+          <NeuralBackground />
+        </div>
+
+        {/* 3. Die oberste Ebene: Dein Content */}
         <Header lang={lang} dictionary={dictionary} />
-        <LiquidBackground />
         <SmoothScroll>
-          <main id="main-content" className="pt-32 scroll-3d-container min-h-screen"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
+          <main id="main-content" className="pt-32 scroll-3d-container min-h-screen relative z-10"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
             {children}
           </main>
         </SmoothScroll>
