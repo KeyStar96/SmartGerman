@@ -3,18 +3,19 @@
 import { useEffect, useRef } from "react";
 
 const CONFIG = {
-  neuronDensity: 0.00006, // Leicht erhöht für mehr Fülle
+  neuronDensity: 0.00006,
   baseSpeed: 0.15,
-  signalSpeed: 5,
-  maxConnections: 4,
-  signalDecay: 0.2,
-  minIntensity: 0.15,
-  chargeFrames: 25,
+  signalSpeed: 6,           // Etwas schneller für mehr Dynamik
+  maxConnections: 5,        // Mehr potenzielle Wege, aber...
+  signalDecay: 0.35,        // Drastischer Verlust: 35% pro Hop
+  spreadProbability: 0.5,   // Nur 50% Chance, dass ein zweiter Pfad entsteht
+  minIntensity: 0.1,        // Unter 10% stirbt das Signal
+  chargeFrames: 20,         // Schnellere Reaktionszeit der Neuronen
   colors: {
-    neuron: "rgba(255, 255, 255, 0.2)",
+    neuron: "rgba(255, 255, 255, 0.15)",
     line: "rgba(255, 255, 255, 0.03)",
-    pulse: "rgba(255, 255, 255, 0.9)",
-  },
+    pulse: "rgba(255, 255, 255, 1)"
+  }
 };
 
 export default function NeuralBackground() {
@@ -41,7 +42,7 @@ export default function NeuralBackground() {
       canvas.height = height * dpr;
       ctx.scale(dpr, dpr);
 
-      const fullHeight = document.documentElement.scrollHeight || height * 3;
+      const fullHeight = document.documentElement.scrollHeight || height;
       const count = Math.floor(width * fullHeight * CONFIG.neuronDensity);
 
       neurons = Array.from({ length: count }, () => ({
@@ -51,26 +52,26 @@ export default function NeuralBackground() {
         vy: (Math.random() - 0.5) * CONFIG.baseSpeed,
         intensity: 0,
         chargeTimer: 0,
-        connections: [],
+        connections: []
       }));
 
+      // Räumliche Suche für Verbindungen
       neurons.forEach((n, i) => {
         const neighbors = neurons
           .map((other, idx) => ({ idx, dist: Math.hypot(n.x - other.x, n.y - other.y) }))
-          .filter((item) => item.idx !== i && item.dist < 250) // Von 180 auf 250 erhöht für bessere Verbindungen
+          .filter(item => item.idx !== i && item.dist < 200)
           .sort((a, b) => a.dist - b.dist)
           .slice(0, CONFIG.maxConnections);
-        n.connections = neighbors.map((nh) => nh.idx);
+        n.connections = neighbors.map(nh => nh.idx);
       });
     };
 
     const triggerNewCycle = () => {
       if (isCycleActive) return;
-
       const scrollY = window.scrollY;
       const visibleIndices = neurons
         .map((_, i) => i)
-        .filter((i) => neurons[i].y > scrollY && neurons[i].y < scrollY + height);
+        .filter(i => neurons[i].y > scrollY + 100 && neurons[i].y < scrollY + height - 100);
 
       if (visibleIndices.length > 0) {
         const startIdx = visibleIndices[Math.floor(Math.random() * visibleIndices.length)];
@@ -84,34 +85,38 @@ export default function NeuralBackground() {
       const scrollY = window.scrollY;
       let hasActiveElements = false;
 
-      neurons.forEach((n) => {
+      neurons.forEach((n, i) => {
         n.x += n.vx;
         n.y += n.vy;
         if (n.x < 0 || n.x > width) n.vx *= -1;
-        const fullH = document.documentElement.scrollHeight;
-        if (n.y < 0 || n.y > fullH) n.vy *= -1;
+        if (n.y < 0 || n.y > document.documentElement.scrollHeight) n.vy *= -1;
 
         if (n.chargeTimer > 0) {
           n.chargeTimer--;
           hasActiveElements = true;
           if (n.chargeTimer === 0) {
-            n.connections.forEach((targetIdx: number) => {
-              const nextIntensity = n.intensity * (1 - CONFIG.signalDecay);
-              if (nextIntensity > CONFIG.minIntensity) {
-                pulses.push({
-                  from: neurons.indexOf(n),
-                  to: targetIdx,
-                  progress: 0,
-                  intensity: nextIntensity,
-                });
+            // Logik: Signal-Weitergabe begrenzen
+            // Wir mischen die Verbindungen zufällig
+            const shuffledTargets = [...n.connections].sort(() => Math.random() - 0.5);
+            
+            // Erstes Ziel bekommt das Signal immer (solange Intensität reicht)
+            if (shuffledTargets.length > 0) {
+              const nextInt = n.intensity * (1 - CONFIG.signalDecay);
+              if (nextInt > CONFIG.minIntensity) {
+                pulses.push({ from: i, to: shuffledTargets[0], progress: 0, intensity: nextInt });
+                
+                // Zweites Ziel nur mit spreadProbability (verhindert Explosion)
+                if (shuffledTargets.length > 1 && Math.random() < CONFIG.spreadProbability) {
+                  pulses.push({ from: i, to: shuffledTargets[1], progress: 0, intensity: nextInt * 0.8 });
+                }
               }
-            });
+            }
             n.intensity = 0;
           }
         }
       });
 
-      pulses = pulses.filter((p) => {
+      pulses = pulses.filter(p => {
         const from = neurons[p.from];
         const to = neurons[p.to];
         const dist = Math.hypot(from.x - to.x, from.y - to.y);
@@ -126,20 +131,21 @@ export default function NeuralBackground() {
         return true;
       });
 
-      if (!hasActiveElements) {
-        // Wenn nichts mehr leuchtet, erzwinge nach einer Sekunde einen Neustart
-        if (!isCycleActive) {
-          triggerNewCycle();
-        } else {
-          // Falls ein Zyklus als aktiv gilt, aber nichts passiert -> Reset
-          isCycleActive = false;
-        }
+      if (!hasActiveElements && isCycleActive) {
+        isCycleActive = false;
+        setTimeout(triggerNewCycle, 2000);
+      } else if (!isCycleActive && !hasActiveElements) {
+        triggerNewCycle();
       }
 
-      // Draw
+      draw(scrollY);
+      animationFrameId = requestAnimationFrame(update);
+    };
+
+    const draw = (scrollY: number) => {
       ctx.clearRect(0, 0, width, height);
 
-      // Linien
+      // 1. Linien (sehr schwach)
       ctx.beginPath();
       ctx.strokeStyle = CONFIG.colors.line;
       ctx.lineWidth = 0.5;
@@ -156,52 +162,53 @@ export default function NeuralBackground() {
       });
       ctx.stroke();
 
-      // Pulse
-      pulses.forEach((p) => {
+      // 2. Pulse mit visuellem Decay auf der Strecke
+      pulses.forEach(p => {
         const from = neurons[p.from];
         const to = neurons[p.to];
-        const startY = from.y - scrollY;
-        const endY = to.y - scrollY;
+        const sY = from.y - scrollY;
+        const eY = to.y - scrollY;
         const curX = from.x + (to.x - from.x) * p.progress;
-        const curY = startY + (endY - startY) * p.progress;
+        const curY = sY + (eY - sY) * p.progress;
+
+        // Signal wird schwächer je weiter es reist
+        const currentAlpha = p.intensity * (1 - p.progress * 0.5);
 
         ctx.beginPath();
-        ctx.strokeStyle = `rgba(255, 255, 255, ${p.intensity * 0.5})`;
-        ctx.lineWidth = 2;
-        ctx.moveTo(from.x, startY);
+        ctx.strokeStyle = `rgba(255, 255, 255, ${currentAlpha * 0.6})`;
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(from.x, sY);
         ctx.lineTo(curX, curY);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.fillStyle = "#ffffff";
-        ctx.arc(curX, curY, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${currentAlpha})`;
+        ctx.arc(curX, curY, 1.2, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Neuronen Köpfe
-      neurons.forEach((n) => {
+      // 3. Neuronen
+      neurons.forEach(n => {
         const dy = n.y - scrollY;
         if (dy < -50 || dy > height + 50) return;
+        
         if (n.chargeTimer > 0) {
           ctx.beginPath();
-          ctx.arc(n.x, dy, 2, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(255, 255, 255, ${n.intensity})`;
+          ctx.arc(n.x, dy, 2, 0, Math.PI * 2);
           ctx.fill();
         } else {
           ctx.beginPath();
-          ctx.arc(n.x, dy, 1, 0, Math.PI * 2);
           ctx.fillStyle = CONFIG.colors.neuron;
+          ctx.arc(n.x, dy, 1, 0, Math.PI * 2);
           ctx.fill();
         }
       });
-
-      animationFrameId = requestAnimationFrame(update);
     };
 
     init();
     update();
     window.addEventListener("resize", init);
-
     return () => {
       window.removeEventListener("resize", init);
       cancelAnimationFrame(animationFrameId);
@@ -211,8 +218,7 @@ export default function NeuralBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none"
-      style={{ backgroundColor: 'transparent' }}
+      className="fixed inset-0 -z-10 w-full h-full pointer-events-none"
     />
   );
 }
