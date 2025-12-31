@@ -262,4 +262,20 @@ body {
         background-position: -50% 0;
       }
     }
+    
+    /* Cinematic Overlay: Grain-Shift Animation (GPU-beschleunigt) */
+    @keyframes grain-shift {
+      0%, 100% { 
+        transform: translate(0, 0) translateZ(0); 
+      }
+      25% { 
+        transform: translate(-2px, 2px) translateZ(0); 
+      }
+      50% { 
+        transform: translate(2px, -2px) translateZ(0); 
+      }
+      75% { 
+        transform: translate(-1px, -1px) translateZ(0); 
+      }
+    }
   }
