@@ -6,12 +6,13 @@ import { useEffect, useRef } from "react";
 const CONFIG = {
   particleCount: 65, // Anzahl der Neuronen (leicht erhöht)
   baseSpeed: 0.3, // Bewegungsgeschwindigkeit der Neuronen
-  signalSpeedCmPerSec: 5, // Signalgeschwindigkeit in cm/s
+  signalSpeedCmPerSec: 8, // Signalgeschwindigkeit in cm/s
   pixelsPerCm: 37.8, // Pixel pro cm (bei 96 DPI)
   fps: 60, // Frames pro Sekunde
   initialDelay: 300, // 5 Sekunden Startverzögerung (300 Frames bei 60fps)
   pauseBetweenSignals: 300, // 5 Sekunden Pause zwischen Signalen
   chargeDuration: 60, // Frames für 1 Sekunde Aufladung (bei 60fps)
+  originChargeDuration: 90, // Frames für 1.5 Sekunden Aufladung für Ursprungsneuron
   maxConnectionsPerNeuron: 5, // Maximale Anzahl der Verbindungen pro Neuron
   viewportPadding: 0.2, // 20% Padding außerhalb des sichtbaren Bereichs
   signalDecayRate: 0.15, // Leuchtkraft-Verlust pro Verbindung (15% pro Hop)
@@ -120,6 +121,9 @@ export default function NeuralBackground() {
     // Set der Neuronen, die bereits Signale empfangen haben (um Rückwärts-Signale zu vermeiden)
     const neuronsThatReceivedSignal = new Set<number>();
     
+    // Index des ursprünglichen Neurons (für verstärktes Aufleuchten)
+    let originNeuronIndex: number | null = null;
+    
     // Frame-Counter
     let frameCount = 0;
 
@@ -165,10 +169,11 @@ export default function NeuralBackground() {
             const randomVisible = visibleNeurons[Math.floor(Math.random() * visibleNeurons.length)];
             const firingNeuron = randomVisible.neuron;
             const firingIndex = randomVisible.index;
-            firingNeuron.chargeTimer = CONFIG.chargeDuration;
+            firingNeuron.chargeTimer = CONFIG.originChargeDuration; // Längere Aufladung für Ursprungsneuron
             firingNeuron.intensity = 1.0;
             neuronsThatReceivedSignal.clear();
             neuronsThatReceivedSignal.add(firingIndex);
+            originNeuronIndex = firingIndex; // Merke ursprüngliches Neuron
             signalState = 'charging';
           }
         }
@@ -185,10 +190,15 @@ export default function NeuralBackground() {
           }
         }
       } else if (signalState === 'signaling') {
-        // Prüfe ob alle Signale abgeklungen sind
-        const allSignalsDone = signals.length === 0 && 
-          particles.every(p => p.chargeTimer === 0 && p.intensity === 0);
+        // Prüfe ob ALLES abgeklungen ist: keine Signale, keine aufladenden Neuronen, keine Intensitäten
+        // WICHTIG: Warte bis wirklich ALLES fertig ist, bevor ein neues Signal gestartet wird
+        const noActiveSignals = signals.length === 0;
+        const noChargingNeurons = particles.every(p => p.chargeTimer === 0);
+        const noIntensities = particles.every(p => p.intensity === 0);
+        
+        const allSignalsDone = noActiveSignals && noChargingNeurons && noIntensities;
         if (allSignalsDone) {
+          originNeuronIndex = null; // Reset für nächstes Signal
           signalState = 'waiting';
           stateTimer = CONFIG.pauseBetweenSignals;
         }
@@ -204,10 +214,11 @@ export default function NeuralBackground() {
             const randomVisible = visibleNeurons[Math.floor(Math.random() * visibleNeurons.length)];
             const firingNeuron = randomVisible.neuron;
             const firingIndex = randomVisible.index;
-            firingNeuron.chargeTimer = CONFIG.chargeDuration;
+            firingNeuron.chargeTimer = CONFIG.originChargeDuration; // Längere Aufladung für Ursprungsneuron
             firingNeuron.intensity = 1.0;
             neuronsThatReceivedSignal.clear();
             neuronsThatReceivedSignal.add(firingIndex);
+            originNeuronIndex = firingIndex; // Merke ursprüngliches Neuron
             signalState = 'charging';
           }
         }
@@ -243,10 +254,11 @@ export default function NeuralBackground() {
               const dy = target.y - p.y;
               const dist = Math.sqrt(dx * dx + dy * dy);
               
-              // Eindeutiger Key für diese Verbindung (immer kleinerer Index zuerst)
-              const connectionKey = index < connectedIndex 
-                ? `${index}-${connectedIndex}` 
-                : `${connectedIndex}-${index}`;
+            // Eindeutiger Key für diese Verbindung (immer kleinerer Index zuerst)
+            // WICHTIG: Muss konsistent sein mit der Zeichnung der Verbindungen
+            const connectionKey = index < connectedIndex 
+              ? `${index}-${connectedIndex}` 
+              : `${connectedIndex}-${index}`;
               
               // Berechne Signalgeschwindigkeit: 5 cm/s = 189 Pixel/s bei 60fps = 3.15 Pixel/Frame
               // Progress pro Frame = (Signalgeschwindigkeit in Pixel/Frame) / Gesamtdistanz
@@ -285,8 +297,11 @@ export default function NeuralBackground() {
           if (connectedIndex > i) {
             const p2 = particles[connectedIndex];
             
-            // Eindeutiger Key für diese Verbindung
-            const connectionKey = `${i}-${connectedIndex}`;
+            // Eindeutiger Key für diese Verbindung (MUSS konsistent sein mit Signal-Erstellung)
+            // WICHTIG: Verwende immer die gleiche Reihenfolge (kleinerer Index zuerst)
+            const connectionKey = i < connectedIndex 
+              ? `${i}-${connectedIndex}` 
+              : `${connectedIndex}-${i}`;
             
             // Finde aktives Signal auf dieser Verbindung
             const activeSignal = signals.find(sig => sig.connectionKey === connectionKey);
@@ -310,14 +325,26 @@ export default function NeuralBackground() {
               const signalX = activeSignal.startX + (activeSignal.endX - activeSignal.startX) * activeSignal.progress;
               const signalY = activeSignal.startY + (activeSignal.endY - activeSignal.startY) * activeSignal.progress;
               
+              // Bestimme Start- und Endpunkt der Verbindung (konsistent mit connectionKey)
+              // connectionKey ist immer "kleinererIndex-größererIndex"
+              const startNeuron = i < connectedIndex ? p1 : p2;
+              const endNeuron = i < connectedIndex ? p2 : p1;
+              
+              // Prüfe ob Signal von startNeuron zu endNeuron geht
+              const signalGoesFromStart = activeSignal.sourceIndex === (i < connectedIndex ? i : connectedIndex);
+              
               // Linie leuchtet nur HINTER dem Signal (von Start bis Signal-Position)
               const glowOpacity = currentIntensity * 0.4;
               const baseOpacity = 0.15;
               const finalOpacity = baseOpacity + glowOpacity * (1 - baseOpacity);
               
               // Zeichne leuchtende Linie nur bis zur Signal-Position
+              // WICHTIG: Startpunkt muss der Quell-Neuron sein
+              const lineStartX = signalGoesFromStart ? startNeuron.x : endNeuron.x;
+              const lineStartY = signalGoesFromStart ? startNeuron.y : endNeuron.y;
+              
               ctx.beginPath();
-              ctx.moveTo(p1.x, p1.y);
+              ctx.moveTo(lineStartX, lineStartY);
               ctx.lineTo(signalX, signalY);
               ctx.strokeStyle = `rgba(255, 255, 255, ${finalOpacity})`;
               ctx.lineWidth = 0.5 + currentIntensity * 1.5;
@@ -340,16 +367,21 @@ export default function NeuralBackground() {
         }
 
         const isCharging = p.chargeTimer > 0;
-        const chargeProgress = isCharging ? 1 - (p.chargeTimer / CONFIG.chargeDuration) : 0;
+        const isOriginNeuron = originNeuronIndex !== null && particles.indexOf(p) === originNeuronIndex;
+        const chargeDuration = isOriginNeuron ? CONFIG.originChargeDuration : CONFIG.chargeDuration;
+        const chargeProgress = isCharging ? 1 - (p.chargeTimer / chargeDuration) : 0;
         
         // Alle Neuronen sind initial weiß
         const finalR = 255;
         const finalG = 255;
         const finalB = 255;
-        // Dezente Opazität: beim Aufladen etwas heller, sonst sehr dezent
-        const finalOpacity = isCharging 
-          ? p.intensity * chargeProgress * 0.5 // Maximal 0.5 beim Aufladen (dezenter)
-          : 0.3; // Sehr dezente Basis-Opazität (reduziert von 0.6)
+        // Ursprungsneuron: Deutlicher und länger aufleuchten
+        const baseOpacity = isOriginNeuron && isCharging 
+          ? p.intensity * chargeProgress * 0.8 // Maximal 0.8 für Ursprungsneuron (deutlicher)
+          : isCharging 
+            ? p.intensity * chargeProgress * 0.5 // Maximal 0.5 beim Aufladen (dezenter)
+            : 0.3; // Sehr dezente Basis-Opazität
+        const finalOpacity = baseOpacity;
 
         // Basis-Neuron (perfekter Kreis)
         ctx.save();
@@ -359,11 +391,15 @@ export default function NeuralBackground() {
         ctx.fill();
         ctx.restore();
 
-        // Weicher Glow-Effekt wenn aufladend (weiß, mit weichem Übergang) - dezenter
+        // Weicher Glow-Effekt wenn aufladend (weiß, mit weichem Übergang)
         if (isCharging) {
-          // Mehrere konzentrische Kreise für weichen Übergang
-          const glowRadius = 2 + chargeProgress * 5; // Radius wächst von 2 bis 7 (etwas kleiner)
-          const glowOpacity = p.intensity * chargeProgress * 0.25; // Dezenter (reduziert von 0.4)
+          // Ursprungsneuron: Größerer und hellerer Glow
+          const glowRadius = isOriginNeuron 
+            ? 2 + chargeProgress * 8 // Radius wächst von 2 bis 10 für Ursprungsneuron
+            : 2 + chargeProgress * 5; // Radius wächst von 2 bis 7 für normale Neuronen
+          const glowOpacity = isOriginNeuron
+            ? p.intensity * chargeProgress * 0.4 // Heller für Ursprungsneuron
+            : p.intensity * chargeProgress * 0.25; // Dezenter für normale Neuronen
           
           // Äußerer Glow (größer, transparenter)
           const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
