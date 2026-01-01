@@ -214,6 +214,9 @@ body {
       transition: background-color 0.5s ease;
     }
     
+    /* Optionaler Hard-Fix für Safari: Deaktiviere Filter-Effekte während des Scrollens */
+    /* .is-scrolling .cinematic-overlay-container { pointer-events: none; } */
+    
     /* 3D Perspective Container für Fluid Reveal Scroll-Animationen */
     .scroll-3d-container {
       perspective: 2000px;
@@ -223,6 +226,7 @@ body {
     /* Verbessert das Subpixel-Rendering */
     #main-content {
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
     }
     

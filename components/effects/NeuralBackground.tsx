@@ -9,24 +9,24 @@ import { gsap } from "@/lib/gsap";
 const CONFIG = {
   // Gitter & Dichte
   neuronDensity: 0.0008,     
-  connectionDistance: 120,    // Etwas erhöht, da sie sich mehr bewegen
-  viewportPadding: 200,       // Padding außerhalb des Viewports für Neuronen
-  gridCellSize: 150,          // Größe der Grid-Zellen für gleichmäßige Verteilung
+  connectionDistance: 120,    
+  viewportPadding: 200,       
+  gridCellSize: 150,          
   
-  // "Freies Schwimmen" (Viereck vergrößert)
-  wanderRadius: 1,          // DEUTLICH erhöht (war 0.5) -> Mehr Freiheit
-  wanderSpeed: 0.015,         // Langsamerer, eleganter Richtungswechsel
-  springStiffness: 0.04,     // Sehr weiche Feder (war 0.008) -> Lässt weite Wege zu
+  // "Freies Schwimmen"
+  wanderRadius: 1,          
+  wanderSpeed: 0.015,         
+  springStiffness: 0.04,     
   
   // Sanfte Maus-Interaktion
   mouseInteractionRadius: 250, 
-  mouseForce: 0.003,          // GANZ sanft (war 0.02) -> Nur eine Ahnung von Bewegung
-  damping: 0.95,              // Sehr ölig/gleitend
+  mouseForce: 0.003,          
+  damping: 0.95,              
   
   // Signale
   signalSpeed: 4.0,           
-  signalLength: 120,          // Längerer Lichtschweif
-  signalDecay: 0.6,           // Schnelleres Abklingen
+  signalLength: 120,          
+  signalDecay: 0.6,           
   minSignalStrength: 0.15,    
   
   // Optik Basis
@@ -34,33 +34,33 @@ const CONFIG = {
   flashDecay: 0.04,
   
   // 3D Z-Dimension
-  zDepthRange: 400,           // Z-Tiefe Bereich (-zDepthRange/2 bis +zDepthRange/2)
-  zBaseOffset: 0,             // Basis-Z-Position (0 = Mitte)
-  zSizeScale: 0.8,            // Größenänderung pro Z-Einheit (größer = mehr Unterschied)
-  zBlurLayers: 3,             // Anzahl überlagerter Kreise für Blur-Effekt
+  zDepthRange: 400,           
+  zBaseOffset: 0,             
+  zSizeScale: 0.8,            
+  zBlurLayers: 3,             
   
   // Auto-Impulse
-  autoPulseEnabled: true,     // Automatische Impulse aktivieren
-  autoPulseMinDelay: 2000,    // Mindestverzögerung zwischen Impulsen (ms)
-  autoPulseMaxDelay: 4000,    // Maximale Verzögerung zwischen Impulsen (ms)
+  autoPulseEnabled: true,     
+  autoPulseMinDelay: 2000,    
+  autoPulseMaxDelay: 4000,    
   
-  // Ruhe-Puls-Animation (subtile neuronale Aktivität)
-  idlePulseEnabled: true,     // Ruhe-Puls-Animation aktivieren
-  idlePulseIntensity: 0.6,    // Sehr dezent (60% der Intensität eines Klicks)
-  idlePulseSpeed: 0.05,        // Langsame Puls-Geschwindigkeit
+  // Ruhe-Puls-Animation
+  idlePulseEnabled: true,     
+  idlePulseIntensity: 0.6,    
+  idlePulseSpeed: 0.05,        
 };
 
 // Farb-Konfigurationen für Light/Dark
 const THEME_COLORS = {
   dark: {
-    neuron: "255, 255, 255", // Weiß
-    signal: "255, 92, 0",    // Leuchtendes Orange
-    lineOpacity: 0.06,       // Reduziert von 0.12 für subtileres Netzwerk
+    neuron: "255, 255, 255", 
+    signal: "255, 92, 0",    
+    lineOpacity: 0.06,       
   },
   light: {
-    neuron: "10, 10, 10",    // Fast Schwarz (Tinte)
-    signal: "235, 80, 0",    // Etwas dunkleres Orange für Kontrast auf Weiß
-    lineOpacity: 0.04,         // Reduziert von 0.08 für subtileres Netzwerk
+    neuron: "10, 10, 10",    
+    signal: "235, 80, 0",    
+    lineOpacity: 0.04,         
   }
 };
 
@@ -77,7 +77,7 @@ interface Neuron {
   wanderAngle: number;
   flash: number;
   connections: number[];
-  idlePulsePhase: number; // Phase für subtile Ruhe-Puls-Animation (0-2π)
+  idlePulsePhase: number; 
 }
 
 interface Pulse {
@@ -93,16 +93,13 @@ export default function NeuralBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Refs für State, der nicht neu rendern soll
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const neuronsRef = useRef<Neuron[]>([]);
   const pulsesRef = useRef<Pulse[]>([]);
   const pulseIdCounter = useRef(0);
   
-  // Ref für das aktuelle Farb-Theme (Mutable, damit Animation Loop zugreifen kann)
   const themeRef = useRef(THEME_COLORS.dark);
 
-  // Fade-in nach Hero-Animation
   useEffect(() => {
     const handleHeroComplete = () => {
       if (containerRef.current) {
@@ -123,15 +120,15 @@ export default function NeuralBackground() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return () => {}; // Cleanup-Funktion auch bei early return
+    if (!canvas) return () => {}; 
 
-    // Performance: desynchronized reduziert Latenz zwischen Rendering und Anzeige
+    // Performance: desynchronized reduziert Latenz
     const ctx = canvas.getContext("2d", { 
       alpha: true,
-      desynchronized: true, // Reduziert Latenz, verbessert Frame-Timing
-      willReadFrequently: false // Optimiert für Write-Only Canvas
+      desynchronized: true, 
+      willReadFrequently: false 
     });
-    if (!ctx) return () => {}; // Cleanup-Funktion auch bei early return
+    if (!ctx) return () => {}; 
 
     let animationFrameId: number;
     let width = 0;
@@ -139,13 +136,10 @@ export default function NeuralBackground() {
     let lastResizeWidth = 0;
     let lastResizeHeight = 0;
     let resizeTimeout: NodeJS.Timeout | null = null;
-    let idlePulseTime = 0; // Zeit-Variable für Ruhe-Puls-Animation
-
-    // Performance: Quality-Level fest (kein adaptives Tracking - verursacht Overhead)
-    let qualityLevel = 1.0; // Fester Wert für bessere Performance
+    let idlePulseTime = 0; 
     
-    // Auto-Pulse State (muss außerhalb initNetwork sein)
-    let estimatedPulseLifetime = 0; // Geschätzte Lebensdauer eines Pulses (in ms)
+    // Auto-Pulse State
+    let estimatedPulseLifetime = 0; 
 
     // --- 0. Theme Detection ---
     const updateTheme = () => {
@@ -153,36 +147,38 @@ export default function NeuralBackground() {
       themeRef.current = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
     };
 
-    // Observer, der auf Klassenänderungen am HTML-Tag achtet (Light/Dark Switch)
     const observer = new MutationObserver(updateTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    updateTheme(); // Initial call
+    updateTheme(); 
 
     // --- 1. Init Network ---
     const initNetwork = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       
-      const dpr = window.devicePixelRatio || 1;
+      // --------------------------------------------------------
+      // PERFORMANCE OPTIMIZATION: DPR Capping
+      // Begrenzt die Render-Auflösung auf max 1.5x. 
+      // Auf Retina-Screens (3x) spart das ca. 75% Pixelberechnung.
+      // --------------------------------------------------------
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       ctx.scale(dpr, dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
 
-      // Erweiterte Bereiche für Neuronen-Platzierung (inkl. Padding außerhalb des Viewports)
       const extendedWidth = width + (CONFIG.viewportPadding * 2);
       const extendedHeight = height + (CONFIG.viewportPadding * 2);
-      const area = width * height; // Berechne Dichte basierend auf sichtbarem Bereich
+      const area = width * height; 
       const baseNumNeurons = Math.floor(area * CONFIG.neuronDensity);
       
       const newNeurons: Neuron[] = [];
 
-      // Grid-basierte Verteilung für gleichmäßige Abdeckung
       const gridCols = Math.ceil(extendedWidth / CONFIG.gridCellSize);
       const gridRows = Math.ceil(extendedHeight / CONFIG.gridCellSize);
       
-      // Platziere mindestens ein Neuron pro Grid-Zelle
       for (let row = 0; row < gridRows; row++) {
         for (let col = 0; col < gridCols; col++) {
           const cellX = (col * CONFIG.gridCellSize) - CONFIG.viewportPadding + (Math.random() * CONFIG.gridCellSize);
@@ -201,12 +197,11 @@ export default function NeuralBackground() {
             wanderAngle: Math.random() * Math.PI * 2,
             flash: 0,
             connections: [],
-            idlePulsePhase: Math.random() * Math.PI * 2, // Zufällige Phase für Variation
+            idlePulsePhase: Math.random() * Math.PI * 2, 
           });
         }
       }
       
-      // Füge zusätzliche Neuronen hinzu, um die gewünschte Dichte zu erreichen
       const additionalNeurons = baseNumNeurons - newNeurons.length;
       for (let i = 0; i < additionalNeurons; i++) {
         const x = (Math.random() * extendedWidth) - CONFIG.viewportPadding;
@@ -223,16 +218,14 @@ export default function NeuralBackground() {
           wanderAngle: Math.random() * Math.PI * 2,
           flash: 0,
           connections: [],
-          idlePulsePhase: Math.random() * Math.PI * 2, // Zufällige Phase für Variation
+          idlePulsePhase: Math.random() * Math.PI * 2, 
         });
       }
 
-      // Jedes Neuron bekommt genau 3 Verbindungen zu den 3 nächsten Nachbarn
       const numNeurons = newNeurons.length;
       for (let i = 0; i < numNeurons; i++) {
         const distances: Array<{ index: number; dist: number }> = [];
         
-        // Berechne Distanzen zu allen anderen Neuronen
         for (let j = 0; j < numNeurons; j++) {
           if (i === j) continue;
           const dx = newNeurons[i].x - newNeurons[j].x;
@@ -241,18 +234,14 @@ export default function NeuralBackground() {
           distances.push({ index: j, dist });
         }
         
-        // Sortiere nach Distanz
         distances.sort((a, b) => a.dist - b.dist);
         
-        // Finde die 3 nächsten verfügbaren Nachbarn (die noch nicht voll sind)
         let connectionsAdded = 0;
         for (const neighbor of distances) {
           if (connectionsAdded >= 3) break;
           
-          // Prüfe ob bereits verbunden
           if (newNeurons[i].connections.includes(neighbor.index)) continue;
           
-          // Erstelle bidirektionale Verbindung
           newNeurons[i].connections.push(neighbor.index);
           if (!newNeurons[neighbor.index].connections.includes(i)) {
             newNeurons[neighbor.index].connections.push(i);
@@ -263,8 +252,6 @@ export default function NeuralBackground() {
 
       neuronsRef.current = newNeurons;
       pulsesRef.current = [];
-      
-      // Setze geschätzte Lebensdauer zurück, damit sie neu berechnet wird
       estimatedPulseLifetime = 0;
     };
 
@@ -284,13 +271,11 @@ export default function NeuralBackground() {
       const neurons = neuronsRef.current;
       const mouse = mouseRef.current;
 
-      // Performance: Cache Maus-Distanz-Berechnung für alle Neuronen
       const mouseSquared = mouse.active ? CONFIG.mouseInteractionRadius * CONFIG.mouseInteractionRadius : 0;
 
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
 
-        // A. Weiträumiges Wandern (Größeres Viereck)
         n.wanderAngle += (Math.random() - 0.5) * CONFIG.wanderSpeed;
         const wanderX = Math.cos(n.wanderAngle) * CONFIG.wanderRadius;
         const wanderY = Math.sin(n.wanderAngle) * CONFIG.wanderRadius;
@@ -298,7 +283,6 @@ export default function NeuralBackground() {
         n.vx += wanderX;
         n.vy += wanderY;
 
-        // B. Sehr weiche Rückfederung
         const dxBase = n.baseX - n.x;
         const dyBase = n.baseY - n.y;
         const dzBase = n.baseZ - n.z;
@@ -306,13 +290,11 @@ export default function NeuralBackground() {
         n.vy += dyBase * CONFIG.springStiffness;
         n.vz += dzBase * CONFIG.springStiffness;
 
-        // C. Subtile Maus-Interaktion (Performance: Verwende squared distance)
         if (mouse.active && mouseSquared > 0) {
           const dxMouse = mouse.x - n.x;
           const dyMouse = mouse.y - n.y;
           const distMouseSquared = dxMouse * dxMouse + dyMouse * dyMouse;
 
-          // Performance: Vermeide sqrt wenn außerhalb des Radius
           if (distMouseSquared < mouseSquared) {
             const distMouse = Math.sqrt(distMouseSquared);
             const force = (1 - distMouse / CONFIG.mouseInteractionRadius) * CONFIG.mouseForce;
@@ -336,7 +318,6 @@ export default function NeuralBackground() {
     };
 
     // --- 3. Rendering ---
-    // Hilfsfunktion: Normalisiere Z-Position zu einem 0-1 Wert (0 = ganz hinten, 1 = ganz vorne)
     const normalizeZ = (z: number): number => {
       const normalized = (z - CONFIG.zBaseOffset + CONFIG.zDepthRange / 2) / CONFIG.zDepthRange;
       return Math.max(0, Math.min(1, normalized));
@@ -347,10 +328,9 @@ export default function NeuralBackground() {
       
       const neurons = neuronsRef.current;
       const pulses = pulsesRef.current;
-      const theme = themeRef.current; // Aktuelles Farbschema nutzen
+      const theme = themeRef.current; 
 
-      // Viewport Culling: Nur Neuronen im sichtbaren Bereich + Padding rendern
-      const viewportPadding = 100; // Fester Padding-Wert
+      const viewportPadding = 100; 
       const visibleBounds = {
         left: -viewportPadding,
         right: width + viewportPadding,
@@ -358,7 +338,6 @@ export default function NeuralBackground() {
         bottom: height + viewportPadding,
       };
 
-      // Filtere sichtbare Neuronen (nur für Rendering, Physik läuft weiter)
       const visibleNeurons = neurons.filter(n => 
         n.x >= visibleBounds.left && 
         n.x <= visibleBounds.right && 
@@ -366,11 +345,9 @@ export default function NeuralBackground() {
         n.y <= visibleBounds.bottom
       );
 
-      // Erstelle eine sortierte Kopie der sichtbaren Neuronen (hinten zuerst für korrektes Z-Buffering)
-      // Sortiere nur wenn nötig (weniger Neuronen = schneller)
       const sortedNeurons = visibleNeurons.sort((a, b) => a.z - b.z);
 
-      // 1. Update Pulse Progress (muss vor dem Rendering passieren)
+      // 1. Update Pulse Progress 
       for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i];
         const nA = neurons[p.fromIndex];
@@ -380,14 +357,12 @@ export default function NeuralBackground() {
         const dy = nB.y - nA.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        // Speichere die ursprüngliche Distanz beim ersten Mal (für konsistente Progress-Berechnung)
         if (p.totalDist === 0) {
           p.totalDist = dist;
         }
         
         p.progress += CONFIG.signalSpeed;
 
-        // Verwende die ursprüngliche Distanz für die Completion-Prüfung
         if (p.progress >= p.totalDist) {
           pulses.splice(i, 1);
           nB.flash = 1.0 * p.strength;
@@ -395,7 +370,6 @@ export default function NeuralBackground() {
           if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
             const newStrength = p.strength * CONFIG.signalDecay;
             nB.connections.forEach(neighborIdx => {
-              // Verhindere Rücksignal zum ursprünglichen Sender
               if (neighborIdx !== p.fromIndex) {
                 spawnPulse(p.toIndex, neighborIdx, newStrength);
               }
@@ -404,10 +378,9 @@ export default function NeuralBackground() {
         }
       }
 
-      // 2. Verbindungen mit leuchtenden Segmenten basierend auf Pulsen
+      // 2. Verbindungen 
       ctx.globalCompositeOperation = "lighter";
       
-      // Gruppiere Pulse nach Verbindungen
       const connectionPulses = new Map<string, Pulse[]>();
       for (const p of pulses) {
         const connectionKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
@@ -417,10 +390,7 @@ export default function NeuralBackground() {
         connectionPulses.get(connectionKey)!.push(p);
       }
 
-      // Zeichne Verbindungen mit leuchtenden Segmenten
-      // Performance: Vereinfachtes Rendering ohne komplexes Batching (weniger Overhead)
       const connectionsDrawn = new Set<string>();
-      // Erstelle Set mit Indizes der sichtbaren Neuronen
       const visibleNeuronIndices = new Set<number>();
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
@@ -433,13 +403,11 @@ export default function NeuralBackground() {
       }
 
       for (let i = 0; i < neurons.length; i++) {
-        // Überspringe wenn Neuron außerhalb des Viewports ist
         if (!visibleNeuronIndices.has(i)) continue;
         
         const n = neurons[i];
         for (const targetIdx of n.connections) {
           if (targetIdx > i) {
-            // Überspringe wenn Ziel-Neuron außerhalb des Viewports ist
             if (!visibleNeuronIndices.has(targetIdx)) continue;
             
             const target = neurons[targetIdx];
@@ -447,16 +415,13 @@ export default function NeuralBackground() {
             if (connectionsDrawn.has(connectionKey)) continue;
             connectionsDrawn.add(connectionKey);
             
-            // Durchschnittliche Z-Position für diese Verbindung
             const avgZ = (n.z + target.z) / 2;
             const zNormalized = normalizeZ(avgZ);
             
-            // Basis-Linienopacity (nicht leuchtend)
             const baseLineOpacity = theme.lineOpacity * (0.5 + zNormalized * 0.5);
             const baseLineWidth = 0.5 + zNormalized * 0.5;
             const lineWidth = baseLineWidth * 1.4;
             
-            // Zeichne Basis-Verbindung (nicht leuchtend)
             ctx.globalCompositeOperation = "source-over";
             ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
             ctx.lineWidth = lineWidth;
@@ -465,7 +430,6 @@ export default function NeuralBackground() {
             ctx.lineTo(target.x, target.y);
             ctx.stroke();
             
-            // Zeichne leuchtende Segmente basierend auf Pulsen
             const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
             if (pulsesOnConnection.length > 0) {
               ctx.globalCompositeOperation = "lighter";
@@ -474,21 +438,17 @@ export default function NeuralBackground() {
               const dy = target.y - n.y;
               const totalDist = Math.sqrt(dx * dx + dy * dy);
               
-              // Erstelle ein Array von Segmenten mit kumulativer Intensität
               const segmentIntensities = new Map<number, number>();
           
               for (const p of pulsesOnConnection) {
-                // Prüfe die Richtung des Pulses
                 const isForward = p.fromIndex === i && p.toIndex === targetIdx;
                 const isReverse = p.fromIndex === targetIdx && p.toIndex === i;
             
                 if (!isForward && !isReverse) continue;
                 
-                // Normalisiere Progress basierend auf ursprünglicher Distanz
                 const t = Math.min(p.progress / (p.totalDist || totalDist), 1.0);
                 const intensity = p.strength * 0.7;
                 
-                // Performance: Reduzierte Segmente für bessere Performance
                 const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
                 
                 if (isForward) {
@@ -506,7 +466,6 @@ export default function NeuralBackground() {
                 }
               }
               
-              // Zeichne die leuchtenden Segmente (vereinfacht, weniger Overhead)
               if (segmentIntensities.size > 0) {
                 const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
                 let lastX = n.x;
@@ -541,51 +500,40 @@ export default function NeuralBackground() {
         }
       }
 
-      // 3. Neuronen (sortiert nach Z: hinten zuerst, damit vordere über hinten gezeichnet werden)
+      // 3. Neuronen 
       const isDark = theme === THEME_COLORS.dark;
       ctx.globalCompositeOperation = isDark ? "lighter" : "source-over";
 
-      // Rendere Neuronen von hinten nach vorne (depth sorting)
       for (let i = 0; i < sortedNeurons.length; i++) {
         const n = sortedNeurons[i];
         const zNormalized = normalizeZ(n.z);
         
-        // Größe basierend auf Z-Position: weiter vorne = größer
-        // zNormalized: 0 (hinten) bis 1 (vorne)
         const sizeMultiplier = 1 + (zNormalized - 0.5) * CONFIG.zSizeScale;
         const particleSize = CONFIG.particleSize * sizeMultiplier;
         
-        // Opacity: weiter hinten = etwas transparenter, weiter vorne = etwas opaker
         let baseAlpha = isDark 
           ? 0.15 + n.flash * 0.5
           : 0.1 + n.flash * 0.35;
         
-        // Subtile Ruhe-Puls-Animation (nur wenn kein Flash aktiv ist)
         if (CONFIG.idlePulseEnabled && n.flash < 0.01) {
           const pulseValue = Math.sin(idlePulseTime + n.idlePulsePhase);
-          // Puls-Intensität: 0 = keine Änderung, 1 = maximale Intensität
-          // Verwende (pulseValue + 1) / 2, um von -1..1 zu 0..1 zu mappen
-          // Dann multipliziere mit der Intensität für subtile Modulation
           const pulseModulation = 1 + (pulseValue * CONFIG.idlePulseIntensity);
           baseAlpha *= pulseModulation;
         }
         
-        const zAlphaModifier = 0.7 + zNormalized * 0.3; // 0.7-1.0 Range
+        const zAlphaModifier = 0.7 + zNormalized * 0.3; 
         const alpha = baseAlpha * zAlphaModifier;
         
-        // Blur-Effekt für vordere Neuronen: mehrere überlagerte Kreise mit abnehmender Opacity
-        // weiter vorne (zNormalized näher bei 1) = mehr Blur-Layers
-        const blurIntensity = zNormalized; // 0 = kein Blur, 1 = maximaler Blur
+        const blurIntensity = zNormalized; 
         
         if (blurIntensity > 0.3) {
-          // Zeichne mehrere überlagerte Kreise für Blur-Effekt
           const baseLayers = blurIntensity > 0.7 
             ? Math.ceil(blurIntensity * CONFIG.zBlurLayers) 
             : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.6);
-          const numBlurLayers = baseLayers; // Fester Wert, kein Quality-Level
+          const numBlurLayers = baseLayers; 
           
           for (let layer = numBlurLayers; layer >= 1; layer--) {
-            const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; // Abnehmende Opacity pro Layer
+            const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; 
             const layerSize = particleSize * (1 + (numBlurLayers - layer + 1) * 0.3);
             
             ctx.fillStyle = `rgba(${theme.neuron}, ${layerAlpha})`;
@@ -594,23 +542,19 @@ export default function NeuralBackground() {
             ctx.fill();
           }
         } else {
-          // Kein Blur für hinten liegende Neuronen - scharfe Darstellung
           ctx.fillStyle = `rgba(${theme.neuron}, ${alpha})`;
           ctx.beginPath();
           ctx.arc(n.x, n.y, particleSize, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Flash Glow (Immer die Signalfarbe, auch Z-abhängig)
         if (n.flash > 0.01) {
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           
-          // Glow-Größe basierend auf Z-Position
           const glowRadius = particleSize * 3 + (n.flash * 15 * sizeMultiplier);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
           
-          // Glow-Intensität basierend auf Z-Position
           const glowIntensity = zNormalized * 0.9 + 0.1;
           glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash * 0.9 * glowIntensity})`);
           glow.addColorStop(0.4, `rgba(${theme.signal}, ${n.flash * 0.45 * glowIntensity})`);
@@ -623,16 +567,13 @@ export default function NeuralBackground() {
           
           ctx.restore();
         } else if (CONFIG.idlePulseEnabled) {
-          // Subtiler Ruhe-Puls-Glow (nur wenn kein Flash aktiv ist)
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           
           const pulseValue = Math.sin(idlePulseTime + n.idlePulsePhase);
-          // Puls-Intensität: 0 = keine Änderung, 1 = maximale Intensität
-          const pulseIntensity = (pulseValue + 1) / 2; // 0..1
+          const pulseIntensity = (pulseValue + 1) / 2; 
           
-          // Sehr subtiler Glow (viel schwächer als Flash)
-          const idleGlowIntensity = CONFIG.idlePulseIntensity * 0.3; // Noch dezentere Intensität
+          const idleGlowIntensity = CONFIG.idlePulseIntensity * 0.3; 
           const glowRadius = particleSize * 2 * (1 + pulseIntensity * 0.5);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
           
@@ -653,13 +594,11 @@ export default function NeuralBackground() {
       ctx.globalCompositeOperation = "source-over";
     };
 
-    // Performance: Frame-Skipping für niedrige FPS-Geräte + Adaptive Quality
     let lastFrameTime = performance.now();
     const targetFPS = 60;
     const frameInterval = 1000 / targetFPS;
     
     const loop = (currentTime: number = performance.now()) => {
-      // Performance: Pausiere Animation wenn Tab im Hintergrund
       if (document.hidden) {
         animationFrameId = requestAnimationFrame(loop);
         return;
@@ -667,7 +606,6 @@ export default function NeuralBackground() {
       
       const deltaTime = currentTime - lastFrameTime;
       
-      // Skip Frame wenn zu schnell (Performance-Optimierung)
       if (deltaTime < frameInterval * 0.8) {
         animationFrameId = requestAnimationFrame(loop);
         return;
@@ -675,24 +613,7 @@ export default function NeuralBackground() {
       
       lastFrameTime = currentTime;
       
-      // FPS-Tracking für adaptive Quality (deaktiviert - verursacht Overhead)
-      // frameCount++;
-      // if (currentTime - lastFPSUpdate >= 2000) {
-      //   currentFPS = frameCount / 2;
-      //   frameCount = 0;
-      //   lastFPSUpdate = currentTime;
-      //   
-      //   if (currentFPS < 45) {
-      //     qualityLevel = Math.max(0.5, qualityLevel - 0.15);
-      //   } else if (currentFPS >= 55) {
-      //     qualityLevel = Math.min(1.0, qualityLevel + 0.1);
-      //   }
-      // }
-      // Quality-Level auf festen Wert setzen (weniger Overhead)
-      qualityLevel = 1.0;
-      
       updatePhysics();
-      // Aktualisiere Zeit für Ruhe-Puls-Animation
       if (CONFIG.idlePulseEnabled) {
         idlePulseTime += CONFIG.idlePulseSpeed;
       }
@@ -701,7 +622,6 @@ export default function NeuralBackground() {
     };
 
     const handleResize = () => {
-      // Debounce: Warte 250ms, bevor wir reagieren
       if (resizeTimeout) {
         clearTimeout(resizeTimeout);
       }
@@ -710,10 +630,6 @@ export default function NeuralBackground() {
         const newWidth = window.innerWidth;
         const newHeight = window.innerHeight;
         
-        // Nur neu initialisieren, wenn sich die Größe signifikant geändert hat
-        // (mehr als 50px Unterschied in Breite oder Höhe)
-        // Dies verhindert Neuinitialisierung bei kleinen Viewport-Änderungen
-        // wie beim Scrollen auf mobilen Geräten oder Pull-to-Refresh
         const widthDiff = Math.abs(newWidth - lastResizeWidth);
         const heightDiff = Math.abs(newHeight - lastResizeHeight);
         
@@ -724,11 +640,8 @@ export default function NeuralBackground() {
         }
       }, 250);
     };
-    // Performance: Optimiertes Maus-Event-Handling für besseren INP
-    // Direkte Updates ohne Throttling für minimale Latenz
+
     const handleMouseMove = (e: MouseEvent) => {
-      // Direktes Update ohne jegliches Throttling für minimale Presentation Delay
-      // Die Physik-Engine ist bereits optimiert und kann mit hoher Event-Rate umgehen
       mouseRef.current = { 
         x: e.clientX, 
         y: e.clientY, 
@@ -738,7 +651,6 @@ export default function NeuralBackground() {
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
     };
-    // Funktion zum Aktivieren eines Neurons (wird von Click und Auto-Pulse verwendet)
     const activateNeuron = (neuronIdx: number) => {
       const neurons = neuronsRef.current;
       if (neuronIdx < 0 || neuronIdx >= neurons.length) return;
@@ -774,12 +686,11 @@ export default function NeuralBackground() {
 
     // Automatischer Impuls-Handler
     let autoPulseTimeout: NodeJS.Timeout | null = null;
-    let lastAutoPulseTime = 0; // Zeitpunkt des letzten automatischen Pulses
+    let lastAutoPulseTime = 0; 
 
-    // Berechne die durchschnittliche Lebensdauer eines Pulses basierend auf Verbindungsdistanzen
     const calculateAveragePulseLifetime = (): number => {
       const neurons = neuronsRef.current;
-      if (neurons.length === 0) return 2000; // Fallback-Wert
+      if (neurons.length === 0) return 2000; 
       
       let totalDist = 0;
       let connectionCount = 0;
@@ -798,20 +709,15 @@ export default function NeuralBackground() {
         }
       }
       
-      if (connectionCount === 0) return 2000; // Fallback-Wert
+      if (connectionCount === 0) return 2000; 
       
       const avgDist = totalDist / connectionCount;
-      // Lebensdauer = Distanz / Signalgeschwindigkeit (in Frames)
-      // Umrechnung zu ms: Frames * (1000 / 60) für 60 FPS
       const lifetimeInFrames = avgDist / CONFIG.signalSpeed;
       const lifetimeInMs = lifetimeInFrames * (1000 / 60);
       
-      // Berücksichtige Signal-Decay (mehrere Generationen)
-      // Schätze durchschnittlich 2-3 Generationen basierend auf signalDecay
       const estimatedGenerations = 1 + (1 / (1 - CONFIG.signalDecay));
       const totalLifetime = lifetimeInMs * estimatedGenerations;
       
-      // Stelle sicher, dass die Lebensdauer mindestens 1000ms beträgt
       return Math.max(totalLifetime, 1000);
     };
 
@@ -822,60 +728,45 @@ export default function NeuralBackground() {
       const pulses = pulsesRef.current;
       const currentTime = Date.now();
       
-      // Berechne die erwartete Lebensdauer, wenn noch nicht gesetzt oder Netzwerk neu initialisiert wurde
       if (estimatedPulseLifetime === 0) {
         estimatedPulseLifetime = calculateAveragePulseLifetime();
       }
       
-      // Zähle alle aktiven Pulse
       const activePulseCount = pulses.length;
-      const maxConcurrentPulses = 5; // Maximal 5 gleichzeitige Pulse (inkl. weitergeleitete)
+      const maxConcurrentPulses = 5; 
       
-      // Prüfe, ob 80% der Lebensdauer seit dem letzten Pulse vergangen sind
       const timeSinceLastPulse = lastAutoPulseTime > 0 ? currentTime - lastAutoPulseTime : Infinity;
       const triggerDelay = estimatedPulseLifetime * 0.8;
       
-      // Starte ein neues Signal, wenn:
-      // 1. Noch kein Signal gestartet wurde (lastAutoPulseTime === 0)
-      // 2. Oder keine Pulse mehr aktiv sind (damit immer mindestens ein Signal sichtbar ist)
-      // 3. Oder 80% der Lebensdauer vergangen sind UND die Anzahl aktiver Pulse niedrig ist
       const shouldTrigger = lastAutoPulseTime === 0 || 
         activePulseCount === 0 ||
         (timeSinceLastPulse >= triggerDelay && activePulseCount < maxConcurrentPulses);
       
       if (shouldTrigger) {
-        // Wähle ein zufälliges Neuron aus
         const randomIdx = Math.floor(Math.random() * neurons.length);
         activateNeuron(randomIdx);
         lastAutoPulseTime = currentTime;
       }
       
-      // Plane den nächsten Check - prüfe regelmäßig
-      // Wenn keine Pulse aktiv sind, prüfe schnell (100ms)
-      // Sonst prüfe alle 200ms oder wenn 80% der Lebensdauer erreicht sind
       const checkInterval = activePulseCount === 0 
-        ? 100 // Schnell prüfen, wenn keine Pulse aktiv sind
-        : Math.min(200, Math.max(triggerDelay - timeSinceLastPulse, 100)); // Regelmäßig prüfen
+        ? 100 
+        : Math.min(200, Math.max(triggerDelay - timeSinceLastPulse, 100)); 
       
       autoPulseTimeout = setTimeout(() => {
         checkAndTriggerAutoPulse();
       }, checkInterval);
     };
 
-    // Starte automatische Impulse nach einer initialen Verzögerung
     const startAutoPulses = () => {
       if (CONFIG.autoPulseEnabled) {
-        // Starte mit einer kurzen initialen Verzögerung, damit das Netzwerk initialisiert ist
-        const initialDelay = 500; // 500ms initiale Verzögerung
+        const initialDelay = 500; 
         autoPulseTimeout = setTimeout(() => {
-          // Beim ersten Check sollte sofort ein Signal gestartet werden (lastAutoPulseTime === 0)
           checkAndTriggerAutoPulse();
         }, initialDelay);
       }
     };
 
     initNetwork();
-    // Speichere die initiale Größe
     lastResizeWidth = window.innerWidth;
     lastResizeHeight = window.innerHeight;
     lastFrameTime = performance.now();
@@ -899,7 +790,7 @@ export default function NeuralBackground() {
       window.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("click", handleClick);
       cancelAnimationFrame(animationFrameId);
-      observer.disconnect(); // Observer aufräumen
+      observer.disconnect(); 
     };
   }, []);
 
@@ -908,14 +799,14 @@ export default function NeuralBackground() {
       ref={containerRef}
       className="fixed inset-0 -z-10"
       style={{
-        opacity: 0, // Startet unsichtbar, wird nach Hero-Animation eingeblendet
+        opacity: 0, 
       }}
     >
       <canvas
         ref={canvasRef}
         className="w-full h-full"
         style={{
-          opacity: 0.4,  // Reduziert von 0.6 für subtileres Netzwerk
+          opacity: 0.4,  
           pointerEvents: "auto",
         }}
       />
