@@ -43,6 +43,11 @@ const CONFIG = {
   autoPulseEnabled: true,     // Automatische Impulse aktivieren
   autoPulseMinDelay: 2000,    // Mindestverzögerung zwischen Impulsen (ms)
   autoPulseMaxDelay: 4000,    // Maximale Verzögerung zwischen Impulsen (ms)
+  
+  // Ruhe-Puls-Animation (subtile neuronale Aktivität)
+  idlePulseEnabled: true,     // Ruhe-Puls-Animation aktivieren
+  idlePulseIntensity: 0.4,    // Sehr dezent (40% der Intensität eines Klicks)
+  idlePulseSpeed: 0.002,      // Langsame Puls-Geschwindigkeit
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -72,6 +77,7 @@ interface Neuron {
   wanderAngle: number;
   flash: number;
   connections: number[];
+  idlePulsePhase: number; // Phase für subtile Ruhe-Puls-Animation (0-2π)
 }
 
 interface Pulse {
@@ -128,6 +134,7 @@ export default function NeuralBackground() {
     let lastResizeWidth = 0;
     let lastResizeHeight = 0;
     let resizeTimeout: NodeJS.Timeout | null = null;
+    let idlePulseTime = 0; // Zeit-Variable für Ruhe-Puls-Animation
 
     // --- 0. Theme Detection ---
     const updateTheme = () => {
@@ -183,6 +190,7 @@ export default function NeuralBackground() {
             wanderAngle: Math.random() * Math.PI * 2,
             flash: 0,
             connections: [],
+            idlePulsePhase: Math.random() * Math.PI * 2, // Zufällige Phase für Variation
           });
         }
       }
@@ -204,6 +212,7 @@ export default function NeuralBackground() {
           wanderAngle: Math.random() * Math.PI * 2,
           flash: 0,
           connections: [],
+          idlePulsePhase: Math.random() * Math.PI * 2, // Zufällige Phase für Variation
         });
       }
 
@@ -502,9 +511,20 @@ export default function NeuralBackground() {
         const particleSize = CONFIG.particleSize * sizeMultiplier;
         
         // Opacity: weiter hinten = etwas transparenter, weiter vorne = etwas opaker
-        const baseAlpha = isDark 
+        let baseAlpha = isDark 
           ? 0.15 + n.flash * 0.5
           : 0.1 + n.flash * 0.35;
+        
+        // Subtile Ruhe-Puls-Animation (nur wenn kein Flash aktiv ist)
+        if (CONFIG.idlePulseEnabled && n.flash < 0.01) {
+          const pulseValue = Math.sin(idlePulseTime + n.idlePulsePhase);
+          // Puls-Intensität: 0 = keine Änderung, 1 = maximale Intensität
+          // Verwende (pulseValue + 1) / 2, um von -1..1 zu 0..1 zu mappen
+          // Dann multipliziere mit der Intensität für subtile Modulation
+          const pulseModulation = 1 + (pulseValue * CONFIG.idlePulseIntensity);
+          baseAlpha *= pulseModulation;
+        }
+        
         const zAlphaModifier = 0.7 + zNormalized * 0.3; // 0.7-1.0 Range
         const alpha = baseAlpha * zAlphaModifier;
         
@@ -553,6 +573,31 @@ export default function NeuralBackground() {
           ctx.fill();
           
           ctx.restore();
+        } else if (CONFIG.idlePulseEnabled) {
+          // Subtiler Ruhe-Puls-Glow (nur wenn kein Flash aktiv ist)
+          ctx.save();
+          ctx.globalCompositeOperation = "lighter";
+          
+          const pulseValue = Math.sin(idlePulseTime + n.idlePulsePhase);
+          // Puls-Intensität: 0 = keine Änderung, 1 = maximale Intensität
+          const pulseIntensity = (pulseValue + 1) / 2; // 0..1
+          
+          // Sehr subtiler Glow (viel schwächer als Flash)
+          const idleGlowIntensity = CONFIG.idlePulseIntensity * 0.3; // Noch dezentere Intensität
+          const glowRadius = particleSize * 2 * (1 + pulseIntensity * 0.5);
+          const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
+          
+          const glowAlpha = idleGlowIntensity * pulseIntensity * (zNormalized * 0.5 + 0.5);
+          glow.addColorStop(0, `rgba(${theme.signal}, ${glowAlpha * 0.6})`);
+          glow.addColorStop(0.5, `rgba(${theme.signal}, ${glowAlpha * 0.3})`);
+          glow.addColorStop(1, `rgba(${theme.signal}, 0)`);
+          
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, glowRadius, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.restore();
         }
       }
 
@@ -561,6 +606,10 @@ export default function NeuralBackground() {
 
     const loop = () => {
       updatePhysics();
+      // Aktualisiere Zeit für Ruhe-Puls-Animation
+      if (CONFIG.idlePulseEnabled) {
+        idlePulseTime += CONFIG.idlePulseSpeed;
+      }
       draw();
       animationFrameId = requestAnimationFrame(loop);
     };
