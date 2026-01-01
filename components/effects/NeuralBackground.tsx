@@ -135,6 +135,12 @@ export default function NeuralBackground() {
     let lastResizeHeight = 0;
     let resizeTimeout: NodeJS.Timeout | null = null;
     let idlePulseTime = 0; // Zeit-Variable für Ruhe-Puls-Animation
+    
+    // Performance: Adaptive Quality & FPS-Tracking
+    let frameCount = 0;
+    let lastFPSUpdate = performance.now();
+    let currentFPS = 60;
+    let qualityLevel = 1.0; // 1.0 = voll, 0.5 = reduziert
 
     // --- 0. Theme Detection ---
     const updateTheme = () => {
@@ -339,7 +345,8 @@ export default function NeuralBackground() {
       const theme = themeRef.current; // Aktuelles Farbschema nutzen
 
       // Viewport Culling: Nur Neuronen im sichtbaren Bereich + Padding rendern
-      const viewportPadding = 100; // Padding für Neuronen außerhalb des Viewports
+      // Adaptive Padding basierend auf Quality-Level
+      const viewportPadding = 100 * qualityLevel; // Reduziertes Padding bei niedriger Qualität
       const visibleBounds = {
         left: -viewportPadding,
         right: width + viewportPadding,
@@ -482,8 +489,10 @@ export default function NeuralBackground() {
                 const intensity = p.strength * 0.7;
                 
                 // Wir diskretisieren die Linie in kleine Segmente für glatte Darstellung
-                // Performance: Reduziere Segmente für längere Linien (weniger Canvas-Operationen)
-                const numSegments = Math.min(Math.ceil(totalDist / 3), 60); // Max 60 Segmente, Segment alle 3px
+                // Performance: Adaptive Segmente basierend auf Quality-Level
+                const segmentDensity = qualityLevel > 0.7 ? 3 : (qualityLevel > 0.5 ? 4 : 5);
+                const maxSegments = qualityLevel > 0.7 ? 60 : (qualityLevel > 0.5 ? 40 : 30);
+                const numSegments = Math.min(Math.ceil(totalDist / segmentDensity), maxSegments);
                 
                 if (isForward) {
                   // Pulse geht von i zu targetIdx (von 0 zu 1 in unserer Rendering-Richtung)
@@ -508,7 +517,9 @@ export default function NeuralBackground() {
               
               // Zeichne die leuchtenden Segmente (optimiert: Batch-Rendering)
               if (segmentIntensities.size > 0) {
-                const numSegments = Math.min(Math.ceil(totalDist / 3), 60);
+                const segmentDensity = qualityLevel > 0.7 ? 3 : (qualityLevel > 0.5 ? 4 : 5);
+                const maxSegments = qualityLevel > 0.7 ? 60 : (qualityLevel > 0.5 ? 40 : 30);
+                const numSegments = Math.min(Math.ceil(totalDist / segmentDensity), maxSegments);
                 
                 // Batch-Rendering: Sammle alle Segmente und zeichne sie in einem Durchgang
                 const segments: Array<{x1: number, y1: number, x2: number, y2: number, intensity: number}> = [];
@@ -593,15 +604,16 @@ export default function NeuralBackground() {
         
         // Blur-Effekt für vordere Neuronen: mehrere überlagerte Kreise mit abnehmender Opacity
         // weiter vorne (zNormalized näher bei 1) = mehr Blur-Layers
-        // Performance: Reduziere Blur-Layers für hinten liegende Neuronen
+        // Performance: Adaptive Blur-Layers basierend auf Quality-Level
         const blurIntensity = zNormalized; // 0 = kein Blur, 1 = maximaler Blur
         
         if (blurIntensity > 0.3) {
           // Zeichne mehrere überlagerte Kreise für Blur-Effekt
-          // Performance: Weniger Layers für mittlere Z-Positionen
-          const numBlurLayers = blurIntensity > 0.7 
+          // Performance: Adaptive Layers basierend auf Quality-Level und Z-Position
+          const baseLayers = blurIntensity > 0.7 
             ? Math.ceil(blurIntensity * CONFIG.zBlurLayers) 
-            : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.6); // Reduziert für mittlere Z
+            : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.6);
+          const numBlurLayers = Math.ceil(baseLayers * qualityLevel); // Reduziert bei niedriger Qualität
           
           for (let layer = numBlurLayers; layer >= 1; layer--) {
             const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; // Abnehmende Opacity pro Layer
@@ -672,12 +684,18 @@ export default function NeuralBackground() {
       ctx.globalCompositeOperation = "source-over";
     };
 
-    // Performance: Frame-Skipping für niedrige FPS-Geräte
+    // Performance: Frame-Skipping für niedrige FPS-Geräte + Adaptive Quality
     let lastFrameTime = performance.now();
     const targetFPS = 60;
     const frameInterval = 1000 / targetFPS;
     
     const loop = (currentTime: number = performance.now()) => {
+      // Performance: Pausiere Animation wenn Tab im Hintergrund
+      if (document.hidden) {
+        animationFrameId = requestAnimationFrame(loop);
+        return;
+      }
+      
       const deltaTime = currentTime - lastFrameTime;
       
       // Skip Frame wenn zu schnell (Performance-Optimierung)
@@ -687,6 +705,21 @@ export default function NeuralBackground() {
       }
       
       lastFrameTime = currentTime;
+      
+      // FPS-Tracking für adaptive Quality
+      frameCount++;
+      if (currentTime - lastFPSUpdate >= 1000) {
+        currentFPS = frameCount;
+        frameCount = 0;
+        lastFPSUpdate = currentTime;
+        
+        // Adaptive Quality: Reduziere Qualität wenn FPS < 50
+        if (currentFPS < 50) {
+          qualityLevel = Math.max(0.5, qualityLevel - 0.1);
+        } else if (currentFPS >= 58) {
+          qualityLevel = Math.min(1.0, qualityLevel + 0.05);
+        }
+      }
       
       updatePhysics();
       // Aktualisiere Zeit für Ruhe-Puls-Animation
@@ -721,8 +754,27 @@ export default function NeuralBackground() {
         }
       }, 250);
     };
+    // Performance: Throttle Maus-Events mit requestAnimationFrame für besseren INP
+    let mouseUpdateScheduled = false;
+    const pendingMouseEvent = { x: 0, y: 0 };
+    
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY, active: true };
+      // Speichere die Position, aber aktualisiere nicht sofort
+      pendingMouseEvent.x = e.clientX;
+      pendingMouseEvent.y = e.clientY;
+      
+      // Schedule Update nur wenn noch keiner geplant ist (throttling)
+      if (!mouseUpdateScheduled) {
+        mouseUpdateScheduled = true;
+        requestAnimationFrame(() => {
+          mouseRef.current = { 
+            x: pendingMouseEvent.x, 
+            y: pendingMouseEvent.y, 
+            active: true 
+          };
+          mouseUpdateScheduled = false;
+        });
+      }
     };
     const handleMouseLeave = () => {
       mouseRef.current.active = false;

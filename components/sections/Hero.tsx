@@ -252,12 +252,15 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           </div>
 
           {/* Brand-Name: SmartGerman */}
+          {/* LCP-Optimierung: Text ist sofort sichtbar, Animation läuft darüber */}
           <h1 
             ref={heroTextWrapper} 
             className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter flex items-center justify-center leading-none gpu-render hero-text-reveal mb-6"
             style={{ 
               transformStyle: "preserve-3d",
-              clipPath: "inset(100% 0 0 0)"
+              clipPath: "inset(100% 0 0 0)",
+              // LCP: Stelle sicher, dass Text sofort gerendert wird
+              contentVisibility: "auto",
             }}
           >
             <span className="inline-block text-foreground select-none font-bold" style={{ fontWeight: 700 }}>
@@ -268,12 +271,17 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             </span>
           </h1>
 
-          {/* Wissenschaftliche Headline */}
+          {/* Wissenschaftliche Headline - LCP Element */}
+          {/* LCP-Optimierung: Text ist sofort sichtbar, nur Opacity wird animiert */}
           <h2 
             ref={headlineRef}
             className="text-3xl md:text-4xl lg:text-5xl font-medium mb-8 max-w-4xl mx-auto leading-tight text-lm-text-espresso dark:text-dm-text-main"
             style={{ 
               opacity: 0,
+              // LCP: Stelle sicher, dass Text sofort gerendert wird (auch wenn unsichtbar)
+              contentVisibility: "auto",
+              // Verhindere Layout-Shift durch reservierten Platz
+              minHeight: "1.2em",
             }}
           >
             {dictionary.hero.headline}
