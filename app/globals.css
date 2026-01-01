@@ -13,7 +13,7 @@
   --accent-cyan: hsl(180, 100%, 50%); /* Für technische Micro-Interactions */
   
   /* Lightmode (Organic Scholar) */
-  --lm-bg-bone: hsl(45, 33%, 96%); /* #F9F7F2 - Haupt-Hintergrund */
+  --lm-bg-bone: #E2D7CE; /* Haupt-Hintergrund */
   --lm-text-espresso: hsl(0, 10%, 27%); /* #4B3D3D - Für Serif-Headlines und Fließtext */
   --lm-accent-sage: hsl(158, 55%, 78%); /* #A8E6CF - Für Erfolgsmeldungen/Icons */
   
