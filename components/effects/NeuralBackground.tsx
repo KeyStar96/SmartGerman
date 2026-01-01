@@ -324,44 +324,7 @@ export default function NeuralBackground() {
       // Erstelle eine sortierte Kopie der Neuronen (hinten zuerst für korrektes Z-Buffering)
       const sortedNeurons = [...neurons].sort((a, b) => a.z - b.z);
 
-      // 1. Verbindungen (mit Z-abhängiger Opacity und Linienstärke)
-      
-      // Zeichne Verbindungen basierend auf durchschnittlicher Z-Position
-      const connectionsDrawn = new Set<string>();
-      for (let i = 0; i < neurons.length; i++) {
-        const n = neurons[i];
-        for (const targetIdx of n.connections) {
-          if (targetIdx > i) {
-            const target = neurons[targetIdx];
-            const connectionKey = `${Math.min(i, targetIdx)}-${Math.max(i, targetIdx)}`;
-            if (connectionsDrawn.has(connectionKey)) continue;
-            connectionsDrawn.add(connectionKey);
-            
-            // Durchschnittliche Z-Position für diese Verbindung
-            const avgZ = (n.z + target.z) / 2;
-            const zNormalized = normalizeZ(avgZ);
-            
-            // Weitere Verbindungen = dünner und transparenter
-            // Vordere Verbindungen = dicker und opaker
-            const lineOpacity = theme.lineOpacity * (0.5 + zNormalized * 0.5);
-            const baseLineWidth = 0.5 + zNormalized * 0.5;
-            
-            // Z-abhängige Linienstärke für beide Modi (gleiche Dicke wie Lightmode)
-            const lineWidth = baseLineWidth * 1.4;
-            
-            ctx.strokeStyle = `rgba(${theme.neuron}, ${lineOpacity})`;
-            ctx.lineWidth = lineWidth;
-            ctx.beginPath();
-            ctx.moveTo(n.x, n.y);
-            ctx.lineTo(target.x, target.y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      // 2. Signale
-      ctx.globalCompositeOperation = "lighter";
-      
+      // 1. Update Pulse Progress (muss vor dem Rendering passieren)
       for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i];
         const nA = neurons[p.fromIndex];
@@ -371,9 +334,15 @@ export default function NeuralBackground() {
         const dy = nB.y - nA.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
+        // Speichere die ursprüngliche Distanz beim ersten Mal (für konsistente Progress-Berechnung)
+        if (p.totalDist === 0) {
+          p.totalDist = dist;
+        }
+        
         p.progress += CONFIG.signalSpeed;
 
-        if (p.progress >= dist) {
+        // Verwende die ursprüngliche Distanz für die Completion-Prüfung
+        if (p.progress >= p.totalDist) {
           pulses.splice(i, 1);
           nB.flash = 1.0 * p.strength;
 
@@ -386,28 +355,115 @@ export default function NeuralBackground() {
               }
             });
           }
-          continue;
         }
+      }
 
-        const t = p.progress / dist;
-        const headX = nA.x + dx * t;
-        const headY = nA.y + dy * t;
-        
-        const tailLen = Math.min(CONFIG.signalLength / dist, t);
-        const tailX = nA.x + dx * (t - tailLen);
-        const tailY = nA.y + dy * (t - tailLen);
+      // 2. Verbindungen mit leuchtenden Segmenten basierend auf Pulsen
+      ctx.globalCompositeOperation = "lighter";
+      
+      // Gruppiere Pulse nach Verbindungen
+      const connectionPulses = new Map<string, Pulse[]>();
+      for (const p of pulses) {
+        const connectionKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
+        if (!connectionPulses.has(connectionKey)) {
+          connectionPulses.set(connectionKey, []);
+        }
+        connectionPulses.get(connectionKey)!.push(p);
+      }
 
-        const gradient = ctx.createLinearGradient(tailX, tailY, headX, headY);
-        gradient.addColorStop(0, `rgba(${theme.signal}, 0)`);
-        // Reduzierte Signal-Intensität für subtilere Effekte
-        gradient.addColorStop(1, `rgba(${theme.signal}, ${p.strength * 0.7})`);
-
-        ctx.strokeStyle = gradient;
-        ctx.lineWidth = 2 * p.strength;
-        ctx.beginPath();
-        ctx.moveTo(tailX, tailY);
-        ctx.lineTo(headX, headY);
-        ctx.stroke();
+      // Zeichne Verbindungen mit leuchtenden Segmenten
+      const connectionsDrawn = new Set<string>();
+      for (let i = 0; i < neurons.length; i++) {
+        const n = neurons[i];
+        for (const targetIdx of n.connections) {
+          if (targetIdx > i) {
+            const target = neurons[targetIdx];
+            const connectionKey = `${i}-${targetIdx}`;
+            if (connectionsDrawn.has(connectionKey)) continue;
+            connectionsDrawn.add(connectionKey);
+            
+            // Durchschnittliche Z-Position für diese Verbindung
+            const avgZ = (n.z + target.z) / 2;
+            const zNormalized = normalizeZ(avgZ);
+            
+            // Basis-Linienopacity (nicht leuchtend)
+            const baseLineOpacity = theme.lineOpacity * (0.5 + zNormalized * 0.5);
+            const baseLineWidth = 0.5 + zNormalized * 0.5;
+            const lineWidth = baseLineWidth * 1.4;
+            
+            // Zeichne Basis-Verbindung (nicht leuchtend)
+            ctx.globalCompositeOperation = "source-over";
+            ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(target.x, target.y);
+            ctx.stroke();
+            
+            // Zeichne leuchtende Segmente basierend auf Pulsen
+            const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
+            if (pulsesOnConnection.length > 0) {
+              ctx.globalCompositeOperation = "lighter";
+              
+              const dx = target.x - n.x;
+              const dy = target.y - n.y;
+              const totalDist = Math.sqrt(dx * dx + dy * dy);
+              
+              // Erstelle ein Array von Segmenten mit kumulativer Intensität
+              // Jedes Segment repräsentiert einen Punkt auf der Linie mit seiner Gesamtintensität
+              const segmentIntensities = new Map<number, number>();
+              
+              for (const p of pulsesOnConnection) {
+                // Normalisiere Progress basierend auf ursprünglicher Distanz
+                // Aber verwende die aktuelle Linie für die Position
+                const t = Math.min(p.progress / (p.totalDist || totalDist), 1.0); // Normalisierte Position (0 = Start, 1 = Ende)
+                const intensity = p.strength * 0.7; // Gleiche Intensität wie vorher
+                
+                // Summiere Intensität für alle Segmente von 0 bis t (hinter dem Pulse)
+                // Wir diskretisieren die Linie in kleine Segmente für glatte Darstellung
+                const numSegments = Math.ceil(totalDist / 2); // Ein Segment alle 2 Pixel
+                const maxSegment = Math.floor(t * numSegments);
+                
+                for (let seg = 0; seg <= maxSegment; seg++) {
+                  const currentIntensity = segmentIntensities.get(seg) || 0;
+                  segmentIntensities.set(seg, currentIntensity + intensity);
+                }
+              }
+              
+              // Zeichne die leuchtenden Segmente
+              if (segmentIntensities.size > 0) {
+                const numSegments = Math.ceil(totalDist / 2);
+                let lastX = n.x;
+                let lastY = n.y;
+                let lastIntensity = 0;
+                
+                for (let seg = 0; seg <= numSegments; seg++) {
+                  const segT = seg / numSegments;
+                  const currentX = n.x + dx * segT;
+                  const currentY = n.y + dy * segT;
+                  const currentIntensity = segmentIntensities.get(seg) || 0;
+                  
+                  // Zeichne Segment nur wenn Intensität vorhanden
+                  if (currentIntensity > 0 || lastIntensity > 0) {
+                    const avgIntensity = (currentIntensity + lastIntensity) / 2;
+                    if (avgIntensity > 0) {
+                      ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
+                      ctx.lineWidth = 2 * Math.min(avgIntensity, 1.0);
+                      ctx.beginPath();
+                      ctx.moveTo(lastX, lastY);
+                      ctx.lineTo(currentX, currentY);
+                      ctx.stroke();
+                    }
+                  }
+                  
+                  lastX = currentX;
+                  lastY = currentY;
+                  lastIntensity = currentIntensity;
+                }
+              }
+            }
+          }
+        }
       }
 
       // 3. Neuronen (sortiert nach Z: hinten zuerst, damit vordere über hinten gezeichnet werden)
