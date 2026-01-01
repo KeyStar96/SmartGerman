@@ -76,19 +76,15 @@ body {
     }
     
     /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
-    /* CHROME-BUG: backdrop-filter bricht wenn Eltern willChange/perspective haben */
-    /* Lösung: isolation: isolate erstellt eigenen Stacking-Context */
+    /* CHROME FIX: Kein z-index, keine isolation - damit backdrop-filter die Hintergründe bluren kann */
     .glass-panel-enhanced {
       @apply rounded-2xl transition-all duration-500;
       /* Lightmode: Feine Linien */
       border: 1px solid rgba(0, 0, 0, 0.1);
       /* Hintergrund mit höherer Opazität als Fallback */
       background: rgba(255, 255, 255, 0.5);
-      /* Expliziter z-index für korrekte Schichtung über Hintergründen */
+      /* Position relative für stabile Positionierung */
       position: relative;
-      z-index: 2;
-      /* CHROME FIX: isolation erstellt eigenen Stacking-Context für backdrop-filter */
-      isolation: isolate;
       /* Blur-Effekt: -webkit zuerst für Safari */
       -webkit-backdrop-filter: blur(40px) saturate(180%);
       backdrop-filter: blur(40px) saturate(180%);
@@ -223,9 +219,10 @@ body {
     /* .is-scrolling .cinematic-overlay-container { pointer-events: none; } */
     
     /* 3D Perspective Container für Fluid Reveal Scroll-Animationen */
+    /* CHROME FIX: perspective und preserve-3d entfernt - bricht backdrop-filter! */
+    /* Die perspective wird jetzt direkt in den GSAP-Animationen auf Element-Ebene gesetzt */
     .scroll-3d-container {
-      perspective: 2000px;
-      transform-style: preserve-3d;
+      /* Keine perspective hier - wird von GSAP pro Element gesetzt */
     }
     
     /* Verbessert das Subpixel-Rendering */

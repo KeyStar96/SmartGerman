@@ -38,20 +38,29 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.className} bg-background text-foreground antialiased`}>
-        {/* 1. Die unterste Ebene: Der Liquid Noise/Vignette */}
-        <div style={{ zIndex: -2 }} className="fixed inset-0 liquid-background-container">
+        {/* 
+          CHROME FIX für backdrop-filter:
+          - Hintergründe mit z-index: 0/1 statt negativen Werten
+          - Main Content OHNE z-index, damit kein isolierter Stacking-Context entsteht
+          - Das erlaubt backdrop-filter, die Hintergründe zu bluren
+        */}
+        
+        {/* 1. Die unterste Ebene: Der Liquid Background (statische Farbe) */}
+        <div className="fixed inset-0 liquid-background-container" style={{ zIndex: 0 }}>
           <LiquidBackground />
         </div>
 
         {/* 2. Die mittlere Ebene: Das Neuronale Netz */}
-        <div style={{ zIndex: -1 }} className="fixed inset-0 neural-background-container">
+        <div className="fixed inset-0 neural-background-container" style={{ zIndex: 1 }}>
           <NeuralBackground />
         </div>
 
-        {/* 3. Die oberste Ebene: Dein Content */}
+        {/* 3. Die oberste Ebene: Header (z-index: 50 für sticky) */}
         <Header lang={lang} dictionary={dictionary} />
+        
+        {/* 4. Main Content: KEIN z-index damit backdrop-filter funktioniert! */}
         <SmoothScroll>
-          <main id="main-content" className="pt-32 scroll-3d-container min-h-screen relative z-10"> {/* Abstand nach oben, damit der Header nichts verdeckt */}
+          <main id="main-content" className="pt-32 scroll-3d-container min-h-screen relative">
             {children}
           </main>
         </SmoothScroll>
