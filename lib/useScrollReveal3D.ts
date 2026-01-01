@@ -57,6 +57,8 @@ export function useScrollReveal3D(
     const initialRotateX = inverted ? -15 : 15;
     
     // Initialer Zustand: Element ist unsichtbar, versetzt und skaliert
+    // CHROME-BUG FIX: transformStyle: "flat" statt "preserve-3d"
+    // preserve-3d bricht backdrop-filter in Chrome wenn Eltern perspective haben!
     gsap.set(element, {
       rotateX: initialRotateX,
       y: 100, // Vertikaler Versatz von unten
@@ -65,7 +67,7 @@ export function useScrollReveal3D(
       opacity: 0,
       transformOrigin,
       force3D: true,
-      transformStyle: "preserve-3d",
+      transformStyle: "flat",
       immediateRender: true,
     });
 

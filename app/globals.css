@@ -141,12 +141,11 @@ body {
     }
     
     /* GPU-Acceleration für High-Performance Animationen */
-    /* will-change nur bei aktiven Animationen setzen, nicht dauerhaft */
+    /* CHROME-BUG FIX: will-change entfernt - bricht backdrop-filter bei Kind-Elementen! */
     .gpu-render {
       transform: translateZ(0);
       backface-visibility: hidden;
-      /* Performance: will-change für transform und opacity bei 3D-Animationen */
-      will-change: transform, opacity;
+      /* will-change: transform, opacity; ← ENTFERNT wegen Chrome backdrop-filter Bug */
     }
     
     /* Performance: Reduziere Re-Paints bei statischen Elementen */
