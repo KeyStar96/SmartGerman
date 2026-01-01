@@ -28,7 +28,7 @@ const CONFIG = {
   
   // Signale - ZEIT-BASIERT für konsistente Geschwindigkeit
   // signalSpeedPerSecond: Wie viel Prozent der Verbindung pro Sekunde zurückgelegt wird
-  signalSpeedPerSecond: 0.8,  // 80% der Verbindungslänge pro Sekunde (langsamer, einheitlich)
+  signalSpeedPerSecond: 0.8,  // 80% der Verbindungslänge pro Sekunde
   signalLength: 120,          
   signalDecay: 0.6,           
   minSignalStrength: 0.15,    
@@ -53,8 +53,9 @@ const CONFIG = {
   idlePulseIntensity: 0.6,    
   idlePulseSpeed: 0.05,
   
-  // NEU: Verbindungs-Afterglow - Langsames Verblassen nach Impuls
-  connectionGlowDecayPerSecond: 1.5, // Glow klingt mit 1.5 pro Sekunde ab (langsames Verblassen)
+  // Trail-Effekt: Wie schnell der Glow hinter dem Impuls verblasst
+  // 0 = sofort weg, 1 = bleibt sehr lange, 0.3 = sanftes Verblassen
+  trailFadeStrength: 0.4,
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -96,11 +97,6 @@ interface Pulse {
   strength: number;
 }
 
-// NEU: Verbindungs-Glow State für langsames Verblassen
-interface ConnectionGlow {
-  intensity: number;     // 0 bis 1
-}
-
 export default function NeuralBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -109,9 +105,6 @@ export default function NeuralBackground() {
   const neuronsRef = useRef<Neuron[]>([]);
   const pulsesRef = useRef<Pulse[]>([]);
   const pulseIdCounter = useRef(0);
-  
-  // NEU: Map für Verbindungs-Glow (Key: "minIndex-maxIndex")
-  const connectionGlowRef = useRef<Map<string, ConnectionGlow>>(new Map());
   
   const themeRef = useRef(THEME_COLORS.dark);
 
@@ -267,7 +260,6 @@ export default function NeuralBackground() {
 
       neuronsRef.current = newNeurons;
       pulsesRef.current = [];
-      connectionGlowRef.current.clear(); // Reset connection glow state
       estimatedPulseLifetime = 0;
     };
 
@@ -337,15 +329,6 @@ export default function NeuralBackground() {
           if (n.flash < 0) n.flash = 0;
         }
       }
-      
-      // NEU: Connection-Glow Decay (langsames Verblassen)
-      const connectionGlow = connectionGlowRef.current;
-      for (const [key, glow] of connectionGlow.entries()) {
-        glow.intensity -= CONFIG.connectionGlowDecayPerSecond * deltaSeconds;
-        if (glow.intensity <= 0) {
-          connectionGlow.delete(key);
-        }
-      }
     };
 
     // --- 3. Rendering ---
@@ -359,7 +342,6 @@ export default function NeuralBackground() {
       
       const neurons = neuronsRef.current;
       const pulses = pulsesRef.current;
-      const connectionGlow = connectionGlowRef.current;
       const theme = themeRef.current; 
 
       const viewportPadding = 100; 
@@ -393,17 +375,8 @@ export default function NeuralBackground() {
           p.totalDist = dist;
         }
         
-        // ZEIT-BASIERT: Progress ist jetzt 0-1 (Prozent), nicht absolute Pixel
-        // signalSpeedPerSecond bestimmt, wie viel Prozent der Verbindung pro Sekunde zurückgelegt wird
+        // ZEIT-BASIERT: Progress ist 0-1 (Prozent der Verbindungslänge)
         p.progress += CONFIG.signalSpeedPerSecond * deltaSeconds;
-        
-        // Setze/aktualisiere den ConnectionGlow für diese Verbindung
-        const glowKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
-        const existingGlow = connectionGlow.get(glowKey);
-        const newGlowIntensity = p.strength * 0.8;
-        if (!existingGlow || existingGlow.intensity < newGlowIntensity) {
-          connectionGlow.set(glowKey, { intensity: newGlowIntensity });
-        }
 
         if (p.progress >= 1.0) {
           pulses.splice(i, 1);
@@ -464,10 +437,7 @@ export default function NeuralBackground() {
             const baseLineWidth = 0.5 + zNormalized * 0.5;
             const lineWidth = baseLineWidth * 1.4;
             
-            // NEU: Prüfe ob diese Verbindung einen Afterglow hat
-            const glowState = connectionGlow.get(connectionKey);
-            const hasActiveGlow = glowState && glowState.intensity > 0.01;
-            
+            // Basis-Verbindung zeichnen
             ctx.globalCompositeOperation = "source-over";
             ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
             ctx.lineWidth = lineWidth;
@@ -475,18 +445,6 @@ export default function NeuralBackground() {
             ctx.moveTo(n.x, n.y);
             ctx.lineTo(target.x, target.y);
             ctx.stroke();
-            
-            // NEU: Zeichne Afterglow wenn vorhanden (langsam verblassende Verbindung)
-            if (hasActiveGlow) {
-              ctx.globalCompositeOperation = "lighter";
-              const glowIntensity = glowState!.intensity;
-              ctx.strokeStyle = `rgba(${theme.signal}, ${glowIntensity * 0.5})`;
-              ctx.lineWidth = lineWidth * (1 + glowIntensity);
-              ctx.beginPath();
-              ctx.moveTo(n.x, n.y);
-              ctx.lineTo(target.x, target.y);
-              ctx.stroke();
-            }
             
             const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
             if (pulsesOnConnection.length > 0) {
@@ -496,6 +454,7 @@ export default function NeuralBackground() {
               const dy = target.y - n.y;
               const totalDist = Math.sqrt(dx * dx + dy * dy);
               
+              const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
               const segmentIntensities = new Map<number, number>();
           
               for (const p of pulsesOnConnection) {
@@ -504,42 +463,59 @@ export default function NeuralBackground() {
             
                 if (!isForward && !isReverse) continue;
                 
-                // Progress ist jetzt bereits 0-1, keine Division mehr nötig
                 const t = Math.min(p.progress, 1.0);
-                const intensity = p.strength * 0.7;
+                const baseIntensity = p.strength * 0.7;
                 
-                const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
+                // TRAIL-EFFEKT: Berechne Intensität für jedes Segment
+                // Segmente HINTER dem Impuls haben abnehmende Intensität
+                // Segmente VOR dem Impuls haben keine Intensität
                 
                 if (isForward) {
-                  const maxSegment = Math.floor(t * numSegments);
-                  for (let seg = 0; seg <= maxSegment; seg++) {
+                  const headSegment = Math.floor(t * numSegments);
+                  for (let seg = 0; seg <= headSegment; seg++) {
+                    // Berechne relative Position: 0 = Startpunkt, 1 = Impuls-Kopf
+                    const segmentProgress = seg / numSegments;
+                    const distanceFromHead = t - segmentProgress;
+                    
+                    // Intensität nimmt ab je weiter weg vom Impuls-Kopf
+                    // trailFadeStrength bestimmt wie schnell der Trail verblasst
+                    const fadeFactor = Math.max(0, 1 - (distanceFromHead / CONFIG.trailFadeStrength));
+                    const segmentIntensity = baseIntensity * fadeFactor;
+                    
                     const currentIntensity = segmentIntensities.get(seg) || 0;
-                    segmentIntensities.set(seg, currentIntensity + intensity);
+                    segmentIntensities.set(seg, Math.max(currentIntensity, segmentIntensity));
                   }
                 } else {
-                  const startSegment = Math.floor((1 - t) * numSegments);
-                  for (let seg = startSegment; seg <= numSegments; seg++) {
+                  // Reverse: Impuls geht von target nach n
+                  const headSegment = Math.floor((1 - t) * numSegments);
+                  for (let seg = numSegments; seg >= headSegment; seg--) {
+                    const segmentProgress = seg / numSegments;
+                    const distanceFromHead = segmentProgress - (1 - t);
+                    
+                    const fadeFactor = Math.max(0, 1 - (distanceFromHead / CONFIG.trailFadeStrength));
+                    const segmentIntensity = baseIntensity * fadeFactor;
+                    
                     const currentIntensity = segmentIntensities.get(seg) || 0;
-                    segmentIntensities.set(seg, currentIntensity + intensity);
+                    segmentIntensities.set(seg, Math.max(currentIntensity, segmentIntensity));
                   }
                 }
               }
               
+              // Zeichne alle Segmente mit ihrer Intensität
               if (segmentIntensities.size > 0) {
-                const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
                 let lastX = n.x;
                 let lastY = n.y;
-                let lastIntensity = 0;
+                let lastIntensity = segmentIntensities.get(0) || 0;
                 
-                for (let seg = 0; seg <= numSegments; seg++) {
+                for (let seg = 1; seg <= numSegments; seg++) {
                   const segT = seg / numSegments;
                   const currentX = n.x + dx * segT;
                   const currentY = n.y + dy * segT;
                   const currentIntensity = segmentIntensities.get(seg) || 0;
                   
-                  if (currentIntensity > 0 || lastIntensity > 0) {
+                  if (currentIntensity > 0.01 || lastIntensity > 0.01) {
                     const avgIntensity = (currentIntensity + lastIntensity) / 2;
-                    if (avgIntensity > 0) {
+                    if (avgIntensity > 0.01) {
                       ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
                       ctx.lineWidth = 2 * Math.min(avgIntensity, 1.0);
                       ctx.beginPath();
