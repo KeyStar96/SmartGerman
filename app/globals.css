@@ -122,16 +122,16 @@ body {
       box-shadow: 0 0 20px rgba(0, 255, 255, 0.15); /* Darkmode: Dezenter Cyan-Glow */
     }
     
-    /* Glassmorphismus für Header: Präzise Linien */
+    /* Glassmorphismus für Header: Sanfter Blur mit mehr Durchscheinen */
     .glass-header {
-      @apply backdrop-blur-2xl backdrop-saturate-150;
+      @apply backdrop-blur-md backdrop-saturate-150;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.45); /* Mehr Transparenz für sanfteren Effekt */
     }
     
     .dark .glass-header {
       border-bottom: 1px solid var(--dm-border-slate);
-      background: rgba(13, 13, 13, 0.8); /* Leicht transparent über #0D0D0D */
+      background: rgba(13, 13, 13, 0.55); /* Mehr Transparenz für sanfteren Effekt */
     }
     
     /* GPU-Acceleration für High-Performance Animationen */
