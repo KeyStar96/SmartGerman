@@ -414,19 +414,40 @@ export default function NeuralBackground() {
               const segmentIntensities = new Map<number, number>();
               
               for (const p of pulsesOnConnection) {
-                // Normalisiere Progress basierend auf ursprünglicher Distanz
-                // Aber verwende die aktuelle Linie für die Position
-                const t = Math.min(p.progress / (p.totalDist || totalDist), 1.0); // Normalisierte Position (0 = Start, 1 = Ende)
-                const intensity = p.strength * 0.7; // Gleiche Intensität wie vorher
+                // Prüfe die Richtung des Pulses
+                // Die Verbindung wird immer von i zu targetIdx gerendert (i < targetIdx)
+                // Wenn p.fromIndex === i, dann geht der Pulse von i zu targetIdx (korrekte Richtung)
+                // Wenn p.fromIndex === targetIdx, dann geht der Pulse von targetIdx zu i (umgekehrte Richtung)
+                const isForward = p.fromIndex === i && p.toIndex === targetIdx;
+                const isReverse = p.fromIndex === targetIdx && p.toIndex === i;
                 
-                // Summiere Intensität für alle Segmente von 0 bis t (hinter dem Pulse)
+                if (!isForward && !isReverse) continue; // Pulse gehört nicht zu dieser Verbindung
+                
+                // Normalisiere Progress basierend auf ursprünglicher Distanz
+                const t = Math.min(p.progress / (p.totalDist || totalDist), 1.0);
+                const intensity = p.strength * 0.7;
+                
                 // Wir diskretisieren die Linie in kleine Segmente für glatte Darstellung
                 const numSegments = Math.ceil(totalDist / 2); // Ein Segment alle 2 Pixel
-                const maxSegment = Math.floor(t * numSegments);
                 
-                for (let seg = 0; seg <= maxSegment; seg++) {
-                  const currentIntensity = segmentIntensities.get(seg) || 0;
-                  segmentIntensities.set(seg, currentIntensity + intensity);
+                if (isForward) {
+                  // Pulse geht von i zu targetIdx (von 0 zu 1 in unserer Rendering-Richtung)
+                  // Leuchte von 0 bis t (hinter dem Pulse)
+                  const maxSegment = Math.floor(t * numSegments);
+                  for (let seg = 0; seg <= maxSegment; seg++) {
+                    const currentIntensity = segmentIntensities.get(seg) || 0;
+                    segmentIntensities.set(seg, currentIntensity + intensity);
+                  }
+                } else {
+                  // Pulse geht von targetIdx zu i (von 1 zu 0 in unserer Rendering-Richtung)
+                  // Leuchte von t bis 1 (hinter dem Pulse, der sich von 1 zu 0 bewegt)
+                  // t=0 bedeutet am targetIdx (Position 1), t=1 bedeutet am i (Position 0)
+                  // Also müssen wir von (1-t) bis 1 leuchten
+                  const startSegment = Math.floor((1 - t) * numSegments);
+                  for (let seg = startSegment; seg <= numSegments; seg++) {
+                    const currentIntensity = segmentIntensities.get(seg) || 0;
+                    segmentIntensities.set(seg, currentIntensity + intensity);
+                  }
                 }
               }
               
