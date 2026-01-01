@@ -273,6 +273,9 @@ export default function NeuralBackground() {
       const neurons = neuronsRef.current;
       const mouse = mouseRef.current;
 
+      // Performance: Cache Maus-Distanz-Berechnung für alle Neuronen
+      const mouseSquared = mouse.active ? CONFIG.mouseInteractionRadius * CONFIG.mouseInteractionRadius : 0;
+
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
 
@@ -292,13 +295,15 @@ export default function NeuralBackground() {
         n.vy += dyBase * CONFIG.springStiffness;
         n.vz += dzBase * CONFIG.springStiffness;
 
-        // C. Subtile Maus-Interaktion
-        if (mouse.active) {
+        // C. Subtile Maus-Interaktion (Performance: Verwende squared distance)
+        if (mouse.active && mouseSquared > 0) {
           const dxMouse = mouse.x - n.x;
           const dyMouse = mouse.y - n.y;
-          const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+          const distMouseSquared = dxMouse * dxMouse + dyMouse * dyMouse;
 
-          if (distMouse < CONFIG.mouseInteractionRadius) {
+          // Performance: Vermeide sqrt wenn außerhalb des Radius
+          if (distMouseSquared < mouseSquared) {
+            const distMouse = Math.sqrt(distMouseSquared);
             const force = (1 - distMouse / CONFIG.mouseInteractionRadius) * CONFIG.mouseForce;
             n.vx += dxMouse * force; 
             n.vy += dyMouse * force;
@@ -333,8 +338,26 @@ export default function NeuralBackground() {
       const pulses = pulsesRef.current;
       const theme = themeRef.current; // Aktuelles Farbschema nutzen
 
-      // Erstelle eine sortierte Kopie der Neuronen (hinten zuerst für korrektes Z-Buffering)
-      const sortedNeurons = [...neurons].sort((a, b) => a.z - b.z);
+      // Viewport Culling: Nur Neuronen im sichtbaren Bereich + Padding rendern
+      const viewportPadding = 100; // Padding für Neuronen außerhalb des Viewports
+      const visibleBounds = {
+        left: -viewportPadding,
+        right: width + viewportPadding,
+        top: -viewportPadding,
+        bottom: height + viewportPadding,
+      };
+
+      // Filtere sichtbare Neuronen (nur für Rendering, Physik läuft weiter)
+      const visibleNeurons = neurons.filter(n => 
+        n.x >= visibleBounds.left && 
+        n.x <= visibleBounds.right && 
+        n.y >= visibleBounds.top && 
+        n.y <= visibleBounds.bottom
+      );
+
+      // Erstelle eine sortierte Kopie der sichtbaren Neuronen (hinten zuerst für korrektes Z-Buffering)
+      // Sortiere nur wenn nötig (weniger Neuronen = schneller)
+      const sortedNeurons = visibleNeurons.sort((a, b) => a.z - b.z);
 
       // 1. Update Pulse Progress (muss vor dem Rendering passieren)
       for (let i = pulses.length - 1; i >= 0; i--) {
@@ -384,11 +407,30 @@ export default function NeuralBackground() {
       }
 
       // Zeichne Verbindungen mit leuchtenden Segmenten
+      // Nur Verbindungen rendern, wenn mindestens ein Neuron sichtbar ist
       const connectionsDrawn = new Set<string>();
+      // Erstelle Set mit Indizes der sichtbaren Neuronen
+      const visibleNeuronIndices = new Set<number>();
       for (let i = 0; i < neurons.length; i++) {
+        const n = neurons[i];
+        if (n.x >= visibleBounds.left && 
+            n.x <= visibleBounds.right && 
+            n.y >= visibleBounds.top && 
+            n.y <= visibleBounds.bottom) {
+          visibleNeuronIndices.add(i);
+        }
+      }
+
+      for (let i = 0; i < neurons.length; i++) {
+        // Überspringe wenn Neuron außerhalb des Viewports ist
+        if (!visibleNeuronIndices.has(i)) continue;
+        
         const n = neurons[i];
         for (const targetIdx of n.connections) {
           if (targetIdx > i) {
+            // Überspringe wenn Ziel-Neuron außerhalb des Viewports ist
+            if (!visibleNeuronIndices.has(targetIdx)) continue;
+            
             const target = neurons[targetIdx];
             const connectionKey = `${i}-${targetIdx}`;
             if (connectionsDrawn.has(connectionKey)) continue;
@@ -440,7 +482,8 @@ export default function NeuralBackground() {
                 const intensity = p.strength * 0.7;
                 
                 // Wir diskretisieren die Linie in kleine Segmente für glatte Darstellung
-                const numSegments = Math.ceil(totalDist / 2); // Ein Segment alle 2 Pixel
+                // Performance: Reduziere Segmente für längere Linien (weniger Canvas-Operationen)
+                const numSegments = Math.min(Math.ceil(totalDist / 3), 60); // Max 60 Segmente, Segment alle 3px
                 
                 if (isForward) {
                   // Pulse geht von i zu targetIdx (von 0 zu 1 in unserer Rendering-Richtung)
@@ -463,9 +506,12 @@ export default function NeuralBackground() {
                 }
               }
               
-              // Zeichne die leuchtenden Segmente
+              // Zeichne die leuchtenden Segmente (optimiert: Batch-Rendering)
               if (segmentIntensities.size > 0) {
-                const numSegments = Math.ceil(totalDist / 2);
+                const numSegments = Math.min(Math.ceil(totalDist / 3), 60);
+                
+                // Batch-Rendering: Sammle alle Segmente und zeichne sie in einem Durchgang
+                const segments: Array<{x1: number, y1: number, x2: number, y2: number, intensity: number}> = [];
                 let lastX = n.x;
                 let lastY = n.y;
                 let lastIntensity = 0;
@@ -476,22 +522,36 @@ export default function NeuralBackground() {
                   const currentY = n.y + dy * segT;
                   const currentIntensity = segmentIntensities.get(seg) || 0;
                   
-                  // Zeichne Segment nur wenn Intensität vorhanden
+                  // Sammle Segment nur wenn Intensität vorhanden
                   if (currentIntensity > 0 || lastIntensity > 0) {
                     const avgIntensity = (currentIntensity + lastIntensity) / 2;
                     if (avgIntensity > 0) {
-                      ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
-                      ctx.lineWidth = 2 * Math.min(avgIntensity, 1.0);
-                      ctx.beginPath();
-                      ctx.moveTo(lastX, lastY);
-                      ctx.lineTo(currentX, currentY);
-                      ctx.stroke();
+                      segments.push({
+                        x1: lastX,
+                        y1: lastY,
+                        x2: currentX,
+                        y2: currentY,
+                        intensity: avgIntensity
+                      });
                     }
                   }
                   
                   lastX = currentX;
                   lastY = currentY;
                   lastIntensity = currentIntensity;
+                }
+                
+                // Zeichne alle Segmente in einem Batch (weniger beginPath/stroke Aufrufe)
+                if (segments.length > 0) {
+                  // Gruppiere nach ähnlicher Intensität für noch besseres Batch-Rendering
+                  segments.forEach(seg => {
+                    ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(seg.intensity, 1.0)})`;
+                    ctx.lineWidth = 2 * Math.min(seg.intensity, 1.0);
+                    ctx.beginPath();
+                    ctx.moveTo(seg.x1, seg.y1);
+                    ctx.lineTo(seg.x2, seg.y2);
+                    ctx.stroke();
+                  });
                 }
               }
             }
@@ -533,11 +593,16 @@ export default function NeuralBackground() {
         
         // Blur-Effekt für vordere Neuronen: mehrere überlagerte Kreise mit abnehmender Opacity
         // weiter vorne (zNormalized näher bei 1) = mehr Blur-Layers
+        // Performance: Reduziere Blur-Layers für hinten liegende Neuronen
         const blurIntensity = zNormalized; // 0 = kein Blur, 1 = maximaler Blur
         
-        if (blurIntensity > 0.1) {
+        if (blurIntensity > 0.3) {
           // Zeichne mehrere überlagerte Kreise für Blur-Effekt
-          const numBlurLayers = Math.ceil(blurIntensity * CONFIG.zBlurLayers);
+          // Performance: Weniger Layers für mittlere Z-Positionen
+          const numBlurLayers = blurIntensity > 0.7 
+            ? Math.ceil(blurIntensity * CONFIG.zBlurLayers) 
+            : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.6); // Reduziert für mittlere Z
+          
           for (let layer = numBlurLayers; layer >= 1; layer--) {
             const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; // Abnehmende Opacity pro Layer
             const layerSize = particleSize * (1 + (numBlurLayers - layer + 1) * 0.3);
@@ -607,7 +672,22 @@ export default function NeuralBackground() {
       ctx.globalCompositeOperation = "source-over";
     };
 
-    const loop = () => {
+    // Performance: Frame-Skipping für niedrige FPS-Geräte
+    let lastFrameTime = performance.now();
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS;
+    
+    const loop = (currentTime: number = performance.now()) => {
+      const deltaTime = currentTime - lastFrameTime;
+      
+      // Skip Frame wenn zu schnell (Performance-Optimierung)
+      if (deltaTime < frameInterval * 0.8) {
+        animationFrameId = requestAnimationFrame(loop);
+        return;
+      }
+      
+      lastFrameTime = currentTime;
+      
       updatePhysics();
       // Aktualisiere Zeit für Ruhe-Puls-Animation
       if (CONFIG.idlePulseEnabled) {
@@ -788,6 +868,7 @@ export default function NeuralBackground() {
     // Speichere die initiale Größe
     lastResizeWidth = window.innerWidth;
     lastResizeHeight = window.innerHeight;
+    lastFrameTime = performance.now();
     loop();
     startAutoPulses();
 

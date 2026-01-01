@@ -50,7 +50,7 @@ export default function CinematicOverlay() {
       style={{
         zIndex: 0, // Über Background (-1, -2), unter Content (10)
         transform: "translateZ(0)", // GPU-Beschleunigung
-        willChange: "opacity",
+        // willChange entfernt - nur setzen wenn tatsächlich animiert wird
       }}
     >
       {/* 1. Dunkle Vignette: Schwarze Abdunkelung an den Rändern */}
@@ -67,16 +67,20 @@ export default function CinematicOverlay() {
       />
 
       {/* 2. Unscharfe Ränder: Blur-Effekt an den äußeren Bereichen */}
+      {/* Performance: backdrop-filter kann teuer sein - reduzieren oder entfernen wenn nötig */}
       <div
         className="absolute inset-0"
         style={{
           // Maskiert nur die Ränder (äußere 15%)
           maskImage: "radial-gradient(circle, transparent 75%, black 100%)",
           WebkitMaskImage: "radial-gradient(circle, transparent 75%, black 100%)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
+          // Performance: Reduzierter Blur für bessere Performance (war 8px)
+          backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)",
           opacity: isDark ? 0.8 : 0.4,
           transform: "translateZ(0)",
+          // GPU-Beschleunigung für backdrop-filter
+          willChange: "opacity",
         }}
       />
 
@@ -92,6 +96,8 @@ export default function CinematicOverlay() {
           pointerEvents: "none",
           // Subtile Animation via CSS (GPU-beschleunigt)
           animation: "grain-shift 8s linear infinite",
+          // GPU-Beschleunigung explizit aktivieren
+          willChange: "transform",
         }}
       />
     </div>
