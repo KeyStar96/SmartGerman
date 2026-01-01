@@ -135,7 +135,7 @@ export default function NeuralBackground() {
     let lastResizeHeight = 0;
     let resizeTimeout: NodeJS.Timeout | null = null;
     let idlePulseTime = 0; // Zeit-Variable für Ruhe-Puls-Animation
-    
+
     // Performance: Adaptive Quality & FPS-Tracking
     let frameCount = 0;
     let lastFPSUpdate = performance.now();
@@ -706,18 +706,18 @@ export default function NeuralBackground() {
       
       lastFrameTime = currentTime;
       
-      // FPS-Tracking für adaptive Quality
+      // FPS-Tracking für adaptive Quality (vereinfacht, weniger Overhead)
       frameCount++;
-      if (currentTime - lastFPSUpdate >= 1000) {
-        currentFPS = frameCount;
+      if (currentTime - lastFPSUpdate >= 2000) { // Update alle 2 Sekunden (weniger Overhead)
+        currentFPS = frameCount / 2; // FPS = frames / 2 seconds
         frameCount = 0;
         lastFPSUpdate = currentTime;
         
         // Adaptive Quality: Reduziere Qualität wenn FPS < 50
-        if (currentFPS < 50) {
-          qualityLevel = Math.max(0.5, qualityLevel - 0.1);
-        } else if (currentFPS >= 58) {
-          qualityLevel = Math.min(1.0, qualityLevel + 0.05);
+        if (currentFPS < 45) {
+          qualityLevel = Math.max(0.5, qualityLevel - 0.15); // Größere Schritte
+        } else if (currentFPS >= 55) {
+          qualityLevel = Math.min(1.0, qualityLevel + 0.1); // Größere Schritte
         }
       }
       
@@ -754,27 +754,27 @@ export default function NeuralBackground() {
         }
       }, 250);
     };
-    // Performance: Throttle Maus-Events mit requestAnimationFrame für besseren INP
-    let mouseUpdateScheduled = false;
-    const pendingMouseEvent = { x: 0, y: 0 };
+    // Performance: Optimiertes Maus-Event-Handling für besseren INP
+    // Direkte Updates ohne requestAnimationFrame-Throttling (reduziert Presentation Delay)
+    let lastMouseUpdate = 0;
+    const mouseUpdateThrottle = 16; // ~60fps (16ms)
     
     const handleMouseMove = (e: MouseEvent) => {
-      // Speichere die Position, aber aktualisiere nicht sofort
-      pendingMouseEvent.x = e.clientX;
-      pendingMouseEvent.y = e.clientY;
+      const now = performance.now();
       
-      // Schedule Update nur wenn noch keiner geplant ist (throttling)
-      if (!mouseUpdateScheduled) {
-        mouseUpdateScheduled = true;
-        requestAnimationFrame(() => {
-          mouseRef.current = { 
-            x: pendingMouseEvent.x, 
-            y: pendingMouseEvent.y, 
-            active: true 
-          };
-          mouseUpdateScheduled = false;
-        });
+      // Throttle nur bei sehr schnellen Bewegungen (nicht bei jedem Event)
+      if (now - lastMouseUpdate < mouseUpdateThrottle) {
+        return;
       }
+      
+      lastMouseUpdate = now;
+      
+      // Direktes Update ohne requestAnimationFrame (reduziert Presentation Delay)
+      mouseRef.current = { 
+        x: e.clientX, 
+        y: e.clientY, 
+        active: true 
+      };
     };
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
