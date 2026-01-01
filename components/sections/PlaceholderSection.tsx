@@ -97,14 +97,11 @@ export default function PlaceholderSection() {
           </p>
         </div>
 
-        {/* Cards Grid - Perspective Container für 3D-Effekt */}
-        {/* SAFARI-BUG FIX: preserve-3d entfernt - bricht backdrop-filter! */}
+        {/* Cards Grid */}
+        {/* CHROME-BUG FIX: perspective vom Container entfernt - bricht backdrop-filter! */}
         <div 
           ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          style={{ 
-            perspective: "1000px",
-          }}
         >
           {cards.map((card, index) => (
             <ScrollReveal3DGlass 

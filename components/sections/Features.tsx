@@ -101,15 +101,11 @@ export default function Features({ dictionary }: FeaturesProps) {
           </p>
         </div>
 
-        {/* Features Grid - Perspective Container für 3D-Effekt */}
-        {/* SAFARI-BUG FIX: preserve-3d entfernt - bricht backdrop-filter! */}
+        {/* Features Grid */}
+        {/* CHROME-BUG FIX: perspective vom Container entfernt - bricht backdrop-filter! */}
         <div 
           ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          style={{ 
-            perspective: "1000px",
-            // transform-style: flat ist default, daher nicht explizit nötig
-          }}
         >
           {features.map((feature, index) => (
             <ScrollReveal3DGlass 
