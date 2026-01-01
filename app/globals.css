@@ -76,7 +76,7 @@ body {
     }
     
     /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
-    /* Explizite backdrop-filter Properties für Browser-Konsistenz (Safari & Chrome) */
+    /* Beide Properties explizit für Browser-Konsistenz (Chrome & Safari) */
     .glass-panel-enhanced {
       @apply rounded-2xl transition-all duration-500;
       /* Lightmode: Feine Linien */
@@ -86,13 +86,9 @@ body {
       /* Expliziter z-index für korrekte Schichtung über Hintergründen */
       position: relative;
       z-index: 2;
-      /* Blur-Effekt - explizit für Safari & Chrome Konsistenz */
+      /* Blur-Effekt: Beide Properties für Chrome & Safari */
       backdrop-filter: blur(60px) saturate(180%);
       -webkit-backdrop-filter: blur(60px) saturate(180%);
-      /* Chrome-Optimierung: Isolation für bessere backdrop-filter Unterstützung */
-      isolation: isolate;
-      /* GPU-Beschleunigung für bessere Performance */
-      transform: translateZ(0);
     }
     
     .dark .glass-panel-enhanced {
@@ -123,22 +119,19 @@ body {
     }
     
     /* Glassmorphismus für Header: Sanfter Blur mit mehr Durchscheinen */
-    /* Explizite backdrop-filter Properties für Browser-Konsistenz (Safari & Chrome) */
+    /* Beide Properties explizit für Browser-Konsistenz (Chrome & Safari) */
     .glass-header {
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       background: rgba(255, 255, 255, 0.45); /* Mehr Transparenz für sanfteren Effekt */
-      backdrop-filter: blur(12px) saturate(150%);
-      -webkit-backdrop-filter: blur(12px) saturate(150%);
-      /* GPU-Beschleunigung für bessere Performance */
-      transform: translateZ(0);
-      isolation: isolate;
+      backdrop-filter: blur(8px) saturate(150%);
+      -webkit-backdrop-filter: blur(8px) saturate(150%);
     }
     
     .dark .glass-header {
       border-bottom: 1px solid var(--dm-border-slate);
       background: rgba(13, 13, 13, 0.55); /* Mehr Transparenz für sanfteren Effekt */
-      backdrop-filter: blur(12px) saturate(150%);
-      -webkit-backdrop-filter: blur(12px) saturate(150%);
+      backdrop-filter: blur(8px) saturate(150%);
+      -webkit-backdrop-filter: blur(8px) saturate(150%);
     }
     
     /* GPU-Acceleration für High-Performance Animationen */
