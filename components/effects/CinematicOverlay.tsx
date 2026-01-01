@@ -79,8 +79,6 @@ export default function CinematicOverlay() {
           WebkitBackdropFilter: "blur(4px)",
           opacity: isDark ? 0.8 : 0.4,
           transform: "translateZ(0)",
-          // Performance: contain: paint isoliert Repaint-Bereich
-          contain: "paint",
         }}
       />
 
@@ -96,8 +94,6 @@ export default function CinematicOverlay() {
           pointerEvents: "none",
           // Subtile Animation via CSS (GPU-beschleunigt)
           animation: "grain-shift 8s linear infinite",
-          // GPU-Beschleunigung explizit aktivieren
-          willChange: "transform",
         }}
       />
     </div>

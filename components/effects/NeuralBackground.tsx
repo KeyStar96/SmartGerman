@@ -141,11 +141,8 @@ export default function NeuralBackground() {
     let resizeTimeout: NodeJS.Timeout | null = null;
     let idlePulseTime = 0; // Zeit-Variable für Ruhe-Puls-Animation
 
-    // Performance: Adaptive Quality & FPS-Tracking
-    let frameCount = 0;
-    let lastFPSUpdate = performance.now();
-    let currentFPS = 60;
-    let qualityLevel = 1.0; // 1.0 = voll, 0.5 = reduziert
+    // Performance: Quality-Level fest (kein adaptives Tracking - verursacht Overhead)
+    let qualityLevel = 1.0; // Fester Wert für bessere Performance
     
     // Auto-Pulse State (muss außerhalb initNetwork sein)
     let estimatedPulseLifetime = 0; // Geschätzte Lebensdauer eines Pulses (in ms)
@@ -353,8 +350,7 @@ export default function NeuralBackground() {
       const theme = themeRef.current; // Aktuelles Farbschema nutzen
 
       // Viewport Culling: Nur Neuronen im sichtbaren Bereich + Padding rendern
-      // Adaptive Padding basierend auf Quality-Level
-      const viewportPadding = 100 * qualityLevel; // Reduziertes Padding bei niedriger Qualität
+      const viewportPadding = 100; // Fester Padding-Wert
       const visibleBounds = {
         left: -viewportPadding,
         right: width + viewportPadding,
@@ -421,21 +417,9 @@ export default function NeuralBackground() {
         connectionPulses.get(connectionKey)!.push(p);
       }
 
-      // Performance: Batching von Basis-Verbindungen (gleiche Farbe/Dicke)
-      // Sammle alle Basis-Verbindungen und gruppiere sie nach ähnlicher Opacity/LineWidth
-      interface BaseConnection {
-        x1: number;
-        y1: number;
-        x2: number;
-        y2: number;
-        opacity: number;
-        lineWidth: number;
-        connectionKey: string;
-      }
-      
-      const baseConnections: BaseConnection[] = [];
+      // Zeichne Verbindungen mit leuchtenden Segmenten
+      // Performance: Vereinfachtes Rendering ohne komplexes Batching (weniger Overhead)
       const connectionsDrawn = new Set<string>();
-      
       // Erstelle Set mit Indizes der sichtbaren Neuronen
       const visibleNeuronIndices = new Set<number>();
       for (let i = 0; i < neurons.length; i++) {
@@ -448,13 +432,14 @@ export default function NeuralBackground() {
         }
       }
 
-      // Sammle alle Basis-Verbindungen
       for (let i = 0; i < neurons.length; i++) {
+        // Überspringe wenn Neuron außerhalb des Viewports ist
         if (!visibleNeuronIndices.has(i)) continue;
         
         const n = neurons[i];
         for (const targetIdx of n.connections) {
           if (targetIdx > i) {
+            // Überspringe wenn Ziel-Neuron außerhalb des Viewports ist
             if (!visibleNeuronIndices.has(targetIdx)) continue;
             
             const target = neurons[targetIdx];
@@ -462,165 +447,94 @@ export default function NeuralBackground() {
             if (connectionsDrawn.has(connectionKey)) continue;
             connectionsDrawn.add(connectionKey);
             
+            // Durchschnittliche Z-Position für diese Verbindung
             const avgZ = (n.z + target.z) / 2;
             const zNormalized = normalizeZ(avgZ);
+            
+            // Basis-Linienopacity (nicht leuchtend)
             const baseLineOpacity = theme.lineOpacity * (0.5 + zNormalized * 0.5);
             const baseLineWidth = 0.5 + zNormalized * 0.5;
             const lineWidth = baseLineWidth * 1.4;
             
-            baseConnections.push({
-              x1: n.x,
-              y1: n.y,
-              x2: target.x,
-              y2: target.y,
-              opacity: baseLineOpacity,
-              lineWidth: lineWidth,
-              connectionKey: connectionKey
-            });
-          }
-        }
-      }
-      
-      // Performance: Batch-Rendering - Gruppiere nach ähnlicher Opacity/LineWidth
-      // Runde Opacity und LineWidth für besseres Batching
-      const batchedConnections = new Map<string, BaseConnection[]>();
-      for (const conn of baseConnections) {
-        // Runde auf 0.01 für besseres Batching
-        const roundedOpacity = Math.round(conn.opacity * 100) / 100;
-        const roundedWidth = Math.round(conn.lineWidth * 10) / 10;
-        const batchKey = `${roundedOpacity}_${roundedWidth}`;
-        
-        if (!batchedConnections.has(batchKey)) {
-          batchedConnections.set(batchKey, []);
-        }
-        batchedConnections.get(batchKey)!.push(conn);
-      }
-      
-      // Zeichne alle Basis-Verbindungen in Batches
-      ctx.globalCompositeOperation = "source-over";
-      for (const [batchKey, connections] of batchedConnections) {
-        if (connections.length === 0) continue;
-        
-        const firstConn = connections[0];
-        ctx.strokeStyle = `rgba(${theme.neuron}, ${firstConn.opacity})`;
-        ctx.lineWidth = firstConn.lineWidth;
-        
-        // Zeichne alle Verbindungen dieser Batch-Gruppe in einem beginPath/stroke
-        ctx.beginPath();
-        for (const conn of connections) {
-          ctx.moveTo(conn.x1, conn.y1);
-          ctx.lineTo(conn.x2, conn.y2);
-        }
-        ctx.stroke();
-      }
-      
-      // Jetzt die Pulse-Segmente für jede Verbindung
-      for (const conn of baseConnections) {
+            // Zeichne Basis-Verbindung (nicht leuchtend)
+            ctx.globalCompositeOperation = "source-over";
+            ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(target.x, target.y);
+            ctx.stroke();
             
-        // Zeichne leuchtende Segmente basierend auf Pulsen
-        const pulsesOnConnection = connectionPulses.get(conn.connectionKey) || [];
-        if (pulsesOnConnection.length > 0) {
-          ctx.globalCompositeOperation = "lighter";
-          
-          const dx = conn.x2 - conn.x1;
-          const dy = conn.y2 - conn.y1;
-          const totalDist = Math.sqrt(dx * dx + dy * dy);
-          
-          // Erstelle ein Array von Segmenten mit kumulativer Intensität
-          const segmentIntensities = new Map<number, number>();
-          
-          // Parse connectionKey um Indizes zu erhalten
-          const [idx1, idx2] = conn.connectionKey.split('-').map(Number);
-          
-          for (const p of pulsesOnConnection) {
-            // Prüfe die Richtung des Pulses
-            const isForward = p.fromIndex === idx1 && p.toIndex === idx2;
-            const isReverse = p.fromIndex === idx2 && p.toIndex === idx1;
-            
-            if (!isForward && !isReverse) continue;
-            
-            // Normalisiere Progress basierend auf ursprünglicher Distanz
-            const t = Math.min(p.progress / (p.totalDist || totalDist), 1.0);
-            const intensity = p.strength * 0.7;
-            
-            // Performance: Adaptive Segmente basierend auf Quality-Level
-            const segmentDensity = qualityLevel > 0.7 ? 3 : (qualityLevel > 0.5 ? 4 : 5);
-            const maxSegments = qualityLevel > 0.7 ? 60 : (qualityLevel > 0.5 ? 40 : 30);
-            const numSegments = Math.min(Math.ceil(totalDist / segmentDensity), maxSegments);
-            
-            if (isForward) {
-              const maxSegment = Math.floor(t * numSegments);
-              for (let seg = 0; seg <= maxSegment; seg++) {
-                const currentIntensity = segmentIntensities.get(seg) || 0;
-                segmentIntensities.set(seg, currentIntensity + intensity);
-              }
-            } else {
-              const startSegment = Math.floor((1 - t) * numSegments);
-              for (let seg = startSegment; seg <= numSegments; seg++) {
-                const currentIntensity = segmentIntensities.get(seg) || 0;
-                segmentIntensities.set(seg, currentIntensity + intensity);
-              }
-            }
-          }
-          
-          // Batch-Rendering: Sammle alle Segmente
-          if (segmentIntensities.size > 0) {
-            const segmentDensity = qualityLevel > 0.7 ? 3 : (qualityLevel > 0.5 ? 4 : 5);
-            const maxSegments = qualityLevel > 0.7 ? 60 : (qualityLevel > 0.5 ? 40 : 30);
-            const numSegments = Math.min(Math.ceil(totalDist / segmentDensity), maxSegments);
-            
-            const segments: Array<{x1: number, y1: number, x2: number, y2: number, intensity: number}> = [];
-            let lastX = conn.x1;
-            let lastY = conn.y1;
-            let lastIntensity = 0;
-            
-            for (let seg = 0; seg <= numSegments; seg++) {
-              const segT = seg / numSegments;
-              const currentX = conn.x1 + dx * segT;
-              const currentY = conn.y1 + dy * segT;
-              const currentIntensity = segmentIntensities.get(seg) || 0;
+            // Zeichne leuchtende Segmente basierend auf Pulsen
+            const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
+            if (pulsesOnConnection.length > 0) {
+              ctx.globalCompositeOperation = "lighter";
               
-              if (currentIntensity > 0 || lastIntensity > 0) {
-                const avgIntensity = (currentIntensity + lastIntensity) / 2;
-                if (avgIntensity > 0) {
-                  segments.push({
-                    x1: lastX,
-                    y1: lastY,
-                    x2: currentX,
-                    y2: currentY,
-                    intensity: avgIntensity
-                  });
-                }
-              }
+              const dx = target.x - n.x;
+              const dy = target.y - n.y;
+              const totalDist = Math.sqrt(dx * dx + dy * dy);
               
-              lastX = currentX;
-              lastY = currentY;
-              lastIntensity = currentIntensity;
-            }
+              // Erstelle ein Array von Segmenten mit kumulativer Intensität
+              const segmentIntensities = new Map<number, number>();
+          
+              for (const p of pulsesOnConnection) {
+                // Prüfe die Richtung des Pulses
+                const isForward = p.fromIndex === i && p.toIndex === targetIdx;
+                const isReverse = p.fromIndex === targetIdx && p.toIndex === i;
             
-            // Performance: Batch-Rendering - Gruppiere Pulse-Segmente nach ähnlicher Intensität
-            if (segments.length > 0) {
-              // Gruppiere nach gerundeter Intensität für besseres Batching
-              const intensityBatches = new Map<number, typeof segments>();
-              for (const seg of segments) {
-                const roundedIntensity = Math.round(seg.intensity * 20) / 20; // Runde auf 0.05
-                if (!intensityBatches.has(roundedIntensity)) {
-                  intensityBatches.set(roundedIntensity, []);
-                }
-                intensityBatches.get(roundedIntensity)!.push(seg);
-              }
-              
-              // Zeichne alle Segmente gruppiert nach Intensität
-              for (const [intensity, segs] of intensityBatches) {
-                ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(intensity, 1.0)})`;
-                ctx.lineWidth = 2 * Math.min(intensity, 1.0);
+                if (!isForward && !isReverse) continue;
                 
-                ctx.beginPath();
-                for (const seg of segs) {
-                  ctx.moveTo(seg.x1, seg.y1);
-                  ctx.lineTo(seg.x2, seg.y2);
+                // Normalisiere Progress basierend auf ursprünglicher Distanz
+                const t = Math.min(p.progress / (p.totalDist || totalDist), 1.0);
+                const intensity = p.strength * 0.7;
+                
+                // Performance: Reduzierte Segmente für bessere Performance
+                const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
+                
+                if (isForward) {
+                  const maxSegment = Math.floor(t * numSegments);
+                  for (let seg = 0; seg <= maxSegment; seg++) {
+                    const currentIntensity = segmentIntensities.get(seg) || 0;
+                    segmentIntensities.set(seg, currentIntensity + intensity);
+                  }
+                } else {
+                  const startSegment = Math.floor((1 - t) * numSegments);
+                  for (let seg = startSegment; seg <= numSegments; seg++) {
+                    const currentIntensity = segmentIntensities.get(seg) || 0;
+                    segmentIntensities.set(seg, currentIntensity + intensity);
+                  }
                 }
-                ctx.stroke();
+              }
+              
+              // Zeichne die leuchtenden Segmente (vereinfacht, weniger Overhead)
+              if (segmentIntensities.size > 0) {
+                const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
+                let lastX = n.x;
+                let lastY = n.y;
+                let lastIntensity = 0;
+                
+                for (let seg = 0; seg <= numSegments; seg++) {
+                  const segT = seg / numSegments;
+                  const currentX = n.x + dx * segT;
+                  const currentY = n.y + dy * segT;
+                  const currentIntensity = segmentIntensities.get(seg) || 0;
+                  
+                  if (currentIntensity > 0 || lastIntensity > 0) {
+                    const avgIntensity = (currentIntensity + lastIntensity) / 2;
+                    if (avgIntensity > 0) {
+                      ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
+                      ctx.lineWidth = 2 * Math.min(avgIntensity, 1.0);
+                      ctx.beginPath();
+                      ctx.moveTo(lastX, lastY);
+                      ctx.lineTo(currentX, currentY);
+                      ctx.stroke();
+                    }
+                  }
+                  
+                  lastX = currentX;
+                  lastY = currentY;
+                  lastIntensity = currentIntensity;
+                }
               }
             }
           }
@@ -661,16 +575,14 @@ export default function NeuralBackground() {
         
         // Blur-Effekt für vordere Neuronen: mehrere überlagerte Kreise mit abnehmender Opacity
         // weiter vorne (zNormalized näher bei 1) = mehr Blur-Layers
-        // Performance: Adaptive Blur-Layers basierend auf Quality-Level
         const blurIntensity = zNormalized; // 0 = kein Blur, 1 = maximaler Blur
         
         if (blurIntensity > 0.3) {
           // Zeichne mehrere überlagerte Kreise für Blur-Effekt
-          // Performance: Adaptive Layers basierend auf Quality-Level und Z-Position
           const baseLayers = blurIntensity > 0.7 
             ? Math.ceil(blurIntensity * CONFIG.zBlurLayers) 
             : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.6);
-          const numBlurLayers = Math.ceil(baseLayers * qualityLevel); // Reduziert bei niedriger Qualität
+          const numBlurLayers = baseLayers; // Fester Wert, kein Quality-Level
           
           for (let layer = numBlurLayers; layer >= 1; layer--) {
             const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; // Abnehmende Opacity pro Layer
@@ -763,20 +675,21 @@ export default function NeuralBackground() {
       
       lastFrameTime = currentTime;
       
-      // FPS-Tracking für adaptive Quality (vereinfacht, weniger Overhead)
-      frameCount++;
-      if (currentTime - lastFPSUpdate >= 2000) { // Update alle 2 Sekunden (weniger Overhead)
-        currentFPS = frameCount / 2; // FPS = frames / 2 seconds
-        frameCount = 0;
-        lastFPSUpdate = currentTime;
-        
-        // Adaptive Quality: Reduziere Qualität wenn FPS < 50
-        if (currentFPS < 45) {
-          qualityLevel = Math.max(0.5, qualityLevel - 0.15); // Größere Schritte
-        } else if (currentFPS >= 55) {
-          qualityLevel = Math.min(1.0, qualityLevel + 0.1); // Größere Schritte
-        }
-      }
+      // FPS-Tracking für adaptive Quality (deaktiviert - verursacht Overhead)
+      // frameCount++;
+      // if (currentTime - lastFPSUpdate >= 2000) {
+      //   currentFPS = frameCount / 2;
+      //   frameCount = 0;
+      //   lastFPSUpdate = currentTime;
+      //   
+      //   if (currentFPS < 45) {
+      //     qualityLevel = Math.max(0.5, qualityLevel - 0.15);
+      //   } else if (currentFPS >= 55) {
+      //     qualityLevel = Math.min(1.0, qualityLevel + 0.1);
+      //   }
+      // }
+      // Quality-Level auf festen Wert setzen (weniger Overhead)
+      qualityLevel = 1.0;
       
       updatePhysics();
       // Aktualisiere Zeit für Ruhe-Puls-Animation
