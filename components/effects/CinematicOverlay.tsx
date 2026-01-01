@@ -67,20 +67,20 @@ export default function CinematicOverlay() {
       />
 
       {/* 2. Unscharfe Ränder: Blur-Effekt an den äußeren Bereichen */}
-      {/* Performance: backdrop-filter kann teuer sein - reduzieren oder entfernen wenn nötig */}
+      {/* Performance: backdrop-filter nur auf Ränder beschränken - Maske schließt Zentrum aus */}
       <div
         className="absolute inset-0"
         style={{
-          // Maskiert nur die Ränder (äußere 15%)
+          // Performance: Maske schließt Zentrum (75%) komplett aus - kein Blur-Rendering im Zentrum
           maskImage: "radial-gradient(circle, transparent 75%, black 100%)",
           WebkitMaskImage: "radial-gradient(circle, transparent 75%, black 100%)",
-          // Performance: Reduzierter Blur für bessere Performance (war 8px)
+          // Performance: Reduzierter Blur nur auf Ränder (war 8px, jetzt 4px)
           backdropFilter: "blur(4px)",
           WebkitBackdropFilter: "blur(4px)",
           opacity: isDark ? 0.8 : 0.4,
           transform: "translateZ(0)",
-          // GPU-Beschleunigung für backdrop-filter
-          willChange: "opacity",
+          // Performance: contain: paint isoliert Repaint-Bereich
+          contain: "paint",
         }}
       />
 

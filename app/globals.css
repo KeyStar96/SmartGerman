@@ -138,6 +138,14 @@ body {
       contain: layout style paint;
     }
     
+    /* Performance: contain: paint für Effekt-Layer isoliert Repaint-Bereiche */
+    .neural-background-container,
+    .liquid-background-container,
+    .cinematic-overlay-container {
+      contain: paint;
+      will-change: auto; /* Nur setzen wenn aktiv animiert */
+    }
+    
     /* Hero-Text initial versteckt - verhindert FOUC */
     .hero-text-reveal {
       clip-path: inset(100% 0 0 0);
