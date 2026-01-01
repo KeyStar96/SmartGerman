@@ -721,7 +721,8 @@ export default function NeuralBackground() {
       const estimatedGenerations = 1 + (1 / (1 - CONFIG.signalDecay));
       const totalLifetime = lifetimeInMs * estimatedGenerations;
       
-      return totalLifetime;
+      // Stelle sicher, dass die Lebensdauer mindestens 1000ms beträgt
+      return Math.max(totalLifetime, 1000);
     };
 
     const checkAndTriggerAutoPulse = () => {
@@ -737,12 +738,11 @@ export default function NeuralBackground() {
       }
       
       // Zähle alle aktiven Pulse
-      // Begrenze die Anzahl gleichzeitiger Signale, damit der Bildschirm nicht überfüllt wird
       const activePulseCount = pulses.length;
       const maxConcurrentPulses = 5; // Maximal 5 gleichzeitige Pulse (inkl. weitergeleitete)
       
       // Prüfe, ob 80% der Lebensdauer seit dem letzten Pulse vergangen sind
-      const timeSinceLastPulse = currentTime - lastAutoPulseTime;
+      const timeSinceLastPulse = lastAutoPulseTime > 0 ? currentTime - lastAutoPulseTime : Infinity;
       const triggerDelay = estimatedPulseLifetime * 0.8;
       
       // Starte ein neues Signal, wenn:
@@ -758,26 +758,27 @@ export default function NeuralBackground() {
         const randomIdx = Math.floor(Math.random() * neurons.length);
         activateNeuron(randomIdx);
         lastAutoPulseTime = currentTime;
-        
-        // Plane den nächsten Check nach 80% der Lebensdauer
-        autoPulseTimeout = setTimeout(() => {
-          checkAndTriggerAutoPulse();
-        }, triggerDelay);
-      } else {
-        // Prüfe erneut nach kurzer Zeit
-        const remainingTime = Math.max(triggerDelay - timeSinceLastPulse, 100);
-        autoPulseTimeout = setTimeout(() => {
-          checkAndTriggerAutoPulse();
-        }, Math.min(remainingTime, 200)); // Maximal 200ms zwischen Checks
       }
+      
+      // Plane den nächsten Check - prüfe regelmäßig
+      // Wenn keine Pulse aktiv sind, prüfe schnell (100ms)
+      // Sonst prüfe alle 200ms oder wenn 80% der Lebensdauer erreicht sind
+      const checkInterval = activePulseCount === 0 
+        ? 100 // Schnell prüfen, wenn keine Pulse aktiv sind
+        : Math.min(200, Math.max(triggerDelay - timeSinceLastPulse, 100)); // Regelmäßig prüfen
+      
+      autoPulseTimeout = setTimeout(() => {
+        checkAndTriggerAutoPulse();
+      }, checkInterval);
     };
 
     // Starte automatische Impulse nach einer initialen Verzögerung
     const startAutoPulses = () => {
       if (CONFIG.autoPulseEnabled) {
-        const initialDelay = CONFIG.autoPulseMinDelay + 
-          Math.random() * (CONFIG.autoPulseMaxDelay - CONFIG.autoPulseMinDelay);
+        // Starte mit einer kurzen initialen Verzögerung, damit das Netzwerk initialisiert ist
+        const initialDelay = 500; // 500ms initiale Verzögerung
         autoPulseTimeout = setTimeout(() => {
+          // Beim ersten Check sollte sofort ein Signal gestartet werden (lastAutoPulseTime === 0)
           checkAndTriggerAutoPulse();
         }, initialDelay);
       }
