@@ -82,16 +82,25 @@ body {
       border: 1px solid rgba(0, 0, 0, 0.1);
       /* Transparenter Hintergrund für sichtbaren Blur-Effekt */
       background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(80px) saturate(180%);
-      -webkit-backdrop-filter: blur(80px) saturate(180%);
+      /* Expliziter z-index für korrekte Schichtung über Hintergründen */
+      position: relative;
+      z-index: 2;
+      /* Blur-Effekt - reduziert auf 60px wie gewünscht */
+      backdrop-filter: blur(60px) saturate(180%);
+      -webkit-backdrop-filter: blur(60px) saturate(180%);
+      /* Chrome-Optimierung: Isolation für bessere backdrop-filter Unterstützung */
+      isolation: isolate;
+      /* GPU-Beschleunigung für bessere Performance */
+      transform: translateZ(0);
+      will-change: backdrop-filter;
     }
     
     .dark .glass-panel-enhanced {
       border: 1px solid var(--dm-border-slate);
       /* Transparenter Hintergrund für sichtbaren Blur-Effekt */
       background: rgba(13, 13, 13, 0.35); /* Transparenter für Blur-Sichtbarkeit */
-      backdrop-filter: blur(80px) saturate(180%);
-      -webkit-backdrop-filter: blur(80px) saturate(180%);
+      backdrop-filter: blur(60px) saturate(180%);
+      -webkit-backdrop-filter: blur(60px) saturate(180%);
     }
     
     /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
