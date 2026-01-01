@@ -80,17 +80,18 @@ body {
       @apply backdrop-blur-2xl rounded-2xl transition-all duration-500;
       /* Lightmode: Feine Linien */
       border: 1px solid rgba(0, 0, 0, 0.1);
-      background: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(60px) saturate(180%);
-      -webkit-backdrop-filter: blur(60px) saturate(180%);
+      /* Transparenter Hintergrund für sichtbaren Blur-Effekt */
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(80px) saturate(180%);
+      -webkit-backdrop-filter: blur(80px) saturate(180%);
     }
     
     .dark .glass-panel-enhanced {
       border: 1px solid var(--dm-border-slate);
-      /* Karten-Hintergrund: Subtiler dunkler Hintergrund, NICHT Teal */
-      background: rgba(13, 13, 13, 0.6); /* Leicht transparent über #0D0D0D */
-      backdrop-filter: blur(60px) saturate(180%);
-      -webkit-backdrop-filter: blur(60px) saturate(180%);
+      /* Transparenter Hintergrund für sichtbaren Blur-Effekt */
+      background: rgba(13, 13, 13, 0.35); /* Transparenter für Blur-Sichtbarkeit */
+      backdrop-filter: blur(80px) saturate(180%);
+      -webkit-backdrop-filter: blur(80px) saturate(180%);
     }
     
     /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
