@@ -735,9 +735,9 @@ export default function NeuralBackground() {
         estimatedPulseLifetime = calculateAveragePulseLifetime();
       }
       
-      // Prüfe, ob 60% der Lebensdauer seit dem letzten Pulse vergangen sind
+      // Prüfe, ob 80% der Lebensdauer seit dem letzten Pulse vergangen sind
       const timeSinceLastPulse = currentTime - lastAutoPulseTime;
-      const triggerDelay = estimatedPulseLifetime * 0.6;
+      const triggerDelay = estimatedPulseLifetime * 0.8;
       
       if (timeSinceLastPulse >= triggerDelay || lastAutoPulseTime === 0) {
         // Wähle ein zufälliges Neuron aus
@@ -745,12 +745,12 @@ export default function NeuralBackground() {
         activateNeuron(randomIdx);
         lastAutoPulseTime = currentTime;
         
-        // Plane den nächsten Check nach 60% der Lebensdauer
+        // Plane den nächsten Check nach 80% der Lebensdauer
         autoPulseTimeout = setTimeout(() => {
           checkAndTriggerAutoPulse();
         }, triggerDelay);
       } else {
-        // Prüfe erneut nach kurzer Zeit, bis 60% erreicht sind
+        // Prüfe erneut nach kurzer Zeit, bis 80% erreicht sind
         const remainingTime = triggerDelay - timeSinceLastPulse;
         autoPulseTimeout = setTimeout(() => {
           checkAndTriggerAutoPulse();
