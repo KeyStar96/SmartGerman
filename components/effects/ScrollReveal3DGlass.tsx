@@ -44,7 +44,8 @@ export default function ScrollReveal3DGlass({
         // preserve-3d bricht backdrop-filter in Safari/iOS!
         transformStyle: "flat",
         transformOrigin: "center center",
-        willChange: "transform, opacity",
+        // CHROME FIX: willChange entfernt - bricht backdrop-filter bei Kind-Elementen!
+        // GPU-Beschleunigung wird stattdessen via gpu-render Klasse gesetzt
       }}
     >
       {children}

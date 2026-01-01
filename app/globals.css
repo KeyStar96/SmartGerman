@@ -76,17 +76,19 @@ body {
     }
     
     /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
-    /* SAFARI-BUG: backdrop-filter funktioniert NICHT mit transform-style: preserve-3d */
-    /* Lösung: Pseudo-Element für Blur, das unabhängig von 3D-Transformationen ist */
+    /* CHROME-BUG: backdrop-filter bricht wenn Eltern willChange/perspective haben */
+    /* Lösung: isolation: isolate erstellt eigenen Stacking-Context */
     .glass-panel-enhanced {
       @apply rounded-2xl transition-all duration-500;
       /* Lightmode: Feine Linien */
       border: 1px solid rgba(0, 0, 0, 0.1);
-      /* Hintergrund mit höherer Opazität als Fallback für Safari bei 3D-Animation */
+      /* Hintergrund mit höherer Opazität als Fallback */
       background: rgba(255, 255, 255, 0.5);
       /* Expliziter z-index für korrekte Schichtung über Hintergründen */
       position: relative;
       z-index: 2;
+      /* CHROME FIX: isolation erstellt eigenen Stacking-Context für backdrop-filter */
+      isolation: isolate;
       /* Blur-Effekt: -webkit zuerst für Safari */
       -webkit-backdrop-filter: blur(40px) saturate(180%);
       backdrop-filter: blur(40px) saturate(180%);
@@ -96,7 +98,7 @@ body {
     
     .dark .glass-panel-enhanced {
       border: 1px solid var(--dm-border-slate);
-      /* Höhere Opazität als Fallback für Safari bei 3D-Animation */
+      /* Höhere Opazität als Fallback */
       background: rgba(13, 13, 13, 0.5);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
       backdrop-filter: blur(40px) saturate(180%);
