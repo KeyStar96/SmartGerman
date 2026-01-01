@@ -88,7 +88,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       }, 0); // Startet sofort bei Position 0
     }
 
-    // 2. Badge fade-in (nach Brand-Name - SmartGerman)
+    // 2. Badge fade-in (nach Brand-Name)
     if (badgeRef.current) {
       gsap.set(badgeRef.current, {
         opacity: 0,
@@ -103,25 +103,25 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 0.8,
         ease: "power2.out",
         force3D: true,
-      }, 1.5); // Startet nach SmartGerman (bei 1.5s, leichtes Overlap)
+      }, 0.5); // Startet nach Brand-Name (bei Position 0.5)
     }
 
     // 3. Headline fade-in (nach Badge)
-    // LCP-Optimierung: Headline ist sofort sichtbar (opacity: 1), nur Y-Offset wird animiert
     if (headlineRef.current) {
       gsap.set(headlineRef.current, {
-        opacity: 1, // LCP: Sofort sichtbar für besseren LCP
+        opacity: 0,
         y: 20,
         force3D: true,
         immediateRender: true
       });
       
       tl.to(headlineRef.current, {
-        y: 0, // Nur Y-Offset animieren, Opacity bleibt 1
+        opacity: 1,
+        y: 0,
         duration: 1,
         ease: "power2.out",
         force3D: true,
-      }, 2.3); // Startet nach Badge (bei 2.3s)
+      }, 1.7); // Angepasst, da Badge jetzt später kommt
     }
 
     // 4. Subline fade-in (nach Headline)
@@ -139,7 +139,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 1,
         ease: "power2.out",
         force3D: true,
-      }, 3.3); // Startet nach Headline (bei 3.3s)
+      }, 2);
     }
 
     // 5. Content (CTAs) fade-in (zuletzt)
@@ -158,14 +158,14 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 1,
         ease: "power2.out",
         force3D: true
-      }, 4.0); // Startet nach Subline (bei 4.0s)
+      }, 2.5);
     }
 
     // Signalisiere, dass die Hero-Animation abgeschlossen ist
-    // Die Timeline endet bei ~5.0 Sekunden (4.0 + 1.0)
+    // Die Timeline endet bei ~3.5 Sekunden (2.5 + 1.0)
     tl.call(() => {
       window.dispatchEvent(new CustomEvent('hero-animation-complete'));
-    }, [], 5.0);
+    }, [], 3.5);
 
     // 6. 3D Scroll-X Rotation - Umfallen-Effekt für Brand-Name
     if (heroTextWrapper.current) {
@@ -268,15 +268,12 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             </span>
           </h1>
 
-          {/* Wissenschaftliche Headline - LCP Element */}
-          {/* LCP-Optimierung: Text ist sofort sichtbar für besseren LCP */}
+          {/* Wissenschaftliche Headline */}
           <h2 
             ref={headlineRef}
             className="text-3xl md:text-4xl lg:text-5xl font-medium mb-8 max-w-4xl mx-auto leading-tight text-lm-text-espresso dark:text-dm-text-main"
             style={{ 
-              opacity: 1, // LCP: Sofort sichtbar
-              // Verhindere Layout-Shift durch reservierten Platz
-              minHeight: "1.2em",
+              opacity: 0,
             }}
           >
             {dictionary.hero.headline}
