@@ -728,6 +728,7 @@ export default function NeuralBackground() {
       if (!CONFIG.autoPulseEnabled) return;
       
       const neurons = neuronsRef.current;
+      const pulses = pulsesRef.current;
       const currentTime = Date.now();
       
       // Berechne die erwartete Lebensdauer, wenn noch nicht gesetzt oder Netzwerk neu initialisiert wurde
@@ -735,11 +736,24 @@ export default function NeuralBackground() {
         estimatedPulseLifetime = calculateAveragePulseLifetime();
       }
       
+      // Zähle alle aktiven Pulse
+      // Begrenze die Anzahl gleichzeitiger Signale, damit der Bildschirm nicht überfüllt wird
+      const activePulseCount = pulses.length;
+      const maxConcurrentPulses = 5; // Maximal 5 gleichzeitige Pulse (inkl. weitergeleitete)
+      
       // Prüfe, ob 80% der Lebensdauer seit dem letzten Pulse vergangen sind
       const timeSinceLastPulse = currentTime - lastAutoPulseTime;
       const triggerDelay = estimatedPulseLifetime * 0.8;
       
-      if (timeSinceLastPulse >= triggerDelay || lastAutoPulseTime === 0) {
+      // Starte ein neues Signal, wenn:
+      // 1. Noch kein Signal gestartet wurde (lastAutoPulseTime === 0)
+      // 2. Oder keine Pulse mehr aktiv sind (damit immer mindestens ein Signal sichtbar ist)
+      // 3. Oder 80% der Lebensdauer vergangen sind UND die Anzahl aktiver Pulse niedrig ist
+      const shouldTrigger = lastAutoPulseTime === 0 || 
+        activePulseCount === 0 ||
+        (timeSinceLastPulse >= triggerDelay && activePulseCount < maxConcurrentPulses);
+      
+      if (shouldTrigger) {
         // Wähle ein zufälliges Neuron aus
         const randomIdx = Math.floor(Math.random() * neurons.length);
         activateNeuron(randomIdx);
@@ -750,11 +764,11 @@ export default function NeuralBackground() {
           checkAndTriggerAutoPulse();
         }, triggerDelay);
       } else {
-        // Prüfe erneut nach kurzer Zeit, bis 80% erreicht sind
-        const remainingTime = triggerDelay - timeSinceLastPulse;
+        // Prüfe erneut nach kurzer Zeit
+        const remainingTime = Math.max(triggerDelay - timeSinceLastPulse, 100);
         autoPulseTimeout = setTimeout(() => {
           checkAndTriggerAutoPulse();
-        }, Math.min(remainingTime, 100)); // Maximal 100ms zwischen Checks
+        }, Math.min(remainingTime, 200)); // Maximal 200ms zwischen Checks
       }
     };
 
