@@ -5,6 +5,9 @@ import { gsap } from "@/lib/gsap";
 
 /**
  * CONFIG: Physics & Grid
+ * 
+ * OPTIMIERUNG: Zeit-basierte Animationen für konsistente Geschwindigkeit
+ * auf allen Bildschirmgrößen und Browsern
  */
 const CONFIG = {
   // Gitter & Dichte
@@ -23,15 +26,16 @@ const CONFIG = {
   mouseForce: 0.003,          
   damping: 0.95,              
   
-  // Signale
-  signalSpeed: 4.0,           
+  // Signale - ZEIT-BASIERT für konsistente Geschwindigkeit
+  // signalSpeedPerSecond: Wie viel Prozent der Verbindung pro Sekunde zurückgelegt wird
+  signalSpeedPerSecond: 0.8,  // 80% der Verbindungslänge pro Sekunde (langsamer, einheitlich)
   signalLength: 120,          
   signalDecay: 0.6,           
   minSignalStrength: 0.15,    
   
   // Optik Basis
   particleSize: 2,
-  flashDecay: 0.04,
+  flashDecayPerSecond: 2.0,   // Flash klingt mit 2.0 pro Sekunde ab
   
   // 3D Z-Dimension
   zDepthRange: 400,           
@@ -47,7 +51,10 @@ const CONFIG = {
   // Ruhe-Puls-Animation
   idlePulseEnabled: true,     
   idlePulseIntensity: 0.6,    
-  idlePulseSpeed: 0.05,        
+  idlePulseSpeed: 0.05,
+  
+  // NEU: Verbindungs-Afterglow - Langsames Verblassen nach Impuls
+  connectionGlowDecayPerSecond: 1.5, // Glow klingt mit 1.5 pro Sekunde ab (langsames Verblassen)
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -84,9 +91,14 @@ interface Pulse {
   id: number;
   fromIndex: number;
   toIndex: number;
-  progress: number;
+  progress: number;      // 0 bis 1 (Prozent der Verbindungslänge)
   totalDist: number;
   strength: number;
+}
+
+// NEU: Verbindungs-Glow State für langsames Verblassen
+interface ConnectionGlow {
+  intensity: number;     // 0 bis 1
 }
 
 export default function NeuralBackground() {
@@ -97,6 +109,9 @@ export default function NeuralBackground() {
   const neuronsRef = useRef<Neuron[]>([]);
   const pulsesRef = useRef<Pulse[]>([]);
   const pulseIdCounter = useRef(0);
+  
+  // NEU: Map für Verbindungs-Glow (Key: "minIndex-maxIndex")
+  const connectionGlowRef = useRef<Map<string, ConnectionGlow>>(new Map());
   
   const themeRef = useRef(THEME_COLORS.dark);
 
@@ -252,6 +267,7 @@ export default function NeuralBackground() {
 
       neuronsRef.current = newNeurons;
       pulsesRef.current = [];
+      connectionGlowRef.current.clear(); // Reset connection glow state
       estimatedPulseLifetime = 0;
     };
 
@@ -266,29 +282,32 @@ export default function NeuralBackground() {
       });
     };
 
-    // --- 2. Physik ---
-    const updatePhysics = () => {
+    // --- 2. Physik (Zeit-basiert für konsistente Animation) ---
+    const updatePhysics = (deltaSeconds: number) => {
       const neurons = neuronsRef.current;
       const mouse = mouseRef.current;
+      
+      // Normalisierungsfaktor: Physik war für 60fps ausgelegt
+      const timeScale = deltaSeconds * 60;
 
       const mouseSquared = mouse.active ? CONFIG.mouseInteractionRadius * CONFIG.mouseInteractionRadius : 0;
 
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
 
-        n.wanderAngle += (Math.random() - 0.5) * CONFIG.wanderSpeed;
+        n.wanderAngle += (Math.random() - 0.5) * CONFIG.wanderSpeed * timeScale;
         const wanderX = Math.cos(n.wanderAngle) * CONFIG.wanderRadius;
         const wanderY = Math.sin(n.wanderAngle) * CONFIG.wanderRadius;
         
-        n.vx += wanderX;
-        n.vy += wanderY;
+        n.vx += wanderX * timeScale;
+        n.vy += wanderY * timeScale;
 
         const dxBase = n.baseX - n.x;
         const dyBase = n.baseY - n.y;
         const dzBase = n.baseZ - n.z;
-        n.vx += dxBase * CONFIG.springStiffness;
-        n.vy += dyBase * CONFIG.springStiffness;
-        n.vz += dzBase * CONFIG.springStiffness;
+        n.vx += dxBase * CONFIG.springStiffness * timeScale;
+        n.vy += dyBase * CONFIG.springStiffness * timeScale;
+        n.vz += dzBase * CONFIG.springStiffness * timeScale;
 
         if (mouse.active && mouseSquared > 0) {
           const dxMouse = mouse.x - n.x;
@@ -298,21 +317,33 @@ export default function NeuralBackground() {
           if (distMouseSquared < mouseSquared) {
             const distMouse = Math.sqrt(distMouseSquared);
             const force = (1 - distMouse / CONFIG.mouseInteractionRadius) * CONFIG.mouseForce;
-            n.vx += dxMouse * force; 
-            n.vy += dyMouse * force;
+            n.vx += dxMouse * force * timeScale; 
+            n.vy += dyMouse * force * timeScale;
           }
         }
 
-        n.vx *= CONFIG.damping;
-        n.vy *= CONFIG.damping;
-        n.vz *= CONFIG.damping;
-        n.x += n.vx;
-        n.y += n.vy;
-        n.z += n.vz;
+        // Damping mit Zeit-Skalierung
+        const dampingFactor = Math.pow(CONFIG.damping, timeScale);
+        n.vx *= dampingFactor;
+        n.vy *= dampingFactor;
+        n.vz *= dampingFactor;
+        n.x += n.vx * timeScale;
+        n.y += n.vy * timeScale;
+        n.z += n.vz * timeScale;
 
+        // Flash-Decay ist jetzt zeit-basiert
         if (n.flash > 0) {
-          n.flash -= CONFIG.flashDecay;
+          n.flash -= CONFIG.flashDecayPerSecond * deltaSeconds;
           if (n.flash < 0) n.flash = 0;
+        }
+      }
+      
+      // NEU: Connection-Glow Decay (langsames Verblassen)
+      const connectionGlow = connectionGlowRef.current;
+      for (const [key, glow] of connectionGlow.entries()) {
+        glow.intensity -= CONFIG.connectionGlowDecayPerSecond * deltaSeconds;
+        if (glow.intensity <= 0) {
+          connectionGlow.delete(key);
         }
       }
     };
@@ -323,11 +354,12 @@ export default function NeuralBackground() {
       return Math.max(0, Math.min(1, normalized));
     };
 
-    const draw = () => {
+    const draw = (deltaSeconds: number) => {
       ctx.clearRect(0, 0, width, height);
       
       const neurons = neuronsRef.current;
       const pulses = pulsesRef.current;
+      const connectionGlow = connectionGlowRef.current;
       const theme = themeRef.current; 
 
       const viewportPadding = 100; 
@@ -347,7 +379,7 @@ export default function NeuralBackground() {
 
       const sortedNeurons = visibleNeurons.sort((a, b) => a.z - b.z);
 
-      // 1. Update Pulse Progress 
+      // 1. Update Pulse Progress (ZEIT-BASIERT für konsistente Geschwindigkeit)
       for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i];
         const nA = neurons[p.fromIndex];
@@ -361,9 +393,19 @@ export default function NeuralBackground() {
           p.totalDist = dist;
         }
         
-        p.progress += CONFIG.signalSpeed;
+        // ZEIT-BASIERT: Progress ist jetzt 0-1 (Prozent), nicht absolute Pixel
+        // signalSpeedPerSecond bestimmt, wie viel Prozent der Verbindung pro Sekunde zurückgelegt wird
+        p.progress += CONFIG.signalSpeedPerSecond * deltaSeconds;
+        
+        // Setze/aktualisiere den ConnectionGlow für diese Verbindung
+        const glowKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
+        const existingGlow = connectionGlow.get(glowKey);
+        const newGlowIntensity = p.strength * 0.8;
+        if (!existingGlow || existingGlow.intensity < newGlowIntensity) {
+          connectionGlow.set(glowKey, { intensity: newGlowIntensity });
+        }
 
-        if (p.progress >= p.totalDist) {
+        if (p.progress >= 1.0) {
           pulses.splice(i, 1);
           nB.flash = 1.0 * p.strength;
 
@@ -422,6 +464,10 @@ export default function NeuralBackground() {
             const baseLineWidth = 0.5 + zNormalized * 0.5;
             const lineWidth = baseLineWidth * 1.4;
             
+            // NEU: Prüfe ob diese Verbindung einen Afterglow hat
+            const glowState = connectionGlow.get(connectionKey);
+            const hasActiveGlow = glowState && glowState.intensity > 0.01;
+            
             ctx.globalCompositeOperation = "source-over";
             ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
             ctx.lineWidth = lineWidth;
@@ -429,6 +475,18 @@ export default function NeuralBackground() {
             ctx.moveTo(n.x, n.y);
             ctx.lineTo(target.x, target.y);
             ctx.stroke();
+            
+            // NEU: Zeichne Afterglow wenn vorhanden (langsam verblassende Verbindung)
+            if (hasActiveGlow) {
+              ctx.globalCompositeOperation = "lighter";
+              const glowIntensity = glowState!.intensity;
+              ctx.strokeStyle = `rgba(${theme.signal}, ${glowIntensity * 0.5})`;
+              ctx.lineWidth = lineWidth * (1 + glowIntensity);
+              ctx.beginPath();
+              ctx.moveTo(n.x, n.y);
+              ctx.lineTo(target.x, target.y);
+              ctx.stroke();
+            }
             
             const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
             if (pulsesOnConnection.length > 0) {
@@ -446,7 +504,8 @@ export default function NeuralBackground() {
             
                 if (!isForward && !isReverse) continue;
                 
-                const t = Math.min(p.progress / (p.totalDist || totalDist), 1.0);
+                // Progress ist jetzt bereits 0-1, keine Division mehr nötig
+                const t = Math.min(p.progress, 1.0);
                 const intensity = p.strength * 0.7;
                 
                 const numSegments = Math.min(Math.ceil(totalDist / 3), 50);
@@ -600,24 +659,30 @@ export default function NeuralBackground() {
     
     const loop = (currentTime: number = performance.now()) => {
       if (document.hidden) {
+        lastFrameTime = currentTime; // Reset timer when tab becomes visible again
         animationFrameId = requestAnimationFrame(loop);
         return;
       }
       
       const deltaTime = currentTime - lastFrameTime;
       
+      // Frame-Limiting für Performance, aber deltaTime wird trotzdem korrekt berechnet
       if (deltaTime < frameInterval * 0.8) {
         animationFrameId = requestAnimationFrame(loop);
         return;
       }
       
+      // Begrenze deltaTime um Sprünge nach Tab-Wechsel zu vermeiden
+      const clampedDelta = Math.min(deltaTime, 100); // Max 100ms pro Frame
+      const deltaSeconds = clampedDelta / 1000;
+      
       lastFrameTime = currentTime;
       
-      updatePhysics();
+      updatePhysics(deltaSeconds);
       if (CONFIG.idlePulseEnabled) {
-        idlePulseTime += CONFIG.idlePulseSpeed;
+        idlePulseTime += CONFIG.idlePulseSpeed * (deltaSeconds * 60); // Normalisiert auf 60fps
       }
-      draw();
+      draw(deltaSeconds);
       animationFrameId = requestAnimationFrame(loop);
     };
 
@@ -689,34 +754,13 @@ export default function NeuralBackground() {
     let lastAutoPulseTime = 0; 
 
     const calculateAveragePulseLifetime = (): number => {
-      const neurons = neuronsRef.current;
-      if (neurons.length === 0) return 2000; 
+      // Da die Geschwindigkeit jetzt zeit-basiert ist (Prozent pro Sekunde),
+      // ist die Lebensdauer eines einzelnen Pulses: 1 / signalSpeedPerSecond Sekunden
+      const singlePulseLifetimeMs = (1 / CONFIG.signalSpeedPerSecond) * 1000;
       
-      let totalDist = 0;
-      let connectionCount = 0;
-      
-      for (let i = 0; i < neurons.length; i++) {
-        const n = neurons[i];
-        for (const targetIdx of n.connections) {
-          if (targetIdx > i) {
-            const target = neurons[targetIdx];
-            const dx = target.x - n.x;
-            const dy = target.y - n.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            totalDist += dist;
-            connectionCount++;
-          }
-        }
-      }
-      
-      if (connectionCount === 0) return 2000; 
-      
-      const avgDist = totalDist / connectionCount;
-      const lifetimeInFrames = avgDist / CONFIG.signalSpeed;
-      const lifetimeInMs = lifetimeInFrames * (1000 / 60);
-      
+      // Schätzung der Generationen basierend auf Decay
       const estimatedGenerations = 1 + (1 / (1 - CONFIG.signalDecay));
-      const totalLifetime = lifetimeInMs * estimatedGenerations;
+      const totalLifetime = singlePulseLifetimeMs * estimatedGenerations;
       
       return Math.max(totalLifetime, 1000);
     };
