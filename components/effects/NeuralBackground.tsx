@@ -46,8 +46,8 @@ const CONFIG = {
   
   // Ruhe-Puls-Animation (subtile neuronale Aktivität)
   idlePulseEnabled: true,     // Ruhe-Puls-Animation aktivieren
-  idlePulseIntensity: 0.8,    // Sehr dezent (80% der Intensität eines Klicks)
-  idlePulseSpeed: 0.02,       // Langsame Puls-Geschwindigkeit
+  idlePulseIntensity: 0.6,    // Sehr dezent (60% der Intensität eines Klicks)
+  idlePulseSpeed: 0.2,        // Langsame Puls-Geschwindigkeit
 };
 
 // Farb-Konfigurationen für Light/Dark
