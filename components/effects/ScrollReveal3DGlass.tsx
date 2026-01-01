@@ -15,6 +15,9 @@ interface ScrollReveal3DGlassProps {
  * - Verwendet sanfte CSS 3D Transforms für flüssige Scroll-Animation
  * - Karten bauen sich aus der Tiefe auf und gleiten dem Nutzer entgegen
  * - Performance-optimiert mit GPU-Beschleunigung
+ * 
+ * SAFARI-BUG FIX: backdrop-filter funktioniert NICHT mit transform-style: preserve-3d
+ * Lösung: 3D-Transformation nur auf den Wrapper anwenden, Kind-Elemente bleiben "flat"
  */
 export default function ScrollReveal3DGlass({
   children,
@@ -37,9 +40,11 @@ export default function ScrollReveal3DGlass({
       ref={elementRef}
       className={`gpu-render ${className}`}
       style={{
-        transformStyle: "preserve-3d",
-        transformOrigin: "center center", // Zentriert statt bottom für harmonische Skalierung
-        willChange: "transform, opacity", // Performance: GPU-Optimierung für Animation
+        // WICHTIG: transform-style: flat statt preserve-3d
+        // preserve-3d bricht backdrop-filter in Safari/iOS!
+        transformStyle: "flat",
+        transformOrigin: "center center",
+        willChange: "transform, opacity",
       }}
     >
       {children}

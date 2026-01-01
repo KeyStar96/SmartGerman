@@ -76,27 +76,30 @@ body {
     }
     
     /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
-    /* Beide Properties explizit für Browser-Konsistenz (Chrome & Safari) */
+    /* SAFARI-BUG: backdrop-filter funktioniert NICHT mit transform-style: preserve-3d */
+    /* Lösung: Pseudo-Element für Blur, das unabhängig von 3D-Transformationen ist */
     .glass-panel-enhanced {
       @apply rounded-2xl transition-all duration-500;
       /* Lightmode: Feine Linien */
       border: 1px solid rgba(0, 0, 0, 0.1);
-      /* Transparenter Hintergrund für sichtbaren Blur-Effekt */
-      background: rgba(255, 255, 255, 0.25);
+      /* Hintergrund mit höherer Opazität als Fallback für Safari bei 3D-Animation */
+      background: rgba(255, 255, 255, 0.5);
       /* Expliziter z-index für korrekte Schichtung über Hintergründen */
       position: relative;
       z-index: 2;
-      /* Blur-Effekt: Beide Properties für Chrome & Safari */
-      backdrop-filter: blur(60px) saturate(180%);
-      -webkit-backdrop-filter: blur(60px) saturate(180%);
+      /* Blur-Effekt: -webkit zuerst für Safari */
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(180%);
+      /* Verhindert 3D-Vererbung auf das Element selbst */
+      transform-style: flat;
     }
     
     .dark .glass-panel-enhanced {
       border: 1px solid var(--dm-border-slate);
-      /* Transparenter Hintergrund für sichtbaren Blur-Effekt */
-      background: rgba(13, 13, 13, 0.35); /* Transparenter für Blur-Sichtbarkeit */
-      backdrop-filter: blur(60px) saturate(180%);
-      -webkit-backdrop-filter: blur(60px) saturate(180%);
+      /* Höhere Opazität als Fallback für Safari bei 3D-Animation */
+      background: rgba(13, 13, 13, 0.5);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      backdrop-filter: blur(40px) saturate(180%);
     }
     
     /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
@@ -119,19 +122,20 @@ body {
     }
     
     /* Glassmorphismus für Header: Sanfter Blur mit mehr Durchscheinen */
-    /* Beide Properties explizit für Browser-Konsistenz (Chrome & Safari) */
+    /* Chrome benötigt position:relative für backdrop-filter */
     .glass-header {
+      position: relative;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       background: rgba(255, 255, 255, 0.45); /* Mehr Transparenz für sanfteren Effekt */
-      backdrop-filter: blur(8px) saturate(150%);
       -webkit-backdrop-filter: blur(8px) saturate(150%);
+      backdrop-filter: blur(8px) saturate(150%);
     }
     
     .dark .glass-header {
       border-bottom: 1px solid var(--dm-border-slate);
       background: rgba(13, 13, 13, 0.55); /* Mehr Transparenz für sanfteren Effekt */
-      backdrop-filter: blur(8px) saturate(150%);
       -webkit-backdrop-filter: blur(8px) saturate(150%);
+      backdrop-filter: blur(8px) saturate(150%);
     }
     
     /* GPU-Acceleration für High-Performance Animationen */

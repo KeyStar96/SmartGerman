@@ -98,12 +98,12 @@ export default function PlaceholderSection() {
         </div>
 
         {/* Cards Grid - Perspective Container für 3D-Effekt */}
+        {/* SAFARI-BUG FIX: preserve-3d entfernt - bricht backdrop-filter! */}
         <div 
           ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
           style={{ 
             perspective: "1000px",
-            transformStyle: "preserve-3d"
           }}
         >
           {cards.map((card, index) => (
