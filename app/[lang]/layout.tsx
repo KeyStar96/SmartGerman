@@ -4,7 +4,6 @@ import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import LiquidBackground from "@/components/effects/LiquidBackground";
 import NeuralBackground from "@/components/effects/NeuralBackground";
-import CinematicOverlay from "@/components/effects/CinematicOverlay";
 import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 
@@ -47,11 +46,6 @@ export default async function RootLayout({
         {/* 2. Die mittlere Ebene: Das Neuronale Netz */}
         <div style={{ zIndex: -1 }} className="fixed inset-0 neural-background-container">
           <NeuralBackground />
-        </div>
-
-        {/* 2.5. Cinematic Overlay: Nur Vignette am Rand (ohne Grain) */}
-        <div className="cinematic-overlay-container">
-          <CinematicOverlay />
         </div>
 
         {/* 3. Die oberste Ebene: Dein Content */}
