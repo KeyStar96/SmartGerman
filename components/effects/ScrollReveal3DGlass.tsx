@@ -63,7 +63,7 @@ export default function ScrollReveal3DGlass({
       // Karten-Styles
       console.group('Karte (.glass-panel-enhanced)');
       console.log('backdrop-filter:', cardStyles.backdropFilter);
-      console.log('-webkit-backdrop-filter:', cardStyles.webkitBackdropFilter);
+      console.log('-webkit-backdrop-filter:', (cardStyles as unknown as Record<string, string>)['webkitBackdropFilter'] || cardStyles.getPropertyValue('-webkit-backdrop-filter'));
       console.log('background:', cardStyles.background);
       console.log('isolation:', cardStyles.isolation);
       console.log('position:', cardStyles.position);
