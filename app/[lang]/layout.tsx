@@ -49,7 +49,7 @@ export default async function RootLayout({
           <NeuralBackground />
         </div>
 
-        {/* 2.5. Cinematic Overlay: Vignette, Blur, Grain & Chromatische Aberration */}
+        {/* 2.5. Cinematic Overlay: Nur Vignette am Rand (ohne Grain) */}
         <div className="cinematic-overlay-container">
           <CinematicOverlay />
         </div>
