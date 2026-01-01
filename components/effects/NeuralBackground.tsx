@@ -252,6 +252,9 @@ export default function NeuralBackground() {
 
       neuronsRef.current = newNeurons;
       pulsesRef.current = [];
+      
+      // Setze geschätzte Lebensdauer zurück, damit sie neu berechnet wird
+      estimatedPulseLifetime = 0;
     };
 
     const spawnPulse = (fromIdx: number, toIdx: number, strength: number) => {
@@ -680,52 +683,78 @@ export default function NeuralBackground() {
 
     // Automatischer Impuls-Handler
     let autoPulseTimeout: NodeJS.Timeout | null = null;
-    let isAutoPulseActive = false;
+    let lastAutoPulseTime = 0; // Zeitpunkt des letzten automatischen Pulses
+    let estimatedPulseLifetime = 0; // Geschätzte Lebensdauer eines Pulses (in ms)
+
+    // Berechne die durchschnittliche Lebensdauer eines Pulses basierend auf Verbindungsdistanzen
+    const calculateAveragePulseLifetime = (): number => {
+      const neurons = neuronsRef.current;
+      if (neurons.length === 0) return 2000; // Fallback-Wert
+      
+      let totalDist = 0;
+      let connectionCount = 0;
+      
+      for (let i = 0; i < neurons.length; i++) {
+        const n = neurons[i];
+        for (const targetIdx of n.connections) {
+          if (targetIdx > i) {
+            const target = neurons[targetIdx];
+            const dx = target.x - n.x;
+            const dy = target.y - n.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            totalDist += dist;
+            connectionCount++;
+          }
+        }
+      }
+      
+      if (connectionCount === 0) return 2000; // Fallback-Wert
+      
+      const avgDist = totalDist / connectionCount;
+      // Lebensdauer = Distanz / Signalgeschwindigkeit (in Frames)
+      // Umrechnung zu ms: Frames * (1000 / 60) für 60 FPS
+      const lifetimeInFrames = avgDist / CONFIG.signalSpeed;
+      const lifetimeInMs = lifetimeInFrames * (1000 / 60);
+      
+      // Berücksichtige Signal-Decay (mehrere Generationen)
+      // Schätze durchschnittlich 2-3 Generationen basierend auf signalDecay
+      const estimatedGenerations = 1 + (1 / (1 - CONFIG.signalDecay));
+      const totalLifetime = lifetimeInMs * estimatedGenerations;
+      
+      return totalLifetime;
+    };
 
     const checkAndTriggerAutoPulse = () => {
-      if (!CONFIG.autoPulseEnabled || isAutoPulseActive) return;
+      if (!CONFIG.autoPulseEnabled) return;
       
       const neurons = neuronsRef.current;
-      const pulses = pulsesRef.current;
+      const currentTime = Date.now();
       
-      // Prüfe, ob alle Pulse abgeklungen sind (keine aktiven Pulse und keine Flashes)
-      const hasActivePulses = pulses.length > 0;
-      const hasActiveFlashes = neurons.some(n => n.flash > 0.01);
+      // Berechne die erwartete Lebensdauer, wenn noch nicht gesetzt oder Netzwerk neu initialisiert wurde
+      if (estimatedPulseLifetime === 0) {
+        estimatedPulseLifetime = calculateAveragePulseLifetime();
+      }
       
-      if (!hasActivePulses && !hasActiveFlashes) {
+      // Prüfe, ob 60% der Lebensdauer seit dem letzten Pulse vergangen sind
+      const timeSinceLastPulse = currentTime - lastAutoPulseTime;
+      const triggerDelay = estimatedPulseLifetime * 0.6;
+      
+      if (timeSinceLastPulse >= triggerDelay || lastAutoPulseTime === 0) {
         // Wähle ein zufälliges Neuron aus
         const randomIdx = Math.floor(Math.random() * neurons.length);
         activateNeuron(randomIdx);
-        isAutoPulseActive = true;
+        lastAutoPulseTime = currentTime;
         
-        // Warte, bis der Impuls komplett abgeklungen ist
-        const checkComplete = () => {
-          const currentPulses = pulsesRef.current;
-          const currentNeurons = neuronsRef.current;
-          const stillHasPulses = currentPulses.length > 0;
-          const stillHasFlashes = currentNeurons.some(n => n.flash > 0.01);
-          
-          if (!stillHasPulses && !stillHasFlashes) {
-            isAutoPulseActive = false;
-            // Warte eine zufällige Zeit, bevor der nächste Impuls kommt
-            const delay = CONFIG.autoPulseMinDelay + 
-              Math.random() * (CONFIG.autoPulseMaxDelay - CONFIG.autoPulseMinDelay);
-            autoPulseTimeout = setTimeout(() => {
-              checkAndTriggerAutoPulse();
-            }, delay);
-          } else {
-            // Prüfe erneut nach kurzer Zeit
-            requestAnimationFrame(checkComplete);
-          }
-        };
-        
-        // Starte die Überwachung nach kurzer Verzögerung
-        setTimeout(() => {
-          requestAnimationFrame(checkComplete);
-        }, 100);
+        // Plane den nächsten Check nach 60% der Lebensdauer
+        autoPulseTimeout = setTimeout(() => {
+          checkAndTriggerAutoPulse();
+        }, triggerDelay);
       } else {
-        // Prüfe erneut nach kurzer Zeit
-        autoPulseTimeout = setTimeout(checkAndTriggerAutoPulse, 500);
+        // Prüfe erneut nach kurzer Zeit, bis 60% erreicht sind
+        const remainingTime = triggerDelay - timeSinceLastPulse;
+        autoPulseTimeout = setTimeout(() => {
+          checkAndTriggerAutoPulse();
+        }, Math.min(remainingTime, 100)); // Maximal 100ms zwischen Checks
       }
     };
 
