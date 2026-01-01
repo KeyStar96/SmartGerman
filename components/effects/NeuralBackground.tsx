@@ -755,21 +755,10 @@ export default function NeuralBackground() {
       }, 250);
     };
     // Performance: Optimiertes Maus-Event-Handling für besseren INP
-    // Direkte Updates ohne requestAnimationFrame-Throttling (reduziert Presentation Delay)
-    let lastMouseUpdate = 0;
-    const mouseUpdateThrottle = 16; // ~60fps (16ms)
-    
+    // Direkte Updates ohne Throttling für minimale Latenz
     const handleMouseMove = (e: MouseEvent) => {
-      const now = performance.now();
-      
-      // Throttle nur bei sehr schnellen Bewegungen (nicht bei jedem Event)
-      if (now - lastMouseUpdate < mouseUpdateThrottle) {
-        return;
-      }
-      
-      lastMouseUpdate = now;
-      
-      // Direktes Update ohne requestAnimationFrame (reduziert Presentation Delay)
+      // Direktes Update ohne jegliches Throttling für minimale Presentation Delay
+      // Die Physik-Engine ist bereits optimiert und kann mit hoher Event-Rate umgehen
       mouseRef.current = { 
         x: e.clientX, 
         y: e.clientY, 

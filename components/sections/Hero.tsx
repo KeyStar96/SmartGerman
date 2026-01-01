@@ -88,7 +88,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       }, 0); // Startet sofort bei Position 0
     }
 
-    // 2. Badge fade-in (nach Brand-Name)
+    // 2. Badge fade-in (nach Brand-Name - SmartGerman)
     if (badgeRef.current) {
       gsap.set(badgeRef.current, {
         opacity: 0,
@@ -103,7 +103,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 0.8,
         ease: "power2.out",
         force3D: true,
-      }, 0.5); // Startet nach Brand-Name (bei Position 0.5)
+      }, 1.5); // Startet nach SmartGerman (bei 1.5s, leichtes Overlap)
     }
 
     // 3. Headline fade-in (nach Badge)
@@ -121,7 +121,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 1,
         ease: "power2.out",
         force3D: true,
-      }, 0.1); // Startet fast sofort für besseren LCP
+      }, 2.3); // Startet nach Badge (bei 2.3s)
     }
 
     // 4. Subline fade-in (nach Headline)
@@ -139,7 +139,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 1,
         ease: "power2.out",
         force3D: true,
-      }, 2);
+      }, 3.3); // Startet nach Headline (bei 3.3s)
     }
 
     // 5. Content (CTAs) fade-in (zuletzt)
@@ -158,14 +158,14 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         duration: 1,
         ease: "power2.out",
         force3D: true
-      }, 2.5);
+      }, 4.0); // Startet nach Subline (bei 4.0s)
     }
 
     // Signalisiere, dass die Hero-Animation abgeschlossen ist
-    // Die Timeline endet bei ~3.5 Sekunden (2.5 + 1.0)
+    // Die Timeline endet bei ~5.0 Sekunden (4.0 + 1.0)
     tl.call(() => {
       window.dispatchEvent(new CustomEvent('hero-animation-complete'));
-    }, [], 3.5);
+    }, [], 5.0);
 
     // 6. 3D Scroll-X Rotation - Umfallen-Effekt für Brand-Name
     if (heroTextWrapper.current) {
