@@ -53,9 +53,9 @@ const CONFIG = {
   idlePulseIntensity: 0.6,    
   idlePulseSpeed: 0.05,
   
-  // Trail-Effekt: Wie schnell der Glow hinter dem Impuls verblasst
-  // 0 = sofort weg, 1 = bleibt sehr lange, 0.3 = sanftes Verblassen
-  trailFadeStrength: 0.4,
+  // Trail-Effekt: Wie schnell der Glow hinter dem Impuls über ZEIT verblasst
+  // Höherer Wert = schnelleres Verblassen
+  trailDecayPerSecond: 1.2,  // Intensität pro Sekunde, die abgezogen wird
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -95,6 +95,9 @@ interface Pulse {
   progress: number;      // 0 bis 1 (Prozent der Verbindungslänge)
   totalDist: number;
   strength: number;
+  // Trail: Intensitäten für jedes Segment (klingen über Zeit ab)
+  trailIntensities: number[];
+  lastHeadSegment: number;  // Letztes Segment, das der Kopf erreicht hat
 }
 
 export default function NeuralBackground() {
@@ -270,7 +273,9 @@ export default function NeuralBackground() {
         toIndex: toIdx,
         progress: 0,
         totalDist: 0,
-        strength: strength
+        strength: strength,
+        trailIntensities: [],  // Wird beim ersten Draw initialisiert
+        lastHeadSegment: -1,
       });
     };
 
@@ -464,39 +469,88 @@ export default function NeuralBackground() {
                 if (!isForward && !isReverse) continue;
                 
                 const t = Math.min(p.progress, 1.0);
-                const baseIntensity = p.strength * 0.7;
+                const baseIntensity = p.strength * 0.8;
                 
-                // TRAIL-EFFEKT: Berechne Intensität für jedes Segment
-                // Segmente HINTER dem Impuls haben abnehmende Intensität
-                // Segmente VOR dem Impuls haben keine Intensität
+                // Initialisiere trailIntensities wenn noch nicht vorhanden
+                if (p.trailIntensities.length === 0) {
+                  p.trailIntensities = new Array(numSegments + 1).fill(0);
+                  p.lastHeadSegment = -1;
+                }
+                
+                // TRAIL-EFFEKT MIT ZEIT-BASIERTEM DECAY:
+                // 1. Berechne aktuelles Kopf-Segment
+                // 2. Setze neue Segmente auf volle Intensität
+                // 3. Alle Segmente hinter dem Kopf klingen über Zeit ab
                 
                 if (isForward) {
                   const headSegment = Math.floor(t * numSegments);
+                  
+                  // Neue Segmente aktivieren (die der Kopf gerade erreicht hat)
+                  for (let seg = p.lastHeadSegment + 1; seg <= headSegment; seg++) {
+                    if (seg >= 0 && seg < p.trailIntensities.length) {
+                      p.trailIntensities[seg] = baseIntensity;
+                    }
+                  }
+                  p.lastHeadSegment = headSegment;
+                  
+                  // Trail-Decay: Alle bereits passierten Segmente klingen ab
+                  for (let seg = 0; seg < headSegment; seg++) {
+                    if (p.trailIntensities[seg] > 0) {
+                      p.trailIntensities[seg] -= CONFIG.trailDecayPerSecond * deltaSeconds;
+                      if (p.trailIntensities[seg] < 0) p.trailIntensities[seg] = 0;
+                    }
+                  }
+                  
+                  // Kopf-Segment hat immer volle Intensität
+                  if (headSegment >= 0 && headSegment < p.trailIntensities.length) {
+                    p.trailIntensities[headSegment] = baseIntensity;
+                  }
+                  
+                  // Sammle Intensitäten für das Zeichnen
                   for (let seg = 0; seg <= headSegment; seg++) {
-                    // Berechne relative Position: 0 = Startpunkt, 1 = Impuls-Kopf
-                    const segmentProgress = seg / numSegments;
-                    const distanceFromHead = t - segmentProgress;
-                    
-                    // Intensität nimmt ab je weiter weg vom Impuls-Kopf
-                    // trailFadeStrength bestimmt wie schnell der Trail verblasst
-                    const fadeFactor = Math.max(0, 1 - (distanceFromHead / CONFIG.trailFadeStrength));
-                    const segmentIntensity = baseIntensity * fadeFactor;
-                    
+                    const intensity = p.trailIntensities[seg] || 0;
                     const currentIntensity = segmentIntensities.get(seg) || 0;
-                    segmentIntensities.set(seg, Math.max(currentIntensity, segmentIntensity));
+                    segmentIntensities.set(seg, Math.max(currentIntensity, intensity));
                   }
                 } else {
-                  // Reverse: Impuls geht von target nach n
+                  // Reverse: Impuls geht von target nach n (Segmente von numSegments nach 0)
                   const headSegment = Math.floor((1 - t) * numSegments);
+                  
+                  // Neue Segmente aktivieren (rückwärts)
+                  for (let seg = p.lastHeadSegment - 1; seg >= headSegment; seg--) {
+                    if (seg >= 0 && seg < p.trailIntensities.length) {
+                      p.trailIntensities[seg] = baseIntensity;
+                    }
+                  }
+                  // Beim ersten Frame initialisieren
+                  if (p.lastHeadSegment === -1) {
+                    p.lastHeadSegment = numSegments + 1;
+                    for (let seg = numSegments; seg >= headSegment; seg--) {
+                      if (seg >= 0 && seg < p.trailIntensities.length) {
+                        p.trailIntensities[seg] = baseIntensity;
+                      }
+                    }
+                  }
+                  p.lastHeadSegment = headSegment;
+                  
+                  // Trail-Decay: Alle bereits passierten Segmente klingen ab
+                  for (let seg = headSegment + 1; seg <= numSegments; seg++) {
+                    if (p.trailIntensities[seg] > 0) {
+                      p.trailIntensities[seg] -= CONFIG.trailDecayPerSecond * deltaSeconds;
+                      if (p.trailIntensities[seg] < 0) p.trailIntensities[seg] = 0;
+                    }
+                  }
+                  
+                  // Kopf-Segment hat immer volle Intensität
+                  if (headSegment >= 0 && headSegment < p.trailIntensities.length) {
+                    p.trailIntensities[headSegment] = baseIntensity;
+                  }
+                  
+                  // Sammle Intensitäten für das Zeichnen
                   for (let seg = numSegments; seg >= headSegment; seg--) {
-                    const segmentProgress = seg / numSegments;
-                    const distanceFromHead = segmentProgress - (1 - t);
-                    
-                    const fadeFactor = Math.max(0, 1 - (distanceFromHead / CONFIG.trailFadeStrength));
-                    const segmentIntensity = baseIntensity * fadeFactor;
-                    
+                    const intensity = p.trailIntensities[seg] || 0;
                     const currentIntensity = segmentIntensities.get(seg) || 0;
-                    segmentIntensities.set(seg, Math.max(currentIntensity, segmentIntensity));
+                    segmentIntensities.set(seg, Math.max(currentIntensity, intensity));
                   }
                 }
               }
