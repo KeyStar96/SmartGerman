@@ -1042,34 +1042,73 @@ export default function NeuralBackground() {
     };
 
     let lastFrameTime = performance.now();
-    const targetFPS = 60;
-    const frameInterval = 1000 / targetFPS;
+    
+    // SCROLL-THROTTLING: Reduziere FPS während des Scrollens für flüssigere UX
+    let isScrolling = false;
+    let scrollTimeout: NodeJS.Timeout | null = null;
+    const SCROLL_IDLE_DELAY = 150; // ms nach letztem Scroll-Event
+    
+    // FPS-Einstellungen: Normal vs. Scroll-Modus
+    const NORMAL_FPS = 60;
+    const SCROLL_FPS = 20; // Stark reduziert während des Scrollens
+    
+    let currentTargetFPS = NORMAL_FPS;
+    let frameInterval = 1000 / currentTargetFPS;
+    
+    // Scroll-Event-Handler
+    const handleScroll = () => {
+      if (!isScrolling) {
+        isScrolling = true;
+        currentTargetFPS = SCROLL_FPS;
+        frameInterval = 1000 / currentTargetFPS;
+      }
+      
+      // Reset Timeout bei jedem Scroll-Event
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        currentTargetFPS = NORMAL_FPS;
+        frameInterval = 1000 / currentTargetFPS;
+      }, SCROLL_IDLE_DELAY);
+    };
+    
+    // Passive Scroll-Listener für beste Performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
     
     const loop = (currentTime: number = performance.now()) => {
       if (document.hidden) {
-        lastFrameTime = currentTime; // Reset timer when tab becomes visible again
+        lastFrameTime = currentTime;
         animationFrameId = requestAnimationFrame(loop);
         return;
       }
       
       const deltaTime = currentTime - lastFrameTime;
       
-      // Frame-Limiting für Performance, aber deltaTime wird trotzdem korrekt berechnet
+      // Dynamisches Frame-Limiting basierend auf Scroll-Status
       if (deltaTime < frameInterval * 0.8) {
         animationFrameId = requestAnimationFrame(loop);
         return;
       }
       
-      // Begrenze deltaTime um Sprünge nach Tab-Wechsel zu vermeiden
-      const clampedDelta = Math.min(deltaTime, 100); // Max 100ms pro Frame
+      // Begrenze deltaTime um Sprünge zu vermeiden
+      const clampedDelta = Math.min(deltaTime, 100);
       const deltaSeconds = clampedDelta / 1000;
       
       lastFrameTime = currentTime;
       
-      updatePhysics(deltaSeconds);
-      if (CONFIG.idlePulseEnabled) {
-        idlePulseTime += CONFIG.idlePulseSpeed * (deltaSeconds * 60); // Normalisiert auf 60fps
+      // SCROLL-OPTIMIERUNG: Überspringe Physics-Update während des Scrollens
+      // (Die Neuronen "frieren" kurz ein, was kaum auffällt)
+      if (!isScrolling) {
+        updatePhysics(deltaSeconds);
       }
+      
+      if (CONFIG.idlePulseEnabled) {
+        idlePulseTime += CONFIG.idlePulseSpeed * (deltaSeconds * 60);
+      }
+      
       draw(deltaSeconds);
       animationFrameId = requestAnimationFrame(loop);
     };
@@ -1226,6 +1265,9 @@ export default function NeuralBackground() {
       if (autoPulseTimeout) {
         clearTimeout(autoPulseTimeout);
       }
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
       if (mouseMoveRafId !== null) {
         cancelAnimationFrame(mouseMoveRafId);
       }
@@ -1233,6 +1275,7 @@ export default function NeuralBackground() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("click", handleClick);
+      window.removeEventListener("scroll", handleScroll);
       cancelAnimationFrame(animationFrameId);
       observer.disconnect(); 
     };
