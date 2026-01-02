@@ -374,7 +374,15 @@ export default function NeuralBackground() {
         }
 
         // Damping mit Zeit-Skalierung
-        const dampingFactor = Math.pow(CONFIG.damping, timeScale);
+        // PERFORMANCE: Math.pow ist teuer - verwende optimierte Berechnung für häufige Werte
+        // Für timeScale ≈ 1 (60fps) ist dampingFactor ≈ CONFIG.damping
+        // Für kleine Abweichungen linear interpolieren statt pow
+        let dampingFactor: number;
+        if (Math.abs(timeScale - 1) < 0.01) {
+          dampingFactor = CONFIG.damping; // Exakter Wert für 60fps
+        } else {
+          dampingFactor = Math.pow(CONFIG.damping, timeScale);
+        }
         n.vx *= dampingFactor;
         n.vy *= dampingFactor;
         n.vz *= dampingFactor;
@@ -542,10 +550,13 @@ export default function NeuralBackground() {
                   p.lastHeadSegment = headSegment;
                   
                   // Trail-Decay: ALLE Segmente klingen über Zeit ab
+                  // PERFORMANCE: Optimiere Loop - nur aktive Segmente verarbeiten
+                  const decayAmount = CONFIG.trailDecayPerSecond * deltaSeconds;
                   for (let seg = 0; seg < p.trailIntensities.length; seg++) {
-                    if (p.trailIntensities[seg] > 0) {
-                      p.trailIntensities[seg] -= CONFIG.trailDecayPerSecond * deltaSeconds;
-                      if (p.trailIntensities[seg] < 0) p.trailIntensities[seg] = 0;
+                    const intensity = p.trailIntensities[seg];
+                    if (intensity > 0) {
+                      const newIntensity = intensity - decayAmount;
+                      p.trailIntensities[seg] = newIntensity > 0 ? newIntensity : 0;
                     }
                   }
                   
@@ -579,10 +590,13 @@ export default function NeuralBackground() {
                   p.lastHeadSegment = headSegment;
                   
                   // Trail-Decay
+                  // PERFORMANCE: Optimiere Loop - nur aktive Segmente verarbeiten
+                  const decayAmount = CONFIG.trailDecayPerSecond * deltaSeconds;
                   for (let seg = 0; seg < p.trailIntensities.length; seg++) {
-                    if (p.trailIntensities[seg] > 0) {
-                      p.trailIntensities[seg] -= CONFIG.trailDecayPerSecond * deltaSeconds;
-                      if (p.trailIntensities[seg] < 0) p.trailIntensities[seg] = 0;
+                    const intensity = p.trailIntensities[seg];
+                    if (intensity > 0) {
+                      const newIntensity = intensity - decayAmount;
+                      p.trailIntensities[seg] = newIntensity > 0 ? newIntensity : 0;
                     }
                   }
                   
@@ -754,6 +768,9 @@ export default function NeuralBackground() {
       const isDark = theme === THEME_COLORS.dark;
       ctx.globalCompositeOperation = isDark ? "lighter" : "source-over";
 
+      // PERFORMANCE: Cache fillStyle um unnötige Canvas-Property-Sets zu vermeiden
+      let currentFillStyle = "";
+      
       for (let i = 0; i < sortedNeurons.length; i++) {
         const n = sortedNeurons[i];
         const zNormalized = normalizeZ(n.z);
@@ -786,13 +803,25 @@ export default function NeuralBackground() {
             const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; 
             const layerSize = particleSize * (1 + (numBlurLayers - layer + 1) * 0.3);
             
-            ctx.fillStyle = `rgba(${theme.neuron}, ${layerAlpha})`;
+            // PERFORMANCE: Setze fillStyle nur bei Änderung
+            const newFillStyle = `rgba(${theme.neuron}, ${layerAlpha})`;
+            if (currentFillStyle !== newFillStyle) {
+              ctx.fillStyle = newFillStyle;
+              currentFillStyle = newFillStyle;
+            }
+            
             ctx.beginPath();
             ctx.arc(n.x, n.y, layerSize, 0, Math.PI * 2);
             ctx.fill();
           }
         } else {
-          ctx.fillStyle = `rgba(${theme.neuron}, ${alpha})`;
+          // PERFORMANCE: Setze fillStyle nur bei Änderung
+          const newFillStyle = `rgba(${theme.neuron}, ${alpha})`;
+          if (currentFillStyle !== newFillStyle) {
+            ctx.fillStyle = newFillStyle;
+            currentFillStyle = newFillStyle;
+          }
+          
           ctx.beginPath();
           ctx.arc(n.x, n.y, particleSize, 0, Math.PI * 2);
           ctx.fill();

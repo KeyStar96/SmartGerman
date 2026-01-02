@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { LucideIcon, UserCheck, Clock, Target } from "lucide-react";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { Instrument_Serif } from "next/font/google";
@@ -29,8 +29,8 @@ export default function Features({ dictionary }: FeaturesProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Features-Daten aus Dictionary - Spaceship UI: Orange für kritische Features, Cyan für technische
-  const features: FeatureProps[] = [
+  // PERFORMANCE: Memoize features Array um unnötige Re-Erstellung zu vermeiden
+  const features: FeatureProps[] = useMemo(() => [
     {
       title: dictionary.sections.features.native_speakers.title,
       description: dictionary.sections.features.native_speakers.description,
@@ -49,7 +49,7 @@ export default function Features({ dictionary }: FeaturesProps) {
       Icon: Target,
       color: "#FF5C00" // Primary Orange - kritisches Feature
     }
-  ];
+  ], [dictionary.sections.features]);
 
   useGSAP(() => {
     if (!sectionRef.current) return;
