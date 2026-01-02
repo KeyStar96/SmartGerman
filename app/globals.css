@@ -49,6 +49,11 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
   min-height: 100vh;
   overflow-x: hidden;
+  /* PERFORMANCE: GPU-Beschleunigung für flüssiges Scrolling */
+  transform: translateZ(0);
+  /* PERFORMANCE: Optimiertes Rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
@@ -142,15 +147,17 @@ body {
     .gpu-render {
       transform: translateZ(0);
       backface-visibility: hidden;
+      /* PERFORMANCE: Optimierte GPU-Beschleunigung ohne will-change */
+      perspective: 1000px;
       /* will-change: transform, opacity; ← ENTFERNT wegen Chrome backdrop-filter Bug */
     }
     
-    /* Performance: Reduziere Re-Paints bei statischen Elementen */
+    /* PERFORMANCE: Containment für bessere Performance bei statischen Elementen */
     .hero-content-fade {
       contain: layout style paint;
+      /* PERFORMANCE: GPU-Beschleunigung für flüssige Animationen */
+      transform: translateZ(0);
     }
-    
-    /* Performance: contain entfernt - kann Scroll-Probleme verursachen */
     
     /* Hero-Text initial versteckt - verhindert FOUC */
     .hero-text-reveal {
@@ -231,6 +238,10 @@ body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
+      /* PERFORMANCE: GPU-Beschleunigung für flüssiges Scrolling */
+      transform: translateZ(0);
+      /* PERFORMANCE: Containment für bessere Performance */
+      contain: layout style;
     }
     
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
@@ -267,9 +278,12 @@ body {
       /* Verhindert Rendering-Artefakte an den Rändern */
       -webkit-font-smoothing: antialiased;
       
-      /* GPU-Beschleunigung für flüssige Animation */
+      /* PERFORMANCE: GPU-Beschleunigung für flüssige Animation */
       transform: translateZ(0);
+      /* PERFORMANCE: will-change nur für animierte Eigenschaft */
       will-change: background-position;
+      /* PERFORMANCE: Containment für bessere Performance */
+      contain: layout style paint;
     }
     
     /* Keyframes für Laser-Sweep-Animation */

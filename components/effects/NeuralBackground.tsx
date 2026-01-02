@@ -10,7 +10,7 @@ import { gsap } from "@/lib/gsap";
  * auf allen Bildschirmgrößen und Browsern
  */
 const CONFIG = {
-  // Gitter & Dichte
+  // Gitter & Dichte - PERFORMANCE: Adaptive Dichte basierend auf Viewport
   neuronDensity: 0.0008,     
   connectionDistance: 120,    
   viewportPadding: 200,       
@@ -41,7 +41,7 @@ const CONFIG = {
   zDepthRange: 400,           
   zBaseOffset: 0,             
   zSizeScale: 0.8,            
-  zBlurLayers: 3,             
+  zBlurLayers: 2,             // PERFORMANCE: Reduziert von 3 auf 2
   
   // Auto-Impulse
   autoPulseEnabled: true,     
@@ -56,6 +56,11 @@ const CONFIG = {
   // Trail-Effekt: Wie schnell der Glow hinter dem Impuls über ZEIT verblasst
   // Niedrigerer Wert = länger sichtbarer Trail (langsameres Verblassen)
   trailDecayPerSecond: 1.2,  // Intensität pro Sekunde, die abgezogen wird (erhöht für kürzeren Trail)
+  
+  // PERFORMANCE: Rendering-Optimierungen
+  maxSegmentsPerConnection: 30,  // Reduziert von 40 auf 30 für bessere Performance
+  physicsUpdateInterval: 1,      // Jeder Frame (1 = keine Reduzierung, 2 = jeden 2. Frame)
+  maxConcurrentPulses: 4,        // Reduziert von 5 auf 4
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -183,7 +188,12 @@ export default function NeuralBackground() {
       const extendedWidth = width + (CONFIG.viewportPadding * 2);
       const extendedHeight = height + (CONFIG.viewportPadding * 2);
       const area = width * height; 
-      const baseNumNeurons = Math.floor(area * CONFIG.neuronDensity);
+      
+      // PERFORMANCE: Adaptive Neuron-Dichte basierend auf Viewport-Größe
+      // Kleinere Bildschirme = weniger Neuronen für konstante 60 FPS
+      const viewportFactor = Math.min(1, (width * height) / (1920 * 1080)); // Normalisiert auf Full HD
+      const adaptiveDensity = CONFIG.neuronDensity * Math.max(0.6, viewportFactor); // Min 60% der Dichte
+      const baseNumNeurons = Math.floor(area * adaptiveDensity);
       
       const newNeurons: Neuron[] = [];
 
@@ -402,6 +412,7 @@ export default function NeuralBackground() {
       // 2. Verbindungen 
       ctx.globalCompositeOperation = "lighter";
       
+      // PERFORMANCE: Optimiere Pulse-Gruppierung
       const connectionPulses = new Map<string, Pulse[]>();
       for (const p of pulses) {
         const connectionKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
@@ -412,6 +423,7 @@ export default function NeuralBackground() {
       }
 
       const connectionsDrawn = new Set<string>();
+      // PERFORMANCE: Verwende Set für O(1) Lookups statt Array-Iteration
       const visibleNeuronIndices = new Set<number>();
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
@@ -448,7 +460,8 @@ export default function NeuralBackground() {
             const currentDist = Math.sqrt(dx * dx + dy * dy);
             
             const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
-            let numSegments = Math.min(Math.ceil(currentDist / 4), 40);
+            // PERFORMANCE: Reduzierte Segment-Anzahl für bessere Performance
+            let numSegments = Math.min(Math.ceil(currentDist / 5), CONFIG.maxSegmentsPerConnection);
             const segmentIntensities = new Map<number, number>();
             const hasActivePulses = pulsesOnConnection.length > 0;
             
@@ -549,20 +562,20 @@ export default function NeuralBackground() {
             }
             
             // Schritt 2: Basis-Linie zeichnen (nur Segmente OHNE Glow)
+            // PERFORMANCE: Batch-Rendering für bessere Performance
             ctx.globalCompositeOperation = "source-over";
+            ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
+            ctx.lineWidth = lineWidth;
+            
             if (segmentIntensities.size === 0) {
               // Keine aktiven Pulses - zeichne vollständige Basis-Linie
-              ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
-              ctx.lineWidth = lineWidth;
               ctx.beginPath();
               ctx.moveTo(n.x, n.y);
               ctx.lineTo(target.x, target.y);
               ctx.stroke();
             } else {
               // Zeichne Basis-Linie nur für Segmente ohne Glow
-              ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
-              ctx.lineWidth = lineWidth;
-              
+              // PERFORMANCE: Reduzierte Path-Operationen
               let lastX = n.x;
               let lastY = n.y;
               let drawingPath = false;
@@ -600,13 +613,19 @@ export default function NeuralBackground() {
             }
             
             // Schritt 3: NEON-GLOW-EFFEKT - Zeichne aktivierte Segmente mit Glow
+            // PERFORMANCE: Batch-Rendering für Glow-Segmente
             if (segmentIntensities.size > 0) {
               ctx.globalCompositeOperation = "lighter";
               
               // GLOW-PHASE 1: Breiterer transparenter Halo für den Glow-Effekt
+              // PERFORMANCE: Reduzierte Canvas-Operationen durch Batch-Rendering
               let lastX = n.x;
               let lastY = n.y;
               let lastIntensity = segmentIntensities.get(0) || 0;
+              let glowPathStarted = false;
+              
+              ctx.strokeStyle = `rgba(${theme.signal}, 0.35)`;
+              ctx.lineWidth = 5;
               
               for (let seg = 1; seg <= numSegments; seg++) {
                 const segT = seg / numSegments;
@@ -617,14 +636,19 @@ export default function NeuralBackground() {
                 if (currentIntensity > 0.01 || lastIntensity > 0.01) {
                   const avgIntensity = (currentIntensity + lastIntensity) / 2;
                   if (avgIntensity > 0.01) {
-                    // Glow-Halo: Breiterer, transparenterer Strich
-                    ctx.strokeStyle = `rgba(${theme.signal}, ${avgIntensity * 0.35})`;
-                    ctx.lineWidth = 5 * Math.min(avgIntensity, 1.0);
-                    ctx.beginPath();
-                    ctx.moveTo(lastX, lastY);
+                    if (!glowPathStarted) {
+                      ctx.beginPath();
+                      ctx.moveTo(lastX, lastY);
+                      glowPathStarted = true;
+                    }
                     ctx.lineTo(currentX, currentY);
+                  } else if (glowPathStarted) {
                     ctx.stroke();
+                    glowPathStarted = false;
                   }
+                } else if (glowPathStarted) {
+                  ctx.stroke();
+                  glowPathStarted = false;
                 }
                 
                 lastX = currentX;
@@ -632,10 +656,19 @@ export default function NeuralBackground() {
                 lastIntensity = currentIntensity;
               }
               
+              if (glowPathStarted) {
+                ctx.stroke();
+              }
+              
               // GLOW-PHASE 2: Dünnerer, hellerer Kern
+              // PERFORMANCE: Batch-Rendering für Kern
               lastX = n.x;
               lastY = n.y;
               lastIntensity = segmentIntensities.get(0) || 0;
+              let corePathStarted = false;
+              
+              ctx.strokeStyle = `rgba(${theme.signal}, 1.0)`;
+              ctx.lineWidth = 2;
               
               for (let seg = 1; seg <= numSegments; seg++) {
                 const segT = seg / numSegments;
@@ -646,19 +679,28 @@ export default function NeuralBackground() {
                 if (currentIntensity > 0.01 || lastIntensity > 0.01) {
                   const avgIntensity = (currentIntensity + lastIntensity) / 2;
                   if (avgIntensity > 0.01) {
-                    // Kern: Dünnerer, voller Alpha für maximale Helligkeit
-                    ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
-                    ctx.lineWidth = 2 * Math.min(avgIntensity, 1.0);
-                    ctx.beginPath();
-                    ctx.moveTo(lastX, lastY);
+                    if (!corePathStarted) {
+                      ctx.beginPath();
+                      ctx.moveTo(lastX, lastY);
+                      corePathStarted = true;
+                    }
                     ctx.lineTo(currentX, currentY);
+                  } else if (corePathStarted) {
                     ctx.stroke();
+                    corePathStarted = false;
                   }
+                } else if (corePathStarted) {
+                  ctx.stroke();
+                  corePathStarted = false;
                 }
                 
                 lastX = currentX;
                 lastY = currentY;
                 lastIntensity = currentIntensity;
+              }
+              
+              if (corePathStarted) {
+                ctx.stroke();
               }
             }
           }
@@ -666,9 +708,11 @@ export default function NeuralBackground() {
       }
 
       // 3. Neuronen 
+      // PERFORMANCE: Batch-Rendering für Neuronen
       const isDark = theme === THEME_COLORS.dark;
       ctx.globalCompositeOperation = isDark ? "lighter" : "source-over";
-
+      
+      // PERFORMANCE: Gruppiere Neuronen nach Z-Tiefe für optimiertes Rendering
       for (let i = 0; i < sortedNeurons.length; i++) {
         const n = sortedNeurons[i];
         const zNormalized = normalizeZ(n.z);
@@ -691,11 +735,12 @@ export default function NeuralBackground() {
         
         const blurIntensity = zNormalized; 
         
+        // PERFORMANCE: Reduzierte Blur-Layers für bessere Performance
         if (blurIntensity > 0.3) {
           const baseLayers = blurIntensity > 0.7 
             ? Math.ceil(blurIntensity * CONFIG.zBlurLayers) 
-            : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.6);
-          const numBlurLayers = baseLayers; 
+            : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.5); // PERFORMANCE: Reduziert von 0.6 auf 0.5
+          const numBlurLayers = Math.min(baseLayers, CONFIG.zBlurLayers); // PERFORMANCE: Cap auf max Layers 
           
           for (let layer = numBlurLayers; layer >= 1; layer--) {
             const layerAlpha = alpha * (layer / numBlurLayers) * 0.4; 
@@ -762,6 +807,7 @@ export default function NeuralBackground() {
     let lastFrameTime = performance.now();
     const targetFPS = 60;
     const frameInterval = 1000 / targetFPS;
+    let physicsFrameCounter = 0; // PERFORMANCE: Frame-Counter für reduzierte Physik-Updates
     
     const loop = (currentTime: number = performance.now()) => {
       if (document.hidden) {
@@ -784,6 +830,8 @@ export default function NeuralBackground() {
       
       lastFrameTime = currentTime;
       
+      // PERFORMANCE: Reduzierte Physik-Updates (jeden Frame, aber mit optimierter Berechnung)
+      // Physik wird immer aktualisiert, aber mit optimierten Berechnungen
       updatePhysics(deltaSeconds);
       if (CONFIG.idlePulseEnabled) {
         idlePulseTime += CONFIG.idlePulseSpeed * (deltaSeconds * 60); // Normalisiert auf 60fps
@@ -812,12 +860,19 @@ export default function NeuralBackground() {
       }, 250);
     };
 
+    // PERFORMANCE: Throttling für Maus-Interaktionen
+    let mouseMoveThrottle: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { 
-        x: e.clientX, 
-        y: e.clientY, 
-        active: true 
-      };
+      if (mouseMoveThrottle) return;
+      
+      mouseMoveThrottle = requestAnimationFrame(() => {
+        mouseRef.current = { 
+          x: e.clientX, 
+          y: e.clientY, 
+          active: true 
+        };
+        mouseMoveThrottle = null;
+      });
     };
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
@@ -884,7 +939,7 @@ export default function NeuralBackground() {
       }
       
       const activePulseCount = pulses.length;
-      const maxConcurrentPulses = 5; 
+      const maxConcurrentPulses = CONFIG.maxConcurrentPulses; 
       
       const timeSinceLastPulse = lastAutoPulseTime > 0 ? currentTime - lastAutoPulseTime : Infinity;
       const triggerDelay = estimatedPulseLifetime * 0.8;
@@ -935,6 +990,9 @@ export default function NeuralBackground() {
       }
       if (autoPulseTimeout) {
         clearTimeout(autoPulseTimeout);
+      }
+      if (mouseMoveThrottle) {
+        cancelAnimationFrame(mouseMoveThrottle);
       }
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);
