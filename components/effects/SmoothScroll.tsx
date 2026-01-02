@@ -22,7 +22,6 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         // PERFORMANCE: Zusätzliche Optimierungen
         orientation: "vertical", // Nur vertikales Scrolling
         gestureOrientation: "vertical", // Nur vertikale Gesten
-        smoothTouch: false, // PERFORMANCE: Deaktiviert für bessere Performance auf Touch-Geräten
       }}
     >
       {children}
