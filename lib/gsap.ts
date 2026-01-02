@@ -8,10 +8,7 @@ if (typeof window !== "undefined") {
   // Performance-Optimierungen für ScrollTrigger
   ScrollTrigger.config({
     autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
-    ignoreMobileResize: true, // Reduziert Recalculations auf Mobile
-    // PERFORMANCE: Zusätzliche Optimierungen für konstante 60 FPS
-    refreshPriority: -1, // Niedrigere Priorität für weniger Recalculations
-    limitCallbacks: true, // Begrenzt Callback-Aufrufe für bessere Performance
+    ignoreMobileResize: true, // PERFORMANCE: Reduziert Recalculations auf Mobile
   });
 }
 
