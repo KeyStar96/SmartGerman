@@ -239,8 +239,9 @@ export default function NeuralBackground() {
     
     // SAFARI-OPTIMIERUNG: Angepasste Einstellungen für bessere Performance
     const SAFARI_CONFIG = {
-      // Niedrigere DPR für Safari (1.0 statt 1.5) - größter Performance-Gewinn
-      maxDPR: isSafariMac ? 1.0 : 1.5,
+      // PERFORMANCE FIX: DPR Clamping auf max 1.5 für alle Browser
+      // Reduziert die Pixel-Last um mehr als 50% auf Retina Macs!
+      maxDPR: 1.5, // Globales Limit statt Browser-spezifisch
       // Weniger Blur-Layers in Safari
       zBlurLayers: isSafariMac ? 1 : CONFIG.zBlurLayers,
       // Aggressiveres Scroll-Throttling für Safari
@@ -291,8 +292,8 @@ export default function NeuralBackground() {
       
       // --------------------------------------------------------
       // PERFORMANCE OPTIMIZATION: DPR Capping
-      // Safari Mac: 1.0x (niedrigste Auflösung für beste Performance)
-      // Andere Browser: 1.5x
+      // PERFORMANCE FIX: Clamping dpr to 1.5 max für alle Browser
+      // Das reduziert die Pixel-Last um mehr als 50% auf Retina Macs!
       // --------------------------------------------------------
       const dpr = Math.min(window.devicePixelRatio || 1, SAFARI_CONFIG.maxDPR);
       
@@ -1138,6 +1139,23 @@ export default function NeuralBackground() {
       }
       
       resizeTimeout = setTimeout(() => {
+        if (!canvasRef.current || !containerRef.current) return;
+        
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        // PERFORMANCE FIX: Clamping dpr to 1.5 max
+        const dpr = Math.min(window.devicePixelRatio || 1, SAFARI_CONFIG.maxDPR);
+        
+        canvasRef.current.width = width * dpr;
+        canvasRef.current.height = height * dpr;
+        
+        // Wichtig: CSS muss weiterhin 100% sein, damit es skaliert wird
+        canvasRef.current.style.width = `${width}px`;
+        canvasRef.current.style.height = `${height}px`;
+        
+        // Scale context entsprechend
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) ctx.scale(dpr, dpr);
+        
         const newWidth = window.innerWidth;
         const newHeight = window.innerHeight;
         

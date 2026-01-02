@@ -3,40 +3,48 @@
 import { ReactLenis } from "lenis/react";
 import { ReactNode, useMemo, useEffect, useState } from "react";
 
-// Easing-Funktion außerhalb der Komponente für bessere Performance
-const smoothEasing = (t: number) => {
-  if (t >= 1) return 1;
-  if (t <= 0) return 0;
-  return Math.min(1, 1.001 - Math.exp(-10 * t * 0.693147));
-};
+// Optimierte Easing-Kurve (etwas flacher für weniger Micro-Jitter)
+const smoothEasing = (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t));
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [isSafari, setIsSafari] = useState(false);
-  
+  const [isLowPowerDevice, setIsLowPowerDevice] = useState(false);
+
   useEffect(() => {
     setMounted(true);
-    // Safari-Detection zur Runtime
-    setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
+    // Strikte Safari Detection
+    const ua = navigator.userAgent.toLowerCase(); 
+    const isSafariCheck = ua.indexOf('safari') != -1 && ua.indexOf('chrome') == -1;
+    setIsSafari(isSafariCheck);
+
+    // Grobe Erkennung für ältere Geräte (basierend auf Cores)
+    if (typeof navigator !== 'undefined' && navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) {
+      setIsLowPowerDevice(true);
+    }
   }, []);
-  
+
   // PERFORMANCE: Memoize options basierend auf Browser-Detection
-  const options = useMemo(() => ({
-    // Kürzere Duration für Safari = schnellere Reaktion
-    duration: isSafari ? 0.8 : 1.0,
-    easing: smoothEasing,
-    smoothWheel: true,
-    // Reduzierte Multiplikatoren für Safari
-    wheelMultiplier: isSafari ? 0.8 : 0.9,
-    touchMultiplier: isSafari ? 1.0 : 1.2,
-    infinite: false,
-    syncTouch: false,
-    syncTouchLerp: 0.1,
-    // Höherer Lerp für Safari = schnellere Reaktion
-    lerp: isSafari ? 0.12 : 0.1,
-    gestureOrientation: "vertical" as const,
-    autoRaf: true,
-  }), [isSafari]);
+  const options = useMemo(() => {
+    // ULTRA-TUNING für MacBook Pro 2017 (Safari)
+    // Wenn Safari + altes Gerät: Wir erhöhen Lerp (träger), um Ruckler zu kaschieren
+    const isLegacySafari = isSafari && isLowPowerDevice;
+
+    return {
+      duration: isLegacySafari ? 1.5 : (isSafari ? 1.2 : 1.0), // Länger = weicher bei Rucklern
+      easing: smoothEasing,
+      smoothWheel: true,
+      // Reduzierter Multiplier verhindert "Overshoot" bei Rucklern
+      wheelMultiplier: isSafari ? 0.8 : 1.0, 
+      touchMultiplier: isSafari ? 1.2 : 1.5,
+      infinite: false,
+      syncTouch: true, // SyncTouch hilft oft bei iOS/Trackpads
+      syncTouchLerp: 0.08, // Etwas direkter bei Touch
+      lerp: isLegacySafari ? 0.08 : 0.1, // Niedrigerer Lerp glättet Framedrops besser
+      gestureOrientation: "vertical" as const,
+      autoRaf: true,
+    };
+  }, [isSafari, isLowPowerDevice]);
   
   // Server-Side: Render children direkt ohne Lenis
   if (!mounted) {
@@ -44,7 +52,11 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
   }
   
   return (
-    <ReactLenis root options={options}>
+    <ReactLenis 
+      root 
+      options={options}
+      className="lenis-scroll-container" // Hook für CSS Optimierungen
+    >
       {children}
     </ReactLenis>
   );

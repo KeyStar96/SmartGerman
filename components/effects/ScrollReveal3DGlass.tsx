@@ -35,7 +35,7 @@ export default function ScrollReveal3DGlass({
     z: -300, // Subtiler Tiefeneffekt (reduziert von -1200)
     transformOrigin: "center center", // Zentriert für harmonische Skalierung
     inverted,
-    scrub: 1.5, // Maximale Geschmeidigkeit
+    scrub: 1.0, // Matcht die Optimierung im Hook
   });
 
   // FIX: Wrapper bleibt immer sichtbar (opacity: 1), damit backdrop-filter funktioniert
@@ -45,21 +45,21 @@ export default function ScrollReveal3DGlass({
       ref={wrapperRef}
       className={className}
       style={{
-        // Wrapper hat KEINE opacity-Animation - bleibt immer sichtbar
         opacity: 1,
-        // Wrapper hat KEINE 3D-Transformationen - nur das Kind-Element
+        // Isolation erzeugt neuen Stacking Context -> isoliert Repaints
+        isolation: "isolate", 
       }}
     >
       <div
         ref={cardRef}
+        // "gpu-render" sollte translate3d(0,0,0) enthalten
         className="gpu-render"
         style={{
-          // WICHTIG: transform-style: flat statt preserve-3d
-          // preserve-3d bricht backdrop-filter in Safari/iOS!
-          transformStyle: "flat",
+          transformStyle: "flat", // WICHTIG für Safari Backdrop Filter
           transformOrigin: "center center",
-          // CHROME FIX: willChange entfernt - bricht backdrop-filter bei Kind-Elementen!
-          // GPU-Beschleunigung wird stattdessen via gpu-render Klasse gesetzt
+          // Wir entfernen explizites willChange hier, das macht GSAP jetzt dynamisch
+          backfaceVisibility: "hidden", // Verhindert Flackern
+          WebkitFontSmoothing: "subpixel-antialiased", // Fix für Text-Rendering während 3D
         }}
       >
         {children}

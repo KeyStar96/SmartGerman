@@ -28,7 +28,7 @@ export function useScrollReveal3D(
 ) {
   const {
     trigger,
-    scrub = 1.5,
+    scrub = 1, // Reduziert von 1.5 auf 1 für direkteres Feedback (weniger Lag-Gefühl)
     z = -300,
     transformOrigin = "center center",
     inverted = false,
@@ -58,64 +58,59 @@ export function useScrollReveal3D(
     }
 
     // PERFORMANCE: Pre-compute values
-    const initialRotateX = inverted ? -15 : 15;
-    const finalRotateX = inverted ? 10 : -10;
+    const initialRotateX = inverted ? 45 : -45;
+    const finalRotateX = inverted ? -45 : 45;
     
-    // Initialer Zustand mit GPU-Beschleunigung
-    gsap.set(element, {
-      rotateX: initialRotateX,
-      y: 100,
-      z: z,
-      scale: 0.9,
-      opacity: 0,
+    // Initial Set (GPU hint)
+    // WICHTIG: backface-visibility: hidden hilft Safari beim Compositing
+    gsap.set(element, { 
       transformOrigin,
-      force3D: true,
-      transformStyle: "flat",
-      immediateRender: true,
+      backfaceVisibility: "hidden",
+      perspective: 1000, // Hilft Safari Tiefe zu verstehen ohne komplexe Matrix
     });
 
-    // PERFORMANCE: Timeline mit optimierter ScrollTrigger-Konfiguration
+    // Timeline Setup
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
-        start: "top bottom",
-        end: "bottom center",
-        scrub,
-        refreshPriority: -1,
+        start: "top bottom-=10%", 
+        end: "bottom top+=10%",   
+        scrub: scrub,
+        // PERFORMANCE: onToggle statt ständigem Rechnen
+        // Wir setzen will-change NUR wenn das Element im Viewport aktiv ist
+        onToggle: (self) => {
+          if (self.isActive) {
+            element.style.willChange = "transform, opacity";
+          } else {
+            element.style.willChange = "auto";
+          }
+        }
       },
     });
-    
-    // Speichere Timeline-Referenz für Cleanup
-    timelineRef.current = tl;
 
-    // Phase 1: Fluid Reveal - Element gleitet aus der Tiefe heran
-    // Opacity wird während der ersten 20% der Scroll-Strecke eingeblendet
-    // BACKDROP-FILTER FIX: z-Wert schnell auf 0 bringen, damit backdrop-filter sofort funktioniert
+    // Phase 1: Intro
     tl.fromTo(element, 
       {
         rotateX: initialRotateX,
-        y: 100,
+        y: 80, // Etwas reduziert von 100
         z: z,
-        scale: 0.9,
+        scale: 0.95, // Weniger Scaling = weniger Repaint
         opacity: 0,
-        force3D: true,
+        force3D: true, // Zwingt Layer-Erstellung
       },
       {
         rotateX: 0,
         y: 0,
-        z: 0, // BACKDROP-FILTER FIX: Immer auf z: 0, damit backdrop-filter funktioniert
+        z: 0,
         scale: 1,
         opacity: 1,
-        ease: "power2.out", // Sanftes Easing für natürliche Bewegung
-        force3D: true,
-        duration: 0.20, // 20% der Timeline für synchronisiertes Einblenden
-        immediateRender: false,
+        ease: "power1.out", // Einfacheres Easing für CPU
+        duration: 0.25,
       }, 
-      0 // Startet sofort bei Position 0
+      0
     );
 
-    // Phase 2: Stabile Lesezone (von 0.20 bis 0.80) - 60% der Timeline
-    // Element bleibt in der perfekten Leseposition
+    // Phase 2: Stable (länger stabil halten)
     tl.to(element, {
       rotateX: 0,
       y: 0,
@@ -123,28 +118,27 @@ export function useScrollReveal3D(
       scale: 1,
       opacity: 1,
       ease: "none",
-      force3D: true,
-      duration: 0.60, // 60% der Timeline für stabiles Lesen
-    }, 0.20);
+      duration: 0.5, // 50% der Scrollzeit stabil
+    }, 0.25);
 
-    // Phase 3: Sanftes Ausfliegen nach oben
+    // Phase 3: Outro
     tl.to(element, {
       rotateX: finalRotateX,
-      y: -50,
-      z: 0,
+      y: -80,
+      z: z,
       scale: 0.95,
-      opacity: 1,
-      ease: "power2.in",
-      force3D: true,
-      duration: 0.20,
-    }, 0.80);
+      opacity: 0,
+      ease: "power1.in",
+      duration: 0.25,
+    }, 0.75);
+    
+    // Speichere Timeline-Referenz für Cleanup
+    timelineRef.current = tl;
 
-    // PERFORMANCE: Cleanup-Funktion mit Timeline-Referenz
     return () => {
-      if (timelineRef.current) {
-        timelineRef.current.kill();
-        timelineRef.current = null;
-      }
+      if (timelineRef.current) timelineRef.current.kill();
+      // Cleanup styles
+      gsap.set(element, { clearProps: "all" });
     };
   }, [elementRef, trigger, scrub, z, transformOrigin, inverted]);
 }
