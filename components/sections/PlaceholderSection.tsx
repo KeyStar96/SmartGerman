@@ -145,10 +145,9 @@ export default function PlaceholderSection() {
                 </p>
 
                 {/* Subtiler Deko-Strich am Boden */}
-                {/* WICHTIG: bottom-0 positioniert den Strich an der unteren Kante der Karte */}
-                {/* Negative left/right kompensieren das Padding (p-8 = 2rem, md:p-10 = 2.5rem) */}
+                {/* WICHTIG: bottom-0 positioniert den Strich an der unteren Kante des Inhalts (innerhalb des Padding) */}
                 <div 
-                  className="absolute bottom-0 left-[-2rem] right-[-2rem] md:left-[-2.5rem] md:right-[-2.5rem] h-[2px] w-0 group-hover:w-[calc(100%+4rem)] md:group-hover:w-[calc(100%+5rem)] transition-all duration-700 opacity-50"
+                  className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 opacity-50"
                   style={{ 
                     backgroundColor: card.color,
                   }}
