@@ -141,9 +141,6 @@ export default function ScrollReveal3DGlass({
 
     return () => {
       backdropTl.kill();
-      if (animationFrameId !== null) {
-        cancelAnimationFrame(animationFrameId);
-      }
     };
   }, [trigger, inverted]);
 
@@ -166,6 +163,7 @@ export default function ScrollReveal3DGlass({
           position: "absolute",
           inset: 0,
           borderRadius: "1.5rem", // Matcht rounded-3xl
+          border: "none", // Border wird vom separaten Border-Layer gehandhabt
           pointerEvents: "none", // Lässt Clicks durch
           zIndex: 0,
           // WICHTIG: KEINE rotateX/rotateY/rotateZ - nur translate/scale
