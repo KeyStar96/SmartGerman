@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -33,16 +33,31 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     setIsDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
 
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    // PERFORMANCE: Throttle Scroll-Event mit requestAnimationFrame
+    let scrollRafId: number | null = null;
+    const handleScroll = () => {
+      if (scrollRafId !== null) return;
+      
+      scrollRafId = requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 50);
+        scrollRafId = null;
+      });
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      if (scrollRafId !== null) {
+        cancelAnimationFrame(scrollRafId);
+      }
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   // Konstante für transparenten Lightmode-Header
   const isTransparentLight = !isScrolled && !isDarkMode;
 
-  // Dynamische Textfarbe: Anthracite (#1A1A1A) im transparenten Lightmode, sonst Standard
-  const getTextColor = () => {
+  // PERFORMANCE: Memoize Textfarbe und Logo-Klassen
+  const textColor = useMemo(() => {
     if (isTransparentLight) {
       return "text-[#1A1A1A]"; // Anthracite im transparenten Lightmode
     }
@@ -50,17 +65,16 @@ export default function Header({ lang, dictionary }: HeaderProps) {
       return "text-[#1A1A1A]"; // Anthracite bei gescrolltem Lightmode-Header
     }
     return "text-foreground"; // Standard (weiß im Dark, Anthracite im Light bei gescrollt)
-  };
+  }, [isTransparentLight, isScrolled, isDarkMode]);
 
-  // Logo-Farbe basierend auf Header-Hintergrund
-  const getLogoClasses = () => {
+  const logoClasses = useMemo(() => {
     // Darkmode: Immer PURE WHITE Logo (unabhängig vom Scroll-Status)
     if (isDarkMode) {
       return "invert brightness-0 contrast-200"; // Pure White im Darkmode
     }
     // Lightmode: Immer Originales Logo (unverändert, egal ob gescrollt oder nicht)
     return ""; // Originales Logo im Lightmode
-  };
+  }, [isDarkMode]);
 
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
@@ -116,7 +130,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
               alt="SmartGerman Logo" 
               width={192} 
               height={40}
-              className={`h-auto object-contain transition-all duration-500 group-hover:scale-105 ${getLogoClasses()}`}
+              className={`h-auto object-contain transition-all duration-500 group-hover:scale-105 ${logoClasses}`}
               priority={true}
             />
           </Link>
@@ -125,15 +139,15 @@ export default function Header({ lang, dictionary }: HeaderProps) {
           <div className="flex items-center gap-4 md:gap-8">
             <div className="hidden md:flex items-center gap-8 mr-4">
               <Link href="#home" 
-                className={`text-sm font-light hover:text-primary-orange transition-colors ${getTextColor()}`}>
+                className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
                 {dictionary.header.nav.home}
               </Link>
               <Link href="#courses" 
-                className={`text-sm font-light hover:text-primary-orange transition-colors ${getTextColor()}`}>
+                className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
                 {dictionary.header.nav.courses}
               </Link>
               <Link href="#prices" 
-                className={`text-sm font-light hover:text-primary-orange transition-colors ${getTextColor()}`}>
+                className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
                 {dictionary.header.nav.prices}
               </Link>
             </div>
@@ -141,7 +155,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
             {/* Theme Toggle Button */}
             <button 
               onClick={toggleTheme}
-              className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${getTextColor()}`}
+              className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${textColor}`}
               aria-label="Toggle Theme"
             >
               {isDarkMode ? (
@@ -155,7 +169,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
             <div className="relative">
               <button 
                 onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                className={`flex items-center gap-1 text-xs font-medium uppercase tracking-widest ${getTextColor()}`}
+                className={`flex items-center gap-1 text-xs font-medium uppercase tracking-widest ${textColor}`}
               >
                 <Globe className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`} />
                 <span>{currentLanguage.label}</span>

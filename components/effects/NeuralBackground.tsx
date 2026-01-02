@@ -150,7 +150,12 @@ export default function NeuralBackground() {
     let idlePulseTime = 0; 
     
     // Auto-Pulse State
-    let estimatedPulseLifetime = 0; 
+    let estimatedPulseLifetime = 0;
+    
+    // PERFORMANCE: Wiederverwendbare Map/Set-Objekte um Memory-Allokationen zu reduzieren
+    const connectionPulsesCache = new Map<string, Pulse[]>();
+    const connectionsDrawnCache = new Set<string>();
+    const visibleNeuronIndicesCache = new Set<number>(); 
 
     // --- 0. Theme Detection ---
     const updateTheme = () => {
@@ -464,39 +469,40 @@ export default function NeuralBackground() {
       // 2. Verbindungen 
       ctx.globalCompositeOperation = "lighter";
       
-      const connectionPulses = new Map<string, Pulse[]>();
+      // PERFORMANCE: Wiederverwende Map/Set statt neue zu erstellen
+      connectionPulsesCache.clear();
       for (const p of pulses) {
         const connectionKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
-        if (!connectionPulses.has(connectionKey)) {
-          connectionPulses.set(connectionKey, []);
+        if (!connectionPulsesCache.has(connectionKey)) {
+          connectionPulsesCache.set(connectionKey, []);
         }
-        connectionPulses.get(connectionKey)!.push(p);
+        connectionPulsesCache.get(connectionKey)!.push(p);
       }
 
-      const connectionsDrawn = new Set<string>();
-      const visibleNeuronIndices = new Set<number>();
+      connectionsDrawnCache.clear();
+      visibleNeuronIndicesCache.clear();
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
         if (n.x >= visibleBounds.left && 
             n.x <= visibleBounds.right && 
             n.y >= visibleBounds.top && 
             n.y <= visibleBounds.bottom) {
-          visibleNeuronIndices.add(i);
+          visibleNeuronIndicesCache.add(i);
         }
       }
 
       for (let i = 0; i < neurons.length; i++) {
-        if (!visibleNeuronIndices.has(i)) continue;
+        if (!visibleNeuronIndicesCache.has(i)) continue;
         
         const n = neurons[i];
         for (const targetIdx of n.connections) {
-          if (targetIdx > i) {
-            if (!visibleNeuronIndices.has(targetIdx)) continue;
+            if (targetIdx > i) {
+            if (!visibleNeuronIndicesCache.has(targetIdx)) continue;
             
             const target = neurons[targetIdx];
             const connectionKey = `${i}-${targetIdx}`;
-            if (connectionsDrawn.has(connectionKey)) continue;
-            connectionsDrawn.add(connectionKey);
+            if (connectionsDrawnCache.has(connectionKey)) continue;
+            connectionsDrawnCache.add(connectionKey);
             
             const avgZ = (n.z + target.z) / 2;
             const zNormalized = normalizeZ(avgZ);
@@ -509,7 +515,7 @@ export default function NeuralBackground() {
             const dy = target.y - n.y;
             const currentDist = Math.sqrt(dx * dx + dy * dy);
             
-            const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
+            const pulsesOnConnection = connectionPulsesCache.get(connectionKey) || [];
             let numSegments = Math.min(Math.ceil(currentDist / 4), 40);
             const segmentIntensities = new Map<number, number>();
             const hasActivePulses = pulsesOnConnection.length > 0;
