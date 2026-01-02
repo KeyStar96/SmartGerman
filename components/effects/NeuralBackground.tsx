@@ -53,9 +53,8 @@ const CONFIG = {
   idlePulseIntensity: 0.6,    
   idlePulseSpeed: 0.05,
   
-  // Trail-Effekt: Wie schnell der Glow hinter dem Impuls über ZEIT verblasst
-  // Niedrigerer Wert = länger sichtbarer Trail (langsameres Verblassen)
-  trailDecayPerSecond: 0.6,  // Intensität pro Sekunde, die abgezogen wird (reduziert für länger sichtbaren Trail)
+  // Trail-Effekt: Länge des sichtbaren Schweifs relativ zur Verbindungslänge
+  trailLengthRatio: 0.3,  // 30% der Verbindungslänge als Trail
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -95,9 +94,6 @@ interface Pulse {
   progress: number;      // 0 bis 1 (Prozent der Verbindungslänge)
   totalDist: number;
   strength: number;
-  // Trail: Intensitäten für jedes Segment (klingen über Zeit ab)
-  trailIntensities: number[];
-  lastHeadSegment: number;  // Letztes Segment, das der Kopf erreicht hat
 }
 
 export default function NeuralBackground() {
@@ -274,8 +270,6 @@ export default function NeuralBackground() {
         progress: 0,
         totalDist: 0,
         strength: strength,
-        trailIntensities: [],  // Wird beim ersten Draw initialisiert
-        lastHeadSegment: -1,
       });
     };
 
@@ -399,18 +393,11 @@ export default function NeuralBackground() {
         }
       }
 
-      // 2. Verbindungen 
-      ctx.globalCompositeOperation = "lighter";
+      // 2. Basis-Verbindungen - Performance: Ein einziger Block ohne Schatten
+      ctx.globalCompositeOperation = "source-over";
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
       
-      const connectionPulses = new Map<string, Pulse[]>();
-      for (const p of pulses) {
-        const connectionKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
-        if (!connectionPulses.has(connectionKey)) {
-          connectionPulses.set(connectionKey, []);
-        }
-        connectionPulses.get(connectionKey)!.push(p);
-      }
-
       const connectionsDrawn = new Set<string>();
       const visibleNeuronIndices = new Set<number>();
       for (let i = 0; i < neurons.length; i++) {
@@ -423,6 +410,7 @@ export default function NeuralBackground() {
         }
       }
 
+      // Zeichne alle Basis-Verbindungen in einem Block (ohne Schatten für Performance)
       for (let i = 0; i < neurons.length; i++) {
         if (!visibleNeuronIndices.has(i)) continue;
         
@@ -443,224 +431,84 @@ export default function NeuralBackground() {
             const baseLineWidth = 0.5 + zNormalized * 0.5;
             const lineWidth = baseLineWidth * 1.4;
             
-            const dx = target.x - n.x;
-            const dy = target.y - n.y;
-            const currentDist = Math.sqrt(dx * dx + dy * dy);
+            // Zeichne Basis-Linie immer (Pulse werden darüber gelegt)
+            ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(target.x, target.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // 3. Pulse mit flüssigem Gradienten-Glow (Awwwards-Niveau)
+      if (pulses.length > 0) {
+        ctx.globalCompositeOperation = "lighter";
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        
+        for (const p of pulses) {
+          const nA = neurons[p.fromIndex];
+          const nB = neurons[p.toIndex];
+          
+          // Prüfe Sichtbarkeit
+          if (!visibleNeuronIndices.has(p.fromIndex) || !visibleNeuronIndices.has(p.toIndex)) {
+            continue;
+          }
+          
+          const dx = nB.x - nA.x;
+          const dy = nB.y - nA.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist === 0) continue;
+          
+          const t = Math.min(p.progress, 1.0);
+          
+          // Kopf-Position des Pulses
+          const headX = nA.x + dx * t;
+          const headY = nA.y + dy * t;
+          
+          // Trail-Länge: 30% der Verbindungslänge
+          const trailLength = dist * CONFIG.trailLengthRatio;
+          const trailProgress = trailLength / dist;
+          
+          // Start-Position des Trails (rückwärts vom Kopf)
+          const trailStartT = Math.max(0, t - trailProgress);
+          const trailStartX = nA.x + dx * trailStartT;
+          const trailStartY = nA.y + dy * trailStartT;
+          
+          // Zeichne nur wenn Trail sichtbar ist
+          if (trailStartT < t) {
+            ctx.save(); // WICHTIG: Isoliere Shadow-Effekt für Performance
             
-            const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
-            let numSegments = Math.min(Math.ceil(currentDist / 3), 50);
-            const segmentIntensities = new Map<number, number>();
-            const hasActivePulses = pulsesOnConnection.length > 0;
+            // Shadow für Glow-Effekt (nur für diesen Pulse)
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = `rgba(${theme.signal}, ${p.strength * 0.6})`;
             
-            // Schritt 1: Pulse-Trails berechnen und Intensitäten sammeln
-            if (hasActivePulses) {
-              // Verwende totalDist vom ersten Pulse für konsistente Segment-Anzahl
-              const drawDist = pulsesOnConnection[0].totalDist > 0 ? pulsesOnConnection[0].totalDist : currentDist;
-              numSegments = Math.min(Math.ceil(drawDist / 3), 50);
-              
-              for (const p of pulsesOnConnection) {
-                const isForward = p.fromIndex === i && p.toIndex === targetIdx;
-                const isReverse = p.fromIndex === targetIdx && p.toIndex === i;
+            // LinearGradient: Von voller Farbe am Kopf zu transparent am Trail-Ende
+            const gradient = ctx.createLinearGradient(
+              trailStartX, trailStartY,
+              headX, headY
+            );
             
-                if (!isForward && !isReverse) continue;
-                
-                const t = Math.min(p.progress, 1.0);
-                const baseIntensity = p.strength * 1.0; // Volle Intensität für besseren Glow
-                
-                // Initialisiere trailIntensities nur beim ersten Frame
-                if (p.trailIntensities.length === 0) {
-                  p.trailIntensities = new Array(numSegments + 1).fill(0);
-                  p.lastHeadSegment = isForward ? -1 : numSegments + 1;
-                }
-                
-                // TRAIL-EFFEKT MIT ZEIT-BASIERTEM DECAY
-                if (isForward) {
-                  const headSegment = Math.min(Math.floor(t * numSegments), numSegments);
-                  
-                  // Neue Segmente aktivieren
-                  if (p.lastHeadSegment < headSegment) {
-                    for (let seg = p.lastHeadSegment + 1; seg <= headSegment; seg++) {
-                      if (seg >= 0 && seg < p.trailIntensities.length) {
-                        p.trailIntensities[seg] = baseIntensity;
-                      }
-                    }
-                  }
-                  p.lastHeadSegment = headSegment;
-                  
-                  // Trail-Decay: ALLE Segmente klingen über Zeit ab
-                  for (let seg = 0; seg < p.trailIntensities.length; seg++) {
-                    if (p.trailIntensities[seg] > 0) {
-                      p.trailIntensities[seg] -= CONFIG.trailDecayPerSecond * deltaSeconds;
-                      if (p.trailIntensities[seg] < 0) p.trailIntensities[seg] = 0;
-                    }
-                  }
-                  
-                  // Kopf-Segment hat immer volle Intensität
-                  if (headSegment >= 0 && headSegment < p.trailIntensities.length) {
-                    p.trailIntensities[headSegment] = baseIntensity;
-                  }
-                  
-                  // Sammle Intensitäten
-                  for (let seg = 0; seg < p.trailIntensities.length; seg++) {
-                    const intensity = p.trailIntensities[seg] || 0;
-                    if (intensity > 0.01) {
-                      const currentIntensity = segmentIntensities.get(seg) || 0;
-                      segmentIntensities.set(seg, Math.max(currentIntensity, intensity));
-                    }
-                  }
-                } else {
-                  // Reverse: Impuls geht von target nach n
-                  const headSegment = Math.max(Math.floor((1 - t) * numSegments), 0);
-                  
-                  if (p.lastHeadSegment > numSegments || p.lastHeadSegment > headSegment) {
-                    if (p.lastHeadSegment > numSegments) {
-                      p.lastHeadSegment = numSegments;
-                    }
-                    for (let seg = p.lastHeadSegment; seg >= headSegment; seg--) {
-                      if (seg >= 0 && seg < p.trailIntensities.length) {
-                        p.trailIntensities[seg] = baseIntensity;
-                      }
-                    }
-                  }
-                  p.lastHeadSegment = headSegment;
-                  
-                  // Trail-Decay
-                  for (let seg = 0; seg < p.trailIntensities.length; seg++) {
-                    if (p.trailIntensities[seg] > 0) {
-                      p.trailIntensities[seg] -= CONFIG.trailDecayPerSecond * deltaSeconds;
-                      if (p.trailIntensities[seg] < 0) p.trailIntensities[seg] = 0;
-                    }
-                  }
-                  
-                  if (headSegment >= 0 && headSegment < p.trailIntensities.length) {
-                    p.trailIntensities[headSegment] = baseIntensity;
-                  }
-                  
-                  // Sammle Intensitäten
-                  for (let seg = 0; seg < p.trailIntensities.length; seg++) {
-                    const intensity = p.trailIntensities[seg] || 0;
-                    if (intensity > 0.01) {
-                      const currentIntensity = segmentIntensities.get(seg) || 0;
-                      segmentIntensities.set(seg, Math.max(currentIntensity, intensity));
-                    }
-                  }
-                }
-              }
-            }
+            const gradientStartAlpha = 0;
+            const gradientEndAlpha = p.strength;
             
-            // Schritt 2: Basis-Linie zeichnen (nur Segmente OHNE Glow)
-            ctx.globalCompositeOperation = "source-over";
-            if (segmentIntensities.size === 0) {
-              // Keine aktiven Pulses - zeichne vollständige Basis-Linie
-              ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
-              ctx.lineWidth = lineWidth;
-              ctx.beginPath();
-              ctx.moveTo(n.x, n.y);
-              ctx.lineTo(target.x, target.y);
-              ctx.stroke();
-            } else {
-              // Zeichne Basis-Linie nur für Segmente ohne Glow
-              ctx.strokeStyle = `rgba(${theme.neuron}, ${baseLineOpacity})`;
-              ctx.lineWidth = lineWidth;
-              
-              let lastX = n.x;
-              let lastY = n.y;
-              let drawingPath = false;
-              
-              for (let seg = 0; seg <= numSegments; seg++) {
-                const segT = seg / numSegments;
-                const currentX = n.x + dx * segT;
-                const currentY = n.y + dy * segT;
-                const hasGlow = (segmentIntensities.get(seg) || 0) > 0.01;
-                
-                if (!hasGlow) {
-                  // Kein Glow - Teil der Basis-Linie
-                  if (!drawingPath) {
-                    ctx.beginPath();
-                    ctx.moveTo(lastX, lastY);
-                    drawingPath = true;
-                  }
-                  ctx.lineTo(currentX, currentY);
-                } else {
-                  // Glow-Segment - beende Basis-Linie und starte neuen Abschnitt
-                  if (drawingPath) {
-                    ctx.stroke();
-                    drawingPath = false;
-                  }
-                }
-                
-                lastX = currentX;
-                lastY = currentY;
-              }
-              
-              // Beende letzte Basis-Linie falls noch offen
-              if (drawingPath) {
-                ctx.stroke();
-              }
-            }
+            gradient.addColorStop(0, `rgba(${theme.signal}, ${gradientStartAlpha})`);
+            gradient.addColorStop(0.3, `rgba(${theme.signal}, ${gradientEndAlpha * 0.4})`);
+            gradient.addColorStop(0.7, `rgba(${theme.signal}, ${gradientEndAlpha * 0.8})`);
+            gradient.addColorStop(1, `rgba(${theme.signal}, ${gradientEndAlpha})`);
             
-            // Schritt 3: NEON-GLOW-EFFEKT - Zeichne aktivierte Segmente mit Glow
-            if (segmentIntensities.size > 0) {
-              ctx.globalCompositeOperation = "lighter";
-              
-              // GLOW-PHASE 1: Breiterer transparenter Halo für den Glow-Effekt
-              let lastX = n.x;
-              let lastY = n.y;
-              let lastIntensity = segmentIntensities.get(0) || 0;
-              
-              for (let seg = 1; seg <= numSegments; seg++) {
-                const segT = seg / numSegments;
-                const currentX = n.x + dx * segT;
-                const currentY = n.y + dy * segT;
-                const currentIntensity = segmentIntensities.get(seg) || 0;
-                
-                if (currentIntensity > 0.01 || lastIntensity > 0.01) {
-                  const avgIntensity = (currentIntensity + lastIntensity) / 2;
-                  if (avgIntensity > 0.01) {
-                    // Glow-Halo: Breiterer, transparenterer Strich
-                    ctx.strokeStyle = `rgba(${theme.signal}, ${avgIntensity * 0.35})`;
-                    ctx.lineWidth = 7 * Math.min(avgIntensity, 1.0);
-                    ctx.beginPath();
-                    ctx.moveTo(lastX, lastY);
-                    ctx.lineTo(currentX, currentY);
-                    ctx.stroke();
-                  }
-                }
-                
-                lastX = currentX;
-                lastY = currentY;
-                lastIntensity = currentIntensity;
-              }
-              
-              // GLOW-PHASE 2: Dünnerer, hellerer Kern
-              lastX = n.x;
-              lastY = n.y;
-              lastIntensity = segmentIntensities.get(0) || 0;
-              
-              for (let seg = 1; seg <= numSegments; seg++) {
-                const segT = seg / numSegments;
-                const currentX = n.x + dx * segT;
-                const currentY = n.y + dy * segT;
-                const currentIntensity = segmentIntensities.get(seg) || 0;
-                
-                if (currentIntensity > 0.01 || lastIntensity > 0.01) {
-                  const avgIntensity = (currentIntensity + lastIntensity) / 2;
-                  if (avgIntensity > 0.01) {
-                    // Kern: Dünnerer, voller Alpha für maximale Helligkeit
-                    ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
-                    ctx.lineWidth = 2.5 * Math.min(avgIntensity, 1.0);
-                    ctx.beginPath();
-                    ctx.moveTo(lastX, lastY);
-                    ctx.lineTo(currentX, currentY);
-                    ctx.stroke();
-                  }
-                }
-                
-                lastX = currentX;
-                lastY = currentY;
-                lastIntensity = currentIntensity;
-              }
-            }
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 2.5 * p.strength;
+            
+            ctx.beginPath();
+            ctx.moveTo(trailStartX, trailStartY);
+            ctx.lineTo(headX, headY);
+            ctx.stroke();
+            
+            ctx.restore(); // Shadow-Effekt wieder entfernen
           }
         }
       }
