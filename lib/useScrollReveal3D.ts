@@ -88,6 +88,7 @@ export function useScrollReveal3D(
 
     // Phase 1: Fluid Reveal - Element gleitet aus der Tiefe heran
     // Opacity wird während der ersten 20% der Scroll-Strecke eingeblendet
+    // BACKDROP-FILTER FIX: z-Wert schnell auf 0 bringen, damit backdrop-filter sofort funktioniert
     tl.fromTo(element, 
       {
         rotateX: initialRotateX,
@@ -100,7 +101,7 @@ export function useScrollReveal3D(
       {
         rotateX: 0,
         y: 0,
-        z: 0,
+        z: 0, // BACKDROP-FILTER FIX: Immer auf z: 0, damit backdrop-filter funktioniert
         scale: 1,
         opacity: 1,
         ease: "power2.out", // Sanftes Easing für natürliche Bewegung
@@ -128,11 +129,12 @@ export function useScrollReveal3D(
     // Anstatt harter Rotation: leichtes Gleiten mit minimaler Gegen-Neigung
     // Normal: Neigt sich leicht zurück (rotateX: -10)
     // Inverted: Neigt sich leicht nach vorne (rotateX: 10)
+    // BACKDROP-FILTER FIX: z-Wert auf 0 begrenzen, damit Karten immer über Hintergründen bleiben
     const finalRotateX = inverted ? 10 : -10;
     tl.to(element, {
       rotateX: finalRotateX,
       y: -50, // Gleitet nach oben
-      z: z * 0.5, // Halbe Tiefe für subtileren Exit
+      z: 0, // Immer auf z: 0 bleiben, damit backdrop-filter funktioniert
       scale: 0.95, // Minimal geschrumpft
       opacity: 0,
       ease: "power2.in", // Sanftes Beschleunigen beim Verlassen

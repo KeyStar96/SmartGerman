@@ -81,7 +81,7 @@ export default function PlaceholderSection() {
     <section 
       ref={sectionRef} 
       className="relative w-full min-h-[120vh] py-24 pt-40 flex flex-col items-center justify-start overflow-visible"
-      style={{ zIndex: 1 }}
+      style={{ zIndex: 2 }}
     >
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header der Sektion */}
