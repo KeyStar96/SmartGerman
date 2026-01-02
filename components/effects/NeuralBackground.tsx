@@ -55,7 +55,7 @@ const CONFIG = {
   
   // Trail-Effekt: Wie schnell der Glow hinter dem Impuls über ZEIT verblasst
   // Niedrigerer Wert = länger sichtbarer Trail (langsameres Verblassen)
-  trailDecayPerSecond: 0.6,  // Intensität pro Sekunde, die abgezogen wird (reduziert für länger sichtbaren Trail)
+  trailDecayPerSecond: 1.2,  // Intensität pro Sekunde, die abgezogen wird (erhöht für kürzeren Trail)
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -448,7 +448,7 @@ export default function NeuralBackground() {
             const currentDist = Math.sqrt(dx * dx + dy * dy);
             
             const pulsesOnConnection = connectionPulses.get(connectionKey) || [];
-            let numSegments = Math.min(Math.ceil(currentDist / 3), 50);
+            let numSegments = Math.min(Math.ceil(currentDist / 4), 40);
             const segmentIntensities = new Map<number, number>();
             const hasActivePulses = pulsesOnConnection.length > 0;
             
@@ -456,7 +456,7 @@ export default function NeuralBackground() {
             if (hasActivePulses) {
               // Verwende totalDist vom ersten Pulse für konsistente Segment-Anzahl
               const drawDist = pulsesOnConnection[0].totalDist > 0 ? pulsesOnConnection[0].totalDist : currentDist;
-              numSegments = Math.min(Math.ceil(drawDist / 3), 50);
+              numSegments = Math.min(Math.ceil(drawDist / 4), 40);
               
               for (const p of pulsesOnConnection) {
                 const isForward = p.fromIndex === i && p.toIndex === targetIdx;
@@ -619,7 +619,7 @@ export default function NeuralBackground() {
                   if (avgIntensity > 0.01) {
                     // Glow-Halo: Breiterer, transparenterer Strich
                     ctx.strokeStyle = `rgba(${theme.signal}, ${avgIntensity * 0.35})`;
-                    ctx.lineWidth = 7 * Math.min(avgIntensity, 1.0);
+                    ctx.lineWidth = 5 * Math.min(avgIntensity, 1.0);
                     ctx.beginPath();
                     ctx.moveTo(lastX, lastY);
                     ctx.lineTo(currentX, currentY);
@@ -648,7 +648,7 @@ export default function NeuralBackground() {
                   if (avgIntensity > 0.01) {
                     // Kern: Dünnerer, voller Alpha für maximale Helligkeit
                     ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
-                    ctx.lineWidth = 2.5 * Math.min(avgIntensity, 1.0);
+                    ctx.lineWidth = 2 * Math.min(avgIntensity, 1.0);
                     ctx.beginPath();
                     ctx.moveTo(lastX, lastY);
                     ctx.lineTo(currentX, currentY);
