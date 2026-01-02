@@ -27,8 +27,8 @@ const CONFIG = {
   damping: 0.95,              
   
   // Signale - ZEIT-BASIERT für konsistente Geschwindigkeit
-  // signalSpeedPerSecond: Wie viel Prozent der Verbindung pro Sekunde zurückgelegt wird
-  signalSpeedPerSecond: 0.8,  // 80% der Verbindungslänge pro Sekunde
+  // signalSpeedPixelsPerSecond: Absolute Geschwindigkeit in Pixeln pro Sekunde
+  signalSpeedPixelsPerSecond: 150,  // Pixel pro Sekunde
   signalLength: 120,          
   signalDecay: 0.6,           
   minSignalStrength: 0.15,    
@@ -381,7 +381,8 @@ export default function NeuralBackground() {
         }
         
         // ZEIT-BASIERT: Progress ist 0-1 (Prozent der Verbindungslänge)
-        p.progress += CONFIG.signalSpeedPerSecond * deltaSeconds;
+        // Absolute Pixel-Geschwindigkeit: Fortschritt skaliert mit tatsächlicher Distanz
+        p.progress += (CONFIG.signalSpeedPixelsPerSecond * deltaSeconds) / (p.totalDist || 1);
 
         if (p.progress >= 1.0) {
           pulses.splice(i, 1);
@@ -859,9 +860,10 @@ export default function NeuralBackground() {
     let lastAutoPulseTime = 0; 
 
     const calculateAveragePulseLifetime = (): number => {
-      // Da die Geschwindigkeit jetzt zeit-basiert ist (Prozent pro Sekunde),
-      // ist die Lebensdauer eines einzelnen Pulses: 1 / signalSpeedPerSecond Sekunden
-      const singlePulseLifetimeMs = (1 / CONFIG.signalSpeedPerSecond) * 1000;
+      // Absolute Pixel-Geschwindigkeit: Lebensdauer = Distanz / Geschwindigkeit
+      // Verwende connectionDistance als Schätzung für durchschnittliche Verbindungslänge
+      const avgDistance = CONFIG.connectionDistance;
+      const singlePulseLifetimeMs = (avgDistance / CONFIG.signalSpeedPixelsPerSecond) * 1000;
       
       // Schätzung der Generationen basierend auf Decay
       const estimatedGenerations = 1 + (1 / (1 - CONFIG.signalDecay));
