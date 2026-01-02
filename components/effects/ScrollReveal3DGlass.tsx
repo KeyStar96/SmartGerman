@@ -65,7 +65,7 @@ export default function ScrollReveal3DGlass({
       {/* Content-Layer: 3D-Transforms OHNE backdrop-filter */}
       <div
         ref={cardRef}
-        className="gpu-render"
+        className="gpu-render h-full"
         style={{
           position: "relative",
           transformStyle: "flat", // WICHTIG für Safari Backdrop Filter

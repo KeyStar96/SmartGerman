@@ -105,13 +105,14 @@ export default function Features({ dictionary }: FeaturesProps) {
         {/* CHROME-BUG FIX: perspective vom Container entfernt - bricht backdrop-filter! */}
         <div 
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch"
         >
           {features.map((feature, index) => (
             <ScrollReveal3DGlass 
               key={index}
               trigger={gridRef}
               inverted={true}
+              className="h-full"
             >
               <div
                 ref={(el) => {
@@ -149,15 +150,22 @@ export default function Features({ dictionary }: FeaturesProps) {
                   {feature.title}
                 </h3>
                 
-                <p className="text-foreground/70 dark:text-dm-text-muted leading-relaxed">
+                <p className="text-foreground/70 dark:text-dm-text-muted leading-relaxed flex-grow">
                   {feature.description}
                 </p>
 
                 {/* Spaceship UI: Präzise 1px-Linie am Boden beim Hover */}
+                {/* WICHTIG: bottom-0 positioniert den Strich an der unteren Kante der Karte */}
+                {/* left-0 und right-0 sorgen für volle Breite, negative Margins kompensieren Padding */}
                 <div 
-                  className="absolute bottom-0 left-0 h-[1px] w-0 group-hover:w-full transition-all duration-700"
+                  className="absolute bottom-0 h-[1px] w-0 group-hover:w-full transition-all duration-700"
                   style={{ 
-                    backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)"
+                    backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)",
+                    left: 0,
+                    right: 0,
+                    // Kompensiert das Padding, damit der Strich wirklich an der Kante ist
+                    marginLeft: "-2rem", // -p-8
+                    marginRight: "-2rem", // -p-8
                   }}
                 />
               </div>

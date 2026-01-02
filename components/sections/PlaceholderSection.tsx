@@ -101,13 +101,14 @@ export default function PlaceholderSection() {
         {/* CHROME-BUG FIX: perspective vom Container entfernt - bricht backdrop-filter! */}
         <div 
           ref={gridRef}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch"
         >
           {cards.map((card, index) => (
             <ScrollReveal3DGlass 
               key={index}
               trigger={gridRef}
               inverted={true}
+              className="h-full"
             >
               <div
                 ref={(el) => {
@@ -139,14 +140,23 @@ export default function PlaceholderSection() {
                   {card.title}
                 </h3>
                 
-                <p className="text-foreground/70 leading-relaxed">
+                <p className="text-foreground/70 leading-relaxed flex-grow">
                   {card.description}
                 </p>
 
                 {/* Subtiler Deko-Strich am Boden */}
+                {/* WICHTIG: bottom-0 positioniert den Strich an der unteren Kante der Karte */}
+                {/* left-0 und right-0 sorgen für volle Breite, negative Margins kompensieren Padding */}
                 <div 
-                  className="absolute bottom-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 opacity-50"
-                  style={{ backgroundColor: card.color }}
+                  className="absolute bottom-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 opacity-50"
+                  style={{ 
+                    backgroundColor: card.color,
+                    left: 0,
+                    right: 0,
+                    // Kompensiert das Padding, damit der Strich wirklich an der Kante ist
+                    marginLeft: "-2rem", // -p-8
+                    marginRight: "-2rem", // -p-8
+                  }}
                 />
               </div>
             </ScrollReveal3DGlass>
