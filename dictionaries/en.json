@@ -81,7 +81,7 @@
           "description": "Build on your basic knowledge and expand your vocabulary for everyday situations.",
           "price": "€ 349",
           "duration": "10 Weeks",
-          "color": "#0047FF"
+          "color": "#00D9FF"
         },
         {
           "level": "B1",
@@ -97,7 +97,7 @@
           "description": "Confident performance in work and everyday life. Perfect your language skills at an advanced level.",
           "price": "€ 449",
           "duration": "14 Weeks",
-          "color": "#0047FF"
+          "color": "#00D9FF"
         }
       ]
     }
