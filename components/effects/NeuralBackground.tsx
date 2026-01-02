@@ -98,6 +98,7 @@ interface Pulse {
   // Trail: Intensitäten für jedes Segment (klingen über Zeit ab)
   trailIntensities: number[];
   lastHeadSegment: number;  // Letztes Segment, das der Kopf erreicht hat
+  completed: boolean;       // True wenn der Pulse das Ziel erreicht hat, aber noch abklingt
 }
 
 export default function NeuralBackground() {
@@ -335,6 +336,7 @@ export default function NeuralBackground() {
         strength: strength,
         trailIntensities: [],  // Wird beim ersten Draw initialisiert
         lastHeadSegment: -1,
+        completed: false,
       });
     };
 
@@ -449,10 +451,14 @@ export default function NeuralBackground() {
         
         // ZEIT-BASIERT: Progress ist 0-1 (Prozent der Verbindungslänge)
         // Absolute Pixel-Geschwindigkeit: Fortschritt skaliert mit tatsächlicher Distanz
-        p.progress += (CONFIG.signalSpeedPixelsPerSecond * deltaSeconds) / (p.totalDist || 1);
+        if (!p.completed) {
+          p.progress += (CONFIG.signalSpeedPixelsPerSecond * deltaSeconds) / (p.totalDist || 1);
+        }
 
-        if (p.progress >= 1.0) {
-          pulses.splice(i, 1);
+        if (p.progress >= 1.0 && !p.completed) {
+          // Pulse hat das Ziel erreicht - markiere als completed, aber lösche nicht sofort
+          p.completed = true;
+          p.progress = 1.0; // Fixiere auf 1.0
           nB.flash = 1.0 * p.strength;
 
           if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
@@ -462,6 +468,24 @@ export default function NeuralBackground() {
                 spawnPulse(p.toIndex, neighborIdx, newStrength);
               }
             });
+          }
+        }
+        
+        // Wenn completed: Prüfe ob alle trailIntensities abgeklungen sind
+        // (Decay passiert im Draw-Loop, hier nur Prüfung auf Löschung)
+        if (p.completed) {
+          let hasActiveTrail = false;
+          
+          for (let seg = 0; seg < p.trailIntensities.length; seg++) {
+            if ((p.trailIntensities[seg] || 0) > 0.01) {
+              hasActiveTrail = true;
+              break;
+            }
+          }
+          
+          // Lösche Pulse erst wenn alle trailIntensities abgeklungen sind
+          if (!hasActiveTrail) {
+            pulses.splice(i, 1);
           }
         }
       }
@@ -545,15 +569,17 @@ export default function NeuralBackground() {
                 if (isForward) {
                   const headSegment = Math.min(Math.floor(t * numSegments), numSegments);
                   
-                  // Neue Segmente aktivieren
-                  if (p.lastHeadSegment < headSegment) {
+                  // Neue Segmente aktivieren (nur wenn noch nicht completed)
+                  if (!p.completed && p.lastHeadSegment < headSegment) {
                     for (let seg = p.lastHeadSegment + 1; seg <= headSegment; seg++) {
                       if (seg >= 0 && seg < p.trailIntensities.length) {
                         p.trailIntensities[seg] = baseIntensity;
                       }
                     }
                   }
-                  p.lastHeadSegment = headSegment;
+                  if (!p.completed) {
+                    p.lastHeadSegment = headSegment;
+                  }
                   
                   // Trail-Decay: ALLE Segmente klingen über Zeit ab
                   // PERFORMANCE: Optimiere Loop - nur aktive Segmente verarbeiten
@@ -566,8 +592,8 @@ export default function NeuralBackground() {
                     }
                   }
                   
-                  // Kopf-Segment hat immer volle Intensität
-                  if (headSegment >= 0 && headSegment < p.trailIntensities.length) {
+                  // Kopf-Segment hat immer volle Intensität (nur wenn noch nicht completed)
+                  if (!p.completed && headSegment >= 0 && headSegment < p.trailIntensities.length) {
                     p.trailIntensities[headSegment] = baseIntensity;
                   }
                   
@@ -583,17 +609,20 @@ export default function NeuralBackground() {
                   // Reverse: Impuls geht von target nach n
                   const headSegment = Math.max(Math.floor((1 - t) * numSegments), 0);
                   
-                  if (p.lastHeadSegment > numSegments || p.lastHeadSegment > headSegment) {
-                    if (p.lastHeadSegment > numSegments) {
-                      p.lastHeadSegment = numSegments;
-                    }
-                    for (let seg = p.lastHeadSegment; seg >= headSegment; seg--) {
-                      if (seg >= 0 && seg < p.trailIntensities.length) {
-                        p.trailIntensities[seg] = baseIntensity;
+                  // Neue Segmente aktivieren (nur wenn noch nicht completed)
+                  if (!p.completed) {
+                    if (p.lastHeadSegment > numSegments || p.lastHeadSegment > headSegment) {
+                      if (p.lastHeadSegment > numSegments) {
+                        p.lastHeadSegment = numSegments;
+                      }
+                      for (let seg = p.lastHeadSegment; seg >= headSegment; seg--) {
+                        if (seg >= 0 && seg < p.trailIntensities.length) {
+                          p.trailIntensities[seg] = baseIntensity;
+                        }
                       }
                     }
+                    p.lastHeadSegment = headSegment;
                   }
-                  p.lastHeadSegment = headSegment;
                   
                   // Trail-Decay
                   // PERFORMANCE: Optimiere Loop - nur aktive Segmente verarbeiten
@@ -606,7 +635,8 @@ export default function NeuralBackground() {
                     }
                   }
                   
-                  if (headSegment >= 0 && headSegment < p.trailIntensities.length) {
+                  // Kopf-Segment hat immer volle Intensität (nur wenn noch nicht completed)
+                  if (!p.completed && headSegment >= 0 && headSegment < p.trailIntensities.length) {
                     p.trailIntensities[headSegment] = baseIntensity;
                   }
                   
