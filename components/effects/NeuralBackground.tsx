@@ -233,6 +233,23 @@ export default function NeuralBackground() {
     const canvas = canvasRef.current;
     if (!canvas) return () => {}; 
 
+    // SAFARI-DETECTION: Safari auf macOS hat spezielle Canvas-Performance-Probleme
+    const isSafariMac = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) &&
+                        /Macintosh/.test(navigator.userAgent);
+    
+    // SAFARI-OPTIMIERUNG: Angepasste Einstellungen für bessere Performance
+    const SAFARI_CONFIG = {
+      // Niedrigere DPR für Safari (1.0 statt 1.5) - größter Performance-Gewinn
+      maxDPR: isSafariMac ? 1.0 : 1.5,
+      // Weniger Blur-Layers in Safari
+      zBlurLayers: isSafariMac ? 1 : CONFIG.zBlurLayers,
+      // Aggressiveres Scroll-Throttling für Safari
+      scrollFPS: isSafariMac ? 12 : 20,
+      normalFPS: isSafariMac ? 45 : 60,
+      // Längere Idle-Zeit nach Scroll für Safari
+      scrollIdleDelay: isSafariMac ? 200 : 150,
+    };
+
     // Performance: desynchronized reduziert Latenz
     const ctx = canvas.getContext("2d", { 
       alpha: true,
@@ -274,10 +291,10 @@ export default function NeuralBackground() {
       
       // --------------------------------------------------------
       // PERFORMANCE OPTIMIZATION: DPR Capping
-      // Begrenzt die Render-Auflösung auf max 1.5x. 
-      // Auf Retina-Screens (3x) spart das ca. 75% Pixelberechnung.
+      // Safari Mac: 1.0x (niedrigste Auflösung für beste Performance)
+      // Andere Browser: 1.5x
       // --------------------------------------------------------
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, SAFARI_CONFIG.maxDPR);
       
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -927,11 +944,12 @@ export default function NeuralBackground() {
       let currentFillStyle = "";
       
       // PERFORMANCE: Pre-compute constants
+      // SAFARI-OPTIMIERUNG: Weniger Blur-Layers für Safari Mac
       const baseParticleSize = CONFIG.particleSize;
       const zSizeScale = CONFIG.zSizeScale;
       const idlePulseEnabled = CONFIG.idlePulseEnabled;
       const idlePulseIntensity = CONFIG.idlePulseIntensity;
-      const zBlurLayers = CONFIG.zBlurLayers;
+      const zBlurLayers = SAFARI_CONFIG.zBlurLayers;
       const neuronColor = theme.neuron;
       const signalColor = theme.signal;
       const sortedLength = visibleNeurons.length;
@@ -1044,13 +1062,14 @@ export default function NeuralBackground() {
     let lastFrameTime = performance.now();
     
     // SCROLL-THROTTLING: Reduziere FPS während des Scrollens für flüssigere UX
+    // SAFARI-OPTIMIERUNG: Noch aggressiveres Throttling für Safari Mac
     let isScrolling = false;
     let scrollTimeout: NodeJS.Timeout | null = null;
-    const SCROLL_IDLE_DELAY = 150; // ms nach letztem Scroll-Event
+    const SCROLL_IDLE_DELAY = SAFARI_CONFIG.scrollIdleDelay;
     
-    // FPS-Einstellungen: Normal vs. Scroll-Modus
-    const NORMAL_FPS = 60;
-    const SCROLL_FPS = 20; // Stark reduziert während des Scrollens
+    // FPS-Einstellungen: Normal vs. Scroll-Modus (Safari-angepasst)
+    const NORMAL_FPS = SAFARI_CONFIG.normalFPS;
+    const SCROLL_FPS = SAFARI_CONFIG.scrollFPS;
     
     let currentTargetFPS = NORMAL_FPS;
     let frameInterval = 1000 / currentTargetFPS;
