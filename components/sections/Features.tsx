@@ -156,16 +156,11 @@ export default function Features({ dictionary }: FeaturesProps) {
 
                 {/* Spaceship UI: Präzise 1px-Linie am Boden beim Hover */}
                 {/* WICHTIG: bottom-0 positioniert den Strich an der unteren Kante der Karte */}
-                {/* left-0 und right-0 sorgen für volle Breite, negative Margins kompensieren Padding */}
+                {/* Negative left/right kompensieren das Padding (p-8 = 2rem, md:p-10 = 2.5rem) */}
                 <div 
-                  className="absolute bottom-0 h-[1px] w-0 group-hover:w-full transition-all duration-700"
+                  className="absolute bottom-0 left-[-2rem] right-[-2rem] md:left-[-2.5rem] md:right-[-2.5rem] h-[1px] w-0 group-hover:w-[calc(100%+4rem)] md:group-hover:w-[calc(100%+5rem)] transition-all duration-700"
                   style={{ 
                     backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)",
-                    left: 0,
-                    right: 0,
-                    // Kompensiert das Padding, damit der Strich wirklich an der Kante ist
-                    marginLeft: "-2rem", // -p-8
-                    marginRight: "-2rem", // -p-8
                   }}
                 />
               </div>

@@ -28,9 +28,10 @@ export default function ScrollReveal3DGlass({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // FIX: Animation direkt auf das Karten-Element anwenden, nicht auf den Wrapper
-  // Der Wrapper bleibt immer sichtbar (opacity: 1), damit backdrop-filter funktioniert
-  useScrollReveal3D(cardRef, {
+  // FIX: Animation auf den Wrapper anwenden, damit die gesamte Karte (inklusive Backdrop) animiert wird
+  // CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
+  // Lösung: backdrop-filter auf separatem Element, aber Wrapper wird animiert
+  useScrollReveal3D(wrapperRef, {
     trigger: trigger || undefined,
     z: -300, // Subtiler Tiefeneffekt (reduziert von -1200)
     transformOrigin: "center center", // Zentriert für harmonische Skalierung
@@ -40,13 +41,12 @@ export default function ScrollReveal3DGlass({
 
   // CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
   // Lösung: backdrop-filter auf separatem Element ohne Transforms
-  // Struktur: Wrapper > Backdrop-Layer (backdrop-filter) > Content-Layer (3D-Transforms)
+  // Struktur: Wrapper (animiert) > Backdrop-Layer (backdrop-filter) > Content-Layer (Inhalt)
   return (
     <div
       ref={wrapperRef}
       className={className}
       style={{
-        opacity: 1,
         position: "relative",
       }}
     >
