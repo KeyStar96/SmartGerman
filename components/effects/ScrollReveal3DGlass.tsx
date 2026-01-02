@@ -40,14 +40,13 @@ export default function ScrollReveal3DGlass({
 
   // FIX: Wrapper bleibt immer sichtbar (opacity: 1), damit backdrop-filter funktioniert
   // Die Animation läuft direkt auf dem Kind-Element (Karte)
+  // CHROME FIX: KEIN isolation: isolate - bricht backdrop-filter!
   return (
     <div
       ref={wrapperRef}
       className={className}
       style={{
         opacity: 1,
-        // Isolation erzeugt neuen Stacking Context -> isoliert Repaints
-        isolation: "isolate", 
       }}
     >
       <div
