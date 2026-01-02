@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, ReactNode } from "react";
+import React, { useRef, ReactNode, useEffect } from "react";
 import { useScrollReveal3D } from "@/lib/useScrollReveal3D";
 
 interface ScrollReveal3DGlassProps {
@@ -34,6 +34,73 @@ export default function ScrollReveal3DGlass({
     inverted,
     scrub: 1.5, // Maximale Geschmeidigkeit
   });
+
+  // DEBUGGING: Überwache computed styles für backdrop-filter
+  useEffect(() => {
+    if (!elementRef.current) return;
+    
+    let lastLogTime = 0;
+    const logInterval = 500; // Log alle 500ms während des Scrollens
+    
+    const checkStyles = () => {
+      const element = elementRef.current;
+      if (!element) return;
+      
+      const computedStyle = window.getComputedStyle(element);
+      const childElement = element.querySelector('.glass-panel-enhanced') as HTMLElement;
+      
+      if (childElement) {
+        const childComputedStyle = window.getComputedStyle(childElement);
+        const backdropFilter = childComputedStyle.backdropFilter;
+        const opacity = childComputedStyle.opacity;
+        const zIndex = childComputedStyle.zIndex;
+        const transform = computedStyle.transform;
+        const parentOpacity = computedStyle.opacity;
+        
+        const now = Date.now();
+        const shouldLog = 
+          backdropFilter === 'none' || 
+          parseFloat(opacity) < 0.5 || 
+          parseFloat(parentOpacity) < 0.5 ||
+          (now - lastLogTime > logInterval && parseFloat(opacity) < 1);
+        
+        if (shouldLog) {
+          console.warn(`[ScrollReveal3DGlass] Problem erkannt:`, {
+            childOpacity: opacity,
+            parentOpacity: parentOpacity,
+            backdropFilter: backdropFilter || 'none',
+            zIndex: zIndex || 'auto',
+            transform: transform || 'none',
+            scrollY: window.scrollY,
+            elementInViewport: element.getBoundingClientRect().top < window.innerHeight,
+          });
+          lastLogTime = now;
+        }
+      }
+    };
+    
+    // MutationObserver für Style-Änderungen
+    const observer = new MutationObserver(checkStyles);
+    observer.observe(elementRef.current, {
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+      subtree: true,
+    });
+    
+    // Interval-Check während des Scrollens
+    const scrollHandler = () => {
+      requestAnimationFrame(checkStyles);
+    };
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+    
+    // Initial check
+    checkStyles();
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', scrollHandler);
+    };
+  }, []);
 
   return (
     <div

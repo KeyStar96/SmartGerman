@@ -77,6 +77,7 @@ body {
     
     /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
     /* CHROME FIX: Kein z-index, keine isolation - damit backdrop-filter die Hintergründe bluren kann */
+    /* Blur auf Header-Niveau reduziert: 8px statt 40px für konsistentes Design */
     .glass-panel-enhanced {
       @apply rounded-2xl transition-all duration-500;
       /* Lightmode: Feine Linien */
@@ -85,9 +86,9 @@ body {
       background: rgba(255, 255, 255, 0.5);
       /* Position relative für stabile Positionierung */
       position: relative;
-      /* Blur-Effekt: -webkit zuerst für Safari */
-      -webkit-backdrop-filter: blur(40px) saturate(180%);
-      backdrop-filter: blur(40px) saturate(180%);
+      /* Blur-Effekt: -webkit zuerst für Safari - auf Header-Niveau reduziert */
+      -webkit-backdrop-filter: blur(8px) saturate(150%);
+      backdrop-filter: blur(8px) saturate(150%);
       /* Verhindert 3D-Vererbung auf das Element selbst */
       transform-style: flat;
     }
@@ -96,8 +97,8 @@ body {
       border: 1px solid var(--dm-border-slate);
       /* Höhere Opazität als Fallback */
       background: rgba(13, 13, 13, 0.5);
-      -webkit-backdrop-filter: blur(40px) saturate(180%);
-      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(8px) saturate(150%);
+      backdrop-filter: blur(8px) saturate(150%);
     }
     
     /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */

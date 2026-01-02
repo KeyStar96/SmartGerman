@@ -83,6 +83,25 @@ export function useScrollReveal3D(
         end: "bottom center", // Endet wenn Element-Mitte Viewport-Mitte erreicht
         scrub,
         refreshPriority: -1,
+        // DEBUGGING: Log Scroll-Progress und Transform-Werte
+        onUpdate: (self) => {
+          const progress = self.progress;
+          const computedStyle = window.getComputedStyle(element);
+          const transform = computedStyle.transform;
+          const opacity = computedStyle.opacity;
+          const backdropFilter = computedStyle.backdropFilter;
+          
+          // Log nur bei wichtigen Meilensteinen (alle 10%)
+          if (Math.floor(progress * 10) !== Math.floor((progress - 0.01) * 10)) {
+            console.log(`[ScrollReveal3D] Progress: ${(progress * 100).toFixed(1)}%`, {
+              opacity,
+              transform,
+              backdropFilter: backdropFilter || 'none',
+              zIndex: computedStyle.zIndex,
+              position: computedStyle.position,
+            });
+          }
+        },
       },
     });
 
@@ -130,16 +149,24 @@ export function useScrollReveal3D(
     // Normal: Neigt sich leicht zurück (rotateX: -10)
     // Inverted: Neigt sich leicht nach vorne (rotateX: 10)
     // BACKDROP-FILTER FIX: z-Wert auf 0 begrenzen, damit Karten immer über Hintergründen bleiben
+    // DEBUGGING: opacity bleibt auf 1, damit Karten nicht transparent werden
     const finalRotateX = inverted ? 10 : -10;
     tl.to(element, {
       rotateX: finalRotateX,
       y: -50, // Gleitet nach oben
       z: 0, // Immer auf z: 0 bleiben, damit backdrop-filter funktioniert
       scale: 0.95, // Minimal geschrumpft
-      opacity: 0,
+      opacity: 1, // DEBUGGING: Opacity auf 1 lassen statt 0 - Karten sollen NICHT transparent werden
       ease: "power2.in", // Sanftes Beschleunigen beim Verlassen
       force3D: true,
       duration: 0.20, // 20% der Timeline
+      onUpdate: function() {
+        // DEBUGGING: Log wenn Phase 3 aktiv ist
+        const currentOpacity = gsap.getProperty(element, "opacity");
+        const currentZ = gsap.getProperty(element, "z");
+        const currentY = gsap.getProperty(element, "y");
+        console.log(`[ScrollReveal3D Phase 3] opacity: ${currentOpacity}, z: ${currentZ}, y: ${currentY}`);
+      },
     }, 0.80);
 
     return () => {
