@@ -52,7 +52,7 @@ export default function CourseCard({ level, title, description, price, duration,
 
         {/* Course Info */}
         <div className="relative z-10 flex flex-col h-full">
-          <h3 className="mb-3 text-3xl font-bold tracking-tight text-white">
+          <h3 className="mb-3 text-3xl font-bold group-hover:font-black tracking-tight text-white transition-all duration-500 ease-out">
             Deutsch {level}
           </h3>
           
@@ -84,6 +84,15 @@ export default function CourseCard({ level, title, description, price, duration,
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{
             background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${color}20, transparent 40%)`
+          }}
+        />
+
+        {/* Noise Texture Overlay - Verhindert Banding und gibt analogen Film-Look */}
+        <div 
+          className="pointer-events-none absolute inset-0 opacity-[0.03] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            backgroundSize: '200px 200px',
           }}
         />
       </div>
