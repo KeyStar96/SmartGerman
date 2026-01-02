@@ -8,7 +8,7 @@ if (typeof window !== "undefined") {
   // Performance-Optimierungen für ScrollTrigger
   ScrollTrigger.config({
     autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
-    ignoreMobileResize: true, // PERFORMANCE: Reduziert Recalculations auf Mobile
+    ignoreMobileResize: true, // Reduziert Recalculations auf Mobile
   });
 }
 
@@ -18,8 +18,6 @@ gsap.config({
   force3D: true,
   // Performance: Reduziere Recalculations
   autoSleep: 60, // Pausiert Animationen nach 60s Inaktivität
-  // PERFORMANCE: Zusätzliche Optimierungen für konstante 60 FPS
-  units: { rotation: "deg" }, // Konsistente Einheiten
 });
 
 export { gsap, ScrollTrigger, useGSAP };

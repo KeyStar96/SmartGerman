@@ -175,7 +175,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           start: "top top",
           end: "bottom top",
           scrub: 1,
-          refreshPriority: -1, // PERFORMANCE: Niedrigere Priorität für bessere Performance
+          refreshPriority: 0,
         },
         rotateX: -90,
         z: -1200,
@@ -193,7 +193,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           trigger: container.current,
           start: "top top",
           end: "bottom top",
-          scrub: 1.2, // PERFORMANCE: Leicht erhöht für flüssigere Animation
+          scrub: 1,
           refreshPriority: -1,
         },
         rotateX: -90,
