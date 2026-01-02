@@ -25,9 +25,12 @@ export default function ScrollReveal3DGlass({
   trigger,
   inverted = true, // Standard: Invertierte Bewegung für natürlicheres Gefühl
 }: ScrollReveal3DGlassProps) {
-  const elementRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  useScrollReveal3D(elementRef, {
+  // FIX: Animation direkt auf das Karten-Element anwenden, nicht auf den Wrapper
+  // Der Wrapper bleibt immer sichtbar (opacity: 1), damit backdrop-filter funktioniert
+  useScrollReveal3D(cardRef, {
     trigger: trigger || undefined,
     z: -300, // Subtiler Tiefeneffekt (reduziert von -1200)
     transformOrigin: "center center", // Zentriert für harmonische Skalierung
@@ -37,42 +40,44 @@ export default function ScrollReveal3DGlass({
 
   // DEBUGGING: Überwache computed styles für backdrop-filter
   useEffect(() => {
-    if (!elementRef.current) return;
+    if (!wrapperRef.current || !cardRef.current) return;
     
     let lastLogTime = 0;
     const logInterval = 500; // Log alle 500ms während des Scrollens
     
     const checkStyles = () => {
-      const element = elementRef.current;
-      if (!element) return;
+      const wrapper = wrapperRef.current;
+      const card = cardRef.current;
+      if (!wrapper || !card) return;
       
-      const computedStyle = window.getComputedStyle(element);
-      const childElement = element.querySelector('.glass-panel-enhanced') as HTMLElement;
+      const wrapperComputedStyle = window.getComputedStyle(wrapper);
+      const cardComputedStyle = window.getComputedStyle(card);
+      const glassPanel = card.querySelector('.glass-panel-enhanced') as HTMLElement;
       
-      if (childElement) {
-        const childComputedStyle = window.getComputedStyle(childElement);
-        const backdropFilter = childComputedStyle.backdropFilter;
-        const opacity = childComputedStyle.opacity;
-        const zIndex = childComputedStyle.zIndex;
-        const transform = computedStyle.transform;
-        const parentOpacity = computedStyle.opacity;
+      if (glassPanel) {
+        const glassComputedStyle = window.getComputedStyle(glassPanel);
+        const backdropFilter = glassComputedStyle.backdropFilter;
+        const glassOpacity = glassComputedStyle.opacity;
+        const cardOpacity = cardComputedStyle.opacity;
+        const wrapperOpacity = wrapperComputedStyle.opacity;
         
         const now = Date.now();
         const shouldLog = 
           backdropFilter === 'none' || 
-          parseFloat(opacity) < 0.5 || 
-          parseFloat(parentOpacity) < 0.5 ||
-          (now - lastLogTime > logInterval && parseFloat(opacity) < 1);
+          parseFloat(glassOpacity) < 0.5 || 
+          parseFloat(cardOpacity) < 0.5 ||
+          parseFloat(wrapperOpacity) < 0.5 ||
+          (now - lastLogTime > logInterval && parseFloat(glassOpacity) < 1);
         
         if (shouldLog) {
           console.warn(`[ScrollReveal3DGlass] Problem erkannt:`, {
-            childOpacity: opacity,
-            parentOpacity: parentOpacity,
+            glassOpacity: glassOpacity,
+            cardOpacity: cardOpacity,
+            wrapperOpacity: wrapperOpacity,
             backdropFilter: backdropFilter || 'none',
-            zIndex: zIndex || 'auto',
-            transform: transform || 'none',
+            cardTransform: cardComputedStyle.transform || 'none',
             scrollY: window.scrollY,
-            elementInViewport: element.getBoundingClientRect().top < window.innerHeight,
+            elementInViewport: wrapper.getBoundingClientRect().top < window.innerHeight,
           });
           lastLogTime = now;
         }
@@ -81,7 +86,7 @@ export default function ScrollReveal3DGlass({
     
     // MutationObserver für Style-Änderungen
     const observer = new MutationObserver(checkStyles);
-    observer.observe(elementRef.current, {
+    observer.observe(wrapperRef.current, {
       attributes: true,
       attributeFilter: ['style', 'class'],
       subtree: true,
@@ -102,20 +107,32 @@ export default function ScrollReveal3DGlass({
     };
   }, []);
 
+  // FIX: Wrapper bleibt immer sichtbar (opacity: 1), damit backdrop-filter funktioniert
+  // Die Animation läuft direkt auf dem Kind-Element (Karte)
   return (
     <div
-      ref={elementRef}
-      className={`gpu-render ${className}`}
+      ref={wrapperRef}
+      className={className}
       style={{
-        // WICHTIG: transform-style: flat statt preserve-3d
-        // preserve-3d bricht backdrop-filter in Safari/iOS!
-        transformStyle: "flat",
-        transformOrigin: "center center",
-        // CHROME FIX: willChange entfernt - bricht backdrop-filter bei Kind-Elementen!
-        // GPU-Beschleunigung wird stattdessen via gpu-render Klasse gesetzt
+        // Wrapper hat KEINE opacity-Animation - bleibt immer sichtbar
+        opacity: 1,
+        // Wrapper hat KEINE 3D-Transformationen - nur das Kind-Element
       }}
     >
-      {children}
+      <div
+        ref={cardRef}
+        className="gpu-render"
+        style={{
+          // WICHTIG: transform-style: flat statt preserve-3d
+          // preserve-3d bricht backdrop-filter in Safari/iOS!
+          transformStyle: "flat",
+          transformOrigin: "center center",
+          // CHROME FIX: willChange entfernt - bricht backdrop-filter bei Kind-Elementen!
+          // GPU-Beschleunigung wird stattdessen via gpu-render Klasse gesetzt
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
