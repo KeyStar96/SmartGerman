@@ -171,14 +171,6 @@ export default function Features({ dictionary }: FeaturesProps) {
                     {feature.description}
                   </p>
 
-                  {/* Kinetic Glass: Präzise 1px-Linie am Boden beim Hover */}
-                  <div 
-                    className="absolute bottom-0 left-0 h-[1px] w-0 group-hover:w-full transition-all duration-700"
-                    style={{ 
-                      backgroundColor: featureColor,
-                    }}
-                  />
-
                   {/* Innerer Glow-Effekt beim Hover - folgt der Maus */}
                   <div 
                     className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"

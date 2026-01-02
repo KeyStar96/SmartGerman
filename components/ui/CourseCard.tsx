@@ -69,12 +69,12 @@ export default function CourseCard({ level, title, description, price, duration,
             {/* Awwwards-Style Button: Minimalistisch & Magnetic - Performance-optimiert */}
             <Link 
               href={`/${lang}/anmeldung`}
-              className="relative flex h-12 w-12 group-hover:w-32 items-center justify-between rounded-full border border-white/20 text-white transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group/btn overflow-hidden px-3 gap-2"
+              className="relative flex h-12 w-12 group-hover:w-[8.5rem] items-center justify-between rounded-full border border-white/20 text-white transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden px-3"
             >
-              <span className="whitespace-nowrap opacity-0 w-0 overflow-hidden transition-all duration-500 ease-out group-hover/btn:opacity-100 group-hover/btn:w-auto font-bold text-sm">
+              <span className="absolute left-3 whitespace-nowrap opacity-0 -translate-x-2 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-x-0 font-bold text-sm">
                 ANMELDEN
               </span>
-              <MoveRight className="flex-shrink-0 transition-all duration-500 ease-out" size={18} />
+              <MoveRight className="relative flex-shrink-0 transition-all duration-500 ease-out group-hover:translate-x-1" size={18} />
             </Link>
           </div>
         </div>
