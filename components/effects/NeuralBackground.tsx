@@ -234,15 +234,66 @@ export default function NeuralBackground() {
       }
 
       const numNeurons = newNeurons.length;
+      
+      // PERFORMANCE: Spatial Grid für O(n) statt O(n²) Verbindungsberechnung
+      // Erstelle ein Grid basierend auf connectionDistance
+      const spatialGridCellSize = CONFIG.connectionDistance * 1.5; // Etwas größer für Sicherheit
+      const spatialGridCols = Math.ceil(extendedWidth / spatialGridCellSize);
+      const spatialGridRows = Math.ceil(extendedHeight / spatialGridCellSize);
+      const spatialGrid: number[][] = [];
+      
+      // Initialisiere Grid
+      for (let i = 0; i < spatialGridRows * spatialGridCols; i++) {
+        spatialGrid[i] = [];
+      }
+      
+      // Füge Neuronen zum Grid hinzu
       for (let i = 0; i < numNeurons; i++) {
+        const n = newNeurons[i];
+        const gridX = Math.floor((n.x + CONFIG.viewportPadding) / spatialGridCellSize);
+        const gridY = Math.floor((n.y + CONFIG.viewportPadding) / spatialGridCellSize);
+        const gridIdx = Math.min(gridY * spatialGridCols + gridX, spatialGrid.length - 1);
+        if (gridIdx >= 0) {
+          spatialGrid[gridIdx].push(i);
+        }
+      }
+      
+      // PERFORMANCE: Set für O(1) Lookups statt Array.includes() O(n)
+      const connectionSet = new Set<string>();
+      
+      for (let i = 0; i < numNeurons; i++) {
+        const n = newNeurons[i];
         const distances: Array<{ index: number; dist: number }> = [];
         
-        for (let j = 0; j < numNeurons; j++) {
-          if (i === j) continue;
-          const dx = newNeurons[i].x - newNeurons[j].x;
-          const dy = newNeurons[i].y - newNeurons[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          distances.push({ index: j, dist });
+        // PERFORMANCE: Prüfe nur Neuronen in benachbarten Grid-Zellen
+        const gridX = Math.floor((n.x + CONFIG.viewportPadding) / spatialGridCellSize);
+        const gridY = Math.floor((n.y + CONFIG.viewportPadding) / spatialGridCellSize);
+        
+        // Prüfe 3x3 Grid um das Neuron
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const checkX = gridX + dx;
+            const checkY = gridY + dy;
+            if (checkX < 0 || checkX >= spatialGridCols || checkY < 0 || checkY >= spatialGridRows) continue;
+            
+            const gridIdx = checkY * spatialGridCols + checkX;
+            const cellNeurons = spatialGrid[gridIdx] || [];
+            
+            for (const j of cellNeurons) {
+              if (i === j) continue;
+              
+              const dx2 = n.x - newNeurons[j].x;
+              const dy2 = n.y - newNeurons[j].y;
+              const distSquared = dx2 * dx2 + dy2 * dy2;
+              const maxDistSquared = CONFIG.connectionDistance * CONFIG.connectionDistance;
+              
+              // PERFORMANCE: Verwende distSquared statt sqrt für Vergleich
+              if (distSquared <= maxDistSquared) {
+                const dist = Math.sqrt(distSquared);
+                distances.push({ index: j, dist });
+              }
+            }
+          }
         }
         
         distances.sort((a, b) => a.dist - b.dist);
@@ -251,12 +302,15 @@ export default function NeuralBackground() {
         for (const neighbor of distances) {
           if (connectionsAdded >= 3) break;
           
-          if (newNeurons[i].connections.includes(neighbor.index)) continue;
+          // PERFORMANCE: Set für O(1) Lookup
+          const connectionKey = `${Math.min(i, neighbor.index)}-${Math.max(i, neighbor.index)}`;
+          if (connectionSet.has(connectionKey)) continue;
           
           newNeurons[i].connections.push(neighbor.index);
           if (!newNeurons[neighbor.index].connections.includes(i)) {
             newNeurons[neighbor.index].connections.push(i);
           }
+          connectionSet.add(connectionKey);
           connectionsAdded++;
         }
       }
@@ -601,12 +655,17 @@ export default function NeuralBackground() {
             
             // Schritt 3: NEON-GLOW-EFFEKT - Zeichne aktivierte Segmente mit Glow
             if (segmentIntensities.size > 0) {
+              // PERFORMANCE: Setze globalCompositeOperation nur einmal
               ctx.globalCompositeOperation = "lighter";
               
               // GLOW-PHASE 1: Breiterer transparenter Halo für den Glow-Effekt
               let lastX = n.x;
               let lastY = n.y;
               let lastIntensity = segmentIntensities.get(0) || 0;
+              
+              // PERFORMANCE: Cache strokeStyle und lineWidth, setze nur bei Änderung
+              let currentStrokeStyle = "";
+              let currentLineWidth = 0;
               
               for (let seg = 1; seg <= numSegments; seg++) {
                 const segT = seg / numSegments;
@@ -618,8 +677,19 @@ export default function NeuralBackground() {
                   const avgIntensity = (currentIntensity + lastIntensity) / 2;
                   if (avgIntensity > 0.01) {
                     // Glow-Halo: Breiterer, transparenterer Strich
-                    ctx.strokeStyle = `rgba(${theme.signal}, ${avgIntensity * 0.35})`;
-                    ctx.lineWidth = 5 * Math.min(avgIntensity, 1.0);
+                    const newStrokeStyle = `rgba(${theme.signal}, ${avgIntensity * 0.35})`;
+                    const newLineWidth = 5 * Math.min(avgIntensity, 1.0);
+                    
+                    // PERFORMANCE: Setze nur bei Änderung
+                    if (currentStrokeStyle !== newStrokeStyle) {
+                      ctx.strokeStyle = newStrokeStyle;
+                      currentStrokeStyle = newStrokeStyle;
+                    }
+                    if (currentLineWidth !== newLineWidth) {
+                      ctx.lineWidth = newLineWidth;
+                      currentLineWidth = newLineWidth;
+                    }
+                    
                     ctx.beginPath();
                     ctx.moveTo(lastX, lastY);
                     ctx.lineTo(currentX, currentY);
@@ -637,6 +707,10 @@ export default function NeuralBackground() {
               lastY = n.y;
               lastIntensity = segmentIntensities.get(0) || 0;
               
+              // PERFORMANCE: Reset Cache für Phase 2
+              currentStrokeStyle = "";
+              currentLineWidth = 0;
+              
               for (let seg = 1; seg <= numSegments; seg++) {
                 const segT = seg / numSegments;
                 const currentX = n.x + dx * segT;
@@ -647,8 +721,19 @@ export default function NeuralBackground() {
                   const avgIntensity = (currentIntensity + lastIntensity) / 2;
                   if (avgIntensity > 0.01) {
                     // Kern: Dünnerer, voller Alpha für maximale Helligkeit
-                    ctx.strokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
-                    ctx.lineWidth = 2 * Math.min(avgIntensity, 1.0);
+                    const newStrokeStyle = `rgba(${theme.signal}, ${Math.min(avgIntensity, 1.0)})`;
+                    const newLineWidth = 2 * Math.min(avgIntensity, 1.0);
+                    
+                    // PERFORMANCE: Setze nur bei Änderung
+                    if (currentStrokeStyle !== newStrokeStyle) {
+                      ctx.strokeStyle = newStrokeStyle;
+                      currentStrokeStyle = newStrokeStyle;
+                    }
+                    if (currentLineWidth !== newLineWidth) {
+                      ctx.lineWidth = newLineWidth;
+                      currentLineWidth = newLineWidth;
+                    }
+                    
                     ctx.beginPath();
                     ctx.moveTo(lastX, lastY);
                     ctx.lineTo(currentX, currentY);
@@ -812,12 +897,19 @@ export default function NeuralBackground() {
       }, 250);
     };
 
+    // PERFORMANCE: Throttle Maus-Events mit requestAnimationFrame
+    let mouseMoveRafId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { 
-        x: e.clientX, 
-        y: e.clientY, 
-        active: true 
-      };
+      if (mouseMoveRafId !== null) return; // Bereits geplant
+      
+      mouseMoveRafId = requestAnimationFrame(() => {
+        mouseRef.current = { 
+          x: e.clientX, 
+          y: e.clientY, 
+          active: true 
+        };
+        mouseMoveRafId = null;
+      });
     };
     const handleMouseLeave = () => {
       mouseRef.current.active = false;
@@ -935,6 +1027,9 @@ export default function NeuralBackground() {
       }
       if (autoPulseTimeout) {
         clearTimeout(autoPulseTimeout);
+      }
+      if (mouseMoveRafId !== null) {
+        cancelAnimationFrame(mouseMoveRafId);
       }
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("mousemove", handleMouseMove);

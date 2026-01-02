@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 
 interface HeroProps {
@@ -67,6 +67,11 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const badgeRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
+  
+  // PERFORMANCE: Memoize highlightKeywords Ergebnis
+  const highlightedSubline = useMemo(() => {
+    return highlightKeywords(dictionary.hero.subline, lang);
+  }, [dictionary.hero.subline, lang]);
 
   useGSAP(() => {
     const tl = gsap.timeline();
@@ -175,7 +180,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           start: "top top",
           end: "bottom top",
           scrub: 1,
-          refreshPriority: 0,
+          refreshPriority: -1, // PERFORMANCE: Niedrigere Priorität für bessere Performance
         },
         rotateX: -90,
         z: -1200,
@@ -301,7 +306,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
               // Inter wird automatisch vom Body übernommen (bereits geladen im Layout)
             }}
           >
-            {highlightKeywords(dictionary.hero.subline, lang)}
+            {highlightedSubline}
           </p>
 
           {/* CTA-Buttons - Spaceship UI: Primär Orange, Sekundär Ghost mit Cyan-Hover */}
