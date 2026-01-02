@@ -82,8 +82,6 @@ export function useScrollReveal3D(
         end: "bottom center",
         scrub,
         refreshPriority: -1,
-        // PERFORMANCE: Reduziere Callback-Overhead
-        fastScrollEnd: true,
       },
     });
     

@@ -15,19 +15,11 @@ if (typeof window !== "undefined") {
     limitCallbacks: true,
   });
   
-  // PERFORMANCE: Throttle ScrollTrigger Updates
-  // Standardmäßig updated ScrollTrigger bei jedem RAF
-  // Dies reduziert CPU-Last bei vielen ScrollTriggers
-  ScrollTrigger.normalizeScroll({
-    allowNestedScroll: true,
-  });
+  // HINWEIS: normalizeScroll() wurde ENTFERNT wegen Safari-Problemen
+  // Es verursacht unruhiges Scrollen und Sprünge
   
-  // PERFORMANCE: Batch-Updates für mehrere ScrollTriggers
+  // PERFORMANCE: Defaults für ScrollTriggers (ohne preventOverlaps - kann Konflikte verursachen)
   ScrollTrigger.defaults({
-    // Reduziere Recalculations
-    fastScrollEnd: true,
-    // Verhindere Layout-Thrashing
-    preventOverlaps: true,
     // GPU-Beschleunigung standardmäßig aktivieren
     toggleActions: "play none none none",
   });
@@ -43,9 +35,7 @@ gsap.config({
 });
 
 // PERFORMANCE: Ticker-Optimierungen
-// Standardmäßig läuft GSAP-Ticker bei jedem RAF (~60fps)
-// Diese Einstellungen verbessern die Performance
-gsap.ticker.lagSmoothing(500, 33); // Verhindert Sprünge nach Tab-Wechsel
-gsap.ticker.fps(60); // Limitiere auf 60fps (spart CPU auf High-Hz Displays)
+// Verhindert Sprünge nach Tab-Wechsel
+gsap.ticker.lagSmoothing(500, 33);
 
 export { gsap, ScrollTrigger, useGSAP };
