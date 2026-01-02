@@ -3,7 +3,14 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { MoveRight } from "lucide-react";
+import { JetBrains_Mono } from "next/font/google";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
+
+const jetBrainsMono = JetBrains_Mono({ 
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+});
 
 interface CourseCardProps {
   level: string; // A1, A2, B1...
@@ -32,7 +39,7 @@ export default function CourseCard({ level, title, description, price, duration,
       <div 
         ref={cardRef}
         onMouseMove={handleMouseMove}
-        className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 transition-all duration-500 hover:bg-white/10"
+        className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 transition-all duration-500 hover:bg-white/10 flex flex-col h-full"
         style={{
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
@@ -44,7 +51,7 @@ export default function CourseCard({ level, title, description, price, duration,
         </div>
 
         {/* Course Info */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col h-full">
           <div 
             className="mb-4 inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest text-white"
             style={{ backgroundColor: color }}
@@ -56,14 +63,14 @@ export default function CourseCard({ level, title, description, price, duration,
             Deutsch {level}
           </h3>
           
-          <p className="mb-8 text-white/60 leading-relaxed">
+          <p className="mb-8 text-white/60 leading-relaxed flex-grow">
             {description}
           </p>
 
-          <div className="flex items-end justify-between">
+          <div className="flex items-end justify-between mt-auto">
             <div>
               <span className="block text-xs uppercase tracking-widest text-white/40">Investition</span>
-              <span className="text-2xl font-mono font-bold text-white">{price}</span>
+              <span className={`${jetBrainsMono.className} text-2xl font-bold text-white`}>{price}</span>
             </div>
 
             {/* Awwwards-Style Button: Minimalistisch & Magnetic - Performance-optimiert */}
@@ -71,10 +78,10 @@ export default function CourseCard({ level, title, description, price, duration,
               href={`/${lang}/anmeldung`}
               className="relative flex h-12 w-12 group-hover:w-32 items-center justify-center rounded-full border border-white/20 text-white transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group/btn overflow-hidden"
             >
-              <span className="absolute left-4 translate-x-[-100%] whitespace-nowrap opacity-0 transition-all duration-500 ease-out group-hover/btn:translate-x-0 group-hover/btn:opacity-100 font-bold text-sm">
+              <span className="absolute left-3 whitespace-nowrap opacity-0 translate-x-[-10px] transition-all duration-500 ease-out group-hover/btn:opacity-100 group-hover/btn:translate-x-0 font-bold text-sm">
                 ANMELDEN
               </span>
-              <MoveRight className="transition-transform duration-500 ease-out group-hover/btn:translate-x-2" size={18} />
+              <MoveRight className="relative transition-all duration-500 ease-out group-hover/btn:translate-x-1" size={18} />
             </Link>
           </div>
         </div>
