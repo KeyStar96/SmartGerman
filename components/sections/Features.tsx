@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import React, { useRef, useMemo } from "react";
 import { LucideIcon, UserCheck, Clock, Target } from "lucide-react";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { Instrument_Serif } from "next/font/google";
@@ -107,64 +107,89 @@ export default function Features({ dictionary }: FeaturesProps) {
           ref={gridRef}
           className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch"
         >
-          {features.map((feature, index) => (
-            <ScrollReveal3DGlass 
-              key={index}
-              trigger={gridRef}
-              inverted={true}
-              className="h-full"
-            >
-              <div
-                ref={(el) => {
-                  if (el) cardsRef.current[index] = el;
-                }}
-                className={`group relative h-full glass-panel-enhanced p-8 md:p-10 flex flex-col items-start transition-all duration-500 ${
-                  // Dynamischer Glow-Effekt basierend auf Feature-Farbe
-                  // Orange für kritische Features, Cyan für technische Micro-Interactions
-                  feature.color === "cyan" ? "card-glow-cyan" : "card-glow-orange"
-                }`}
+          {features.map((feature, index) => {
+            const cardRef = React.useRef<HTMLDivElement>(null);
+            const featureColor = feature.color === "#FF5C00" ? "#FF5C00" : feature.color === "cyan" ? "#00D9FF" : "#FF5C00";
+
+            const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+              if (!cardRef.current) return;
+              const rect = cardRef.current.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              cardRef.current.style.setProperty("--mouse-x", `${x}px`);
+              cardRef.current.style.setProperty("--mouse-y", `${y}px`);
+            };
+
+            return (
+              <ScrollReveal3DGlass 
+                key={index}
+                trigger={gridRef}
+                inverted={true}
+                className="h-full"
               >
-                {/* Icon Container - Spaceship UI: Präzise Linien, Orange/Cyan für technische Icons */}
-                <div 
-                  className="relative mb-8 p-4 rounded-2xl bg-background/50 dark:bg-black/20 border border-black/10 dark:border-dm-border-slate group-hover:scale-110 transition-transform duration-500 overflow-hidden"
-                  style={{ 
-                    color: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)"
+                <div
+                  ref={(el) => {
+                    if (el) {
+                      cardsRef.current[index] = el;
+                      cardRef.current = el;
+                    }
+                  }}
+                  onMouseMove={handleMouseMove}
+                  className="group relative h-full overflow-hidden rounded-3xl bg-white/5 p-8 md:p-10 flex flex-col items-start transition-all duration-500 hover:bg-white/10"
+                  style={{
+                    backdropFilter: "blur(16px)",
+                    WebkitBackdropFilter: "blur(16px)",
                   }}
                 >
-                  {/* Dezenter Glow-Hintergrund beim Hover (Lightmode & Darkmode) */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-10 dark:group-hover:opacity-15 transition-opacity duration-500 blur-xl"
+                  {/* Icon Container - Kinetic Glass Design */}
+                  <div 
+                    className="relative mb-8 p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform duration-500 overflow-hidden"
                     style={{ 
-                      backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)",
-                      transform: "scale(1.5)",
+                      color: featureColor
+                    }}
+                  >
+                    {/* Dezenter Glow-Hintergrund beim Hover */}
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl"
+                      style={{ 
+                        backgroundColor: featureColor,
+                        transform: "scale(1.5)",
+                      }}
+                    />
+                    <feature.Icon 
+                      size={32} 
+                      strokeWidth={1.5} 
+                      className="relative z-10"
+                    />
+                  </div>
+
+                  <h3 className="text-2xl font-bold mb-4 tracking-tight text-white">
+                    {feature.title}
+                  </h3>
+                  
+                  <p className="text-white/60 leading-relaxed flex-grow">
+                    {feature.description}
+                  </p>
+
+                  {/* Kinetic Glass: Präzise 1px-Linie am Boden beim Hover */}
+                  <div 
+                    className="absolute bottom-0 left-0 h-[1px] w-0 group-hover:w-full transition-all duration-700"
+                    style={{ 
+                      backgroundColor: featureColor,
                     }}
                   />
-                  <feature.Icon 
-                    size={32} 
-                    strokeWidth={1.5} 
-                    className="relative z-10"
+
+                  {/* Innerer Glow-Effekt beim Hover - folgt der Maus */}
+                  <div 
+                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    style={{
+                      background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${featureColor}20, transparent 40%)`
+                    }}
                   />
                 </div>
-
-                <h3 className="text-2xl font-bold mb-4 tracking-tight text-foreground dark:text-dm-text-main">
-                  {feature.title}
-                </h3>
-                
-                <p className="text-foreground/70 dark:text-dm-text-muted leading-relaxed flex-grow">
-                  {feature.description}
-                </p>
-
-                {/* Spaceship UI: Präzise 1px-Linie am Boden beim Hover */}
-                {/* WICHTIG: bottom-0 positioniert den Strich an der unteren Kante des Inhalts (innerhalb des Padding) */}
-                <div 
-                  className="absolute bottom-0 left-0 h-[1px] w-0 group-hover:w-full transition-all duration-700"
-                  style={{ 
-                    backgroundColor: feature.color === "#FF5C00" ? "var(--primary-orange)" : feature.color === "cyan" ? "var(--accent-cyan)" : "var(--primary-orange)",
-                  }}
-                />
-              </div>
-            </ScrollReveal3DGlass>
-          ))}
+              </ScrollReveal3DGlass>
+            );
+          })}
         </div>
       </div>
     </section>

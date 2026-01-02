@@ -29,6 +29,7 @@ export default function ScrollReveal3DGlass({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
+  const borderRef = useRef<HTMLDivElement>(null);
 
   // CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
   // Lösung: Animation auf Content-Layer, Backdrop-Layer wird synchron mit animiert (nur translate/scale, keine Rotation)
@@ -40,15 +41,16 @@ export default function ScrollReveal3DGlass({
     scrub: 1.0, // Matcht die Optimierung im Hook
   });
 
-  // Synchronisiere Backdrop-Layer mit Content-Layer Animation
-  // WICHTIG: Backdrop bekommt NUR translate/scale/opacity, KEINE 3D-Rotation (rotateX/Y/Z)
-  // Das verhindert, dass backdrop-filter in Chrome bricht
+  // Synchronisiere Backdrop-Layer und Border-Layer mit Content-Layer Animation
+  // WICHTIG: Backdrop und Border bekommen NUR translate/scale/opacity, KEINE 3D-Rotation (rotateX/Y/Z)
+  // Das verhindert, dass backdrop-filter in Chrome bricht und der Border sauber animiert wird
   useEffect(() => {
     const card = cardRef.current;
     const backdrop = backdropRef.current;
-    if (!card || !backdrop || !trigger) return;
+    const border = borderRef.current;
+    if (!card || !backdrop || !border) return;
 
-    // Resolve trigger element
+    // Resolve trigger element - verwende card als Fallback wenn kein trigger vorhanden
     let triggerTarget: HTMLElement | null = null;
     if (trigger) {
       if ("current" in trigger && trigger.current) {
@@ -57,12 +59,13 @@ export default function ScrollReveal3DGlass({
         triggerTarget = trigger as HTMLElement;
       }
     }
+    // Fallback: Wenn kein trigger, verwende die Card selbst
     if (!triggerTarget) triggerTarget = card;
 
     const initialRotateX = inverted ? 45 : -45;
     const finalRotateX = inverted ? -45 : 45;
 
-    // Backdrop-Animation: Gleiche Timeline, aber NUR translate/scale/opacity
+    // Backdrop- und Border-Animation: Gleiche Timeline, aber NUR translate/scale/opacity
     const backdropTl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
@@ -73,7 +76,7 @@ export default function ScrollReveal3DGlass({
     });
 
     // Phase 1: Intro - nur translate/scale/opacity, KEINE Rotation
-    backdropTl.fromTo(backdrop,
+    backdropTl.fromTo([backdrop, border],
       {
         y: 80,
         scale: 0.95,
@@ -90,7 +93,7 @@ export default function ScrollReveal3DGlass({
     );
 
     // Phase 2: Stable
-    backdropTl.to(backdrop, {
+    backdropTl.to([backdrop, border], {
       y: 0,
       scale: 1,
       opacity: 1,
@@ -99,7 +102,7 @@ export default function ScrollReveal3DGlass({
     }, 0.25);
 
     // Phase 3: Outro
-    backdropTl.to(backdrop, {
+    backdropTl.to([backdrop, border], {
       y: -80,
       scale: 0.95,
       opacity: 0,
@@ -130,7 +133,7 @@ export default function ScrollReveal3DGlass({
         style={{
           position: "absolute",
           inset: 0,
-          borderRadius: "1rem", // Matcht rounded-2xl
+          borderRadius: "1.5rem", // Matcht rounded-3xl
           pointerEvents: "none", // Lässt Clicks durch
           zIndex: 0,
           // WICHTIG: KEINE rotateX/rotateY/rotateZ - nur translate/scale
@@ -138,7 +141,21 @@ export default function ScrollReveal3DGlass({
         }}
       />
       
-      {/* Content-Layer: 3D-Transforms OHNE backdrop-filter */}
+      {/* Border-Layer: Border OHNE 3D-Rotation (synchron mit Backdrop animiert) */}
+      <div
+        ref={borderRef}
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "1.5rem", // Matcht rounded-3xl
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          pointerEvents: "none", // Lässt Clicks durch
+          zIndex: 1,
+          transformStyle: "flat",
+        }}
+      />
+      
+      {/* Content-Layer: 3D-Transforms OHNE backdrop-filter und Border */}
       <div
         ref={cardRef}
         className="gpu-render h-full"
@@ -146,7 +163,7 @@ export default function ScrollReveal3DGlass({
           position: "relative",
           transformStyle: "flat", // WICHTIG für Safari Backdrop Filter
           transformOrigin: "center center",
-          zIndex: 1,
+          zIndex: 2,
           // Wir entfernen explizites willChange hier, das macht GSAP jetzt dynamisch
           backfaceVisibility: "hidden", // Verhindert Flackern
           WebkitFontSmoothing: "subpixel-antialiased", // Fix für Text-Rendering während 3D

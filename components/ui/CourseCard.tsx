@@ -32,7 +32,7 @@ export default function CourseCard({ level, title, description, price, duration,
       <div 
         ref={cardRef}
         onMouseMove={handleMouseMove}
-        className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 transition-all duration-500 hover:bg-white/10"
+        className="group relative overflow-hidden rounded-3xl bg-white/5 p-8 transition-all duration-500 hover:bg-white/10"
         style={{
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
@@ -66,15 +66,15 @@ export default function CourseCard({ level, title, description, price, duration,
               <span className="text-2xl font-mono font-bold text-white">{price}</span>
             </div>
 
-            {/* Awwwards-Style Button: Minimalistisch & Magnetic */}
+            {/* Awwwards-Style Button: Minimalistisch & Magnetic - Performance-optimiert */}
             <Link 
               href={`/${lang}/anmeldung`}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white transition-all duration-300 hover:w-32 group/btn overflow-hidden"
+              className="relative flex h-12 w-12 group-hover:w-32 items-center justify-center rounded-full border border-white/20 text-white transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group/btn overflow-hidden"
             >
-              <span className="absolute translate-x-[-100%] opacity-0 transition-all duration-300 group-hover/btn:translate-x-[-10px] group-hover/btn:opacity-100 font-bold text-sm">
+              <span className="absolute left-4 translate-x-[-100%] whitespace-nowrap opacity-0 transition-all duration-500 ease-out group-hover/btn:translate-x-0 group-hover/btn:opacity-100 font-bold text-sm">
                 ANMELDEN
               </span>
-              <MoveRight className="transition-transform duration-300 group-hover/btn:translate-x-10" />
+              <MoveRight className="transition-transform duration-500 ease-out group-hover/btn:translate-x-2" size={18} />
             </Link>
           </div>
         </div>
