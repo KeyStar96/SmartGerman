@@ -38,24 +38,39 @@ export default function ScrollReveal3DGlass({
     scrub: 1.0, // Matcht die Optimierung im Hook
   });
 
-  // FIX: Wrapper bleibt immer sichtbar (opacity: 1), damit backdrop-filter funktioniert
-  // Die Animation läuft direkt auf dem Kind-Element (Karte)
-  // CHROME FIX: KEIN isolation: isolate - bricht backdrop-filter!
+  // CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
+  // Lösung: backdrop-filter auf separatem Element ohne Transforms
+  // Struktur: Wrapper > Backdrop-Layer (backdrop-filter) > Content-Layer (3D-Transforms)
   return (
     <div
       ref={wrapperRef}
       className={className}
       style={{
         opacity: 1,
+        position: "relative",
       }}
     >
+      {/* Backdrop-Layer: backdrop-filter OHNE 3D-Transforms */}
+      <div
+        className="glass-panel-backdrop"
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "1rem", // Matcht rounded-2xl
+          pointerEvents: "none", // Lässt Clicks durch
+          zIndex: 0,
+        }}
+      />
+      
+      {/* Content-Layer: 3D-Transforms OHNE backdrop-filter */}
       <div
         ref={cardRef}
-        // "gpu-render" sollte translate3d(0,0,0) enthalten
         className="gpu-render"
         style={{
+          position: "relative",
           transformStyle: "flat", // WICHTIG für Safari Backdrop Filter
           transformOrigin: "center center",
+          zIndex: 1,
           // Wir entfernen explizites willChange hier, das macht GSAP jetzt dynamisch
           backfaceVisibility: "hidden", // Verhindert Flackern
           WebkitFontSmoothing: "subpixel-antialiased", // Fix für Text-Rendering während 3D

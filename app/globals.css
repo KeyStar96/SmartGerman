@@ -75,30 +75,45 @@ body {
       background: var(--dm-surface-teal);
     }
     
-    /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
-    /* CHROME FIX: Kein z-index, keine isolation - damit backdrop-filter die Hintergründe bluren kann */
-    /* Blur auf Header-Niveau reduziert: 8px statt 40px für konsistentes Design */
-    .glass-panel-enhanced {
-      @apply rounded-2xl transition-all duration-500;
+    /* CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
+     * Lösung: backdrop-filter auf separatem Layer ohne Transforms
+     */
+    .glass-panel-backdrop {
       /* Lightmode: Feine Linien */
       border: 1px solid rgba(0, 0, 0, 0.1);
       /* Hintergrund mit höherer Opazität als Fallback */
       background: rgba(255, 255, 255, 0.5);
-      /* Position relative für stabile Positionierung */
-      position: relative;
       /* Blur-Effekt: -webkit zuerst für Safari - auf Header-Niveau reduziert */
       -webkit-backdrop-filter: blur(8px) saturate(150%);
       backdrop-filter: blur(8px) saturate(150%);
-      /* Verhindert 3D-Vererbung auf das Element selbst */
-      transform-style: flat;
+      /* WICHTIG: KEINE Transforms auf diesem Element! */
     }
     
-    .dark .glass-panel-enhanced {
+    .dark .glass-panel-backdrop {
       border: 1px solid var(--dm-border-slate);
       /* Höhere Opazität als Fallback */
       background: rgba(13, 13, 13, 0.5);
       -webkit-backdrop-filter: blur(8px) saturate(150%);
       backdrop-filter: blur(8px) saturate(150%);
+    }
+    
+    /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
+    /* CHROME FIX: backdrop-filter wurde auf .glass-panel-backdrop verschoben */
+    /* Dieses Element hat nur noch Styling, KEIN backdrop-filter mehr */
+    .glass-panel-enhanced {
+      @apply rounded-2xl transition-all duration-500;
+      /* Position relative für stabile Positionierung */
+      position: relative;
+      /* Verhindert 3D-Vererbung auf das Element selbst */
+      transform-style: flat;
+      /* Border wird jetzt vom backdrop-Layer gehandhabt */
+      border: none;
+      background: transparent;
+    }
+    
+    .dark .glass-panel-enhanced {
+      border: none;
+      background: transparent;
     }
     
     /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
