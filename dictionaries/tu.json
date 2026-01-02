@@ -57,12 +57,51 @@
           "title": "Esnek Kurs Saatleri",
           "description": "Programınıza uyum sağlayan, günün farklı saatlerinde kurslar sunuyoruz - akşam saatleri dahil."
         },
-        "methods": {
-          "title": "Pratik Yöntemler",
-          "description": "Etkileşimli ve iletişimsel öğretim yöntemlerimiz, hızlı ve sürdürülebilir öğrenme başarısı için günlük durumlara odaklanır."
-        }
+      "methods": {
+        "title": "Pratik Yöntemler",
+        "description": "Etkileşimli ve iletişimsel öğretim yöntemlerimiz, hızlı ve sürdürülebilir öğrenme başarısı için günlük durumlara odaklanır."
       }
     },
+    "courses": {
+      "title_part1": "Bizim",
+      "title_part2": "Kurslarımız",
+      "intro": "Başlangıçtan profesyonele – sizin için doğru kursa sahibiz. Her kurs maksimum verimlilik ve sürdürülebilir öğrenme başarısı için tasarlanmıştır.",
+      "items": [
+        {
+          "level": "A1",
+          "title": "Almanca A1",
+          "description": "Ön bilgi olmadan ideal başlangıç. Destekleyici bir ortamda Almanca dilinin temellerini öğrenin.",
+          "price": "€ 299",
+          "duration": "8 Hafta",
+          "color": "#FF5C00"
+        },
+        {
+          "level": "A2",
+          "title": "Almanca A2",
+          "description": "Temel bilgilerinizin üzerine inşa edin ve günlük durumlar için kelime dağarcığınızı genişletin.",
+          "price": "€ 349",
+          "duration": "10 Hafta",
+          "color": "#0047FF"
+        },
+        {
+          "level": "B1",
+          "title": "Almanca B1",
+          "description": "Sağlam bir orta seviyeye ulaşın ve profesyonel ve özel konuşmalarda güven kazanın.",
+          "price": "€ 399",
+          "duration": "12 Hafta",
+          "color": "#FF5C00"
+        },
+        {
+          "level": "B2",
+          "title": "Almanca B2",
+          "description": "İş ve günlük yaşamda güvenli performans. Dil becerilerinizi ileri seviyede mükemmelleştirin.",
+          "price": "€ 449",
+          "duration": "14 Hafta",
+          "color": "#0047FF"
+        }
+      ]
+    }
+  },
     "features": {
       "native_support": "Ana Dili Desteği",
       "native_desc": "Karmaşık dilbilgisi konularında Rusça/Ukraynaca açıklamalar.",

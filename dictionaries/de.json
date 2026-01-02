@@ -57,12 +57,51 @@
           "title": "Flexible Kurszeiten",
           "description": "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends."
         },
-        "methods": {
-          "title": "Praxisnahe Methoden",
-          "description": "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg."
-        }
+      "methods": {
+        "title": "Praxisnahe Methoden",
+        "description": "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg."
       }
     },
+    "courses": {
+      "title_part1": "Unsere",
+      "title_part2": "Kurse",
+      "intro": "Vom Anfänger bis zum Profi – wir haben den richtigen Kurs für dich. Jeder Kurs ist auf maximale Effizienz und nachhaltigen Lernerfolg ausgelegt.",
+      "items": [
+        {
+          "level": "A1",
+          "title": "Deutsch A1",
+          "description": "Der ideale Einstieg ohne Vorkenntnisse. Lerne die Grundlagen der deutschen Sprache in einer unterstützenden Umgebung.",
+          "price": "€ 299",
+          "duration": "8 Wochen",
+          "color": "#FF5C00"
+        },
+        {
+          "level": "A2",
+          "title": "Deutsch A2",
+          "description": "Baue auf deinen Grundkenntnissen auf und erweitere deinen Wortschatz für alltägliche Situationen.",
+          "price": "€ 349",
+          "duration": "10 Wochen",
+          "color": "#0047FF"
+        },
+        {
+          "level": "B1",
+          "title": "Deutsch B1",
+          "description": "Erreiche ein solides Mittelstufenniveau und gewinne Sicherheit in beruflichen und privaten Gesprächen.",
+          "price": "€ 399",
+          "duration": "12 Wochen",
+          "color": "#FF5C00"
+        },
+        {
+          "level": "B2",
+          "title": "Deutsch B2",
+          "description": "Sicheres Auftreten im Beruf und Alltag. Perfektioniere deine Sprachkenntnisse auf fortgeschrittenem Niveau.",
+          "price": "€ 449",
+          "duration": "14 Wochen",
+          "color": "#0047FF"
+        }
+      ]
+    }
+  },
     "features": {
       "native_support": "Muttersprachliche Begleitung",
       "native_desc": "Erklärungen auf Russisch/Ukrainisch bei komplexen Grammatikthemen.",

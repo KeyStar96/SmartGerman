@@ -57,12 +57,51 @@
           "title": "Flexible Course Times",
           "description": "We offer courses at various times of day that adapt to your schedule - including evenings."
         },
-        "methods": {
-          "title": "Practical Methods",
-          "description": "Our interactive and communicative teaching methods focus on everyday situations for quick and sustainable learning success."
-        }
+      "methods": {
+        "title": "Practical Methods",
+        "description": "Our interactive and communicative teaching methods focus on everyday situations for quick and sustainable learning success."
       }
     },
+    "courses": {
+      "title_part1": "Our",
+      "title_part2": "Courses",
+      "intro": "From beginner to pro – we have the right course for you. Each course is designed for maximum efficiency and sustainable learning success.",
+      "items": [
+        {
+          "level": "A1",
+          "title": "German A1",
+          "description": "The ideal start without prior knowledge. Learn the basics of the German language in a supportive environment.",
+          "price": "€ 299",
+          "duration": "8 Weeks",
+          "color": "#FF5C00"
+        },
+        {
+          "level": "A2",
+          "title": "German A2",
+          "description": "Build on your basic knowledge and expand your vocabulary for everyday situations.",
+          "price": "€ 349",
+          "duration": "10 Weeks",
+          "color": "#0047FF"
+        },
+        {
+          "level": "B1",
+          "title": "German B1",
+          "description": "Reach a solid intermediate level and gain confidence in professional and private conversations.",
+          "price": "€ 399",
+          "duration": "12 Weeks",
+          "color": "#FF5C00"
+        },
+        {
+          "level": "B2",
+          "title": "German B2",
+          "description": "Confident performance in work and everyday life. Perfect your language skills at an advanced level.",
+          "price": "€ 449",
+          "duration": "14 Weeks",
+          "color": "#0047FF"
+        }
+      ]
+    }
+  },
     "features": {
       "native_support": "Native Support",
       "native_desc": "Explanations in Russian/Ukrainian for complex grammar topics.",
