@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, useEffect } from "react";
+import { RefObject, useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 interface UseScrollReveal3DOptions {
@@ -14,16 +14,13 @@ interface UseScrollReveal3DOptions {
 /**
  * Hook für elegante Fluid 3D Reveal Scroll-Animationen
  * 
+ * PERFORMANCE OPTIMIERT:
+ * - Minimale Re-Renders durch useRef für Timeline
+ * - force3D: true für GPU-Beschleunigung
+ * - Optimierte Timeline-Struktur
+ * 
  * Die Karten bauen sich beim Scrollen sanft aus der Tiefe des Raumes auf
  * und kommen dem Nutzer entgegen - keine harten Rotationen mehr.
- * 
- * Standard (inverted=false):
- * - Beim Runterscrollen: Gleitet von unten mit subtiler Neigung (rotateX: 15° -> 0°)
- * - Beim Hochscrollen: Gleitet nach oben mit leichter Gegen-Neigung (rotateX: 0° -> -10°)
- * 
- * Invertiert (inverted=true):
- * - Beim Runterscrollen: Entgegengesetzte Neigung (rotateX: -15° -> 0°)
- * - Beim Hochscrollen: Gegen-Neigung nach oben (rotateX: 0° -> 10°)
  */
 export function useScrollReveal3D(
   elementRef: RefObject<HTMLElement>,
@@ -31,15 +28,24 @@ export function useScrollReveal3D(
 ) {
   const {
     trigger,
-    scrub = 1.5, // Erhöht für maximale Geschmeidigkeit
-    z = -300, // Subtilerer Tiefeneffekt (vorher -1200)
-    transformOrigin = "center center", // Zentriert für harmonische Skalierung
+    scrub = 1.5,
+    z = -300,
+    transformOrigin = "center center",
     inverted = false,
   } = options;
+  
+  // PERFORMANCE: Speichere Timeline-Referenz für sauberes Cleanup
+  const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
+
+    // PERFORMANCE: Cleanup alte Timeline falls vorhanden
+    if (timelineRef.current) {
+      timelineRef.current.kill();
+      timelineRef.current = null;
+    }
 
     // Resolve trigger element - ensure it's an HTMLElement, not a RefObject
     let triggerTarget: HTMLElement = element;
@@ -51,19 +57,16 @@ export function useScrollReveal3D(
       }
     }
 
-    // Initial state: Subtile Neigung statt harter Rotation
-    // Normal: Element startet mit leichter Neigung nach hinten (rotateX: 15)
-    // Inverted: Element startet mit leichter Neigung nach vorne (rotateX: -15)
+    // PERFORMANCE: Pre-compute values
     const initialRotateX = inverted ? -15 : 15;
+    const finalRotateX = inverted ? 10 : -10;
     
-    // Initialer Zustand: Element ist unsichtbar, versetzt und skaliert
-    // CHROME-BUG FIX: transformStyle: "flat" statt "preserve-3d"
-    // preserve-3d bricht backdrop-filter in Chrome wenn Eltern perspective haben!
+    // Initialer Zustand mit GPU-Beschleunigung
     gsap.set(element, {
       rotateX: initialRotateX,
-      y: 100, // Vertikaler Versatz von unten
+      y: 100,
       z: z,
-      scale: 0.9, // Leicht verkleinert für Tiefeneffekt
+      scale: 0.9,
       opacity: 0,
       transformOrigin,
       force3D: true,
@@ -71,20 +74,21 @@ export function useScrollReveal3D(
       immediateRender: true,
     });
 
-    // Timeline für die Fluid 3D Reveal Animation
-    // Drei Phasen mit optimierter Timing-Verteilung:
-    // Phase 1 (0.0-0.20): Einblenden und Einfliegen - opacity synchronisiert
-    // Phase 2 (0.20-0.80): Stabile Lesezone (60% der Zeit)
-    // Phase 3 (0.80-1.0): Sanftes Ausfliegen nach oben
+    // PERFORMANCE: Timeline mit optimierter ScrollTrigger-Konfiguration
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
-        start: "top bottom", // Startet wenn Element von unten in Viewport kommt
-        end: "bottom center", // Endet wenn Element-Mitte Viewport-Mitte erreicht
+        start: "top bottom",
+        end: "bottom center",
         scrub,
         refreshPriority: -1,
+        // PERFORMANCE: Reduziere Callback-Overhead
+        fastScrollEnd: true,
       },
     });
+    
+    // Speichere Timeline-Referenz für Cleanup
+    timelineRef.current = tl;
 
     // Phase 1: Fluid Reveal - Element gleitet aus der Tiefe heran
     // Opacity wird während der ersten 20% der Scroll-Strecke eingeblendet
@@ -126,25 +130,23 @@ export function useScrollReveal3D(
     }, 0.20);
 
     // Phase 3: Sanftes Ausfliegen nach oben
-    // Anstatt harter Rotation: leichtes Gleiten mit minimaler Gegen-Neigung
-    // Normal: Neigt sich leicht zurück (rotateX: -10)
-    // Inverted: Neigt sich leicht nach vorne (rotateX: 10)
-    // BACKDROP-FILTER FIX: z-Wert auf 0 begrenzen, damit Karten immer über Hintergründen bleiben
-    // Opacity bleibt auf 1, damit Karten nicht transparent werden
-    const finalRotateX = inverted ? 10 : -10;
     tl.to(element, {
       rotateX: finalRotateX,
-      y: -50, // Gleitet nach oben
-      z: 0, // Immer auf z: 0 bleiben, damit backdrop-filter funktioniert
-      scale: 0.95, // Minimal geschrumpft
-      opacity: 1, // Opacity auf 1 lassen statt 0 - Karten sollen NICHT transparent werden
-      ease: "power2.in", // Sanftes Beschleunigen beim Verlassen
+      y: -50,
+      z: 0,
+      scale: 0.95,
+      opacity: 1,
+      ease: "power2.in",
       force3D: true,
-      duration: 0.20, // 20% der Timeline
+      duration: 0.20,
     }, 0.80);
 
+    // PERFORMANCE: Cleanup-Funktion mit Timeline-Referenz
     return () => {
-      tl.kill();
+      if (timelineRef.current) {
+        timelineRef.current.kill();
+        timelineRef.current = null;
+      }
     };
   }, [elementRef, trigger, scrub, z, transformOrigin, inverted]);
 }

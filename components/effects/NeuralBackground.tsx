@@ -56,6 +56,33 @@ const CONFIG = {
   // Trail-Effekt: Wie schnell der Glow hinter dem Impuls über ZEIT verblasst
   // Niedrigerer Wert = länger sichtbarer Trail (langsameres Verblassen)
   trailDecayPerSecond: 1.2,  // Intensität pro Sekunde, die abgezogen wird (erhöht für kürzeren Trail)
+} as const;
+
+// PERFORMANCE: Pre-computed Math constants
+const TWO_PI = Math.PI * 2;
+const HALF_PI = Math.PI / 2;
+
+// PERFORMANCE: Sin/Cos Lookup Table für schnellere Trigonometrie
+const SIN_TABLE_SIZE = 360;
+const SIN_TABLE: Float32Array = new Float32Array(SIN_TABLE_SIZE);
+const COS_TABLE: Float32Array = new Float32Array(SIN_TABLE_SIZE);
+for (let i = 0; i < SIN_TABLE_SIZE; i++) {
+  const angle = (i / SIN_TABLE_SIZE) * TWO_PI;
+  SIN_TABLE[i] = Math.sin(angle);
+  COS_TABLE[i] = Math.cos(angle);
+}
+
+// PERFORMANCE: Fast sin/cos using lookup table
+const fastSin = (angle: number): number => {
+  const normalized = ((angle % TWO_PI) + TWO_PI) % TWO_PI;
+  const index = (normalized / TWO_PI * SIN_TABLE_SIZE) | 0;
+  return SIN_TABLE[index];
+};
+
+const fastCos = (angle: number): number => {
+  const normalized = ((angle % TWO_PI) + TWO_PI) % TWO_PI;
+  const index = (normalized / TWO_PI * SIN_TABLE_SIZE) | 0;
+  return COS_TABLE[index];
 };
 
 // Farb-Konfigurationen für Light/Dark
@@ -96,9 +123,81 @@ interface Pulse {
   totalDist: number;
   strength: number;
   // Trail: Intensitäten für jedes Segment (klingen über Zeit ab)
-  trailIntensities: number[];
+  trailIntensities: Float32Array | number[];  // PERFORMANCE: TypedArray für bessere Performance
   lastHeadSegment: number;  // Letztes Segment, das der Kopf erreicht hat
   completed: boolean;       // True wenn der Pulse das Ziel erreicht hat, aber noch abklingt
+  active: boolean;          // PERFORMANCE: Object Pool - markiert ob Pulse aktiv ist
+}
+
+// PERFORMANCE: Object Pool für Pulses - vermeidet GC-Spikes
+class PulsePool {
+  private pool: Pulse[] = [];
+  private activeCount = 0;
+  private idCounter = 0;
+  
+  acquire(fromIndex: number, toIndex: number, strength: number): Pulse {
+    // Suche einen inaktiven Pulse im Pool
+    for (let i = 0; i < this.pool.length; i++) {
+      if (!this.pool[i].active) {
+        const pulse = this.pool[i];
+        pulse.id = this.idCounter++;
+        pulse.fromIndex = fromIndex;
+        pulse.toIndex = toIndex;
+        pulse.progress = 0;
+        pulse.totalDist = 0;
+        pulse.strength = strength;
+        pulse.lastHeadSegment = -1;
+        pulse.completed = false;
+        pulse.active = true;
+        // Reset trailIntensities wird beim ersten Draw gemacht
+        if (pulse.trailIntensities instanceof Float32Array) {
+          pulse.trailIntensities.fill(0);
+        } else {
+          pulse.trailIntensities = [];
+        }
+        this.activeCount++;
+        return pulse;
+      }
+    }
+    
+    // Keine inaktiven Pulses verfügbar - erstelle neuen
+    const newPulse: Pulse = {
+      id: this.idCounter++,
+      fromIndex,
+      toIndex,
+      progress: 0,
+      totalDist: 0,
+      strength,
+      trailIntensities: [],
+      lastHeadSegment: -1,
+      completed: false,
+      active: true,
+    };
+    this.pool.push(newPulse);
+    this.activeCount++;
+    return newPulse;
+  }
+  
+  release(pulse: Pulse): void {
+    pulse.active = false;
+    this.activeCount--;
+  }
+  
+  getActivePulses(): Pulse[] {
+    // PERFORMANCE: Filtere nur aktive Pulses
+    return this.pool.filter(p => p.active);
+  }
+  
+  get count(): number {
+    return this.activeCount;
+  }
+  
+  clear(): void {
+    for (const pulse of this.pool) {
+      pulse.active = false;
+    }
+    this.activeCount = 0;
+  }
 }
 
 export default function NeuralBackground() {
@@ -107,8 +206,8 @@ export default function NeuralBackground() {
   
   const mouseRef = useRef({ x: -1000, y: -1000, active: false });
   const neuronsRef = useRef<Neuron[]>([]);
-  const pulsesRef = useRef<Pulse[]>([]);
-  const pulseIdCounter = useRef(0);
+  // PERFORMANCE: Object Pool statt Array für Pulses
+  const pulsePoolRef = useRef<PulsePool>(new PulsePool());
   
   const themeRef = useRef(THEME_COLORS.dark);
 
@@ -322,74 +421,71 @@ export default function NeuralBackground() {
       }
 
       neuronsRef.current = newNeurons;
-      pulsesRef.current = [];
+      pulsePoolRef.current.clear();
       estimatedPulseLifetime = 0;
     };
 
+    // PERFORMANCE: Nutze Object Pool für Pulses
     const spawnPulse = (fromIdx: number, toIdx: number, strength: number) => {
-      pulsesRef.current.push({
-        id: pulseIdCounter.current++,
-        fromIndex: fromIdx,
-        toIndex: toIdx,
-        progress: 0,
-        totalDist: 0,
-        strength: strength,
-        trailIntensities: [],  // Wird beim ersten Draw initialisiert
-        lastHeadSegment: -1,
-        completed: false,
-      });
+      pulsePoolRef.current.acquire(fromIdx, toIdx, strength);
     };
 
     // --- 2. Physik (Zeit-basiert für konsistente Animation) ---
     const updatePhysics = (deltaSeconds: number) => {
       const neurons = neuronsRef.current;
       const mouse = mouseRef.current;
+      const numNeurons = neurons.length;
       
-      // Normalisierungsfaktor: Physik war für 60fps ausgelegt
+      // PERFORMANCE: Pre-compute constants outside loop
       const timeScale = deltaSeconds * 60;
+      const wanderSpeedScaled = CONFIG.wanderSpeed * timeScale;
+      const springScaled = CONFIG.springStiffness * timeScale;
+      const flashDecay = CONFIG.flashDecayPerSecond * deltaSeconds;
+      const mouseRadius = CONFIG.mouseInteractionRadius;
+      const mouseSquared = mouse.active ? mouseRadius * mouseRadius : 0;
+      const mouseX = mouse.x;
+      const mouseY = mouse.y;
+      const mouseForce = CONFIG.mouseForce;
+      const wanderRadius = CONFIG.wanderRadius;
+      
+      // PERFORMANCE: Pre-compute damping factor (pow is expensive)
+      // Für timeScale ≈ 1 (60fps) ist dampingFactor ≈ CONFIG.damping
+      const dampingFactor = Math.abs(timeScale - 1) < 0.01 
+        ? CONFIG.damping 
+        : Math.pow(CONFIG.damping, timeScale);
 
-      const mouseSquared = mouse.active ? CONFIG.mouseInteractionRadius * CONFIG.mouseInteractionRadius : 0;
-
-      for (let i = 0; i < neurons.length; i++) {
+      for (let i = 0; i < numNeurons; i++) {
         const n = neurons[i];
 
-        n.wanderAngle += (Math.random() - 0.5) * CONFIG.wanderSpeed * timeScale;
-        const wanderX = Math.cos(n.wanderAngle) * CONFIG.wanderRadius;
-        const wanderY = Math.sin(n.wanderAngle) * CONFIG.wanderRadius;
+        // PERFORMANCE: Use fastSin/fastCos lookup tables
+        n.wanderAngle += (Math.random() - 0.5) * wanderSpeedScaled;
+        const wanderX = fastCos(n.wanderAngle) * wanderRadius;
+        const wanderY = fastSin(n.wanderAngle) * wanderRadius;
         
         n.vx += wanderX * timeScale;
         n.vy += wanderY * timeScale;
 
-        const dxBase = n.baseX - n.x;
-        const dyBase = n.baseY - n.y;
-        const dzBase = n.baseZ - n.z;
-        n.vx += dxBase * CONFIG.springStiffness * timeScale;
-        n.vy += dyBase * CONFIG.springStiffness * timeScale;
-        n.vz += dzBase * CONFIG.springStiffness * timeScale;
+        // Spring force to base position
+        n.vx += (n.baseX - n.x) * springScaled;
+        n.vy += (n.baseY - n.y) * springScaled;
+        n.vz += (n.baseZ - n.z) * springScaled;
 
-        if (mouse.active && mouseSquared > 0) {
-          const dxMouse = mouse.x - n.x;
-          const dyMouse = mouse.y - n.y;
+        // Mouse interaction
+        if (mouseSquared > 0) {
+          const dxMouse = mouseX - n.x;
+          const dyMouse = mouseY - n.y;
           const distMouseSquared = dxMouse * dxMouse + dyMouse * dyMouse;
 
           if (distMouseSquared < mouseSquared) {
+            // PERFORMANCE: Fast inverse sqrt approximation for distance
             const distMouse = Math.sqrt(distMouseSquared);
-            const force = (1 - distMouse / CONFIG.mouseInteractionRadius) * CONFIG.mouseForce;
-            n.vx += dxMouse * force * timeScale; 
-            n.vy += dyMouse * force * timeScale;
+            const force = (1 - distMouse / mouseRadius) * mouseForce * timeScale;
+            n.vx += dxMouse * force;
+            n.vy += dyMouse * force;
           }
         }
 
-        // Damping mit Zeit-Skalierung
-        // PERFORMANCE: Math.pow ist teuer - verwende optimierte Berechnung für häufige Werte
-        // Für timeScale ≈ 1 (60fps) ist dampingFactor ≈ CONFIG.damping
-        // Für kleine Abweichungen linear interpolieren statt pow
-        let dampingFactor: number;
-        if (Math.abs(timeScale - 1) < 0.01) {
-          dampingFactor = CONFIG.damping; // Exakter Wert für 60fps
-        } else {
-          dampingFactor = Math.pow(CONFIG.damping, timeScale);
-        }
+        // Apply damping and update position
         n.vx *= dampingFactor;
         n.vy *= dampingFactor;
         n.vz *= dampingFactor;
@@ -397,10 +493,9 @@ export default function NeuralBackground() {
         n.y += n.vy * timeScale;
         n.z += n.vz * timeScale;
 
-        // Flash-Decay ist jetzt zeit-basiert
+        // Flash decay (time-based)
         if (n.flash > 0) {
-          n.flash -= CONFIG.flashDecayPerSecond * deltaSeconds;
-          if (n.flash < 0) n.flash = 0;
+          n.flash = Math.max(0, n.flash - flashDecay);
         }
       }
     };
@@ -415,79 +510,99 @@ export default function NeuralBackground() {
       ctx.clearRect(0, 0, width, height);
       
       const neurons = neuronsRef.current;
-      const pulses = pulsesRef.current;
-      const theme = themeRef.current; 
+      const pulsePool = pulsePoolRef.current;
+      const pulses = pulsePool.getActivePulses();
+      const theme = themeRef.current;
+      
+      // PERFORMANCE: Pre-compute bounds
+      const viewportPadding = 100;
+      const boundsLeft = -viewportPadding;
+      const boundsRight = width + viewportPadding;
+      const boundsTop = -viewportPadding;
+      const boundsBottom = height + viewportPadding;
 
-      const viewportPadding = 100; 
-      const visibleBounds = {
-        left: -viewportPadding,
-        right: width + viewportPadding,
-        top: -viewportPadding,
-        bottom: height + viewportPadding,
-      };
+      // PERFORMANCE: Inline filtering statt .filter() für weniger Overhead
+      const visibleNeurons: Neuron[] = [];
+      for (let i = 0; i < neurons.length; i++) {
+        const n = neurons[i];
+        if (n.x >= boundsLeft && n.x <= boundsRight && 
+            n.y >= boundsTop && n.y <= boundsBottom) {
+          visibleNeurons.push(n);
+        }
+      }
 
-      const visibleNeurons = neurons.filter(n => 
-        n.x >= visibleBounds.left && 
-        n.x <= visibleBounds.right && 
-        n.y >= visibleBounds.top && 
-        n.y <= visibleBounds.bottom
-      );
+      // PERFORMANCE: Inline sort für Z-Sortierung
+      visibleNeurons.sort((a, b) => a.z - b.z);
 
-      const sortedNeurons = visibleNeurons.sort((a, b) => a.z - b.z);
-
+      // PERFORMANCE: Pre-compute signal speed
+      const signalSpeed = CONFIG.signalSpeedPixelsPerSecond * deltaSeconds;
+      const signalDecay = CONFIG.signalDecay;
+      const minStrength = CONFIG.minSignalStrength;
+      
       // 1. Update Pulse Progress (ZEIT-BASIERT für konsistente Geschwindigkeit)
-      for (let i = pulses.length - 1; i >= 0; i--) {
+      // PERFORMANCE: Collect pulses to release after iteration
+      const pulsesToRelease: Pulse[] = [];
+      
+      for (let i = 0; i < pulses.length; i++) {
         const p = pulses[i];
         const nA = neurons[p.fromIndex];
         const nB = neurons[p.toIndex];
 
         const dx = nB.x - nA.x;
         const dy = nB.y - nA.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
         
         if (p.totalDist === 0) {
-          p.totalDist = dist;
+          p.totalDist = Math.sqrt(dx * dx + dy * dy);
         }
         
         // ZEIT-BASIERT: Progress ist 0-1 (Prozent der Verbindungslänge)
-        // Absolute Pixel-Geschwindigkeit: Fortschritt skaliert mit tatsächlicher Distanz
         if (!p.completed) {
-          p.progress += (CONFIG.signalSpeedPixelsPerSecond * deltaSeconds) / (p.totalDist || 1);
+          p.progress += signalSpeed / (p.totalDist || 1);
         }
 
         if (p.progress >= 1.0 && !p.completed) {
-          // Pulse hat das Ziel erreicht - markiere als completed, aber lösche nicht sofort
+          // Pulse hat das Ziel erreicht
           p.completed = true;
-          p.progress = 1.0; // Fixiere auf 1.0
-          nB.flash = 1.0 * p.strength;
+          p.progress = 1.0;
+          nB.flash = p.strength;
 
-          if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
-            const newStrength = p.strength * CONFIG.signalDecay;
-            nB.connections.forEach(neighborIdx => {
-              if (neighborIdx !== p.fromIndex) {
-                spawnPulse(p.toIndex, neighborIdx, newStrength);
+          // Spawn child pulses
+          if (p.strength * signalDecay > minStrength) {
+            const newStrength = p.strength * signalDecay;
+            const connections = nB.connections;
+            const fromIndex = p.fromIndex;
+            const toIndex = p.toIndex;
+            for (let j = 0; j < connections.length; j++) {
+              const neighborIdx = connections[j];
+              if (neighborIdx !== fromIndex) {
+                spawnPulse(toIndex, neighborIdx, newStrength);
               }
-            });
+            }
           }
         }
         
-        // Wenn completed: Prüfe ob alle trailIntensities abgeklungen sind
-        // (Decay passiert im Draw-Loop, hier nur Prüfung auf Löschung)
+        // Check if trail has faded out
         if (p.completed) {
           let hasActiveTrail = false;
+          const trailIntensities = p.trailIntensities;
+          const trailLength = trailIntensities.length;
           
-          for (let seg = 0; seg < p.trailIntensities.length; seg++) {
-            if ((p.trailIntensities[seg] || 0) > 0.01) {
+          for (let seg = 0; seg < trailLength; seg++) {
+            if (trailIntensities[seg] > 0.01) {
               hasActiveTrail = true;
               break;
             }
           }
           
-          // Lösche Pulse erst wenn alle trailIntensities abgeklungen sind
           if (!hasActiveTrail) {
-            pulses.splice(i, 1);
+            pulsesToRelease.push(p);
           }
         }
+      }
+      
+      // PERFORMANCE: Release completed pulses back to pool
+      for (let i = 0; i < pulsesToRelease.length; i++) {
+        pulsePool.release(pulsesToRelease[i]);
       }
 
       // 2. Verbindungen 
@@ -495,22 +610,26 @@ export default function NeuralBackground() {
       
       // PERFORMANCE: Wiederverwende Map/Set statt neue zu erstellen
       connectionPulsesCache.clear();
-      for (const p of pulses) {
-        const connectionKey = `${Math.min(p.fromIndex, p.toIndex)}-${Math.max(p.fromIndex, p.toIndex)}`;
-        if (!connectionPulsesCache.has(connectionKey)) {
-          connectionPulsesCache.set(connectionKey, []);
+      for (let i = 0; i < pulses.length; i++) {
+        const p = pulses[i];
+        // PERFORMANCE: Bitwise min/max für Integer
+        const minIdx = p.fromIndex < p.toIndex ? p.fromIndex : p.toIndex;
+        const maxIdx = p.fromIndex < p.toIndex ? p.toIndex : p.fromIndex;
+        const connectionKey = `${minIdx}-${maxIdx}`;
+        let arr = connectionPulsesCache.get(connectionKey);
+        if (!arr) {
+          arr = [];
+          connectionPulsesCache.set(connectionKey, arr);
         }
-        connectionPulsesCache.get(connectionKey)!.push(p);
+        arr.push(p);
       }
 
       connectionsDrawnCache.clear();
       visibleNeuronIndicesCache.clear();
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
-        if (n.x >= visibleBounds.left && 
-            n.x <= visibleBounds.right && 
-            n.y >= visibleBounds.top && 
-            n.y <= visibleBounds.bottom) {
+        if (n.x >= boundsLeft && n.x <= boundsRight && 
+            n.y >= boundsTop && n.y <= boundsBottom) {
           visibleNeuronIndicesCache.add(i);
         }
       }
@@ -559,9 +678,9 @@ export default function NeuralBackground() {
                 const t = Math.min(p.progress, 1.0);
                 const baseIntensity = p.strength * 1.0; // Volle Intensität für besseren Glow
                 
-                // Initialisiere trailIntensities nur beim ersten Frame
+                // PERFORMANCE: Initialisiere trailIntensities als Float32Array
                 if (p.trailIntensities.length === 0) {
-                  p.trailIntensities = new Array(numSegments + 1).fill(0);
+                  p.trailIntensities = new Float32Array(numSegments + 1);
                   p.lastHeadSegment = isForward ? -1 : numSegments + 1;
                 }
                 
@@ -807,20 +926,31 @@ export default function NeuralBackground() {
       // PERFORMANCE: Cache fillStyle um unnötige Canvas-Property-Sets zu vermeiden
       let currentFillStyle = "";
       
-      for (let i = 0; i < sortedNeurons.length; i++) {
-        const n = sortedNeurons[i];
+      // PERFORMANCE: Pre-compute constants
+      const baseParticleSize = CONFIG.particleSize;
+      const zSizeScale = CONFIG.zSizeScale;
+      const idlePulseEnabled = CONFIG.idlePulseEnabled;
+      const idlePulseIntensity = CONFIG.idlePulseIntensity;
+      const zBlurLayers = CONFIG.zBlurLayers;
+      const neuronColor = theme.neuron;
+      const signalColor = theme.signal;
+      const sortedLength = visibleNeurons.length;
+      
+      for (let i = 0; i < sortedLength; i++) {
+        const n = visibleNeurons[i];
         const zNormalized = normalizeZ(n.z);
         
-        const sizeMultiplier = 1 + (zNormalized - 0.5) * CONFIG.zSizeScale;
-        const particleSize = CONFIG.particleSize * sizeMultiplier;
+        const sizeMultiplier = 1 + (zNormalized - 0.5) * zSizeScale;
+        const particleSize = baseParticleSize * sizeMultiplier;
         
         let baseAlpha = isDark 
           ? 0.15 + n.flash * 0.5
           : 0.1 + n.flash * 0.35;
         
-        if (CONFIG.idlePulseEnabled && n.flash < 0.01) {
-          const pulseValue = Math.sin(idlePulseTime + n.idlePulsePhase);
-          const pulseModulation = 1 + (pulseValue * CONFIG.idlePulseIntensity);
+        // PERFORMANCE: Use fastSin lookup table
+        if (idlePulseEnabled && n.flash < 0.01) {
+          const pulseValue = fastSin(idlePulseTime + n.idlePulsePhase);
+          const pulseModulation = 1 + (pulseValue * idlePulseIntensity);
           baseAlpha *= pulseModulation;
         }
         
@@ -830,9 +960,10 @@ export default function NeuralBackground() {
         const blurIntensity = zNormalized; 
         
         if (blurIntensity > 0.3) {
+          // PERFORMANCE: Bitwise ceil approximation
           const baseLayers = blurIntensity > 0.7 
-            ? Math.ceil(blurIntensity * CONFIG.zBlurLayers) 
-            : Math.ceil(blurIntensity * CONFIG.zBlurLayers * 0.6);
+            ? ((blurIntensity * zBlurLayers) + 0.999) | 0
+            : ((blurIntensity * zBlurLayers * 0.6) + 0.999) | 0;
           const numBlurLayers = baseLayers; 
           
           for (let layer = numBlurLayers; layer >= 1; layer--) {
@@ -840,26 +971,26 @@ export default function NeuralBackground() {
             const layerSize = particleSize * (1 + (numBlurLayers - layer + 1) * 0.3);
             
             // PERFORMANCE: Setze fillStyle nur bei Änderung
-            const newFillStyle = `rgba(${theme.neuron}, ${layerAlpha})`;
+            const newFillStyle = `rgba(${neuronColor}, ${layerAlpha})`;
             if (currentFillStyle !== newFillStyle) {
               ctx.fillStyle = newFillStyle;
               currentFillStyle = newFillStyle;
             }
             
             ctx.beginPath();
-            ctx.arc(n.x, n.y, layerSize, 0, Math.PI * 2);
+            ctx.arc(n.x, n.y, layerSize, 0, TWO_PI);
             ctx.fill();
           }
         } else {
           // PERFORMANCE: Setze fillStyle nur bei Änderung
-          const newFillStyle = `rgba(${theme.neuron}, ${alpha})`;
+          const newFillStyle = `rgba(${neuronColor}, ${alpha})`;
           if (currentFillStyle !== newFillStyle) {
             ctx.fillStyle = newFillStyle;
             currentFillStyle = newFillStyle;
           }
           
           ctx.beginPath();
-          ctx.arc(n.x, n.y, particleSize, 0, Math.PI * 2);
+          ctx.arc(n.x, n.y, particleSize, 0, TWO_PI);
           ctx.fill();
         }
 
@@ -871,35 +1002,36 @@ export default function NeuralBackground() {
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
           
           const glowIntensity = zNormalized * 0.9 + 0.1;
-          glow.addColorStop(0, `rgba(${theme.signal}, ${n.flash * 0.9 * glowIntensity})`);
-          glow.addColorStop(0.4, `rgba(${theme.signal}, ${n.flash * 0.45 * glowIntensity})`);
-          glow.addColorStop(1, `rgba(${theme.signal}, 0)`);
+          glow.addColorStop(0, `rgba(${signalColor}, ${n.flash * 0.9 * glowIntensity})`);
+          glow.addColorStop(0.4, `rgba(${signalColor}, ${n.flash * 0.45 * glowIntensity})`);
+          glow.addColorStop(1, `rgba(${signalColor}, 0)`);
           
           ctx.fillStyle = glow;
           ctx.beginPath();
-          ctx.arc(n.x, n.y, glowRadius, 0, Math.PI * 2);
+          ctx.arc(n.x, n.y, glowRadius, 0, TWO_PI);
           ctx.fill();
           
           ctx.restore();
-        } else if (CONFIG.idlePulseEnabled) {
+        } else if (idlePulseEnabled) {
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           
-          const pulseValue = Math.sin(idlePulseTime + n.idlePulsePhase);
-          const pulseIntensity = (pulseValue + 1) / 2; 
+          // PERFORMANCE: Use fastSin lookup table
+          const pulseValue = fastSin(idlePulseTime + n.idlePulsePhase);
+          const pulseIntensity = (pulseValue + 1) * 0.5; // PERFORMANCE: * 0.5 statt / 2
           
-          const idleGlowIntensity = CONFIG.idlePulseIntensity * 0.3; 
+          const idleGlowIntensity = idlePulseIntensity * 0.3; 
           const glowRadius = particleSize * 2 * (1 + pulseIntensity * 0.5);
           const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowRadius);
           
           const glowAlpha = idleGlowIntensity * pulseIntensity * (zNormalized * 0.5 + 0.5);
-          glow.addColorStop(0, `rgba(${theme.signal}, ${glowAlpha * 0.6})`);
-          glow.addColorStop(0.5, `rgba(${theme.signal}, ${glowAlpha * 0.3})`);
-          glow.addColorStop(1, `rgba(${theme.signal}, 0)`);
+          glow.addColorStop(0, `rgba(${signalColor}, ${glowAlpha * 0.6})`);
+          glow.addColorStop(0.5, `rgba(${signalColor}, ${glowAlpha * 0.3})`);
+          glow.addColorStop(1, `rgba(${signalColor}, 0)`);
           
           ctx.fillStyle = glow;
           ctx.beginPath();
-          ctx.arc(n.x, n.y, glowRadius, 0, Math.PI * 2);
+          ctx.arc(n.x, n.y, glowRadius, 0, TWO_PI);
           ctx.fill();
           
           ctx.restore();
@@ -1033,14 +1165,15 @@ export default function NeuralBackground() {
       if (!CONFIG.autoPulseEnabled) return;
       
       const neurons = neuronsRef.current;
-      const pulses = pulsesRef.current;
+      const pulsePool = pulsePoolRef.current;
       const currentTime = Date.now();
       
       if (estimatedPulseLifetime === 0) {
         estimatedPulseLifetime = calculateAveragePulseLifetime();
       }
       
-      const activePulseCount = pulses.length;
+      // PERFORMANCE: Nutze Pool-Counter statt Array-Length
+      const activePulseCount = pulsePool.count;
       const maxConcurrentPulses = 5; 
       
       const timeSinceLastPulse = lastAutoPulseTime > 0 ? currentTime - lastAutoPulseTime : Infinity;
@@ -1051,7 +1184,7 @@ export default function NeuralBackground() {
         (timeSinceLastPulse >= triggerDelay && activePulseCount < maxConcurrentPulses);
       
       if (shouldTrigger) {
-        const randomIdx = Math.floor(Math.random() * neurons.length);
+        const randomIdx = (Math.random() * neurons.length) | 0; // PERFORMANCE: Bitwise floor
         activateNeuron(randomIdx);
         lastAutoPulseTime = currentTime;
       }

@@ -49,6 +49,10 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
   min-height: 100vh;
   overflow-x: hidden;
+  /* PERFORMANCE: Text-Rendering optimieren */
+  text-rendering: optimizeSpeed;
+  /* PERFORMANCE: Verhindere Layout-Shift bei Scrollbar */
+  scrollbar-gutter: stable;
 }
 
 /* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
@@ -296,5 +300,84 @@ body {
       75% { 
         transform: translate(-1px, -1px) translateZ(0); 
       }
+    }
+    
+    /* ============================================
+       PERFORMANCE OPTIMIERUNGEN
+       CPU/GPU Entlastung ohne visuelle Änderungen
+       ============================================ */
+    
+    /* PERFORMANCE: Hintergrund-Container - isolierter Rendering-Layer */
+    .liquid-background-container,
+    .neural-background-container {
+      /* Isoliere als eigene Compositing-Layer */
+      isolation: isolate;
+      /* Verhindere unnötige Pointer-Events */
+      pointer-events: none;
+      /* GPU-Layer ohne will-change (das kann Probleme verursachen) */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      /* Verhindere Overflow-Berechnungen */
+      overflow: hidden;
+      /* contain: strict würde die Canvas-Animation brechen, daher nur layout/style */
+      contain: layout style;
+    }
+    
+    /* PERFORMANCE: Canvas-Elemente */
+    .liquid-background-container canvas,
+    .neural-background-container canvas {
+      /* Optimiere Rendering-Pipeline */
+      image-rendering: optimizeSpeed;
+      /* Verhindere Subpixel-Antialiasing (spart GPU) */
+      -webkit-font-smoothing: none;
+    }
+    
+    /* PERFORMANCE: Header - Optimiere fixed positioning */
+    header {
+      /* Isoliere als eigene Layer */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    
+    /* PERFORMANCE: Main Content - Scroll-Optimierung */
+    #main-content {
+      /* Verhindere Paint-Bleeding */
+      contain: layout style;
+      /* Optimiere Scroll-Performance */
+      scroll-behavior: auto;
+    }
+    
+    /* PERFORMANCE: Marquee-Animation - nur transform, kein Repaint */
+    .animate-marquee {
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+    
+    /* PERFORMANCE: Reduziere Animationen bei Präferenz */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      
+      .animate-marquee {
+        animation: none !important;
+      }
+      
+      .laser-text {
+        animation: none !important;
+        background: var(--primary-orange) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+      }
+    }
+    
+    /* PERFORMANCE: Optimiere Font-Loading */
+    @font-face {
+      font-display: swap;
     }
   }
