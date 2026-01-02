@@ -50,19 +50,6 @@ export default function ScrollReveal3DGlass({
     const border = borderRef.current;
     if (!card || !backdrop || !border) return;
 
-    // Initiale Border-Höhe setzen
-    const setInitialBorderHeight = () => {
-      if (border && card) {
-        const height = card.offsetHeight || card.getBoundingClientRect().height;
-        if (height > 0) {
-          border.style.height = `${height}px`;
-        }
-      }
-    };
-    
-    // Initial setzen (nach kurzer Verzögerung, damit Layout fertig ist)
-    setTimeout(setInitialBorderHeight, 0);
-
     // Resolve trigger element - verwende card als Fallback wenn kein trigger vorhanden
     let triggerTarget: HTMLElement | null = null;
     if (trigger) {
@@ -75,29 +62,32 @@ export default function ScrollReveal3DGlass({
     // Fallback: Wenn kein trigger, verwende die Card selbst
     if (!triggerTarget) triggerTarget = card;
 
-    // Initiale Höhe für Border-Berechnung
-    let initialHeight = card.offsetHeight || card.getBoundingClientRect().height;
-    
     // Funktion zur Berechnung der Border-Höhe basierend auf Rotation
+    // Formel: y = länge_karte * cos(rotationswinkel)
     const updateBorderHeight = () => {
       if (!border || !card) return;
       
-      // Aktualisiere initialHeight falls nötig (für responsive Layouts)
-      if (initialHeight === 0) {
-        initialHeight = card.offsetHeight || card.getBoundingClientRect().height;
-      }
+      // Lese die tatsächliche Höhe der Karte (ohne Rotation)
+      const cardRect = card.getBoundingClientRect();
+      const originalHeight = card.offsetHeight || cardRect.height;
       
       // Lese die aktuelle rotateX aus dem Card-Element
-      const cardTransform = gsap.getProperty(card, "rotateX") as number || 0;
-      const rotateXRad = (cardTransform * Math.PI) / 180;
-      const heightScale = Math.abs(Math.cos(rotateXRad));
-      const newHeight = initialHeight * heightScale;
+      const rotateX = (gsap.getProperty(card, "rotateX") as number) || 0;
+      const rotateXRad = (rotateX * Math.PI) / 180;
       
-      // Border-Höhe und vertikale Position anpassen
-      const heightDiff = initialHeight - newHeight;
+      // Berechne die Y-Komponente: y = länge_karte * cos(rotationswinkel)
+      const newHeight = originalHeight * Math.abs(Math.cos(rotateXRad));
+      
+      // Border-Höhe setzen
       border.style.height = `${newHeight}px`;
+      
+      // Border vertikal zentrieren (basierend auf der neuen Höhe)
+      const heightDiff = originalHeight - newHeight;
       border.style.top = `${heightDiff / 2}px`;
     };
+    
+    // Initiale Berechnung sofort ausführen
+    updateBorderHeight();
     
     // Backdrop-Animation: Gleiche Timeline, aber NUR translate/scale/opacity
     const backdropTl = gsap.timeline({
@@ -106,7 +96,7 @@ export default function ScrollReveal3DGlass({
         start: "top bottom-=10%",
         end: "bottom top+=10%",
         scrub: 1.0,
-        onUpdate: updateBorderHeight,
+        onUpdate: updateBorderHeight, // Wichtig: Bei jedem Scroll-Update
         onEnter: updateBorderHeight,
         onLeave: updateBorderHeight,
         onEnterBack: updateBorderHeight,
@@ -151,6 +141,9 @@ export default function ScrollReveal3DGlass({
 
     return () => {
       backdropTl.kill();
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
   }, [trigger, inverted]);
 
