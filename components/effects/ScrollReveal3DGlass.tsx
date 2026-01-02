@@ -29,6 +29,7 @@ export default function ScrollReveal3DGlass({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
+  const borderRef = useRef<HTMLDivElement>(null);
 
   // CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
   // Lösung: Animation auf Content-Layer, Backdrop-Layer wird synchron mit animiert (nur translate/scale, keine Rotation)
@@ -40,14 +41,27 @@ export default function ScrollReveal3DGlass({
     scrub: 1.0, // Matcht die Optimierung im Hook
   });
 
-  // Synchronisiere Backdrop-Layer mit Content-Layer Animation
-  // WICHTIG: Backdrop bekommt NUR translate/scale/opacity, KEINE 3D-Rotation (rotateX/Y/Z)
-  // Das verhindert, dass backdrop-filter in Chrome bricht
-  // Border wird jetzt auf dem Content-Layer platziert, damit er mit der 3D-Transformation mitgeht
+  // Synchronisiere Backdrop-Layer und Border-Layer mit Content-Layer Animation
+  // OPTIMIERT: Border-Höhe wird basierend auf Rotation berechnet (cos(rotateX)), statt Border zu rotieren
+  // Das ist effizienter und verhindert visuelle Probleme
   useEffect(() => {
     const card = cardRef.current;
     const backdrop = backdropRef.current;
-    if (!card || !backdrop) return;
+    const border = borderRef.current;
+    if (!card || !backdrop || !border) return;
+
+    // Initiale Border-Höhe setzen
+    const setInitialBorderHeight = () => {
+      if (border && card) {
+        const height = card.offsetHeight || card.getBoundingClientRect().height;
+        if (height > 0) {
+          border.style.height = `${height}px`;
+        }
+      }
+    };
+    
+    // Initial setzen (nach kurzer Verzögerung, damit Layout fertig ist)
+    setTimeout(setInitialBorderHeight, 0);
 
     // Resolve trigger element - verwende card als Fallback wenn kein trigger vorhanden
     let triggerTarget: HTMLElement | null = null;
@@ -61,6 +75,30 @@ export default function ScrollReveal3DGlass({
     // Fallback: Wenn kein trigger, verwende die Card selbst
     if (!triggerTarget) triggerTarget = card;
 
+    // Initiale Höhe für Border-Berechnung
+    let initialHeight = card.offsetHeight || card.getBoundingClientRect().height;
+    
+    // Funktion zur Berechnung der Border-Höhe basierend auf Rotation
+    const updateBorderHeight = () => {
+      if (!border || !card) return;
+      
+      // Aktualisiere initialHeight falls nötig (für responsive Layouts)
+      if (initialHeight === 0) {
+        initialHeight = card.offsetHeight || card.getBoundingClientRect().height;
+      }
+      
+      // Lese die aktuelle rotateX aus dem Card-Element
+      const cardTransform = gsap.getProperty(card, "rotateX") as number || 0;
+      const rotateXRad = (cardTransform * Math.PI) / 180;
+      const heightScale = Math.abs(Math.cos(rotateXRad));
+      const newHeight = initialHeight * heightScale;
+      
+      // Border-Höhe und vertikale Position anpassen
+      const heightDiff = initialHeight - newHeight;
+      border.style.height = `${newHeight}px`;
+      border.style.top = `${heightDiff / 2}px`;
+    };
+    
     // Backdrop-Animation: Gleiche Timeline, aber NUR translate/scale/opacity
     const backdropTl = gsap.timeline({
       scrollTrigger: {
@@ -68,6 +106,11 @@ export default function ScrollReveal3DGlass({
         start: "top bottom-=10%",
         end: "bottom top+=10%",
         scrub: 1.0,
+        onUpdate: updateBorderHeight,
+        onEnter: updateBorderHeight,
+        onLeave: updateBorderHeight,
+        onEnterBack: updateBorderHeight,
+        onLeaveBack: updateBorderHeight,
       },
     });
 
@@ -137,7 +180,25 @@ export default function ScrollReveal3DGlass({
         }}
       />
       
-      {/* Content-Layer: 3D-Transforms mit Border (Border geht mit 3D-Transformation mit) */}
+      {/* Border-Layer: Dynamische Höhe basierend auf Rotation (OPTIMIERT) */}
+      <div
+        ref={borderRef}
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 0,
+          width: "100%",
+          borderRadius: "1.5rem", // Matcht rounded-3xl
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          pointerEvents: "none", // Lässt Clicks durch
+          zIndex: 1,
+          transformStyle: "flat",
+          // Höhe wird dynamisch via onUpdate berechnet
+        }}
+      />
+      
+      {/* Content-Layer: 3D-Transforms OHNE Border (Border ist separater Layer) */}
       <div
         ref={cardRef}
         className="gpu-render h-full"
@@ -145,9 +206,8 @@ export default function ScrollReveal3DGlass({
           position: "relative",
           transformStyle: "flat", // WICHTIG für Safari Backdrop Filter
           transformOrigin: "center center",
-          zIndex: 1,
+          zIndex: 2,
           borderRadius: "1.5rem", // Matcht rounded-3xl
-          border: "1px solid rgba(255, 255, 255, 0.1)",
           // Wir entfernen explizites willChange hier, das macht GSAP jetzt dynamisch
           backfaceVisibility: "hidden", // Verhindert Flackern
           WebkitFontSmoothing: "subpixel-antialiased", // Fix für Text-Rendering während 3D
