@@ -52,13 +52,6 @@ export default function CourseCard({ level, title, description, price, duration,
 
         {/* Course Info */}
         <div className="relative z-10 flex flex-col h-full">
-          <div 
-            className="mb-4 inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest text-white"
-            style={{ backgroundColor: color }}
-          >
-            {duration}
-          </div>
-          
           <h3 className="mb-3 text-3xl font-bold tracking-tight text-white">
             Deutsch {level}
           </h3>
@@ -76,12 +69,12 @@ export default function CourseCard({ level, title, description, price, duration,
             {/* Awwwards-Style Button: Minimalistisch & Magnetic - Performance-optimiert */}
             <Link 
               href={`/${lang}/anmeldung`}
-              className="relative flex h-12 w-12 group-hover:w-32 items-center justify-center rounded-full border border-white/20 text-white transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group/btn overflow-hidden"
+              className="relative flex h-12 w-12 group-hover:w-32 items-center justify-between rounded-full border border-white/20 text-white transition-[width] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group/btn overflow-hidden px-3 gap-2"
             >
-              <span className="absolute left-3 whitespace-nowrap opacity-0 translate-x-[-10px] transition-all duration-500 ease-out group-hover/btn:opacity-100 group-hover/btn:translate-x-0 font-bold text-sm">
+              <span className="whitespace-nowrap opacity-0 w-0 overflow-hidden transition-all duration-500 ease-out group-hover/btn:opacity-100 group-hover/btn:w-auto font-bold text-sm">
                 ANMELDEN
               </span>
-              <MoveRight className="relative transition-all duration-500 ease-out group-hover/btn:translate-x-1" size={18} />
+              <MoveRight className="flex-shrink-0 transition-all duration-500 ease-out" size={18} />
             </Link>
           </div>
         </div>

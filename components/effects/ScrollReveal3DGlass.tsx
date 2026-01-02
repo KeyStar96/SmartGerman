@@ -29,7 +29,6 @@ export default function ScrollReveal3DGlass({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
-  const borderRef = useRef<HTMLDivElement>(null);
 
   // CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
   // Lösung: Animation auf Content-Layer, Backdrop-Layer wird synchron mit animiert (nur translate/scale, keine Rotation)
@@ -41,14 +40,14 @@ export default function ScrollReveal3DGlass({
     scrub: 1.0, // Matcht die Optimierung im Hook
   });
 
-  // Synchronisiere Backdrop-Layer und Border-Layer mit Content-Layer Animation
-  // WICHTIG: Backdrop und Border bekommen NUR translate/scale/opacity, KEINE 3D-Rotation (rotateX/Y/Z)
-  // Das verhindert, dass backdrop-filter in Chrome bricht und der Border sauber animiert wird
+  // Synchronisiere Backdrop-Layer mit Content-Layer Animation
+  // WICHTIG: Backdrop bekommt NUR translate/scale/opacity, KEINE 3D-Rotation (rotateX/Y/Z)
+  // Das verhindert, dass backdrop-filter in Chrome bricht
+  // Border wird jetzt auf dem Content-Layer platziert, damit er mit der 3D-Transformation mitgeht
   useEffect(() => {
     const card = cardRef.current;
     const backdrop = backdropRef.current;
-    const border = borderRef.current;
-    if (!card || !backdrop || !border) return;
+    if (!card || !backdrop) return;
 
     // Resolve trigger element - verwende card als Fallback wenn kein trigger vorhanden
     let triggerTarget: HTMLElement | null = null;
@@ -62,10 +61,7 @@ export default function ScrollReveal3DGlass({
     // Fallback: Wenn kein trigger, verwende die Card selbst
     if (!triggerTarget) triggerTarget = card;
 
-    const initialRotateX = inverted ? 45 : -45;
-    const finalRotateX = inverted ? -45 : 45;
-
-    // Backdrop- und Border-Animation: Gleiche Timeline, aber NUR translate/scale/opacity
+    // Backdrop-Animation: Gleiche Timeline, aber NUR translate/scale/opacity
     const backdropTl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
@@ -76,7 +72,7 @@ export default function ScrollReveal3DGlass({
     });
 
     // Phase 1: Intro - nur translate/scale/opacity, KEINE Rotation
-    backdropTl.fromTo([backdrop, border],
+    backdropTl.fromTo(backdrop,
       {
         y: 80,
         scale: 0.95,
@@ -93,7 +89,7 @@ export default function ScrollReveal3DGlass({
     );
 
     // Phase 2: Stable
-    backdropTl.to([backdrop, border], {
+    backdropTl.to(backdrop, {
       y: 0,
       scale: 1,
       opacity: 1,
@@ -102,7 +98,7 @@ export default function ScrollReveal3DGlass({
     }, 0.25);
 
     // Phase 3: Outro
-    backdropTl.to([backdrop, border], {
+    backdropTl.to(backdrop, {
       y: -80,
       scale: 0.95,
       opacity: 0,
@@ -141,21 +137,7 @@ export default function ScrollReveal3DGlass({
         }}
       />
       
-      {/* Border-Layer: Border OHNE 3D-Rotation (synchron mit Backdrop animiert) */}
-      <div
-        ref={borderRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "1.5rem", // Matcht rounded-3xl
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          pointerEvents: "none", // Lässt Clicks durch
-          zIndex: 1,
-          transformStyle: "flat",
-        }}
-      />
-      
-      {/* Content-Layer: 3D-Transforms OHNE backdrop-filter und Border */}
+      {/* Content-Layer: 3D-Transforms mit Border (Border geht mit 3D-Transformation mit) */}
       <div
         ref={cardRef}
         className="gpu-render h-full"
@@ -163,7 +145,9 @@ export default function ScrollReveal3DGlass({
           position: "relative",
           transformStyle: "flat", // WICHTIG für Safari Backdrop Filter
           transformOrigin: "center center",
-          zIndex: 2,
+          zIndex: 1,
+          borderRadius: "1.5rem", // Matcht rounded-3xl
+          border: "1px solid rgba(255, 255, 255, 0.1)",
           // Wir entfernen explizites willChange hier, das macht GSAP jetzt dynamisch
           backfaceVisibility: "hidden", // Verhindert Flackern
           WebkitFontSmoothing: "subpixel-antialiased", // Fix für Text-Rendering während 3D
