@@ -47,8 +47,17 @@ export function useScrollReveal3D(
       timelineRef.current = null;
     }
 
-    // FIX: TypeScript-Fehler permanent behoben - vereinfachte Logik
-    const triggerTarget = (trigger && 'current' in trigger ? trigger.current : trigger) || element;
+    // FIX: TypeScript-Fehler permanent behoben - extrahiere HTMLElement aus RefObject
+    let triggerTarget: HTMLElement = element;
+    if (trigger) {
+      if ('current' in trigger && trigger.current) {
+        // RefObject<HTMLElement> - extrahiere .current
+        triggerTarget = trigger.current;
+      } else if (!('current' in trigger)) {
+        // Direktes HTMLElement
+        triggerTarget = trigger as HTMLElement;
+      }
+    }
 
     // Mehr Rotation für dramatischeren Effekt, da wir näher an der Kamera sind
     const initialRotateX = inverted ? -25 : 25; 
