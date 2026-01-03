@@ -260,6 +260,29 @@ export default function GlassCard({
       className={`h-full ${className}`}
       accentColor={color || "#FF5C00"}
     >
+      {/* Expanding Flip-Indicator - AUSSERHALB des card-flip-container damit er nicht mit rotiert */}
+      {hasBackface && (
+        <div 
+          className="flip-indicator-container"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsFlipped(!isFlipped);
+          }}
+          style={{ 
+            '--indicator-color': color,
+          } as React.CSSProperties}
+        >
+          {/* Icon Container */}
+          <div className="flip-indicator-icon">
+            <RotateCcw size={16} strokeWidth={2} />
+          </div>
+          {/* Text - wird bei Hover sichtbar */}
+          <span className={`${jetBrainsMono.className} flip-indicator-text`}>
+            {flipHintLabel}
+          </span>
+        </div>
+      )}
+
       <div 
         ref={flipContainerRef}
         className={hasBackface ? "card-flip-container" : "card-simple-container"}
@@ -276,29 +299,6 @@ export default function GlassCard({
               borderColor: color,
             }}
           />
-        )}
-        
-        {/* Expanding Flip-Indicator (Expanding Pill Design) - nur bei Karten mit Backflip */}
-        {hasBackface && (
-          <div 
-            className="flip-indicator-container"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsFlipped(!isFlipped);
-            }}
-            style={{ 
-              '--indicator-color': color,
-            } as React.CSSProperties}
-          >
-            {/* Icon Container - wird bei Hover nach links geschoben */}
-            <div className="flip-indicator-icon">
-              <RotateCcw size={16} strokeWidth={2} />
-            </div>
-            {/* Text - wird bei Hover sichtbar */}
-            <span className={`${jetBrainsMono.className} flip-indicator-text`}>
-              {flipHintLabel}
-            </span>
-          </div>
         )}
         {/* Front Face */}
         <div 
@@ -375,11 +375,27 @@ export default function GlassCard({
         >
           {/* glass-card-bg für Back Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
-          <div className="relative h-full flex flex-col p-8 md:p-10 items-center justify-center text-center">
+          
+          {/* Watermark auf Rückseite - gespiegelt für korrekte Lesbarkeit nach Flip */}
+          {watermark && (
+            <div 
+              className={`${jetBrainsMono.className} absolute top-4 left-6 text-[8rem] font-normal opacity-[0.03] select-none pointer-events-none watermark-glow`}
+              style={{ 
+                color,
+                fontWeight: 400,
+                transform: 'scaleX(-1)', // Spiegeln für korrekte Lesbarkeit nach 180° Rotation
+              }}
+            >
+              {watermark}
+            </div>
+          )}
+          
+          {/* Content Container - mit mehr Padding oben für den Flip-Indicator */}
+          <div className="relative h-full flex flex-col pt-16 pb-8 px-8 md:pt-20 md:pb-10 md:px-10 items-center justify-center text-center">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
-            <div className="relative z-10 space-y-6">
-              {/* Bug 4: Beschreibung auf Rückseite */}
+            <div className="relative z-10 space-y-5">
+              {/* Beschreibung auf Rückseite */}
               {backfaceContent?.description && (
                 <div className="space-y-2">
                   <p className="text-base text-white/70 leading-relaxed max-w-xs">{backfaceContent.description}</p>
@@ -387,7 +403,7 @@ export default function GlassCard({
               )}
               
               {backfaceContent?.duration && (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <span className={`${jetBrainsMono.className} text-xs uppercase tracking-widest text-white/40`}>
                     Dauer
                   </span>
@@ -396,7 +412,7 @@ export default function GlassCard({
               )}
               
               {backfaceContent?.focus && (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <span className={`${jetBrainsMono.className} text-xs uppercase tracking-widest text-white/40`}>
                     Fokus
                   </span>
@@ -405,7 +421,7 @@ export default function GlassCard({
               )}
               
               {backfaceContent?.start && (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <span className={`${jetBrainsMono.className} text-xs uppercase tracking-widest text-white/40`}>
                     Start
                   </span>
