@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useRef, useMemo } from "react";
-import { LucideIcon, UserCheck, Clock, Target } from "lucide-react";
-import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
+import { UserCheck, Clock, Target } from "lucide-react";
+import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif } from "next/font/google";
 import { gsap, useGSAP } from "@/lib/gsap";
 
@@ -15,7 +15,7 @@ const instrumentSerif = Instrument_Serif({
 interface FeatureProps {
   title: string;
   description: string;
-  Icon: LucideIcon;
+  Icon: typeof UserCheck;
   color: string;
   bgGradient: string;
 }
@@ -57,25 +57,23 @@ export default function Features({ dictionary }: FeaturesProps) {
     if (!headerRef.current) return;
     gsap.fromTo(headerRef.current, 
       { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: headerRef.current, start: "top 80%" } }
+      { 
+        opacity: 1, 
+        y: 0, 
+        duration: 1, 
+        ease: "power3.out",
+        force3D: true,
+        scrollTrigger: { 
+          trigger: headerRef.current, 
+          start: "top 80%"
+        } 
+      }
     );
   }, { scope: sectionRef });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const cards = document.querySelectorAll(".feature-card-spotlight");
-    cards.forEach((card) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      (card as HTMLElement).style.setProperty("--mouse-x", `${x}px`);
-      (card as HTMLElement).style.setProperty("--mouse-y", `${y}px`);
-    });
-  };
 
   return (
     <section 
       ref={sectionRef} 
-      onMouseMove={handleMouseMove}
       className="relative w-full py-24 flex flex-col items-center justify-start overflow-visible bg-transparent z-10"
     >
       <div className="container mx-auto px-4 max-w-7xl">
@@ -92,70 +90,52 @@ export default function Features({ dictionary }: FeaturesProps) {
           </p>
         </div>
 
-        {/* Grid */}
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        {/* Grid - Desktop: Grid, Mobile: Horizontal Scroll-Snap */}
+        <div 
+          ref={gridRef} 
+          className="
+            flex md:grid
+            md:grid-cols-3
+            gap-8 items-stretch
+            overflow-x-auto md:overflow-x-visible
+            snap-x snap-mandatory md:snap-none
+            -mx-4 px-4 md:mx-0 md:px-0
+          "
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+        >
           {features.map((feature, index) => (
-            <div key={index} className="h-full">
-              <ScrollReveal3DGlass 
+            <div 
+              key={index} 
+              className="
+                h-full min-w-[85vw] md:min-w-0
+                snap-center snap-always
+                flex-shrink-0 md:flex-shrink
+              "
+            >
+              <GlassCard
+                title={feature.title}
+                description={feature.description}
+                icon={feature.Icon}
+                color={feature.color}
+                bgGradient={feature.bgGradient}
                 trigger={gridRef}
-                inverted={true}
-                className="h-full"
-              >
-                <div
-                  className="feature-card-spotlight group relative h-full flex flex-col p-10"
-                >
-                   {/* 1. Spotlight Border */}
-                   <div 
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{
-                      background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.1), transparent 40%)`,
-                      pointerEvents: "none",
-                      borderRadius: "2rem",
-                      zIndex: 0
-                    }}
-                  />
-
-                  {/* 2. Background Gradient (unten) */}
-                  <div className={`absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t ${feature.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-b-[2rem]`} />
-
-                  {/* 3. Watermark Icon */}
-                  <feature.Icon 
-                    className="absolute -right-8 -bottom-8 text-white/[0.02] transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-12"
-                    size={200}
-                    strokeWidth={1}
-                  />
-
-                  {/* 4. Content */}
-                  <div className="relative z-10">
-                    <div 
-                      className="inline-flex mb-6 p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500"
-                      style={{ color: feature.color }}
-                    >
-                      <feature.Icon size={32} strokeWidth={1.5} />
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:translate-x-1 transition-transform duration-300">
-                      {feature.title}
-                    </h3>
-                    
-                    <p className="text-white/60 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
-
-                   {/* Noise Overlay */}
-                   <div 
-                    className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay rounded-[2rem]"
-                    style={{
-                      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                    }}
-                  />
-                </div>
-              </ScrollReveal3DGlass>
+                inverted={index % 2 === 0}
+                spotlightClassName="feature-card-spotlight"
+              />
             </div>
           ))}
         </div>
       </div>
+
+      {/* Hide Scrollbar Styles */}
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 }

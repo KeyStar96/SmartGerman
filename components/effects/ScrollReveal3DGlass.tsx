@@ -38,7 +38,7 @@ export default function ScrollReveal3DGlass({
     >
       <div
         ref={cardRef}
-        className="relative w-full h-full"
+        className="relative w-full h-full group/card transition-transform duration-500 hover:translate-z-[20px]"
         style={{
           transformStyle: "preserve-3d", // Wichtig!
           willChange: "transform, opacity", // Performance Hint
@@ -46,29 +46,30 @@ export default function ScrollReveal3DGlass({
           transform: "translate3d(0,0,0)", 
         }}
       >
-        {/* 1. GLASS & BORDER LAYER 
-          Dieser Layer bewegt sich 1:1 mit dem Content. Kein Versatz mehr möglich.
+        {/* 1. GLASS & BORDER LAYER (z-0)
+          CHROME/SAFARI FIX: backdrop-filter auf separatem Layer OHNE 3D-Transform
+          Dieser Layer bleibt statisch, um Blur-Bugs zu vermeiden
         */}
         <div 
-          className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl transition-colors duration-500 group-hover:bg-white/10"
+          className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl transition-colors duration-500 group-hover:bg-white/10 group-hover:border-white/20"
           style={{
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
-            // Hardware Acceleration Hack für Chrome Blur-Bug
-            transform: "translateZ(0)", 
-            backfaceVisibility: "hidden",
+            // KEIN 3D-Transform hier - verhindert Blur-Bugs
+            zIndex: 0,
             boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)", // Deep Shadow für 3D Effekt
           }}
         />
 
-        {/* 2. CONTENT LAYER
-          Liegt minimal vor dem Glas (z: 1px), um Z-Fighting zu verhindern
+        {/* 2. CONTENT LAYER (z-10)
+          Liegt vor dem Glas, kann 3D-Transforms haben
         */}
         <div 
           className="relative h-full w-full overflow-hidden rounded-[2rem]"
           style={{
              transform: "translateZ(1px)",
              transformStyle: "preserve-3d",
+             zIndex: 10,
           }}
         >
           {children}
