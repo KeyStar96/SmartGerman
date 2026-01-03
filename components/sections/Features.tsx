@@ -37,52 +37,60 @@ export default function Features({ dictionary }: FeaturesProps) {
     console.log("🔍 [Features] Methods:", dictionary?.sections?.features?.methods);
   }, [dictionary]);
 
+  // HARTES FALLBACK-ARRAY - Garantiert immer 3 Features
+  const fallbackFeatures: FeatureProps[] = [
+    {
+      title: "Muttersprachliche Lehrer",
+      description: "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz.",
+      Icon: UserCheck,
+      color: "#FF5C00",
+    },
+    {
+      title: "Flexible Kurszeiten",
+      description: "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen.",
+      Icon: Clock,
+      color: "#00D9FF",
+    },
+    {
+      title: "Praxisnahe Methoden",
+      description: "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen.",
+      Icon: Target,
+      color: "#FF5C00",
+    }
+  ];
+
   const features: FeatureProps[] = useMemo(() => {
     console.log("🔍 [Features] Building features array...");
     
-    // Fallback falls Dictionary-Daten fehlen
-    const fallbackFeatures: FeatureProps[] = [
-      {
-        title: "Muttersprachliche Lehrer",
-        description: "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz.",
-        Icon: UserCheck,
-        color: "#FF5C00",
-      },
-      {
-        title: "Flexible Kurszeiten",
-        description: "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen.",
-        Icon: Clock,
-        color: "#00D9FF",
-      },
-      {
-        title: "Praxisnahe Methoden",
-        description: "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen.",
-        Icon: Target,
-        color: "#FF5C00",
-      }
-    ];
+    // ABSOLUT SICHER: Prüfe jeden Pfad einzeln
+    const hasDictionary = dictionary && typeof dictionary === 'object';
+    const hasSections = hasDictionary && dictionary.sections && typeof dictionary.sections === 'object';
+    const hasFeatures = hasSections && dictionary.sections.features && typeof dictionary.sections.features === 'object';
 
-    if (!dictionary?.sections?.features) {
+    if (!hasFeatures) {
       console.warn("⚠️ [Features] Dictionary features missing, using fallback");
       return fallbackFeatures;
     }
 
+    const featuresData = dictionary.sections.features;
+    
+    // Sichere Extraktion mit Fallback auf jeden einzelnen Wert
     const featuresArray: FeatureProps[] = [
       {
-        title: dictionary.sections.features.native_speakers?.title || fallbackFeatures[0].title,
-        description: dictionary.sections.features.native_speakers?.description || fallbackFeatures[0].description,
+        title: featuresData.native_speakers?.title || fallbackFeatures[0].title,
+        description: featuresData.native_speakers?.description || fallbackFeatures[0].description,
         Icon: UserCheck,
         color: "#FF5C00",
       },
       {
-        title: dictionary.sections.features.flexibility?.title || fallbackFeatures[1].title,
-        description: dictionary.sections.features.flexibility?.description || fallbackFeatures[1].description,
+        title: featuresData.flexibility?.title || fallbackFeatures[1].title,
+        description: featuresData.flexibility?.description || fallbackFeatures[1].description,
         Icon: Clock,
         color: "#00D9FF",
       },
       {
-        title: dictionary.sections.features.methods?.title || fallbackFeatures[2].title,
-        description: dictionary.sections.features.methods?.description || fallbackFeatures[2].description,
+        title: featuresData.methods?.title || fallbackFeatures[2].title,
+        description: featuresData.methods?.description || fallbackFeatures[2].description,
         Icon: Target,
         color: "#FF5C00",
       }
@@ -119,13 +127,13 @@ export default function Features({ dictionary }: FeaturesProps) {
         {/* Header */}
         <div ref={headerRef} className="text-center max-w-3xl mx-auto mb-20">
           <h2 className="text-4xl md:text-6xl font-medium mb-6 leading-tight text-white">
-            {dictionary.sections.features.title_part1}{" "}
+            {dictionary?.sections?.features?.title_part1 || "Was uns"}{" "}
             <span className={`${instrumentSerif.className} text-[#FF5C00]`}>
-              {dictionary.sections.features.title_part2}
+              {dictionary?.sections?.features?.title_part2 || "auszeichnet"}
             </span>
           </h2>
           <p className="text-lg text-white/60 leading-relaxed">
-            {dictionary.sections.features.intro}
+            {dictionary?.sections?.features?.intro || "Entdecken Sie unsere einzigartigen Vorteile"}
           </p>
         </div>
 

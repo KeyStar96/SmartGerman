@@ -100,25 +100,7 @@ body {
     0 30px 60px -30px rgba(0, 0, 0, 0.6);
 }
 
-/* Glass Card Background - Chrome optimiert mit isolation */
-.glass-card-bg {
-  position: absolute;
-  inset: 0;
-  /* Höhere Opazität als Fallback für Chrome */
-  background: rgba(20, 20, 20, 0.7);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  /* Zwingt Chrome in einen eigenen Layer ohne 3D-Kontext zu stören */
-  isolation: isolate;
-  border-radius: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-.group\/card:hover .glass-card-bg {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(25, 25, 25, 0.75);
-}
+/* Glass Card Background wurde nach @layer components verschoben */
 
 /* ============================================
    SPACESHIP UI: Präzise Linien statt Schatten
@@ -323,11 +305,12 @@ body {
     }
     
     /* GLASS CARD BACKGROUND - CHROME FIX
-       position: relative erzwingt einen neuen Stacking Context
-       Das hilft Chrome, backdrop-filter korrekt zu rendern
+       position: absolute für korrekte Positionierung innerhalb der Card Faces
+       KEIN will-change - wird dynamisch von GSAP gesetzt
     */
     .glass-card-bg {
-      position: relative;
+      position: absolute;
+      inset: 0;
       /* Höhere Opazität als Fallback falls backdrop-filter nicht funktioniert */
       background: rgba(20, 20, 20, 0.7);
       /* backdrop-filter mit -webkit Prefix für Safari */
@@ -336,12 +319,16 @@ body {
       /* isolation erzwingt eigenen Compositing Layer */
       isolation: isolate;
       z-index: 0;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      /* WICHTIG: Kein will-change hier - wird dynamisch von GSAP gesetzt */
     }
     
     /* Hover-Effekt für Glass Card */
     .group\/card:hover .glass-card-bg {
       border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(25, 25, 25, 0.75);
     }
     
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
@@ -464,7 +451,7 @@ body {
       perspective-origin: center center;
     }
     
-    /* Spotlight-Glow Layer */
+    /* Spotlight-Glow Layer - nur sichtbar wenn Card eingeflogen ist */
     .card-spotlight {
       position: absolute;
       inset: 0;
@@ -473,13 +460,15 @@ body {
       border-radius: 2rem;
       opacity: 0;
       transition: opacity 0.3s ease;
+      /* WICHTIG: Erbt Opacity vom Parent - wird automatisch versteckt wenn Card opacity: 0 */
     }
     
+    /* Spotlight nur anzeigen wenn Card sichtbar ist UND gehovered wird */
     .card-interactive-container:hover .card-spotlight {
       opacity: 1;
     }
     
-    /* Gradient-Glow in Akzentfarbe */
+    /* Gradient-Glow in Akzentfarbe - nur sichtbar wenn Card Opacity > 0 */
     .card-accent-glow {
       position: absolute;
       inset: -2px;
@@ -490,8 +479,10 @@ body {
       opacity: 0;
       transition: opacity 0.4s ease;
       mix-blend-mode: screen;
+      /* WICHTIG: Erbt Opacity vom Parent - wird automatisch versteckt wenn Card opacity: 0 */
     }
     
+    /* Glow nur anzeigen wenn Container sichtbar ist (Opacity > 0) UND gehovered wird */
     .card-interactive-container:hover .card-accent-glow {
       opacity: 1;
     }

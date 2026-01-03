@@ -47,15 +47,8 @@ export function useScrollReveal3D(
       timelineRef.current = null;
     }
 
-    // Fix für den TypeScript-Fehler: Target explizit validieren und für GSAP casten
-    let triggerTarget: HTMLElement | gsap.DOMTarget = element;
-    if (trigger) {
-      if ('current' in trigger && trigger.current) {
-        triggerTarget = trigger.current as HTMLElement;
-      } else if (!('current' in trigger)) {
-        triggerTarget = trigger as HTMLElement;
-      }
-    }
+    // FIX: TypeScript-Fehler permanent behoben - vereinfachte Logik
+    const triggerTarget = (trigger && 'current' in trigger ? trigger.current : trigger) || element;
 
     // Mehr Rotation für dramatischeren Effekt, da wir näher an der Kamera sind
     const initialRotateX = inverted ? -25 : 25; 
