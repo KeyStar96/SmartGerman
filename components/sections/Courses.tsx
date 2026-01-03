@@ -96,16 +96,28 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
   }, [dictionary]);
 
   // Expanding Button Component - Nur Expansion, keine magnetische Anziehung
+  // Mobile-First: Standardmäßig breit, auf Desktop klein mit Hover-Expansion
   function ExpandingButton({ href, label }: { href: string; label: string }) {
     return (
       <Link
         href={href}
-        className="group/btn relative flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5 transition-all duration-300 hover:w-32 hover:bg-white hover:border-white overflow-hidden"
+        className="group/btn relative flex h-12 items-center justify-center rounded-full border overflow-hidden transition-all duration-300
+          w-32 bg-white border-white
+          md:w-12 md:bg-white/5 md:border-white/20
+          md:hover:w-32 md:hover:bg-white md:hover:border-white"
       >
-        <div className="absolute flex items-center justify-center transition-all duration-300 group-hover/btn:translate-x-12 group-hover/btn:opacity-0">
+        {/* Icon - auf Mobile versteckt, auf Desktop sichtbar bis Hover */}
+        <div className="absolute flex items-center justify-center transition-all duration-300
+          opacity-0 translate-x-12
+          md:opacity-100 md:translate-x-0
+          md:group-hover/btn:translate-x-12 md:group-hover/btn:opacity-0">
           <ArrowUpRight size={20} className="text-white" />
         </div>
-        <span className="absolute whitespace-nowrap opacity-0 -translate-x-12 transition-all duration-300 group-hover/btn:translate-x-0 group-hover/btn:opacity-100 text-black font-bold text-xs tracking-wider uppercase">
+        {/* Text - auf Mobile immer sichtbar, auf Desktop nur bei Hover */}
+        <span className="absolute whitespace-nowrap transition-all duration-300 font-bold text-xs tracking-wider uppercase
+          text-black opacity-100 translate-x-0
+          md:opacity-0 md:-translate-x-12
+          md:group-hover/btn:translate-x-0 md:group-hover/btn:opacity-100">
           {label}
         </span>
       </Link>

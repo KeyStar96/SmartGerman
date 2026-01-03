@@ -50,8 +50,8 @@ export default function GlassCard({
   trigger,
   inverted = true,
   backfaceContent,
-  flipHintLabel = "Details zeigen",
-  backHintLabel = "Zurück",
+  flipHintLabel = "DETAILS",
+  backHintLabel = "ZURÜCK",
 }: GlassCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipContainerRef = useRef<HTMLDivElement>(null);

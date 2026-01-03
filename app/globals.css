@@ -570,6 +570,37 @@ body {
       margin-left: 8px;
     }
     
+    /* ============================================
+       MOBILE TOUCH SUPPORT (hover: none)
+       Flip-Indicator ist auf Touch-Geräten IMMER expandiert
+       ============================================ */
+    @media (hover: none) {
+      /* Flip-Indicator: Immer sichtbar und expandiert auf Touch */
+      .flip-indicator-container {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+        width: 110px; /* Kompaktere Breite für Mobile */
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--indicator-color, #FF5C00);
+        box-shadow: 
+          0 0 15px var(--indicator-color, #FF5C00),
+          0 0 30px rgba(255, 92, 0, 0.15);
+      }
+      
+      /* Text immer sichtbar auf Touch */
+      .flip-indicator-container .flip-indicator-text {
+        max-width: 80px;
+        opacity: 1;
+        margin-left: 6px;
+      }
+      
+      /* Active-State für Touch-Feedback */
+      .flip-indicator-container:active {
+        transform: scale(0.95) !important;
+        background: rgba(255, 255, 255, 0.25);
+      }
+    }
+    
     /* Card Faces (Front & Back) - Verbesserte 3D-Drehung */
     .card-face {
       position: absolute;
