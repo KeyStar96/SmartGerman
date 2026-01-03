@@ -89,19 +89,21 @@ export default function Features({ dictionary }: FeaturesProps) {
       const deltaX = Math.abs(touchCurrentX - touchStartX);
       const deltaY = Math.abs(touchCurrentY - touchStartY);
 
-      // Entscheide bei der ersten signifikanten Bewegung (> 10px)
-      if (isScrollingHorizontally === null && (deltaX > 10 || deltaY > 10)) {
+      // Richtungserkennung - schnellere Entscheidung (5px statt 10px)
+      if (isScrollingHorizontally === null && (deltaX > 5 || deltaY > 5)) {
         isScrollingHorizontally = deltaX > deltaY;
       }
 
-      // Wenn horizontal gescrollt wird, blockiere vertikales Page-Scrolling
+      // Wenn wir als horizontal erkannt wurden:
       if (isScrollingHorizontally) {
-        e.preventDefault();
+        // NUR DANN preventDefault, um das vertikale Scrollen der Seite zu stoppen
+        // e.cancelable Check verhindert Konsolenfehler wenn Event nicht abbrechbar ist
+        if (e.cancelable) e.preventDefault();
       }
     };
 
-    // passive: false ist wichtig für preventDefault() auf iOS
-    container.addEventListener("touchstart", handleTouchStart, { passive: true });
+    // BEIDE müssen passive: false sein, damit iOS die Priorität korrekt übergibt
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
     container.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     return () => {

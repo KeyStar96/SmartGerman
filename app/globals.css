@@ -295,6 +295,9 @@ body {
     .hide-scrollbar {
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none; /* IE/Edge */
+      /* WICHTIG für iOS: Verhindert, dass der Browser 
+         das vertikale Scrollen erzwingt, während wir horizontal wischen */
+      touch-action: pan-x;
     }
     
     .hide-scrollbar::-webkit-scrollbar {
@@ -429,13 +432,7 @@ body {
     }
     
     /* PERFORMANCE & UTILS */
-    .hide-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .hide-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    /* hide-scrollbar wurde oben bereits definiert */
     
     /* ============================================
        PREMIUM INTERACTIVE CARD FEATURES
