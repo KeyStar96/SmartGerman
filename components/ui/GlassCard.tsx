@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode, useState, useRef, useEffect } from "react";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, RotateCcw } from "lucide-react";
 import { JetBrains_Mono } from "next/font/google";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { gsap } from "@/lib/gsap";
@@ -272,6 +272,27 @@ export default function GlassCard({
               borderColor: color,
             }}
           />
+        )}
+        
+        {/* Glass Tab mit Flip-Icon - nur bei Karten mit Backflip */}
+        {hasBackface && (
+          <div 
+            className="flip-tab-container"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsFlipped(!isFlipped);
+            }}
+          >
+            <div 
+              className="flip-tab"
+              style={{ 
+                '--tab-color': color,
+                borderColor: `${color}30`,
+              } as React.CSSProperties}
+            >
+              <RotateCcw size={14} strokeWidth={2} className="flip-tab-icon" />
+            </div>
+          </div>
         )}
         {/* Front Face */}
         <div 

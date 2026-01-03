@@ -482,6 +482,73 @@ body {
       transition: opacity 0.3s ease;
     }
     
+    /* Glass Tab mit Flip-Icon - Container */
+    .flip-tab-container {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 30;
+      cursor: pointer;
+    }
+    
+    /* Glass Tab - Das Tab selbst */
+    .flip-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Hover: Tab wird sichtbar */
+    .card-interactive-container:hover .flip-tab {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    /* Hover auf Tab selbst: Glow-Puls-Effekt */
+    .flip-tab:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--tab-color, #FF5C00);
+      color: var(--tab-color, #FF5C00);
+      box-shadow: 
+        0 0 15px var(--tab-color, #FF5C00),
+        0 0 30px rgba(255, 92, 0, 0.3);
+      animation: flip-tab-pulse 1.5s ease-in-out infinite;
+    }
+    
+    /* Icon-Rotation bei Hover */
+    .flip-tab-icon {
+      transition: transform 0.3s ease;
+    }
+    
+    .flip-tab:hover .flip-tab-icon {
+      transform: rotate(-180deg);
+    }
+    
+    /* Puls-Animation für Glow-Effekt */
+    @keyframes flip-tab-pulse {
+      0%, 100% {
+        box-shadow: 
+          0 0 15px var(--tab-color, #FF5C00),
+          0 0 30px rgba(255, 92, 0, 0.3);
+      }
+      50% {
+        box-shadow: 
+          0 0 20px var(--tab-color, #FF5C00),
+          0 0 40px rgba(255, 92, 0, 0.5);
+      }
+    }
+    
     /* Card Faces (Front & Back) - Verbesserte 3D-Drehung */
     .card-face {
       position: absolute;
