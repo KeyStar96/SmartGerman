@@ -32,8 +32,9 @@ export interface GlassCardProps {
     start?: string;
     description?: string; // Bug 4: Beschreibung für Rückseite
   };
-  // Hint-Label für Expanding Flip-Indicator (übersetzbar)
+  // Hint-Labels für Expanding Flip-Indicator (übersetzbar)
   flipHintLabel?: string;
+  backHintLabel?: string;
 }
 
 export default function GlassCard({
@@ -50,6 +51,7 @@ export default function GlassCard({
   inverted = true,
   backfaceContent,
   flipHintLabel = "Details zeigen",
+  backHintLabel = "Zurück",
 }: GlassCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipContainerRef = useRef<HTMLDivElement>(null);
@@ -376,6 +378,27 @@ export default function GlassCard({
         >
           {/* glass-card-bg für Back Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
+          
+          {/* Flip-Indicator auch auf der Rückseite */}
+          <div 
+            className="flip-indicator-container"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsFlipped(!isFlipped);
+            }}
+            style={{ 
+              '--indicator-color': color,
+            } as React.CSSProperties}
+          >
+            {/* Icon Container */}
+            <div className="flip-indicator-icon">
+              <RotateCcw size={16} strokeWidth={2} />
+            </div>
+            {/* Text - wird bei Hover sichtbar */}
+            <span className={`${jetBrainsMono.className} flip-indicator-text`}>
+              {backHintLabel}
+            </span>
+          </div>
           
           {/* Watermark auf Rückseite - KEINE Spiegelung nötig, da card-face-back bereits rotateY(180deg) hat */}
           {watermark && (

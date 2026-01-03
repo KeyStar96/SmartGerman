@@ -242,6 +242,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                   description: course.backDescription,
                 }}
                 flipHintLabel={dictionary?.courses?.flip_hint || "Details zeigen"}
+                backHintLabel={dictionary?.courses?.back_hint || "Zurück"}
               >
                 {/* Price & CTA */}
                 <div className="flex items-center justify-between mt-2">
