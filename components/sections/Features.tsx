@@ -66,6 +66,50 @@ export default function Features({ dictionary }: FeaturesProps) {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
+  // iOS Touch-Handler: Verhindert, dass vertikales Scrolling das horizontale überlagert
+  useEffect(() => {
+    const container = gridRef.current;
+    if (!container) return;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isScrollingHorizontally: boolean | null = null;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      isScrollingHorizontally = null; // Reset bei neuem Touch
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!e.touches[0]) return;
+
+      const touchCurrentX = e.touches[0].clientX;
+      const touchCurrentY = e.touches[0].clientY;
+      const deltaX = Math.abs(touchCurrentX - touchStartX);
+      const deltaY = Math.abs(touchCurrentY - touchStartY);
+
+      // Entscheide bei der ersten signifikanten Bewegung (> 10px)
+      if (isScrollingHorizontally === null && (deltaX > 10 || deltaY > 10)) {
+        isScrollingHorizontally = deltaX > deltaY;
+      }
+
+      // Wenn horizontal gescrollt wird, blockiere vertikales Page-Scrolling
+      if (isScrollingHorizontally) {
+        e.preventDefault();
+      }
+    };
+
+    // passive: false ist wichtig für preventDefault() auf iOS
+    container.addEventListener("touchstart", handleTouchStart, { passive: true });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, []);
+
   // Programmatisches Scrollen zu bestimmter Karte
   const scrollToCard = (index: number) => {
     if (!gridRef.current) return;
