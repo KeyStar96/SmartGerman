@@ -645,8 +645,8 @@ export default function GlassCard({
             }}
           />
 
-          {/* Content Container - High-End Layout mit Padding p-8 */}
-          <div className="relative h-full flex flex-col p-8 overflow-hidden">
+          {/* Content Container - High-End Layout mit exaktem Padding wie Vorderseite */}
+          <div className="relative h-full flex flex-col p-5 md:p-10 overflow-hidden">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
             <div className="relative z-10 flex flex-col h-full gap-5 overflow-y-auto pt-16">
