@@ -47,13 +47,13 @@ export function useScrollReveal3D(
       timelineRef.current = null;
     }
 
-    // Fix für den TypeScript-Fehler: Target explizit validieren
-    let triggerTarget: HTMLElement = element;
+    // Fix für den TypeScript-Fehler: Target explizit validieren und für GSAP casten
+    let triggerTarget: HTMLElement | gsap.DOMTarget = element;
     if (trigger) {
       if ('current' in trigger && trigger.current) {
-        triggerTarget = trigger.current;
+        triggerTarget = trigger.current as HTMLElement;
       } else if (!('current' in trigger)) {
-        triggerTarget = trigger;
+        triggerTarget = trigger as HTMLElement;
       }
     }
 

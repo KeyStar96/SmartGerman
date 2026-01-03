@@ -449,6 +449,116 @@ body {
       scrollbar-width: none;
     }
     
+    /* ============================================
+       PREMIUM INTERACTIVE CARD FEATURES
+       Awwwards-Standard: 3D Flip, Spotlight, Tilt
+       ============================================ */
+    
+    /* Interactive Container für Mouse-Follow-Effekte */
+    .card-interactive-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    /* Spotlight-Glow Layer */
+    .card-spotlight {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      border-radius: 2rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .card-interactive-container:hover .card-spotlight {
+      opacity: 1;
+    }
+    
+    /* Tilt-Effekt für 3D-Neigung */
+    .card-tilt {
+      transition: transform 0.1s ease-out;
+      will-change: transform;
+    }
+    
+    /* 3D Flip-Container */
+    .card-flip-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Card Faces (Front & Back) */
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 2rem;
+      overflow: hidden;
+    }
+    
+    .card-face-front {
+      transform: rotateY(0deg);
+    }
+    
+    .card-face-back {
+      transform: rotateY(180deg);
+    }
+    
+    /* Shimmer-Effekt: Diagonaler Lichtstreifen bei Hover */
+    .card-face-front::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      transition: transform 0.6s ease;
+      pointer-events: none;
+      z-index: 20;
+    }
+    
+    .card-interactive-container:hover .card-face-front::before {
+      transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+    
+    /* Watermark Parallax & Glow */
+    .watermark-parallax {
+      transition: transform 0.1s ease-out;
+    }
+    
+    .watermark-glow {
+      filter: drop-shadow(0 0 0px currentColor);
+      transition: filter 0.3s ease;
+    }
+    
+    .card-interactive-container:hover .watermark-glow {
+      filter: drop-shadow(0 0 20px currentColor);
+    }
+    
+    /* Variable Font Weight für Price */
+    .price-variable-font {
+      transition: font-weight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 400;
+    }
+    
+    .card-interactive-container:hover .price-variable-font {
+      font-weight: 700;
+    }
+    
     /* PERFORMANCE: Reduziere Animationen bei Präferenz */
     @media (prefers-reduced-motion: reduce) {
       *,
@@ -469,6 +579,18 @@ body {
         background: var(--primary-orange) !important;
         -webkit-background-clip: text !important;
         background-clip: text !important;
+      }
+      
+      .card-flip-container {
+        transition: none !important;
+      }
+      
+      .card-tilt {
+        transform: none !important;
+      }
+      
+      .watermark-parallax {
+        transform: none !important;
       }
     }
   }

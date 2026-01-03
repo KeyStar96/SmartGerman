@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { gsap } from "@/lib/gsap";
 
 const instrumentSerif = Instrument_Serif({ 
   subsets: ["latin"],
@@ -37,8 +38,11 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         features: [],
         price: item.price?.replace("€ ", "") || "299",
         color: item.color || "#FF5C00",
-        // HIER GEÄNDERT: Watermark ist jetzt das Level (z.B. "A1") statt Index
-        watermark: item.level, 
+        watermark: item.level,
+        // Backface-Content für Flip-Animation
+        duration: item.duration || "8 Wochen",
+        focus: item.focus || "Grundlagen & Praxis",
+        start: item.start || "Flexibel",
       }));
     }
     
@@ -77,6 +81,83 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
     ];
   }, [dictionary]);
 
+  // Magnetic Button Component
+  function MagneticButton({ href, label }: { href: string; label: string }) {
+    const buttonRef = useRef<HTMLAnchorElement>(null);
+
+    useEffect(() => {
+      const button = buttonRef.current;
+      if (!button) return;
+
+      const handleMouseMove = (e: MouseEvent) => {
+        const rect = button.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const mouseX = e.clientX - centerX;
+        const mouseY = e.clientY - centerY;
+        const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+        
+        // Magnetic-Effekt im Umkreis von 50px
+        if (distance < 50) {
+          const strength = (50 - distance) / 50; // 0-1
+          const moveX = mouseX * strength * 0.3; // Max 30% Verschiebung
+          const moveY = mouseY * strength * 0.3;
+          
+          gsap.to(button, {
+            x: moveX,
+            y: moveY,
+            duration: 0.3,
+            ease: "power2.out",
+          });
+        } else {
+          gsap.to(button, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
+      };
+
+      const handleMouseLeave = () => {
+        gsap.to(button, {
+          x: 0,
+          y: 0,
+          duration: 0.5,
+          ease: "power2.out",
+        });
+      };
+
+      // Event-Listener auf dem Parent-Container (Card)
+      const cardContainer = button.closest(".card-interactive-container");
+      if (cardContainer) {
+        cardContainer.addEventListener("mousemove", handleMouseMove);
+        cardContainer.addEventListener("mouseleave", handleMouseLeave);
+        
+        return () => {
+          cardContainer.removeEventListener("mousemove", handleMouseMove);
+          cardContainer.removeEventListener("mouseleave", handleMouseLeave);
+        };
+      }
+    }, []);
+
+    return (
+      <Link
+        ref={buttonRef}
+        href={href}
+        className="group/btn relative flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5 transition-all duration-300 hover:w-32 hover:bg-white hover:border-white overflow-hidden"
+      >
+        <div className="absolute flex items-center justify-center transition-all duration-300 group-hover/btn:translate-x-12 group-hover/btn:opacity-0">
+          <ArrowUpRight size={20} className="text-white" />
+        </div>
+        <span className="absolute whitespace-nowrap opacity-0 -translate-x-12 transition-all duration-300 group-hover/btn:translate-x-0 group-hover/btn:opacity-100 text-black font-bold text-xs tracking-wider uppercase">
+          {label}
+        </span>
+      </Link>
+    );
+  }
+
   return (
     <section className="relative w-full py-24 md:py-32 overflow-hidden">
       <div className="container relative z-10 mx-auto px-4 md:px-6">
@@ -109,10 +190,14 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                 description={course.desc}
                 badge={course.level}
                 color={course.color}
-                // HIER GEÄNDERT: Trigger ist jetzt gridRef (wie Features)
                 trigger={gridRef} 
                 watermark={course.watermark}
                 inverted={index % 2 === 0}
+                backfaceContent={{
+                  duration: course.duration,
+                  focus: course.focus,
+                  start: course.start,
+                }}
               >
                 {/* Price & CTA */}
                 <div className="flex items-center justify-between mt-2">
@@ -122,24 +207,17 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                     </span>
                     <div className="flex items-baseline">
                       <span className="text-lg text-white/60 mr-1">€</span>
-                      <span className={`${jetBrainsMono.className} text-3xl font-bold text-white`}>
+                      <span className={`${jetBrainsMono.className} text-3xl font-normal text-white price-variable-font`}>
                         {course.price}
                       </span>
                     </div>
                   </div>
 
                   {/* Magnetic Button Animation */}
-                  <Link
+                  <MagneticButton
                     href={`/${lang}/anmeldung`}
-                    className="group/btn relative flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5 transition-all duration-300 hover:w-32 hover:bg-white hover:border-white overflow-hidden"
-                  >
-                    <div className="absolute flex items-center justify-center transition-all duration-300 group-hover/btn:translate-x-12 group-hover/btn:opacity-0">
-                      <ArrowUpRight size={20} className="text-white" />
-                    </div>
-                    <span className="absolute whitespace-nowrap opacity-0 -translate-x-12 transition-all duration-300 group-hover/btn:translate-x-0 group-hover/btn:opacity-100 text-black font-bold text-xs tracking-wider uppercase">
-                      {dictionary?.sections?.courses?.cta || "Buchen"}
-                    </span>
-                  </Link>
+                    label={dictionary?.sections?.courses?.cta || "Buchen"}
+                  />
                 </div>
               </GlassCard>
             </div>
