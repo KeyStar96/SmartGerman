@@ -574,7 +574,7 @@ body {
       background: rgba(25, 25, 30, 0.95);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--indicator-color, #FF5C00);
+      border: none; /* KEIN Border */
       
       /* Initial: Versteckt */
       opacity: 0;
@@ -595,11 +595,11 @@ body {
       transform: scale(1);
     }
     
-    /* Hover auf Indicator selbst: Expandiert zur Pill mit Text - OHNE Glow */
+    /* Hover auf Indicator selbst: Expandiert zur Pill mit Text - OHNE Border */
     .flip-indicator-container:hover {
       width: 160px; /* Expandiert für Text */
       background: rgba(30, 30, 35, 0.98);
-      border-color: var(--indicator-color, #FF5C00);
+      border: none; /* KEIN Border */
       /* KEIN Glow - nur solider, intransparenter Button */
       box-shadow: none;
     }
@@ -648,13 +648,13 @@ body {
        Flip-Indicator ist auf Touch-Geräten IMMER expandiert
        ============================================ */
     @media (hover: none) {
-      /* Flip-Indicator: Immer sichtbar und expandiert auf Touch - OHNE Glow */
+      /* Flip-Indicator: Immer sichtbar und expandiert auf Touch - OHNE Border */
       .flip-indicator-container {
         opacity: 1 !important;
         transform: scale(1) !important;
         width: 110px; /* Kompaktere Breite für Mobile */
         background: rgba(25, 25, 30, 0.95);
-        border-color: var(--indicator-color, #FF5C00);
+        border: none; /* KEIN Border */
         /* KEIN Glow - solider, intransparenter Button */
         box-shadow: none;
       }
