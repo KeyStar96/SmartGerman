@@ -236,8 +236,10 @@ export default function Features({ dictionary }: FeaturesProps) {
         {/* Grid - Desktop: Grid, Mobile: Horizontal Scroll-Snap */}
         <div className="relative">
           {/* Scroll-Container mit Touch-Support */}
+          {/* data-lenis-prevent: Lenis soll die Finger von diesem Container lassen */}
           <div 
-            ref={gridRef} 
+            ref={gridRef}
+            data-lenis-prevent
             className="
               flex md:grid
               md:grid-cols-3

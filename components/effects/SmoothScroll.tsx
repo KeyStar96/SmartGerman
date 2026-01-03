@@ -38,7 +38,10 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       wheelMultiplier: isSafari ? 0.8 : 1.0, 
       touchMultiplier: isSafari ? 1.2 : 1.5,
       infinite: false,
-      syncTouch: true, // SyncTouch hilft oft bei iOS/Trackpads
+      // syncTouch: false - WICHTIG für iOS horizontales Scrolling!
+      // Wenn true, fängt Lenis ALLE Touch-Events ab und verhindert horizontales Scrolling
+      // data-lenis-prevent auf Containern funktioniert nur mit syncTouch: false
+      syncTouch: false,
       syncTouchLerp: 0.08, // Etwas direkter bei Touch
       lerp: isLegacySafari ? 0.08 : 0.1, // Niedrigerer Lerp glättet Framedrops besser
       gestureOrientation: "vertical" as const,
