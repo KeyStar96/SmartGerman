@@ -66,7 +66,8 @@ export function useScrollReveal3D(
     gsap.set(element, { 
       transformOrigin: transformOrigin,
       backfaceVisibility: "hidden", 
-      transformStyle: "flat" // "flat" hilft Chrome beim Blurren
+      transformStyle: "flat", // "flat" hilft Chrome beim Blurren
+      pointerEvents: "auto" // WICHTIG: Immer interaktiv, auch während Animation
     });
 
     const tl = gsap.timeline({

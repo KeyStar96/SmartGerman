@@ -505,6 +505,20 @@ body {
       overflow: visible; /* Wichtig für Flip-Animation Glow */
       perspective: 1200px; /* Perspective für 3D Flip */
       perspective-origin: center center;
+      /* WICHTIG: Karten bleiben IMMER interaktiv, auch während der Scroll-Animation */
+      pointer-events: auto !important;
+    }
+    
+    /* Sicherstellen, dass alle Kind-Elemente auch während 3D-Transforms interaktiv bleiben */
+    .card-interactive-container * {
+      pointer-events: auto;
+    }
+    
+    /* Ausnahme: Dekorative Elemente die keine Interaktion brauchen */
+    .card-interactive-container .watermark-parallax,
+    .card-interactive-container .watermark-glow,
+    .card-interactive-container .card-flip-glow {
+      pointer-events: none;
     }
     
     /* Glow-Effekte wurden direkt auf .glass-card-bg verschoben für konsistente Animation */
@@ -513,6 +527,9 @@ body {
     .card-tilt {
       transition: transform 0.1s ease-out;
       will-change: transform;
+      /* Sicherstellen, dass der Tilt-Container keine Z-Kämpfe verursacht */
+      transform-style: preserve-3d;
+      isolation: isolate;
     }
     
     /* 3D Flip-Container - Verbesserte Perspective für echte 180° Drehung */
