@@ -276,15 +276,6 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                 </AnimatePresence>
               </div>
               </div>
-              
-              {/* MOBILE PDF DOWNLOAD FLOATING */}
-              <div 
-                className="md:hidden p-6 border-t border-white/10 bg-black"
-              >
-                 <button className="w-full py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
-                   <Download size={16} /> PDF Download
-                 </button>
-              </div>
             </motion.div>
           </div>
         )}
