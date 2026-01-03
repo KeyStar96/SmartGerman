@@ -228,7 +228,9 @@
         "extras": "ДОДАТКОВО",
         "contract": "ДОГОВІР",
         "monthly_cancellable": "Щомісячно розірвний",
-        "telegram_materials": "Група Telegram & Матеріали"
+        "monthly_cancellable_short": "Щоміс. розірвний",
+        "telegram_materials": "Група Telegram & Матеріали",
+        "extras_short": "Вкл. Матеріали & Telegram"
       },
       "a1": {
         "name": "A1 Початківець",

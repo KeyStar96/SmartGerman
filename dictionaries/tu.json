@@ -228,7 +228,9 @@
         "extras": "EKSTRALAR",
         "contract": "SÖZLEŞME",
         "monthly_cancellable": "Aylık iptal edilebilir",
-        "telegram_materials": "Telegram Grubu & Materyaller"
+        "monthly_cancellable_short": "Aylık iptal edilebilir",
+        "telegram_materials": "Telegram Grubu & Materyaller",
+        "extras_short": "Dahil Materyal & Telegram"
       },
       "a1": {
         "name": "A1 Başlangıç",

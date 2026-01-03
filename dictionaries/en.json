@@ -228,7 +228,9 @@
         "extras": "EXTRAS",
         "contract": "CONTRACT",
         "monthly_cancellable": "Monthly cancellable",
-        "telegram_materials": "Telegram Group & Materials"
+        "monthly_cancellable_short": "Monthly cancellable",
+        "telegram_materials": "Telegram Group & Materials",
+        "extras_short": "Incl. Material & Telegram"
       },
       "a1": {
         "name": "A1 Beginner",

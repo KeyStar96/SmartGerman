@@ -63,8 +63,10 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
           focus: item.focus || "Grundlagen",
           start: item.start || "Flexibel",
           backDescription: item.backDescription || item.description,
-          // Instructor: Alle Kurse Anastasia Sitov, außer Online B2 → Lisa Kahl
-          instructor: (item.badge === "Online" && level === "B2") ? "Lisa Kahl" : (item.teacher || "Anastasia Sitov"),
+          // Instructor: Alle Kurse Anastasia Sitov, außer "Deutsch B2" → Lisa Kahl
+          // Prüfe: Titel enthält "B2" ODER (badge ist Online UND level ist B2)
+          instructor: (item.title?.includes("B2") || ((item.badge === "Online" || item.badge === "Онлайн") && level === "B2"))
+                     ? "Lisa Kahl" : (item.teacher || "Anastasia Sitov"),
         };
       });
     }

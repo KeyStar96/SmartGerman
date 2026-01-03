@@ -55,7 +55,9 @@ export interface GlassCardProps {
     extras?: string;
     contract?: string;
     monthly_cancellable?: string;
+    monthly_cancellable_short?: string;
     telegram_materials?: string;
+    extras_short?: string;
   };
 }
 
@@ -133,32 +135,26 @@ export default function GlassCard({
     return appointments;
   };
   
-  // Helper: Unterrichtseinheit formatieren
-  const formatLessonBlock = (lessonBlock?: string): { parts: string[]; total: string } | null => {
+  // Helper: Unterrichtseinheit formatieren - Kompakte Version
+  const formatLessonBlock = (lessonBlock?: string): string | null => {
     if (!lessonBlock) return null;
     
-    // Format: "90 Min. (2x 45 Min.)" → ["2x 45 Min.", "90 Min. Gesamt"]
+    // Format: "90 Min. (2x 45 Min.)" → "90m (2x45)"
     const match = lessonBlock.match(/(\d+)\s*Min\.?\s*\((\d+)x\s*(\d+)\s*Min\.?\)/i);
     if (match) {
       const total = match[1];
       const count = match[2];
       const unit = match[3];
-      return {
-        parts: [`${count}x ${unit} Min.`],
-        total: `${total} Min. Gesamt`
-      };
+      return `${total}m (${count}x${unit})`;
     }
     
-    // Format: "45 Min" → ["45 Min."]
+    // Format: "45 Min" → "45m"
     const simpleMatch = lessonBlock.match(/(\d+)\s*Min\.?/i);
     if (simpleMatch) {
-      return {
-        parts: [`${simpleMatch[1]} Min.`],
-        total: ''
-      };
+      return `${simpleMatch[1]}m`;
     }
     
-    return { parts: [lessonBlock], total: '' };
+    return lessonBlock;
   };
   const flipContainerRef = useRef<HTMLDivElement>(null);
   const frontFaceRef = useRef<HTMLDivElement>(null);
@@ -654,73 +650,88 @@ export default function GlassCard({
           <div className="relative h-full flex flex-col p-5 md:p-10 overflow-hidden">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
-            <div className="relative z-10 flex flex-col h-full gap-5 overflow-y-auto pt-16">
-              {/* Block 1: Grid - EINHEIT (links) & GRUPPE (rechts) */}
-              <div className="backface-item grid grid-cols-2 gap-6 flex-shrink-0">
+            {/* Kompaktes 2-Spalten-Grid Layout - Kein Scrolling */}
+            <div className="relative z-10 flex flex-col h-full gap-y-2 gap-x-4 pt-16 pb-24 overflow-hidden">
+              {/* Zeile 1: EINHEIT (links) | GRUPPE (rechts) */}
+              <div className="backface-item grid grid-cols-2 gap-x-4 gap-y-2 flex-shrink-0">
                 {/* Spalte 1: EINHEIT */}
                 {backfaceContent?.lessonBlock && (() => {
                   const formatted = formatLessonBlock(backfaceContent.lessonBlock);
                   return formatted ? (
                     <div>
-                      <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                      <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
                         {backfaceLabels?.unit || "EINHEIT"}
                       </span>
-                      <div className="space-y-0.5">
-                        {formatted.parts.map((part, idx) => (
-                          <p key={idx} className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
-                            {part}
-                          </p>
-                        ))}
-                        {formatted.total && (
-                          <p className={`${jetBrainsMono.className} text-xs text-white/60 leading-tight`}>
-                            {formatted.total}
-                          </p>
-                        )}
-                      </div>
+                      <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight`}>
+                        {formatted}
+                      </p>
                     </div>
                   ) : null;
                 })()}
                 
                 {/* Spalte 2: GRUPPE */}
                 <div>
-                  <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
                     {backfaceLabels?.group || "GRUPPE"}
                   </span>
-                  <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
+                  <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight`}>
                     {backfaceContent?.participants || "Max. 20"}
                   </p>
                 </div>
               </div>
               
-              {/* Block 2: STANDORT */}
+              {/* Zeile 2: STANDORT (links) | VERTRAG (rechts) */}
+              <div className="backface-item grid grid-cols-2 gap-x-4 gap-y-2 flex-shrink-0">
+                {/* STANDORT */}
+                <div>
+                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                    {backfaceLabels?.location || "STANDORT"}
+                  </span>
+                  <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight whitespace-nowrap`}>
+                    {(() => {
+                      const badgeLower = badge?.toLowerCase() || "";
+                      // Prüfe auf Online-Varianten in verschiedenen Sprachen
+                      if (badgeLower.includes("online") || badgeLower === "онлайн") {
+                        return "Microsoft Teams";
+                      }
+                      // Alle anderen sind Präsenz
+                      return "FZH Vahrenwald";
+                    })()}
+                  </p>
+                </div>
+                
+                {/* VERTRAG */}
+                <div>
+                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                    {backfaceLabels?.contract || "VERTRAG"}
+                  </span>
+                  <p className={`${jetBrainsMono.className} text-[12px] font-medium text-white leading-tight`}>
+                    <span style={{ color }}>✓</span> {backfaceLabels?.monthly_cancellable_short || backfaceLabels?.monthly_cancellable?.replace("Monatlich", "Monatl.") || "Monatl. kündbar"}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Zeile 3: EXTRAS (ganzbreitig) */}
               <div className="backface-item flex-shrink-0">
-                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
-                  {backfaceLabels?.location || "STANDORT"}
+                <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                  {backfaceLabels?.extras || "EXTRAS"}
                 </span>
-                <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
-                  {(() => {
-                    const badgeLower = badge?.toLowerCase() || "";
-                    // Prüfe auf Online-Varianten in verschiedenen Sprachen
-                    if (badgeLower.includes("online") || badgeLower === "онлайн") {
-                      return "Microsoft Teams";
-                    }
-                    // Alle anderen sind Präsenz
-                    return "FZH Vahrenwald, Hannover";
-                  })()}
+                <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight`}>
+                  {backfaceLabels?.extras_short || "Inkl. Material & Telegram"}
                 </p>
               </div>
               
-              {/* Block 3: TERMINE - vertikal gestapelt */}
+              {/* Zeile 4: TERMINE (ganzbreitig, Tage kompakt untereinander) */}
               {backfaceContent?.start && (() => {
                 const appointments = parseAppointments(backfaceContent.start);
                 return appointments.length > 0 ? (
                   <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                    <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
                       {backfaceLabels?.appointments || "TERMINE"}
                     </span>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       {appointments.map((appt, idx) => (
-                        <div key={idx} className={`${jetBrainsMono.className} text-sm leading-tight`}>
+                        <div key={idx} className={`${jetBrainsMono.className} text-[12px] leading-tight`}>
                           <span className="font-bold text-white">{appt.day}</span>
                           {appt.time && (
                             <>
@@ -734,50 +745,30 @@ export default function GlassCard({
                   </div>
                 ) : (
                   <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                    <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
                       {backfaceLabels?.appointments || "TERMINE"}
                     </span>
-                    <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight break-words`}>
+                    <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight break-words`}>
                       {backfaceContent.start}
                     </p>
                   </div>
                 );
               })()}
-              
-              {/* Block 4: EXTRAS */}
-              <div className="backface-item flex-shrink-0">
-                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
-                  {backfaceLabels?.extras || "EXTRAS"}
-                </span>
-                <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
-                  {backfaceLabels?.telegram_materials || "Telegram-Gruppe & Materialien"}
-                </p>
-              </div>
-              
-              {/* Block 5: VERTRAG Badge - Prominent aber elegant */}
-              <div className="backface-item flex-shrink-0">
-                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
-                  {backfaceLabels?.contract || "VERTRAG"}
-                </span>
-                <p className={`${jetBrainsMono.className} text-sm font-medium text-white leading-tight`}>
-                  <span style={{ color }}>✓</span> {backfaceLabels?.monthly_cancellable || "Monatlich kündbar"}
-                </p>
-              </div>
-              
-              {/* Dozentin-Footer - Ganz unten mit Label und Name in Akzentfarbe */}
-              {backfaceContent?.instructor && (
-                <div className="backface-item mt-auto pt-4 border-t border-white/10 flex-shrink-0">
-                  <div className="flex flex-col gap-1">
-                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40`}>
-                      {backfaceLabels?.instructor || "DOZENTIN"}
-                    </span>
-                    <p className="text-sm font-medium leading-tight" style={{ color }}>
-                      {backfaceContent.instructor}
-                    </p>
-                  </div>
-                </div>
-              )}
             </div>
+              
+            {/* Dozentin-Footer - Absolut positioniert ganz unten */}
+            {backfaceContent?.instructor && (
+              <div className="absolute bottom-4 left-5 right-5 md:left-8 md:right-8 md:bottom-4 z-20 backface-item border-t border-white/10 pt-2">
+                <div className="flex flex-col gap-0.5">
+                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40`}>
+                    {backfaceLabels?.instructor || "DOZENTIN"}
+                  </span>
+                  <p className="text-[12px] font-medium leading-tight" style={{ color }}>
+                    {backfaceContent.instructor}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         )}
