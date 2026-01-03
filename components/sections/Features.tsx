@@ -169,6 +169,7 @@ export default function Features({ dictionary }: FeaturesProps) {
                     title={feature.title}
                     description={feature.description}
                     icon={feature.Icon}
+                    watermarkIcon={feature.Icon}
                     color={feature.color}
                     trigger={gridRef}
                     inverted={index % 2 === 0}

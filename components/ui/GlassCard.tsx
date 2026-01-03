@@ -21,6 +21,7 @@ export interface GlassCardProps {
   icon?: LucideIcon;
   badge?: string;
   watermark?: string;
+  watermarkIcon?: LucideIcon; // Icon als Watermark (für Features)
   className?: string;
   trigger?: React.RefObject<HTMLElement>;
   inverted?: boolean;
@@ -41,6 +42,7 @@ export default function GlassCard({
   icon: Icon,
   badge,
   watermark,
+  watermarkIcon: WatermarkIcon,
   className = "",
   trigger,
   inverted = true,
@@ -137,9 +139,11 @@ export default function GlassCard({
   }, [isFlipped, backfaceContent]);
 
   // Parallax Watermark & Variable Font Weight
-  // Nur aktiv wenn watermark vorhanden ist
+  // Aktiv wenn watermark ODER watermarkIcon vorhanden ist
+  const hasWatermark = !!watermark || !!WatermarkIcon;
+  
   useEffect(() => {
-    if (!watermark) return;
+    if (!hasWatermark) return;
     
     const container = flipContainerRef.current?.closest(".card-interactive-container");
     if (!container || !watermarkRef.current) return;
@@ -159,34 +163,54 @@ export default function GlassCard({
 
     container.addEventListener("mousemove", handleMouseMove);
     return () => container.removeEventListener("mousemove", handleMouseMove);
-  }, [watermark]);
+  }, [hasWatermark]);
 
-  // Variable Font Weight Animation bei Hover
-  // Nur aktiv wenn watermark vorhanden ist
+  // Variable Font Weight Animation bei Hover (nur für Text-Watermark)
+  // Scale Animation für Icon-Watermark
   useEffect(() => {
-    if (!watermark) return;
+    if (!hasWatermark) return;
     
     const container = flipContainerRef.current?.closest(".card-interactive-container");
     if (!container) return;
 
     const handleMouseEnter = () => {
       if (watermarkRef.current) {
-        gsap.to(watermarkRef.current, {
-          fontWeight: 700,
-          duration: 0.5,
-          ease: "power2.out",
-        });
+        if (watermark) {
+          // Text-Watermark: Font-Weight Animation
+          gsap.to(watermarkRef.current, {
+            fontWeight: 700,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        } else if (WatermarkIcon) {
+          // Icon-Watermark: Scale Animation
+          gsap.to(watermarkRef.current, {
+            scale: 1.15,
+            opacity: 0.08,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
       }
       // Price Variable Font wird über CSS gehandhabt (.price-variable-font)
     };
 
     const handleMouseLeave = () => {
       if (watermarkRef.current) {
-        gsap.to(watermarkRef.current, {
-          fontWeight: 400,
-          duration: 0.5,
-          ease: "power2.out",
-        });
+        if (watermark) {
+          gsap.to(watermarkRef.current, {
+            fontWeight: 400,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        } else if (WatermarkIcon) {
+          gsap.to(watermarkRef.current, {
+            scale: 1,
+            opacity: 0.04,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
       }
     };
 
@@ -197,7 +221,7 @@ export default function GlassCard({
       container.removeEventListener("mouseenter", handleMouseEnter);
       container.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [watermark]);
+  }, [hasWatermark, watermark, WatermarkIcon]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Ignoriere Klicks auf CTA-Buttons
@@ -259,6 +283,7 @@ export default function GlassCard({
           {/* glass-card-bg für Front Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
           <div className="relative h-full flex flex-col p-8 md:p-10">
+            {/* Text-Watermark (für Courses) */}
             {watermark && (
               <div 
                 ref={watermarkRef}
@@ -269,6 +294,16 @@ export default function GlassCard({
                 }}
               >
                 {watermark}
+              </div>
+            )}
+            {/* Icon-Watermark (für Features) */}
+            {WatermarkIcon && !watermark && (
+              <div 
+                ref={watermarkRef}
+                className="absolute top-1/2 right-4 -translate-y-1/2 opacity-[0.04] select-none pointer-events-none transition-all duration-700 watermark-parallax watermark-glow"
+                style={{ color }}
+              >
+                <WatermarkIcon size={180} strokeWidth={0.8} />
               </div>
             )}
             <div className="flex justify-between items-start mb-6">

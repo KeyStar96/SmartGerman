@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, ReactNode, useState, useEffect } from "react";
+import React, { useRef, ReactNode, useEffect } from "react";
 import { useScrollReveal3D } from "@/lib/useScrollReveal3D";
 
 interface ScrollReveal3DGlassProps {
@@ -8,7 +8,7 @@ interface ScrollReveal3DGlassProps {
   className?: string;
   trigger?: React.RefObject<HTMLElement>;
   inverted?: boolean;
-  accentColor?: string; // Akzentfarbe für Gradient-Glow
+  accentColor?: string; // Akzentfarbe für Hover-Glow
 }
 
 export default function ScrollReveal3DGlass({
@@ -20,18 +20,6 @@ export default function ScrollReveal3DGlass({
 }: ScrollReveal3DGlassProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
-
-  // DEBUGGING: Log ScrollReveal3DGlass
-  useEffect(() => {
-    console.log("🔍 [ScrollReveal3DGlass] Rendering:", {
-      hasChildren: !!children,
-      className,
-      accentColor,
-      hasTrigger: !!trigger,
-      inverted,
-    });
-  }, [children, className, accentColor, trigger, inverted]);
 
   useScrollReveal3D(cardRef, {
     trigger: trigger || undefined,
@@ -39,22 +27,14 @@ export default function ScrollReveal3DGlass({
     inverted,
   });
 
-  // Mouse-Follow für Spotlight & Tilt
+  // Mouse-Follow für Tilt-Effekt
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
       
-      setMousePosition({ x, y });
-
-      // CSS-Variablen für Spotlight
-      container.style.setProperty("--mouse-x", `${x}%`);
-      container.style.setProperty("--mouse-y", `${y}%`);
-
       // Tilt-Effekt: Subtile Neigung basierend auf Mausposition
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
@@ -71,11 +51,6 @@ export default function ScrollReveal3DGlass({
     };
 
     const handleMouseLeave = () => {
-      setMousePosition({ x: 50, y: 50 });
-      if (container) {
-        container.style.setProperty("--mouse-x", "50%");
-        container.style.setProperty("--mouse-y", "50%");
-      }
       if (cardRef.current) {
         cardRef.current.style.setProperty("--tilt-x", "0deg");
         cardRef.current.style.setProperty("--tilt-y", "0deg");
@@ -95,24 +70,10 @@ export default function ScrollReveal3DGlass({
     <div 
       ref={containerRef}
       className={`${className} card-interactive-container`}
+      style={{
+        '--accent-color': accentColor,
+      } as React.CSSProperties}
     >
-      {/* Spotlight-Glow Layer */}
-      <div 
-        className="card-spotlight"
-        style={{
-          background: `radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.08), transparent 70%)`,
-        }}
-      />
-      
-      {/* Gradient-Glow in Akzentfarbe - Bug 2 Fix: borderColor entfernt */}
-      <div 
-        className="card-accent-glow"
-        style={{
-          background: `radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), ${accentColor}15, transparent 60%)`,
-          // borderColor entfernt - verursachte sichtbaren Rahmen beim Einfliegen
-        }}
-      />
-      
       {/* Tilt-Container: Separater Layer für Mouse-Tilt, damit Scroll-Animation nicht gestört wird */}
       <div
         className="relative w-full h-full group/card card-tilt"

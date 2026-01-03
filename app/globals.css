@@ -283,9 +283,6 @@ body {
     /* 3D Perspective Container für Fluid Reveal Scroll-Animationen */
     /* CHROME FIX: perspective und preserve-3d entfernt - bricht backdrop-filter! */
     /* Die perspective wird jetzt direkt in den GSAP-Animationen auf Element-Ebene gesetzt */
-    .scroll-3d-container {
-      /* Keine perspective hier - wird von GSAP pro Element gesetzt */
-    }
     
     /* Verbessert das Subpixel-Rendering */
     #main-content {
@@ -325,10 +322,14 @@ body {
       /* WICHTIG: Kein will-change hier - wird dynamisch von GSAP gesetzt */
     }
     
-    /* Hover-Effekt für Glass Card */
+    /* Hover-Effekt für Glass Card - mit integriertem Glow */
     .group\/card:hover .glass-card-bg {
       border-color: rgba(255, 255, 255, 0.2);
       background: rgba(25, 25, 25, 0.75);
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.4),
+        0 0 40px -10px var(--accent-color, #FF5C00),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
@@ -451,41 +452,7 @@ body {
       perspective-origin: center center;
     }
     
-    /* Spotlight-Glow Layer - nur sichtbar wenn Card eingeflogen ist */
-    .card-spotlight {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      border-radius: 2rem;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      /* WICHTIG: Erbt Opacity vom Parent - wird automatisch versteckt wenn Card opacity: 0 */
-    }
-    
-    /* Spotlight nur anzeigen wenn Card sichtbar ist UND gehovered wird */
-    .card-interactive-container:hover .card-spotlight {
-      opacity: 1;
-    }
-    
-    /* Gradient-Glow in Akzentfarbe - nur sichtbar wenn Card Opacity > 0 */
-    .card-accent-glow {
-      position: absolute;
-      inset: -2px;
-      pointer-events: none;
-      z-index: 0;
-      border-radius: 2rem;
-      border: 1px solid transparent;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      mix-blend-mode: screen;
-      /* WICHTIG: Erbt Opacity vom Parent - wird automatisch versteckt wenn Card opacity: 0 */
-    }
-    
-    /* Glow nur anzeigen wenn Container sichtbar ist (Opacity > 0) UND gehovered wird */
-    .card-interactive-container:hover .card-accent-glow {
-      opacity: 1;
-    }
+    /* Glow-Effekte wurden direkt auf .glass-card-bg verschoben für konsistente Animation */
     
     /* Tilt-Effekt für 3D-Neigung */
     .card-tilt {
