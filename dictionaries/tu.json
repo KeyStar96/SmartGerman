@@ -241,6 +241,16 @@
         "desc": "İş ve günlük yaşamda güvenli performans."
       }
     },
+    "schedule": {
+      "title": "Başarıya Giden Yolunuz – Haftalık Program",
+      "subtitle": "Kursları görmek için bir gün seçin",
+      "open_button": "Haftalık Programı Aç",
+      "filter_all": "Tümü",
+      "filter_seniors": "Yaşlılar",
+      "instructor": "Eğitmen",
+      "no_courses": "Bu günde kurs yok",
+      "print_button": "Yazdırma Görünümü / PDF"
+    },
     "footer": {
       "rights": "© 2025 SmartGerman Hannover. Tüm hakları saklıdır.",
       "links": {

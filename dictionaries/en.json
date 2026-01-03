@@ -241,6 +241,16 @@
         "desc": "Confident performance in work and everyday life."
       }
     },
+    "schedule": {
+      "title": "Your Path to Success – The Weekly Schedule",
+      "subtitle": "Select a day to view the courses",
+      "open_button": "Open Weekly Schedule",
+      "filter_all": "All",
+      "filter_seniors": "Seniors",
+      "instructor": "Instructor",
+      "no_courses": "No courses on this day",
+      "print_button": "Print View / PDF"
+    },
     "footer": {
       "rights": "© 2025 SmartGerman Hannover. All rights reserved.",
       "links": {

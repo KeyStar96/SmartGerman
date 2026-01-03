@@ -241,6 +241,16 @@
         "desc": "Sicheres Auftreten im Beruf und Alltag."
       }
     },
+    "schedule": {
+      "title": "Dein Weg zum Erfolg – Der Wochenplan",
+      "subtitle": "Wähle einen Tag aus, um die Kurse zu sehen",
+      "open_button": "Wochenplan öffnen",
+      "filter_all": "Alle",
+      "filter_seniors": "Senioren",
+      "instructor": "Dozentin",
+      "no_courses": "Keine Kurse an diesem Tag",
+      "print_button": "Druckansicht / PDF"
+    },
     "footer": {
       "rights": "© 2025 SmartGerman Hannover. Alle Rechte vorbehalten.",
       "links": {
