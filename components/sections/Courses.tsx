@@ -2,7 +2,7 @@
 
 import React, { useRef, useMemo } from "react";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Users, MessageCircle, Laptop, GraduationCap } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
 
@@ -27,72 +27,42 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
   // WICHTIG: Wir nutzen gridRef für die Animation, damit es exakt wie bei Features ist
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // Icon-Mapping basierend auf dem icon-String aus dem Dictionary
+  const iconMap: Record<string, typeof Users> = {
+    Users,
+    MessageCircle,
+    Laptop,
+    GraduationCap,
+  };
+
   const courses = useMemo(() => {
-    // Bug 3 Fix: Korrekter Pfad zu sections.courses.items
+    // Korrekter Pfad zu sections.courses.items
     const coursesData = dictionary?.sections?.courses?.items;
     if (coursesData) {
-      return coursesData.map((item: any, index: number) => ({
-        id: item.level.toLowerCase(),
-        level: item.level,
-        title: item.title,
-        desc: item.description,
-        features: [],
-        price: item.price?.replace("€ ", "") || "299",
-        color: item.color || "#FF5C00",
-        watermark: item.level,
-        // Backface-Content für Flip-Animation - Bug 4: Beschreibung hinzugefügt
-        duration: item.duration || "8 Wochen",
-        focus: item.focus || "Grundlagen & Praxis",
-        start: item.start || "Flexibel",
-        backDescription: item.backDescription || item.description, // Fallback auf Vorderseite
-      }));
+      return coursesData.map((item: any, index: number) => {
+        // Icon aus dem Dictionary-String laden
+        const IconComponent = item.icon ? iconMap[item.icon] : undefined;
+        
+        return {
+          id: item.title?.toLowerCase().replace(/\s+/g, "-") || `course-${index}`,
+          title: item.title,
+          desc: item.description,
+          badge: item.badge || "Kurs",
+          price: item.price?.replace("€ ", "") || "0",
+          color: item.color || "#FF5C00",
+          watermark: item.title?.substring(0, 2) || String(index + 1).padStart(2, "0"),
+          icon: IconComponent,
+          // Backface-Content für Flip-Animation
+          duration: item.duration || "45 Min",
+          focus: item.focus || "Grundlagen",
+          start: item.start || "Flexibel",
+          backDescription: item.backDescription || item.description,
+        };
+      });
     }
     
-    // Fallback Mock Data - Bug 4: backDescription hinzugefügt
-    return [
-      {
-        id: "a1",
-        level: "A1",
-        title: "Anfänger",
-        desc: "Der ideale Einstieg ohne Vorkenntnisse.",
-        features: ["Grundlagen Grammatik", "Erste Gespräche", "Kulturelle Basics"],
-        price: "299",
-        color: "#FF5C00",
-        watermark: "01",
-        duration: "8 Wochen",
-        focus: "Grundlagen & erste Gespräche",
-        start: "Flexibel",
-        backDescription: "Lernen Sie die Grundlagen der deutschen Sprache in einer unterstützenden Umgebung.",
-      },
-      {
-        id: "a2",
-        level: "A2",
-        title: "Basiswissen",
-        desc: "Erweitern Sie Ihren Wortschatz für den Alltag.",
-        features: ["Alltagssituationen", "Briefe schreiben", "Flüssiger sprechen"],
-        price: "349",
-        color: "#00D9FF",
-        watermark: "02",
-        duration: "10 Wochen",
-        focus: "Alltagskommunikation",
-        start: "Flexibel",
-        backDescription: "Erweitern Sie Ihren Wortschatz und meistern Sie alltägliche Situationen souverän.",
-      },
-      {
-        id: "b1",
-        level: "B1",
-        title: "Fortgeschritten",
-        desc: "Selbstständige Sprachverwendung im Beruf.",
-        features: ["Business Deutsch", "Komplexe Texte", "Diskussionen"],
-        price: "399",
-        color: "#FF5C00",
-        watermark: "03",
-        duration: "12 Wochen",
-        focus: "Beruf & komplexe Themen",
-        start: "Flexibel",
-        backDescription: "Erreichen Sie ein solides Mittelstufenniveau für professionelle Gespräche.",
-      }
-    ];
+    // Fallback Mock Data (sollte normalerweise nicht verwendet werden)
+    return [];
   }, [dictionary]);
 
   // Expanding Button Component - Nur Expansion, keine magnetische Anziehung
@@ -151,7 +121,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
               <GlassCard
                 title={course.title}
                 description={course.desc}
-                badge={course.level}
+                badge={course.badge}
+                icon={course.icon}
                 color={course.color}
                 trigger={gridRef} 
                 watermark={course.watermark}
