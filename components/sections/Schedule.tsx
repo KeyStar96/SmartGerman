@@ -283,7 +283,7 @@ export default function Schedule({ dictionary, lang }: ScheduleProps) {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
-              transition={{ duration: 0.4, ease: "power3.out" }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
               className="fixed inset-4 md:inset-8 lg:inset-16 z-[101] 
                 bg-black/40 backdrop-blur-2xl
                 border border-white/10 rounded-[2rem]
