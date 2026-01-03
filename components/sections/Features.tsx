@@ -42,7 +42,8 @@ export default function Features({ dictionary }: FeaturesProps) {
     const clientWidth = container.clientWidth;
     
     // Berechne aktiven Index basierend auf Scroll-Position
-    const cardWidth = clientWidth * 0.8; // 80vw Kartenbreite
+    // Kartenbreite: 280px + 16px gap
+    const cardWidth = 296;
     const newIndex = Math.round(scrollLeft / cardWidth);
     setActiveIndex(Math.min(newIndex, 2)); // Max 3 Karten (0, 1, 2)
     
@@ -67,7 +68,8 @@ export default function Features({ dictionary }: FeaturesProps) {
   const scrollToCard = (index: number) => {
     if (!gridRef.current) return;
     const container = gridRef.current;
-    const cardWidth = container.clientWidth * 0.8;
+    // Kartenbreite: 280px + 16px gap
+    const cardWidth = 296;
     container.scrollTo({
       left: index * cardWidth,
       behavior: "smooth"
@@ -214,7 +216,7 @@ export default function Features({ dictionary }: FeaturesProps) {
             className="
               flex md:grid
               md:grid-cols-3
-              gap-6 md:gap-8 items-stretch
+              gap-4 md:gap-8 items-stretch
               overflow-x-auto md:overflow-x-visible
               snap-x snap-mandatory md:snap-none
               -mx-4 px-4 md:mx-0 md:px-0
@@ -233,7 +235,9 @@ export default function Features({ dictionary }: FeaturesProps) {
                   <div 
                     key={index} 
                     className="
-                      h-full min-w-[80vw] md:min-w-0
+                      min-h-[320px] md:min-h-0
+                      w-[280px] md:w-auto
+                      min-w-[280px] md:min-w-0
                       snap-center snap-always
                       flex-shrink-0 md:flex-shrink
                     "
@@ -246,6 +250,7 @@ export default function Features({ dictionary }: FeaturesProps) {
                       color={feature.color}
                       trigger={gridRef}
                       inverted={index % 2 === 0}
+                      className="h-full"
                     />
                   </div>
                 );
