@@ -659,10 +659,10 @@ export default function GlassCard({
                   const formatted = formatLessonBlock(backfaceContent.lessonBlock);
                   return formatted ? (
                     <div>
-                      <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                      <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                         {backfaceLabels?.unit || "EINHEIT"}
                       </span>
-                      <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight`}>
+                      <p className={`${jetBrainsMono.className} text-[13px] font-bold text-white leading-tight`}>
                         {formatted}
                       </p>
                     </div>
@@ -671,10 +671,10 @@ export default function GlassCard({
                 
                 {/* Spalte 2: GRUPPE */}
                 <div>
-                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                  <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                     {backfaceLabels?.group || "GRUPPE"}
                   </span>
-                  <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight`}>
+                  <p className={`${jetBrainsMono.className} text-[13px] font-bold text-white leading-tight`}>
                     {backfaceContent?.participants || "Max. 20"}
                   </p>
                 </div>
@@ -684,10 +684,10 @@ export default function GlassCard({
               <div className="backface-item grid grid-cols-2 gap-x-4 gap-y-2 flex-shrink-0">
                 {/* STANDORT */}
                 <div>
-                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                  <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                     {backfaceLabels?.location || "STANDORT"}
                   </span>
-                  <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight whitespace-nowrap`}>
+                  <p className={`${jetBrainsMono.className} text-[13px] font-bold text-white leading-tight whitespace-nowrap`}>
                     {(() => {
                       const badgeLower = badge?.toLowerCase() || "";
                       // Prüfe auf Online-Varianten in verschiedenen Sprachen
@@ -702,10 +702,10 @@ export default function GlassCard({
                 
                 {/* VERTRAG */}
                 <div>
-                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                  <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                     {backfaceLabels?.contract || "VERTRAG"}
                   </span>
-                  <p className={`${jetBrainsMono.className} text-[12px] font-medium text-white leading-tight`}>
+                  <p className={`${jetBrainsMono.className} text-[13px] font-medium text-white leading-tight`}>
                     <span style={{ color }}>✓</span> {backfaceLabels?.monthly_cancellable_short || backfaceLabels?.monthly_cancellable?.replace("Monatlich", "Monatl.") || "Monatl. kündbar"}
                   </p>
                 </div>
@@ -713,10 +713,10 @@ export default function GlassCard({
               
               {/* Zeile 3: EXTRAS (ganzbreitig) */}
               <div className="backface-item flex-shrink-0">
-                <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                   {backfaceLabels?.extras || "EXTRAS"}
                 </span>
-                <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight`}>
+                <p className={`${jetBrainsMono.className} text-[13px] font-bold text-white leading-tight`}>
                   {backfaceLabels?.extras_short || "Inkl. Material & Telegram"}
                 </p>
               </div>
@@ -726,12 +726,12 @@ export default function GlassCard({
                 const appointments = parseAppointments(backfaceContent.start);
                 return appointments.length > 0 ? (
                   <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                       {backfaceLabels?.appointments || "TERMINE"}
                     </span>
                     <div className="space-y-0.5">
                       {appointments.map((appt, idx) => (
-                        <div key={idx} className={`${jetBrainsMono.className} text-[12px] leading-tight`}>
+                        <div key={idx} className={`${jetBrainsMono.className} text-[13px] leading-tight`}>
                           <span className="font-bold text-white">{appt.day}</span>
                           {appt.time && (
                             <>
@@ -745,10 +745,10 @@ export default function GlassCard({
                   </div>
                 ) : (
                   <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                       {backfaceLabels?.appointments || "TERMINE"}
                     </span>
-                    <p className={`${jetBrainsMono.className} text-[12px] font-bold text-white leading-tight break-words`}>
+                    <p className={`${jetBrainsMono.className} text-[13px] font-bold text-white leading-tight break-words`}>
                       {backfaceContent.start}
                     </p>
                   </div>
@@ -760,10 +760,10 @@ export default function GlassCard({
             {backfaceContent?.instructor && (
               <div className="absolute bottom-4 left-5 right-5 md:left-8 md:right-8 md:bottom-4 z-20 backface-item border-t border-white/10 pt-2">
                 <div className="flex flex-col gap-0.5">
-                  <span className={`${jetBrainsMono.className} text-[8px] font-bold uppercase tracking-widest text-white/40`}>
+                  <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40`}>
                     {backfaceLabels?.instructor || "DOZENTIN"}
                   </span>
-                  <p className="text-[12px] font-medium leading-tight" style={{ color }}>
+                  <p className="text-[13px] font-medium leading-tight" style={{ color }}>
                     {backfaceContent.instructor}
                   </p>
                 </div>
