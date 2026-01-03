@@ -301,44 +301,94 @@ body {
       display: none; /* Chrome/Safari */
     }
     
-    /* GLASS CARD BACKGROUND - CHROME FIX
-       position: absolute für korrekte Positionierung innerhalb der Card Faces
-       KEIN will-change - wird dynamisch von GSAP gesetzt
+    /* GLASS CARD BACKGROUND - CROSS-BROWSER FIX
+       Robuster Glass-Effekt der in Chrome, Safari & iOS funktioniert
+       Nutzt mehrere Techniken für konsistenten Look
     */
     .glass-card-bg {
       position: absolute;
       inset: 0;
-      /* Höhere Opazität als Fallback falls backdrop-filter nicht funktioniert */
-      background: rgba(20, 20, 20, 0.7);
-      /* backdrop-filter mit -webkit Prefix für Safari */
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      backdrop-filter: blur(20px) saturate(180%);
-      /* isolation erzwingt eigenen Compositing Layer */
-      isolation: isolate;
       z-index: 0;
       border-radius: 2rem;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-      /* Smooth transition für Hover-Effekte */
-      transition: all 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
-      /* WICHTIG: Kein will-change hier - wird dynamisch von GSAP gesetzt */
-    }
-    
-    /* Hover-Effekt für Glass Card - Border-Glow statt Shimmer */
-    .group\/card:hover .glass-card-bg {
-      /* Stärkerer Blur bei Hover */
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      backdrop-filter: blur(28px) saturate(200%);
-      /* Leuchtender Border mit Accent-Farbe */
-      border-color: var(--accent-color, #FF5C00);
-      border-width: 1px;
-      background: rgba(25, 25, 25, 0.8);
-      /* Subtiler Border-Glow */
+      overflow: hidden;
+      
+      /* Solider Hintergrund als Basis (funktioniert immer) */
+      background: linear-gradient(
+        135deg,
+        rgba(30, 30, 35, 0.92) 0%,
+        rgba(20, 20, 25, 0.95) 50%,
+        rgba(25, 25, 30, 0.93) 100%
+      );
+      
+      /* backdrop-filter als Enhancement (wenn unterstützt) */
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      backdrop-filter: blur(20px) saturate(150%);
+      
+      /* Border und Schatten */
+      border: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: 
         0 25px 50px -12px rgba(0, 0, 0, 0.5),
-        0 0 20px -5px var(--accent-color, #FF5C00),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      
+      /* Smooth transition */
       transition: all 0.4s ease;
+    }
+    
+    /* Noise-Textur für Glass-Effekt */
+    .glass-card-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 2rem;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* Innerer Glanz-Effekt (Glasreflexion) */
+    .glass-card-bg::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      border-radius: 2rem 2rem 50% 50%;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.06) 0%,
+        rgba(255, 255, 255, 0.02) 50%,
+        transparent 100%
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+    
+    /* Hover-Effekt für Glass Card - Border-Glow */
+    .group\/card:hover .glass-card-bg {
+      /* Leicht hellerer Hintergrund */
+      background: linear-gradient(
+        135deg,
+        rgba(35, 35, 40, 0.94) 0%,
+        rgba(25, 25, 30, 0.96) 50%,
+        rgba(30, 30, 35, 0.94) 100%
+      );
+      
+      /* Leuchtender Border mit Accent-Farbe */
+      border-color: var(--accent-color, #FF5C00);
+      
+      /* Border-Glow */
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.6),
+        0 0 25px -5px var(--accent-color, #FF5C00),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Verstärkte Noise bei Hover */
+    .group\/card:hover .glass-card-bg::before {
+      opacity: 0.04;
     }
     
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
