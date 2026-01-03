@@ -18,7 +18,7 @@ export default function ScrollReveal3DGlass({
 }: ScrollReveal3DGlassProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Hook steuert die Rotation des GESAMTEN Containers
+  // Hook steuert die Rotation des GESAMTEN Containers (inkl. Glass)
   useScrollReveal3D(cardRef, {
     trigger: trigger || undefined,
     z: -300, 
@@ -35,22 +35,7 @@ export default function ScrollReveal3DGlass({
         transformStyle: "preserve-3d",
       }}
     >
-      {/* GLASS LAYER - AUSSERHALB der 3D-Transform-Hierarchie für Chrome-Kompatibilität */}
-      <div 
-        className="absolute inset-0 rounded-[2rem] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-white/20"
-        style={{
-          // CHROME FIX: Höhere Opazität + isolation für backdrop-filter Kompatibilität
-          background: "rgba(255, 255, 255, 0.03)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          // Isolation verhindert, dass 3D-Transforms den Filter beeinflussen
-          isolation: "isolate",
-          zIndex: 0,
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
-        }}
-      />
-
-      {/* 3D ANIMATED CONTAINER */}
+      {/* 3D ANIMATED CONTAINER - Enthält Glass + Content */}
       <div
         ref={cardRef}
         className="relative w-full h-full group/card"
@@ -60,10 +45,31 @@ export default function ScrollReveal3DGlass({
           transform: "translate3d(0,0,0)", 
         }}
       >
+        {/* GLASS LAYER - INNERHALB des animierten Containers
+            transform-style: flat verhindert, dass backdrop-filter bricht
+        */}
+        <div 
+          className="absolute inset-0 rounded-[2rem] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-white/20"
+          style={{
+            background: "rgba(255, 255, 255, 0.03)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            // CHROME FIX: flat verhindert 3D-Transform Vererbung auf diesen Layer
+            transformStyle: "flat",
+            // Kein eigener Transform, nur vom Parent geerbt
+            zIndex: 0,
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
+          }}
+        />
+
         {/* CONTENT LAYER */}
         <div 
           className="relative h-full w-full overflow-hidden rounded-[2rem]"
-          style={{ zIndex: 10 }}
+          style={{ 
+            zIndex: 10,
+            // Content kann 3D haben
+            transformStyle: "preserve-3d",
+          }}
         >
           {children}
         </div>
