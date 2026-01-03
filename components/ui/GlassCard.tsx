@@ -12,24 +12,17 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export interface GlassCardProps {
-  // Content
   title: string;
   description: string;
-  children?: ReactNode; // Für zusätzlichen Content (z.B. Features-Liste)
-  
-  // Visual
-  color: string; // z.B. "#FF5C00"
-  icon?: LucideIcon; // Nur für Features verwendet
-  badge?: string; // z.B. "A1", "A2" für Level-Badges
-  watermark?: string; // Für großes Watermark-Text (z.B. "01", "02")
-  
-  // Layout
+  children?: ReactNode;
+  color: string;
+  icon?: LucideIcon;
+  badge?: string;
+  watermark?: string;
   className?: string;
   trigger?: React.RefObject<HTMLElement>;
   inverted?: boolean;
-  
-  // Spotlight
-  spotlightClassName?: string; // Für spezifische Spotlight-Klassen
+  spotlightClassName?: string;
 }
 
 export default function GlassCard({
@@ -45,76 +38,56 @@ export default function GlassCard({
   inverted = true,
   spotlightClassName = "glass-card-spotlight",
 }: GlassCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    cardRef.current.style.setProperty("--mouse-x", `${x}px`);
-    cardRef.current.style.setProperty("--mouse-y", `${y}px`);
-  };
-
+  
   return (
     <ScrollReveal3DGlass 
-      trigger={trigger}
+      trigger={trigger} 
       inverted={inverted}
-      className={`h-full ${className}`}
+      className={className}
     >
-      <div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        className={`${spotlightClassName} group relative h-full flex flex-col p-8 md:p-10`}
-      >
-        {/* Spotlight Border - folgt der Maus (nur dieser Effekt bleibt) */}
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-[2rem]"
-          style={{
-            background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), ${color}20, transparent 40%)`,
-          }}
-        />
+      {/* DER CONTAINER - Hier liegt die Magie für Chrome.
+         group/card steuert Hover-Effekte.
+      */}
+      <div className="relative w-full h-full group/card rounded-[2rem] overflow-hidden">
+        
+        {/* 1. GLASS LAYER (Background + Blur) */}
+        <div className="absolute inset-0 glass-panel transition-all duration-500 rounded-[2rem]" />
 
-        {/* Watermark Text (optional) - Für Courses mit großem Level */}
-        {watermark && (
-          <div 
-            className={`${jetBrainsMono.className} absolute -right-4 -top-4 text-[160px] font-bold leading-none select-none pointer-events-none transition-transform duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:scale-105`}
-            style={{
-              color: "transparent",
-              WebkitTextStroke: `1px ${color}15`,
-            }}
-          >
-            {watermark}
-          </div>
-        )}
+        {/* 2. NOISE TEXTURE (Awwwards Style) */}
+        <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
 
-        {/* Watermark Icon (optional) - Nur für Features */}
-        {Icon && !watermark && (
-          <Icon 
-            className="absolute -right-8 -bottom-8 text-white/[0.02] transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none"
-            size={200}
-            strokeWidth={1}
-          />
-        )}
+        {/* 3. SPOTLIGHT (Optional, bewegt sich oder statisch) */}
+        <div className={`absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none ${spotlightClassName}`} />
 
-        {/* Content (Vordergrund) */}
-        <div className="relative z-10 flex flex-col h-full">
-          {/* Header: Icon oder Badge */}
-          <div className="flex justify-between items-start mb-6">
-            {/* Icon Box - Nur für Features */}
+        {/* 4. CONTENT */}
+        <div className="relative z-10 p-8 h-full flex flex-col">
+          
+          {/* Watermark (Groß im Hintergrund) */}
+          {watermark && (
+            <div 
+              className={`${jetBrainsMono.className} absolute top-4 right-6 text-[8rem] leading-none font-bold opacity-[0.03] select-none pointer-events-none transition-transform duration-700 group-hover/card:scale-110 group-hover/card:rotate-3`}
+              style={{ color: color }}
+            >
+              {watermark}
+            </div>
+          )}
+
+          {/* Header Area */}
+          <div className="flex items-start justify-between mb-6">
+            {/* Icon Box (Features) */}
             {Icon && (
               <div 
-                className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500"
+                className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500 shadow-lg backdrop-blur-sm"
                 style={{ color }}
               >
                 <Icon size={32} strokeWidth={1.5} />
               </div>
             )}
             
-            {/* Badge - Für Courses Level */}
+            {/* Badge (Courses) */}
             {badge && (
               <span 
-                className={`${jetBrainsMono.className} text-xs font-bold tracking-widest px-3 py-1.5 rounded-full border bg-transparent group-hover:bg-white/5 transition-all duration-300`}
+                className={`${jetBrainsMono.className} text-xs font-bold tracking-widest px-3 py-1.5 rounded-full border bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300`}
                 style={{ 
                   color,
                   borderColor: `${color}40`,
@@ -126,18 +99,18 @@ export default function GlassCard({
           </div>
 
           {/* Title */}
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:translate-x-1 transition-transform duration-300">
+          <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 group-hover:translate-x-1 transition-transform duration-300 drop-shadow-lg">
             {title}
           </h3>
           
           {/* Description */}
-          <p className="text-white/60 leading-relaxed mb-6 flex-grow">
+          <p className="text-white/70 leading-relaxed mb-6 flex-grow font-light">
             {description}
           </p>
 
-          {/* Additional Content (z.B. Features-Liste, Price Footer) */}
+          {/* Footer Area */}
           {children && (
-            <div className="mt-auto">
+            <div className="mt-auto pt-4 border-t border-white/5">
               {children}
             </div>
           )}

@@ -2,7 +2,7 @@
 
 import React, { useRef, useMemo } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
 
@@ -24,10 +24,9 @@ interface CoursesProps {
 }
 
 export default function Courses({ dictionary, lang }: CoursesProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  // WICHTIG: Wir nutzen gridRef für die Animation, damit es exakt wie bei Features ist
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Course Data - nutzt Dictionary falls verfügbar, sonst Fallback
   const courses = useMemo(() => {
     if (dictionary?.sections?.courses?.items) {
       return dictionary.sections.courses.items.map((item: any, index: number) => ({
@@ -38,8 +37,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         features: [],
         price: item.price?.replace("€ ", "") || "299",
         color: item.color || "#FF5C00",
-        // Watermark: 01, 02, 03...
-        watermark: String(index + 1).padStart(2, "0"),
+        // HIER GEÄNDERT: Watermark ist jetzt das Level (z.B. "A1") statt Index
+        watermark: item.level, 
       }));
     }
     
@@ -79,79 +78,47 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
   }, [dictionary]);
 
   return (
-    <section 
-      ref={containerRef}
-      className="relative w-full py-32 overflow-hidden"
-    >
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="relative w-full py-24 md:py-32 overflow-hidden">
+      <div className="container relative z-10 mx-auto px-4 md:px-6">
         
-        {/* Section Header */}
-        <div className="mb-24 text-center max-w-3xl mx-auto">
-          <span className="inline-block py-1 px-3 rounded-full border border-white/10 bg-white/5 text-xs font-medium tracking-widest uppercase text-white/70 mb-6 backdrop-blur-md">
-            {dictionary?.sections?.courses?.badge || "Ausbildungsweg"}
+        {/* Header */}
+        <div className="max-w-2xl mb-16 md:mb-24">
+          <span className={`${jetBrainsMono.className} text-[#FF5C00] text-sm tracking-widest uppercase mb-4 block`}>
+            {dictionary?.sections?.courses?.overline || "Curriculum"}
           </span>
-          <h2 className="text-4xl md:text-6xl font-medium mb-6 leading-tight text-white">
-            {dictionary?.sections?.courses?.title_part1 || "Wähle dein"} <br/>
-            <span className={`${instrumentSerif.className} text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50`}>
-              {dictionary?.sections?.courses?.title_part2 || "Sprachniveau"}
+          <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
+            {dictionary?.sections?.courses?.title_part1 || "Master the"}{" "}
+            <span className={`${instrumentSerif.className} text-[#FF5C00]`}>
+              {dictionary?.sections?.courses?.title_part2 || "Language"}
             </span>
           </h2>
+          <p className="text-lg text-white/60 leading-relaxed">
+            {dictionary?.sections?.courses?.intro}
+          </p>
         </div>
 
-        {/* Grid - Desktop: Grid, Mobile: Horizontal Scroll-Snap */}
+        {/* Grid - Identische Struktur wie Features für konsistente Animation */}
         <div 
           ref={gridRef}
-          className="
-            flex md:grid
-            md:grid-cols-3
-            gap-8 items-stretch
-            overflow-x-auto md:overflow-x-visible
-            snap-x snap-mandatory md:snap-none
-            -mx-4 px-4 md:mx-0 md:px-0
-            hide-scrollbar
-          "
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
         >
-          {courses.map((course, index) => (
-            <div 
-              key={course.id} 
-              className="
-                h-full min-h-[500px] min-w-[85vw] md:min-w-0
-                snap-center snap-always
-                flex-shrink-0 md:flex-shrink
-              "
-            >
+          {courses.map((course: any, index: number) => (
+            <div key={course.id} className="h-full min-h-[400px]">
               <GlassCard
-                title={`Deutsch ${course.level}`}
+                title={course.title}
                 description={course.desc}
                 badge={course.level}
                 color={course.color}
+                // HIER GEÄNDERT: Trigger ist jetzt gridRef (wie Features)
+                trigger={gridRef} 
                 watermark={course.watermark}
-                trigger={gridRef}
                 inverted={index % 2 === 0}
-                spotlightClassName="course-card-spotlight"
               >
-                {/* Features List */}
-                {course.features.length > 0 && (
-                  <>
-                    <div className="h-px w-full bg-gradient-to-r from-white/10 to-transparent mb-6" />
-                    <ul className="space-y-4 mb-auto">
-                      {course.features.map((feature: string, i: number) => (
-                        <li key={i} className="flex items-center text-sm text-white/80">
-                          <span className="mr-3 flex items-center justify-center w-5 h-5 rounded-full bg-white/5 text-white/40">
-                            <Check size={12} />
-                          </span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-
-                {/* Footer: Price & Action */}
-                <div className="mt-8 pt-6 flex items-end justify-between border-t border-white/5">
-                  <div>
-                    <span className="block text-xs uppercase text-white/40 mb-1 tracking-wider">
-                      {dictionary?.sections?.courses?.price_label || "Investition"}
+                {/* Price & CTA */}
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-white/40 uppercase tracking-wider mb-1">
+                      {dictionary?.sections?.courses?.price_label || "Invest"}
                     </span>
                     <div className="flex items-baseline">
                       <span className="text-lg text-white/60 mr-1">€</span>
