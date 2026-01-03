@@ -125,6 +125,8 @@
     "courses": {
       "title": "Unsere Kurse",
       "subtitle": "Vom Anfänger bis zum Profi – wir haben den richtigen Kurs für dich.",
+      "flip_hint": "KLICK ZUM DREHEN",
+      "back_hint": "ZURÜCK",
       "a1": {
         "name": "A1 Anfänger",
         "desc": "Der ideale Einstieg ohne Vorkenntnisse."

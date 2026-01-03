@@ -125,6 +125,8 @@
     "courses": {
       "title": "Kurslarımız",
       "subtitle": "Başlangıçtan profesyonele – sizin için doğru kursa sahibiz.",
+      "flip_hint": "ÇEVİRMEK İÇİN TIKLA",
+      "back_hint": "GERİ",
       "a1": {
         "name": "A1 Başlangıç",
         "desc": "Ön bilgi olmadan ideal başlangıç."
