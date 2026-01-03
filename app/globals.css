@@ -536,9 +536,27 @@ body {
       transform: rotateY(180deg) translateZ(1px);
     }
     
+    /* Bug 1 Fix: Simple Card ohne Flip-Animation - für Feature-Karten */
+    .card-simple-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .card-face-simple {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 2rem;
+      overflow: hidden;
+      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+    }
+    
     
     /* Shimmer-Effekt: Diagonaler Lichtstreifen bei Hover */
-    .card-face-front::before {
+    .card-face-front::before,
+    .card-face-back::before,
+    .card-face-simple::before {
       content: "";
       position: absolute;
       top: -50%;
@@ -557,7 +575,9 @@ body {
       z-index: 20;
     }
     
-    .card-interactive-container:hover .card-face-front::before {
+    .card-interactive-container:hover .card-face-front::before,
+    .card-interactive-container:hover .card-face-back::before,
+    .card-interactive-container:hover .card-face-simple::before {
       transform: translateX(100%) translateY(100%) rotate(45deg);
     }
     

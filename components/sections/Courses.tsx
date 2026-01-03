@@ -29,8 +29,10 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
   const gridRef = useRef<HTMLDivElement>(null);
 
   const courses = useMemo(() => {
-    if (dictionary?.courses?.items) {
-      return dictionary.courses.items.map((item: any, index: number) => ({
+    // Bug 3 Fix: Korrekter Pfad zu sections.courses.items
+    const coursesData = dictionary?.sections?.courses?.items;
+    if (coursesData) {
+      return coursesData.map((item: any, index: number) => ({
         id: item.level.toLowerCase(),
         level: item.level,
         title: item.title,
@@ -39,14 +41,15 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         price: item.price?.replace("€ ", "") || "299",
         color: item.color || "#FF5C00",
         watermark: item.level,
-        // Backface-Content für Flip-Animation
+        // Backface-Content für Flip-Animation - Bug 4: Beschreibung hinzugefügt
         duration: item.duration || "8 Wochen",
         focus: item.focus || "Grundlagen & Praxis",
         start: item.start || "Flexibel",
+        backDescription: item.backDescription || item.description, // Fallback auf Vorderseite
       }));
     }
     
-    // Fallback Mock Data
+    // Fallback Mock Data - Bug 4: backDescription hinzugefügt
     return [
       {
         id: "a1",
@@ -57,6 +60,10 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         price: "299",
         color: "#FF5C00",
         watermark: "01",
+        duration: "8 Wochen",
+        focus: "Grundlagen & erste Gespräche",
+        start: "Flexibel",
+        backDescription: "Lernen Sie die Grundlagen der deutschen Sprache in einer unterstützenden Umgebung.",
       },
       {
         id: "a2",
@@ -67,6 +74,10 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         price: "349",
         color: "#00D9FF",
         watermark: "02",
+        duration: "10 Wochen",
+        focus: "Alltagskommunikation",
+        start: "Flexibel",
+        backDescription: "Erweitern Sie Ihren Wortschatz und meistern Sie alltägliche Situationen souverän.",
       },
       {
         id: "b1",
@@ -77,20 +88,46 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         price: "399",
         color: "#FF5C00",
         watermark: "03",
+        duration: "12 Wochen",
+        focus: "Beruf & komplexe Themen",
+        start: "Flexibel",
+        backDescription: "Erreichen Sie ein solides Mittelstufenniveau für professionelle Gespräche.",
       }
     ];
   }, [dictionary]);
 
-  // Magnetic Button Component
+  // Magnetic Button Component - Bug 6 Fix: Kein Zittern bei Hover
   function MagneticButton({ href, label }: { href: string; label: string }) {
     const buttonRef = useRef<HTMLAnchorElement>(null);
+    const isHoveredRef = useRef(false); // Verhindert Zittern wenn Button gehovered ist
+    const initialRectRef = useRef<DOMRect | null>(null); // Speichert initiale Position
 
     useEffect(() => {
       const button = buttonRef.current;
       if (!button) return;
 
+      const handleMouseEnterButton = () => {
+        isHoveredRef.current = true;
+        // Stoppe Animation und setze Button auf finale Position
+        gsap.killTweensOf(button);
+        gsap.set(button, { x: 0, y: 0 });
+      };
+
+      const handleMouseLeaveButton = () => {
+        isHoveredRef.current = false;
+        initialRectRef.current = null; // Reset initiale Rect
+      };
+
       const handleMouseMove = (e: MouseEvent) => {
-        const rect = button.getBoundingClientRect();
+        // Bug 6 Fix: Keine Magnetic-Animation wenn Button bereits gehovered ist
+        if (isHoveredRef.current) return;
+        
+        // Nutze initiale Rect für stabile Berechnung
+        if (!initialRectRef.current) {
+          initialRectRef.current = button.getBoundingClientRect();
+        }
+        const rect = initialRectRef.current;
+        
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         
@@ -98,11 +135,11 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         const mouseY = e.clientY - centerY;
         const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
         
-        // Magnetic-Effekt im Umkreis von 100px (verstärkt)
+        // Magnetic-Effekt im Umkreis von 100px
         if (distance < 100) {
           const strength = (100 - distance) / 100; // 0-1
-          const moveX = mouseX * strength * 0.5; // Max 50% Verschiebung (verstärkt)
-          const moveY = mouseY * strength * 0.5;
+          const moveX = mouseX * strength * 0.4; // Leicht reduziert für Stabilität
+          const moveY = mouseY * strength * 0.4;
           
           gsap.to(button, {
             x: moveX,
@@ -117,10 +154,12 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
             duration: 0.5,
             ease: "power2.out",
           });
+          initialRectRef.current = null; // Reset wenn außerhalb
         }
       };
 
       const handleMouseLeave = () => {
+        initialRectRef.current = null;
         gsap.to(button, {
           x: 0,
           y: 0,
@@ -129,6 +168,10 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         });
       };
 
+      // Event-Listener auf dem Button selbst für Hover-Detection
+      button.addEventListener("mouseenter", handleMouseEnterButton);
+      button.addEventListener("mouseleave", handleMouseLeaveButton);
+
       // Event-Listener auf dem Parent-Container (Card)
       const cardContainer = button.closest(".card-interactive-container");
       if (cardContainer) {
@@ -136,6 +179,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         cardContainer.addEventListener("mouseleave", handleMouseLeave);
         
         return () => {
+          button.removeEventListener("mouseenter", handleMouseEnterButton);
+          button.removeEventListener("mouseleave", handleMouseLeaveButton);
           cardContainer.removeEventListener("mousemove", handleMouseMove);
           cardContainer.removeEventListener("mouseleave", handleMouseLeave);
         };
@@ -162,16 +207,16 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
     <section className="relative w-full py-24 md:py-32 overflow-hidden">
       <div className="container relative z-10 mx-auto px-4 md:px-6">
         
-        {/* Header - Zentriert */}
+        {/* Header - Zentriert - Bug 3 Fix: Korrekter Dictionary-Pfad */}
         <div className="max-w-2xl mx-auto text-center mb-16 md:mb-24">
           <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
-            {dictionary?.courses?.title_part1 || "Master the"}{" "}
+            {dictionary?.sections?.courses?.title_part1 || "Unsere"}{" "}
             <span className={`${instrumentSerif.className} text-[#FF5C00]`}>
-              {dictionary?.courses?.title_part2 || "Language"}
+              {dictionary?.sections?.courses?.title_part2 || "Kurse"}
             </span>
           </h2>
           <p className="text-lg text-white/60 leading-relaxed">
-            {dictionary?.courses?.intro}
+            {dictionary?.sections?.courses?.intro}
           </p>
         </div>
 
@@ -194,6 +239,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                   duration: course.duration,
                   focus: course.focus,
                   start: course.start,
+                  description: course.backDescription, // Bug 4: Beschreibung für Rückseite
                 }}
               >
                 {/* Price & CTA */}

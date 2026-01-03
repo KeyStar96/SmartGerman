@@ -104,12 +104,12 @@ export default function ScrollReveal3DGlass({
         }}
       />
       
-      {/* Gradient-Glow in Akzentfarbe */}
+      {/* Gradient-Glow in Akzentfarbe - Bug 2 Fix: borderColor entfernt */}
       <div 
         className="card-accent-glow"
         style={{
           background: `radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), ${accentColor}15, transparent 60%)`,
-          borderColor: accentColor,
+          // borderColor entfernt - verursachte sichtbaren Rahmen beim Einfliegen
         }}
       />
       

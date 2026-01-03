@@ -29,6 +29,7 @@ export interface GlassCardProps {
     duration?: string;
     focus?: string;
     start?: string;
+    description?: string; // Bug 4: Beschreibung für Rückseite
   };
 }
 
@@ -223,6 +224,9 @@ export default function GlassCard({
     });
   }, [title, description, color, Icon, badge, watermark, backfaceContent, children]);
 
+  // Bug 1: Wenn kein backfaceContent, nutze einfaches Layout ohne absolute Positioning
+  const hasBackface = !!backfaceContent;
+
   return (
     <ScrollReveal3DGlass 
       trigger={trigger} 
@@ -232,12 +236,12 @@ export default function GlassCard({
     >
       <div 
         ref={flipContainerRef}
-        className="card-flip-container"
+        className={hasBackface ? "card-flip-container" : "card-simple-container"}
         onClick={handleCardClick}
-        style={{ cursor: backfaceContent ? "pointer" : "default" }}
+        style={{ cursor: hasBackface ? "pointer" : "default" }}
       >
         {/* Glow-Effekt während Flip - nur wenn backfaceContent vorhanden */}
-        {backfaceContent && (
+        {hasBackface && (
           <div 
             ref={flipGlowRef}
             className="card-flip-glow"
@@ -250,7 +254,7 @@ export default function GlassCard({
         {/* Front Face */}
         <div 
           ref={frontFaceRef}
-          className="card-face card-face-front"
+          className={hasBackface ? "card-face card-face-front" : "card-face-simple"}
         >
           {/* glass-card-bg für Front Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
@@ -304,7 +308,7 @@ export default function GlassCard({
         </div>
 
         {/* Back Face - nur wenn backfaceContent vorhanden */}
-        {backfaceContent && (
+        {hasBackface && (
         <div 
           ref={backFaceRef}
           className="card-face card-face-back"
@@ -315,6 +319,13 @@ export default function GlassCard({
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
             <div className="relative z-10 space-y-6">
+              {/* Bug 4: Beschreibung auf Rückseite */}
+              {backfaceContent?.description && (
+                <div className="space-y-2">
+                  <p className="text-base text-white/70 leading-relaxed max-w-xs">{backfaceContent.description}</p>
+                </div>
+              )}
+              
               {backfaceContent?.duration && (
                 <div className="space-y-2">
                   <span className={`${jetBrainsMono.className} text-xs uppercase tracking-widest text-white/40`}>
@@ -339,13 +350,6 @@ export default function GlassCard({
                     Start
                   </span>
                   <p className="text-xl font-semibold text-white">{backfaceContent.start}</p>
-                </div>
-              )}
-
-              {!backfaceContent && (
-                <div className="space-y-4">
-                  <p className="text-white/60">Weitere Informationen</p>
-                  <p className="text-sm text-white/40">Klicken Sie erneut, um zurückzukehren</p>
                 </div>
               )}
             </div>

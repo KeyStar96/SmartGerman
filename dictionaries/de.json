@@ -73,6 +73,9 @@
           "description": "Der ideale Einstieg ohne Vorkenntnisse. Lerne die Grundlagen der deutschen Sprache in einer unterstützenden Umgebung.",
           "price": "€ 299",
           "duration": "8 Wochen",
+          "focus": "Grundlagen & erste Gespräche",
+          "start": "Flexibel",
+          "backDescription": "Lernen Sie die Grundlagen: Alphabet, Zahlen, Begrüßungen und einfache Sätze für den Alltag.",
           "color": "#FF5C00"
         },
         {
@@ -81,6 +84,9 @@
           "description": "Baue auf deinen Grundkenntnissen auf und erweitere deinen Wortschatz für alltägliche Situationen.",
           "price": "€ 349",
           "duration": "10 Wochen",
+          "focus": "Alltagskommunikation",
+          "start": "Flexibel",
+          "backDescription": "Erweitern Sie Ihren Wortschatz und meistern Sie alltägliche Situationen wie Einkaufen und Termine.",
           "color": "#00D9FF"
         },
         {
@@ -89,6 +95,9 @@
           "description": "Erreiche ein solides Mittelstufenniveau und gewinne Sicherheit in beruflichen und privaten Gesprächen.",
           "price": "€ 399",
           "duration": "12 Wochen",
+          "focus": "Beruf & komplexe Themen",
+          "start": "Flexibel",
+          "backDescription": "Führen Sie selbstständige Gespräche über Beruf, Reisen und aktuelle Themen.",
           "color": "#FF5C00"
         },
         {
@@ -97,6 +106,9 @@
           "description": "Sicheres Auftreten im Beruf und Alltag. Perfektioniere deine Sprachkenntnisse auf fortgeschrittenem Niveau.",
           "price": "€ 449",
           "duration": "14 Wochen",
+          "focus": "Fließende Kommunikation",
+          "start": "Flexibel",
+          "backDescription": "Perfektionieren Sie Ihr Deutsch für anspruchsvolle berufliche und akademische Situationen.",
           "color": "#00D9FF"
         }
       ]

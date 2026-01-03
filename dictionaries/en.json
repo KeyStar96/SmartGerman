@@ -73,6 +73,9 @@
           "description": "The ideal start without prior knowledge. Learn the basics of the German language in a supportive environment.",
           "price": "€ 299",
           "duration": "8 Weeks",
+          "focus": "Basics & first conversations",
+          "start": "Flexible",
+          "backDescription": "Learn the basics: alphabet, numbers, greetings and simple sentences for everyday life.",
           "color": "#FF5C00"
         },
         {
@@ -81,6 +84,9 @@
           "description": "Build on your basic knowledge and expand your vocabulary for everyday situations.",
           "price": "€ 349",
           "duration": "10 Weeks",
+          "focus": "Everyday communication",
+          "start": "Flexible",
+          "backDescription": "Expand your vocabulary and master everyday situations like shopping and appointments.",
           "color": "#00D9FF"
         },
         {
@@ -89,6 +95,9 @@
           "description": "Reach a solid intermediate level and gain confidence in professional and private conversations.",
           "price": "€ 399",
           "duration": "12 Weeks",
+          "focus": "Work & complex topics",
+          "start": "Flexible",
+          "backDescription": "Have independent conversations about work, travel and current topics.",
           "color": "#FF5C00"
         },
         {
@@ -97,6 +106,9 @@
           "description": "Confident performance in work and everyday life. Perfect your language skills at an advanced level.",
           "price": "€ 449",
           "duration": "14 Weeks",
+          "focus": "Fluent communication",
+          "start": "Flexible",
+          "backDescription": "Perfect your German for demanding professional and academic situations.",
           "color": "#00D9FF"
         }
       ]

@@ -73,6 +73,9 @@
           "description": "Ön bilgi olmadan ideal başlangıç. Destekleyici bir ortamda Almanca dilinin temellerini öğrenin.",
           "price": "€ 299",
           "duration": "8 Hafta",
+          "focus": "Temel ve ilk konuşmalar",
+          "start": "Esnek",
+          "backDescription": "Temelleri öğrenin: alfabe, sayılar, selamlaşmalar ve günlük yaşam için basit cümleler.",
           "color": "#FF5C00"
         },
         {
@@ -81,6 +84,9 @@
           "description": "Temel bilgilerinizin üzerine inşa edin ve günlük durumlar için kelime dağarcığınızı genişletin.",
           "price": "€ 349",
           "duration": "10 Hafta",
+          "focus": "Günlük iletişim",
+          "start": "Esnek",
+          "backDescription": "Kelime dağarcığınızı genişletin ve alışveriş ve randevular gibi günlük durumları ustaca yönetin.",
           "color": "#00D9FF"
         },
         {
@@ -89,6 +95,9 @@
           "description": "Sağlam bir orta seviyeye ulaşın ve profesyonel ve özel konuşmalarda güven kazanın.",
           "price": "€ 399",
           "duration": "12 Hafta",
+          "focus": "İş ve karmaşık konular",
+          "start": "Esnek",
+          "backDescription": "İş, seyahat ve güncel konular hakkında bağımsız konuşmalar yapın.",
           "color": "#FF5C00"
         },
         {
@@ -97,6 +106,9 @@
           "description": "İş ve günlük yaşamda güvenli performans. Dil becerilerinizi ileri seviyede mükemmelleştirin.",
           "price": "€ 449",
           "duration": "14 Hafta",
+          "focus": "Akıcı iletişim",
+          "start": "Esnek",
+          "backDescription": "Zorlu profesyonel ve akademik durumlar için Almanca'nızı mükemmelleştirin.",
           "color": "#00D9FF"
         }
       ]
