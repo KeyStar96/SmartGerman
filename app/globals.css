@@ -258,6 +258,28 @@ body {
       display: none; /* Chrome/Safari */
     }
     
+    /* GLASS CARD BACKGROUND - CHROME FIX
+       position: relative erzwingt einen neuen Stacking Context
+       Das hilft Chrome, backdrop-filter korrekt zu rendern
+    */
+    .glass-card-bg {
+      position: relative;
+      /* Höhere Opazität als Fallback falls backdrop-filter nicht funktioniert */
+      background: rgba(20, 20, 20, 0.7);
+      /* backdrop-filter mit -webkit Prefix für Safari */
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      backdrop-filter: blur(20px) saturate(180%);
+      /* isolation erzwingt eigenen Compositing Layer */
+      isolation: isolate;
+      z-index: 0;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Hover-Effekt für Glass Card */
+    .group\/card:hover .glass-card-bg {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
     .laser-text {
       position: relative;

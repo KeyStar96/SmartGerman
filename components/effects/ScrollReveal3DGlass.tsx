@@ -30,35 +30,22 @@ export default function ScrollReveal3DGlass({
   return (
     <div
       className={className}
-      style={{
-        perspective: "1500px",
-        // KEIN preserve-3d auf diesem Level - sonst bricht Chrome backdrop-filter
-      }}
+      style={{ perspective: "1500px" }}
     >
       {/* 3D ANIMATED CONTAINER - Enthält Glass + Content */}
       <div
         ref={cardRef}
         className="relative w-full h-full group/card"
         style={{
-          // KEIN will-change hier - wird dynamisch von GSAP gesetzt
-          // KEIN preserve-3d hier - wir nutzen nur transform für die Animation
           transform: "translate3d(0,0,0)", 
           backfaceVisibility: "hidden",
         }}
       >
-        {/* GLASS LAYER mit backdrop-filter
-            isolation: isolate erzwingt eigenen Stacking Context für Chrome
+        {/* GLASS LAYER - CHROME FIX: 
+            position: relative + höhere Opazität + isolation
         */}
         <div 
-          className="absolute inset-0 rounded-[2rem] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-white/20"
-          style={{
-            background: "rgba(255, 255, 255, 0.03)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            isolation: "isolate",
-            zIndex: 0,
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
-          }}
+          className="glass-card-bg absolute inset-0 rounded-[2rem] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-white/20"
         />
 
         {/* CONTENT LAYER */}

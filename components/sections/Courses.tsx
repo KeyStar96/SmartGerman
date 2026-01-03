@@ -25,6 +25,7 @@ interface CoursesProps {
 
 export default function Courses({ dictionary, lang }: CoursesProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Course Data - nutzt Dictionary falls verfügbar, sonst Fallback
   const courses = useMemo(() => {
@@ -99,6 +100,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
 
         {/* Grid - Desktop: Grid, Mobile: Horizontal Scroll-Snap */}
         <div 
+          ref={gridRef}
           className="
             flex md:grid
             md:grid-cols-3
@@ -124,7 +126,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                 badge={course.level}
                 color={course.color}
                 watermark={course.watermark}
-                trigger={containerRef}
+                trigger={gridRef}
                 inverted={index % 2 === 0}
                 spotlightClassName="course-card-spotlight"
               >
