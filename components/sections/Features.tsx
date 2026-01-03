@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useMemo, useEffect } from "react";
-import { UserCheck, Clock, Target } from "lucide-react";
+import React, { useRef, useMemo, useEffect, useState, useCallback } from "react";
+import { UserCheck, Clock, Target, ChevronLeft, ChevronRight } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif } from "next/font/google";
 import { gsap, useGSAP } from "@/lib/gsap";
@@ -27,6 +27,52 @@ export default function Features({ dictionary }: FeaturesProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  
+  // Mobile Scroll-Indicator State
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Scroll-Handler für Indicator-Update
+  const handleScroll = useCallback(() => {
+    if (!gridRef.current) return;
+    const container = gridRef.current;
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    
+    // Berechne aktiven Index basierend auf Scroll-Position
+    const cardWidth = clientWidth * 0.8; // 80vw Kartenbreite
+    const newIndex = Math.round(scrollLeft / cardWidth);
+    setActiveIndex(Math.min(newIndex, 2)); // Max 3 Karten (0, 1, 2)
+    
+    // Kann links/rechts scrollen?
+    setCanScrollLeft(scrollLeft > 10);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+  }, []);
+
+  // Scroll-Event-Listener
+  useEffect(() => {
+    const container = gridRef.current;
+    if (!container) return;
+    
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    // Initial check
+    handleScroll();
+    
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  // Programmatisches Scrollen zu bestimmter Karte
+  const scrollToCard = (index: number) => {
+    if (!gridRef.current) return;
+    const container = gridRef.current;
+    const cardWidth = container.clientWidth * 0.8;
+    container.scrollTo({
+      left: index * cardWidth,
+      behavior: "smooth"
+    });
+  };
 
   // DEBUGGING: Log Dictionary-Daten
   useEffect(() => {
@@ -137,47 +183,127 @@ export default function Features({ dictionary }: FeaturesProps) {
         </div>
 
         {/* Grid - Desktop: Grid, Mobile: Horizontal Scroll-Snap */}
-        <div 
-          ref={gridRef} 
-          className="
-            flex md:grid
-            md:grid-cols-3
-            gap-8 items-stretch
-            overflow-x-auto md:overflow-x-visible
-            snap-x snap-mandatory md:snap-none
-            -mx-4 px-4 md:mx-0 md:px-0
-            hide-scrollbar
-          "
-        >
-          {features.length === 0 ? (
-            <div className="col-span-3 text-center text-white/60 py-12">
-              <p>⚠️ Keine Features gefunden. Bitte Console prüfen.</p>
+        <div className="relative">
+          {/* Fade-Edge Links (nur Mobile, wenn scrollbar) */}
+          <div 
+            className={`
+              absolute left-0 top-0 bottom-0 w-12 z-20
+              bg-gradient-to-r from-[#0D0D0D] to-transparent
+              pointer-events-none
+              md:hidden
+              transition-opacity duration-300
+              ${canScrollLeft ? 'opacity-100' : 'opacity-0'}
+            `}
+          />
+          
+          {/* Fade-Edge Rechts (nur Mobile, wenn scrollbar) */}
+          <div 
+            className={`
+              absolute right-0 top-0 bottom-0 w-12 z-20
+              bg-gradient-to-l from-[#0D0D0D] to-transparent
+              pointer-events-none
+              md:hidden
+              transition-opacity duration-300
+              ${canScrollRight ? 'opacity-100' : 'opacity-0'}
+            `}
+          />
+
+          {/* Scroll-Container */}
+          <div 
+            ref={gridRef} 
+            className="
+              flex md:grid
+              md:grid-cols-3
+              gap-6 md:gap-8 items-stretch
+              overflow-x-auto md:overflow-x-visible
+              snap-x snap-mandatory md:snap-none
+              -mx-4 px-4 md:mx-0 md:px-0
+              pb-4 md:pb-0
+              hide-scrollbar
+            "
+          >
+            {features.length === 0 ? (
+              <div className="col-span-3 text-center text-white/60 py-12">
+                <p>⚠️ Keine Features gefunden. Bitte Console prüfen.</p>
+              </div>
+            ) : (
+              features.map((feature, index) => {
+                console.log(`🔍 [Features] Rendering feature ${index}:`, feature);
+                return (
+                  <div 
+                    key={index} 
+                    className="
+                      h-full min-w-[80vw] md:min-w-0
+                      snap-center snap-always
+                      flex-shrink-0 md:flex-shrink
+                    "
+                  >
+                    <GlassCard
+                      title={feature.title}
+                      description={feature.description}
+                      icon={feature.Icon}
+                      watermarkIcon={feature.Icon}
+                      color={feature.color}
+                      trigger={gridRef}
+                      inverted={index % 2 === 0}
+                    />
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Mobile Scroll-Indicator (Dots + Arrows) */}
+          <div className="flex md:hidden items-center justify-center gap-4 mt-6">
+            {/* Pfeil Links */}
+            <button
+              onClick={() => scrollToCard(Math.max(0, activeIndex - 1))}
+              className={`
+                p-2 rounded-full border border-white/20 bg-white/5
+                transition-all duration-300
+                ${canScrollLeft 
+                  ? 'opacity-100 hover:bg-white/10 hover:border-white/40' 
+                  : 'opacity-30 cursor-not-allowed'}
+              `}
+              disabled={!canScrollLeft}
+              aria-label="Vorherige Karte"
+            >
+              <ChevronLeft size={20} className="text-white" />
+            </button>
+            
+            {/* Dot Indicators */}
+            <div className="flex items-center gap-2">
+              {features.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollToCard(index)}
+                  className={`
+                    w-2.5 h-2.5 rounded-full transition-all duration-300
+                    ${activeIndex === index 
+                      ? 'bg-[#FF5C00] w-6 shadow-[0_0_10px_#FF5C00]' 
+                      : 'bg-white/30 hover:bg-white/50'}
+                  `}
+                  aria-label={`Gehe zu Karte ${index + 1}`}
+                />
+              ))}
             </div>
-          ) : (
-            features.map((feature, index) => {
-              console.log(`🔍 [Features] Rendering feature ${index}:`, feature);
-              return (
-                <div 
-                  key={index} 
-                  className="
-                    h-full min-w-[85vw] md:min-w-0
-                    snap-center snap-always
-                    flex-shrink-0 md:flex-shrink
-                  "
-                >
-                  <GlassCard
-                    title={feature.title}
-                    description={feature.description}
-                    icon={feature.Icon}
-                    watermarkIcon={feature.Icon}
-                    color={feature.color}
-                    trigger={gridRef}
-                    inverted={index % 2 === 0}
-                  />
-                </div>
-              );
-            })
-          )}
+            
+            {/* Pfeil Rechts */}
+            <button
+              onClick={() => scrollToCard(Math.min(features.length - 1, activeIndex + 1))}
+              className={`
+                p-2 rounded-full border border-white/20 bg-white/5
+                transition-all duration-300
+                ${canScrollRight 
+                  ? 'opacity-100 hover:bg-white/10 hover:border-white/40' 
+                  : 'opacity-30 cursor-not-allowed'}
+              `}
+              disabled={!canScrollRight}
+              aria-label="Nächste Karte"
+            >
+              <ChevronRight size={20} className="text-white" />
+            </button>
+          </div>
         </div>
       </div>
     </section>
