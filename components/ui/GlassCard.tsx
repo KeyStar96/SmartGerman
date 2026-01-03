@@ -1,8 +1,8 @@
 "use client";
 
 import React, { ReactNode, useState, useRef, useEffect } from "react";
-import { LucideIcon, RotateCcw } from "lucide-react";
-import { JetBrains_Mono } from "next/font/google";
+import { LucideIcon, RotateCcw, Clock, Users, Calendar, GraduationCap } from "lucide-react";
+import { JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { gsap } from "@/lib/gsap";
 
@@ -11,6 +11,12 @@ const jetBrainsMono = JetBrains_Mono({
   weight: ["400", "700"],
   display: "swap",
   variable: "--font-jetbrains-mono",
+});
+
+const instrumentSerif = Instrument_Serif({ 
+  subsets: ["latin"],
+  weight: "400",
+  style: ["italic"],
 });
 
 export interface GlassCardProps {
@@ -31,7 +37,9 @@ export interface GlassCardProps {
     duration?: string;
     focus?: string;
     start?: string;
-    description?: string; // Bug 4: Beschreibung für Rückseite
+    description?: string;
+    participants?: string; // Optional: Teilnehmerzahl
+    instructor?: string; // Optional: Dozenten-Info
   };
   // Hint-Labels für Expanding Flip-Indicator (übersetzbar)
   flipHintLabel?: string;
@@ -108,6 +116,23 @@ export default function GlassCard({
         delay: 0.4,
         ease: "power2.out",
       });
+      
+      // Stagger-Effekt für Backface-Elemente
+      gsap.fromTo(
+        back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-instructor'),
+        {
+          opacity: 0,
+          y: 10,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.4,
+          delay: 0.5,
+          stagger: 0.08,
+          ease: "power2.out",
+        }
+      );
     } else {
       // Glow-Effekt während der Rückdrehung
       if (glow) {
@@ -120,7 +145,14 @@ export default function GlassCard({
         });
       }
       
-      // Back Face ausblenden
+      // Back Face ausblenden - auch Stagger-Elemente ausblenden
+      gsap.to(back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-instructor'), {
+        opacity: 0,
+        y: 10,
+        duration: 0.2,
+        ease: "power2.in",
+      });
+      
       gsap.to(back, {
         opacity: 0,
         duration: 0.3,
@@ -472,42 +504,114 @@ export default function GlassCard({
             </div>
           )}
           
-          {/* Content Container - mit mehr Padding oben für den Flip-Indicator */}
-          <div className="relative h-full flex flex-col pt-16 pb-8 px-8 md:pt-20 md:pb-10 md:px-10 items-center justify-center text-center">
+          {/* Subtiler Glow-Punkt im Hintergrund mit Akzentfarbe */}
+          <div 
+            className="absolute top-1/2 right-1/4 w-32 h-32 rounded-full opacity-[0.03] blur-3xl"
+            style={{
+              background: `radial-gradient(circle, ${color}, transparent)`,
+              transform: 'translate(50%, -50%)',
+            }}
+          />
+
+          {/* Content Container - Asymmetrisches Layout */}
+          <div className="relative h-full flex flex-col pt-20 pb-8 px-6 md:pt-24 md:pb-10 md:px-10">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
-            <div className="relative z-10 space-y-5">
-              {/* Beschreibung auf Rückseite */}
+            <div className="relative z-10 flex flex-col h-full">
+              {/* Oben links: Kurzbeschreibung */}
               {backfaceContent?.description && (
-                <div className="space-y-2">
-                  <p className="text-base text-white/70 leading-relaxed max-w-xs">{backfaceContent.description}</p>
+                <div className="backface-desc mb-6 md:mb-8 text-left max-w-md">
+                  <p className={`text-sm md:text-base text-white/80 leading-relaxed line-clamp-3 ${instrumentSerif.className}`}>
+                    {backfaceContent.description}
+                  </p>
                 </div>
               )}
               
-              {backfaceContent?.duration && (
-                <div className="space-y-1">
-                  <span className={`${jetBrainsMono.className} text-xs uppercase tracking-widest text-white/40`}>
-                    Dauer
-                  </span>
-                  <p className="text-2xl font-bold text-white">{backfaceContent.duration}</p>
-                </div>
+              {/* Trennlinie */}
+              {(backfaceContent?.description || backfaceContent?.duration || backfaceContent?.start) && (
+                <div className="backface-divider h-px bg-white/10 mb-6 md:mb-8 w-full" />
               )}
               
-              {backfaceContent?.focus && (
-                <div className="space-y-1">
-                  <span className={`${jetBrainsMono.className} text-xs uppercase tracking-widest text-white/40`}>
-                    Fokus
-                  </span>
-                  <p className="text-lg text-white/80">{backfaceContent.focus}</p>
-                </div>
-              )}
+              {/* Mitte: 2x2 Grid für harte Fakten */}
+              <div className="backface-grid grid grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8 flex-grow">
+                {/* Dauer */}
+                {backfaceContent?.duration && (
+                  <div className="backface-item">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Clock size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
+                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
+                        Dauer
+                      </span>
+                    </div>
+                    <p className="text-lg md:text-xl font-semibold text-white leading-tight">
+                      {backfaceContent.duration}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Teilnehmerzahl */}
+                {backfaceContent?.participants && (
+                  <div className="backface-item">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Users size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
+                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
+                        Teilnehmer
+                      </span>
+                    </div>
+                    <p className="text-lg md:text-xl font-semibold text-white leading-tight">
+                      {backfaceContent.participants}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Termine */}
+                {backfaceContent?.start && (
+                  <div className="backface-item">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Calendar size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
+                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
+                        Termine
+                      </span>
+                    </div>
+                    <p className="text-sm md:text-base font-semibold text-white/90 leading-tight">
+                      {backfaceContent.start}
+                    </p>
+                  </div>
+                )}
+                
+                {/* Fokus */}
+                {backfaceContent?.focus && (
+                  <div className="backface-item">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <GraduationCap size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
+                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
+                        Fokus
+                      </span>
+                    </div>
+                    <p className="text-sm md:text-base font-semibold text-white/90 leading-tight">
+                      {backfaceContent.focus}
+                    </p>
+                  </div>
+                )}
+              </div>
               
-              {backfaceContent?.start && (
-                <div className="space-y-1">
-                  <span className={`${jetBrainsMono.className} text-xs uppercase tracking-widest text-white/40`}>
-                    Start
-                  </span>
-                  <p className="text-xl font-semibold text-white">{backfaceContent.start}</p>
+              {/* Unten: Dozenten-Info als Badge */}
+              {backfaceContent?.instructor && (
+                <div className="backface-instructor mt-auto">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap size={16} style={{ color }} />
+                    <span 
+                      className={`${jetBrainsMono.className} text-xs font-bold px-3 py-1.5 rounded-full border backdrop-blur-md badge-glow`}
+                      style={{
+                        color,
+                        borderColor: `${color}40`,
+                        backgroundColor: `${color}10`,
+                        '--badge-color': color,
+                      } as React.CSSProperties}
+                    >
+                      {backfaceContent.instructor}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
