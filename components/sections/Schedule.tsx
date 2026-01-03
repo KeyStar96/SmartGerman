@@ -23,6 +23,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
   
   // Ref für mausbasiertes Scrollen
   const coursesScrollRef = useRef<HTMLDivElement>(null);
+  const gridScrollRef = useRef<HTMLDivElement>(null);
   const scrollAnimationRef = useRef<number | null>(null);
 
   // Erkenne ob Gerät Hover unterstützt (Desktop mit Cursor)
@@ -60,58 +61,66 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
     }
   }, [isOpen]);
 
-  // Mausbasiertes Scrollen für Tagesansicht
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const container = coursesScrollRef.current;
-    if (!container) return;
+  // Generisches mausbasiertes Scrollen
+  const createMouseScrollHandler = useCallback((containerRef: React.RefObject<HTMLDivElement>) => {
+    return (e: React.MouseEvent<HTMLDivElement>) => {
+      const container = containerRef.current;
+      if (!container) return;
 
-    const rect = container.getBoundingClientRect();
-    const mouseY = e.clientY - rect.top;
-    const containerHeight = rect.height;
-    const scrollHeight = container.scrollHeight;
-    const clientHeight = container.clientHeight;
-    
-    // Kann nicht scrollen wenn Content passt
-    if (scrollHeight <= clientHeight) return;
+      const rect = container.getBoundingClientRect();
+      const mouseY = e.clientY - rect.top;
+      const containerHeight = rect.height;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+      
+      // Kann nicht scrollen wenn Content passt
+      if (scrollHeight <= clientHeight) return;
 
-    // Berechne relative Position (0 = oben, 1 = unten)
-    const relativeY = mouseY / containerHeight;
-    
-    // Dead zone in der Mitte (40-60%)
-    const deadZoneStart = 0.4;
-    const deadZoneEnd = 0.6;
-    
-    // Cancel vorherige Animation
-    if (scrollAnimationRef.current) {
-      cancelAnimationFrame(scrollAnimationRef.current);
-      scrollAnimationRef.current = null;
-    }
+      // Berechne relative Position (0 = oben, 1 = unten)
+      const relativeY = mouseY / containerHeight;
+      
+      // Dead zone in der Mitte (35-65% für smootheres Gefühl)
+      const deadZoneStart = 0.35;
+      const deadZoneEnd = 0.65;
+      
+      // Cancel vorherige Animation
+      if (scrollAnimationRef.current) {
+        cancelAnimationFrame(scrollAnimationRef.current);
+        scrollAnimationRef.current = null;
+      }
 
-    // Scroll-Geschwindigkeit berechnen
-    let scrollSpeed = 0;
-    const maxSpeed = 8; // Max Pixel pro Frame
-    
-    if (relativeY < deadZoneStart) {
-      // Nach oben scrollen
-      const intensity = 1 - (relativeY / deadZoneStart);
-      scrollSpeed = -maxSpeed * Math.pow(intensity, 1.5);
-    } else if (relativeY > deadZoneEnd) {
-      // Nach unten scrollen
-      const intensity = (relativeY - deadZoneEnd) / (1 - deadZoneEnd);
-      scrollSpeed = maxSpeed * Math.pow(intensity, 1.5);
-    }
+      // Scroll-Geschwindigkeit berechnen
+      let scrollSpeed = 0;
+      const maxSpeed = 6; // Etwas langsamer für smootheres Feeling
+      
+      if (relativeY < deadZoneStart) {
+        // Nach oben scrollen
+        const intensity = 1 - (relativeY / deadZoneStart);
+        scrollSpeed = -maxSpeed * Math.pow(intensity, 2); // Quadratisch für smootheren Start
+      } else if (relativeY > deadZoneEnd) {
+        // Nach unten scrollen
+        const intensity = (relativeY - deadZoneEnd) / (1 - deadZoneEnd);
+        scrollSpeed = maxSpeed * Math.pow(intensity, 2);
+      }
 
-    // Animiere das Scrollen
-    if (scrollSpeed !== 0) {
-      const animate = () => {
-        if (container) {
-          container.scrollTop += scrollSpeed;
-          scrollAnimationRef.current = requestAnimationFrame(animate);
-        }
-      };
-      scrollAnimationRef.current = requestAnimationFrame(animate);
-    }
+      // Animiere das Scrollen mit Interpolation für Smoothness
+      if (scrollSpeed !== 0) {
+        let currentSpeed = 0;
+        const animate = () => {
+          if (container) {
+            // Smooth interpolation
+            currentSpeed += (scrollSpeed - currentSpeed) * 0.1;
+            container.scrollTop += currentSpeed;
+            scrollAnimationRef.current = requestAnimationFrame(animate);
+          }
+        };
+        scrollAnimationRef.current = requestAnimationFrame(animate);
+      }
+    };
   }, []);
+
+  const handleMouseMove = useMemo(() => createMouseScrollHandler(coursesScrollRef), [createMouseScrollHandler]);
+  const handleGridMouseMove = useMemo(() => createMouseScrollHandler(gridScrollRef), [createMouseScrollHandler]);
 
   const handleMouseLeave = useCallback(() => {
     if (scrollAnimationRef.current) {
@@ -137,7 +146,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
     Do: dictionary?.schedule?.thursday || "Donnerstag",
     Fr: dictionary?.schedule?.friday || "Freitag"
   };
-
+  
   // Extrahiere Kurse mit Original-Farben aus courses.items
   const scheduleData = useMemo(() => {
     const courses = dictionary?.sections?.courses?.items || [];
@@ -253,26 +262,27 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
             onClick={() => setIsOpen(true)}
             onMouseEnter={() => hasHover && setIsButtonHovered(true)}
             onMouseLeave={() => setIsButtonHovered(false)}
-            className="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-black/80 border border-primary-orange/30 text-white rounded-full backdrop-blur-md overflow-hidden"
+            className="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-black/90 border-2 border-primary-orange text-white rounded-full backdrop-blur-md overflow-hidden"
             style={{
               width: hasHover && isButtonHovered ? "auto" : "56px",
               height: "56px",
               paddingLeft: hasHover && isButtonHovered ? "20px" : "0",
               paddingRight: hasHover && isButtonHovered ? "20px" : "0",
+              boxShadow: "0 0 20px rgba(255, 92, 0, 0.4), 0 0 40px rgba(255, 92, 0, 0.2), inset 0 0 15px rgba(255, 92, 0, 0.1)",
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
             <AnimatePresence>
               {hasHover && isButtonHovered && (
-                <motion.span
+            <motion.span
                   initial={{ width: 0, opacity: 0, marginRight: 0 }}
                   animate={{ width: "auto", opacity: 1, marginRight: 12 }}
                   exit={{ width: 0, opacity: 0, marginRight: 0 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  className={`overflow-hidden whitespace-nowrap font-bold uppercase tracking-widest text-[10px] ${jetBrainsMono.className}`}
-                >
+              className={`overflow-hidden whitespace-nowrap font-bold uppercase tracking-widest text-[10px] ${jetBrainsMono.className}`}
+            >
                   {weekPlanText}
-                </motion.span>
+            </motion.span>
               )}
             </AnimatePresence>
             <Calendar size={22} className="text-primary-orange flex-shrink-0" />
@@ -335,7 +345,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                     }`}
                   >
                     {dictionary?.schedule?.view_grid || "Wochenübersicht"}
-                  </button>
+            </button>
                 </div>
 
                 {/* Mobile: Nur Titel */}
@@ -346,48 +356,48 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                 </div>
 
                 {/* Close Button */}
-                <button 
+              <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/5"
                 >
                   <X size={24} strokeWidth={1.5} />
-                </button>
+              </button>
               </div>
-
+              
               {/* CONTENT */}
               <div className="flex-1 overflow-auto">
-                <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait">
                   {/* Editorial View - Standard auf Mobile */}
                   {(viewMode === "editorial" || !hasHover) ? (
-                    <motion.div
+                  <motion.div
                       key="editorial-view"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="h-full flex flex-col md:flex-row"
-                    >
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="h-full flex flex-col md:flex-row"
+                  >
                       {/* LEFT: Days */}
                       <div className="w-full md:w-[35%] lg:w-[30%] border-b md:border-b-0 md:border-r border-white/5 flex flex-col justify-center p-6 md:p-10 lg:p-16">
                         <div className="flex md:flex-col gap-2 md:gap-0 overflow-x-auto md:overflow-visible pb-4 md:pb-0 no-scrollbar">
                           {days.map((day, index) => (
                             <motion.button
-                              key={day}
+                            key={day}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: index * 0.05 }}
-                              onMouseEnter={() => setHoveredDay(day)}
-                              onClick={() => setHoveredDay(day)}
+                            onMouseEnter={() => setHoveredDay(day)}
+                            onClick={() => setHoveredDay(day)}
                               className={`text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium transition-all duration-300 text-left px-4 py-2 md:py-3 whitespace-nowrap ${
-                                hoveredDay === day 
+                              hoveredDay === day 
                                 ? "text-primary-orange opacity-100" 
                                 : "text-white/20 hover:text-white/40"
-                              }`}
-                            >
-                              <span className={instrumentSerif.className}>{day}.</span>
+                            }`}
+                          >
+                            <span className={instrumentSerif.className}>{day}.</span>
                             </motion.button>
-                          ))}
-                        </div>
+                        ))}
                       </div>
+                    </div>
 
                       {/* RIGHT: Courses - mit mausbasiertem Scrollen */}
                       <div 
@@ -400,20 +410,20 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                         {/* Scroll-Indikator oben */}
                         <div className="hidden md:block pointer-events-none absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/80 to-transparent z-10 opacity-50" />
                         
-                        <div className="max-w-xl">
-                          <AnimatePresence mode="wait">
-                            <motion.div
-                              key={hoveredDay}
+                      <div className="max-w-xl">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={hoveredDay}
                               initial={{ opacity: 0, y: 15 }}
-                              animate={{ opacity: 1, y: 0 }}
+                            animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -15 }}
                               transition={{ duration: 0.25 }}
                               className="space-y-6 md:space-y-8 pb-32"
-                            >
-                              {scheduleData[hoveredDay]?.length > 0 ? (
-                                scheduleData[hoveredDay].map((course: any, i: number) => {
+                          >
+                            {scheduleData[hoveredDay]?.length > 0 ? (
+                              scheduleData[hoveredDay].map((course: any, i: number) => {
                                   const isOnline = course.type?.toLowerCase() === 'online';
-                                  return (
+                                return (
                                     <motion.div 
                                       key={i} 
                                       initial={{ opacity: 0, x: -10 }}
@@ -437,12 +447,12 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                           {isOnline ? <Monitor size={11} /> : <MapPin size={11} />}
                                           {course.type}
                                         </span>
-                                      </div>
+                                    </div>
 
                                       {/* Title */}
                                       <h3 className="text-xl md:text-2xl font-semibold text-white mb-2 leading-tight">
-                                        {course.title}
-                                      </h3>
+                                      {course.title}
+                                    </h3>
 
                                       {/* Meta */}
                                       <div className="text-sm text-white/40 space-y-1">
@@ -453,31 +463,38 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                         <div className="flex items-center gap-2">
                                           <span className="text-white/30">·</span>
                                           {course.location}
-                                        </div>
-                                      </div>
+                                    </div>
+                                  </div>
                                     </motion.div>
-                                  );
-                                })
-                              ) : (
+                                );
+                              })
+                            ) : (
                                 <div className="text-white/30 italic py-8">{noCoursesText}</div>
-                              )}
-                            </motion.div>
-                          </AnimatePresence>
-                        </div>
+                            )}
+                          </motion.div>
+                        </AnimatePresence>
+                      </div>
                         
                         {/* Scroll-Indikator unten */}
                         <div className="hidden md:block pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent z-10 opacity-50" />
-                      </div>
-                    </motion.div>
-                  ) : (
+                    </div>
+                  </motion.div>
+                ) : (
                     /* Grid View - nur auf Desktop */
                     <motion.div
                       key="grid-view"
+                      ref={gridScrollRef}
+                      onMouseMove={handleGridMouseMove}
+                      onMouseLeave={handleMouseLeave}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="p-6 lg:p-8 pb-16"
+                      className="p-6 lg:p-8 pb-16 h-full overflow-y-auto relative"
+                      style={{ scrollBehavior: 'auto' }}
                     >
+                      {/* Scroll-Indikator oben */}
+                      <div className="pointer-events-none absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/90 to-transparent z-10" />
+                      
                       <div className="w-full">
                         {/* Grid Header */}
                         <div className="grid grid-cols-[90px_repeat(5,1fr)] mb-1">
@@ -486,12 +503,12 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                           </div>
                           {days.map((day, index) => (
                             <motion.div
-                              key={day}
+                                key={day}
                               initial={{ opacity: 0, y: -10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.05 }}
                               className="p-3 text-center"
-                            >
+                              >
                               <span className={`${instrumentSerif.className} text-lg text-white/60`}>
                                 {dayNames[day as keyof typeof dayNames]}
                               </span>
@@ -519,8 +536,8 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                 {days.map((day, colIndex) => {
                                   const courses = gridData.gridCourses[day][timeSlot] || [];
                                   
-                                  return (
-                                    <div 
+                                      return (
+                                        <div
                                       key={day}
                                       className="p-2 min-h-[100px] border-l border-white/5"
                                     >
@@ -531,7 +548,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                             
                                             return (
                                               <motion.div
-                                                key={i}
+                                          key={i}
                                                 initial={{ opacity: 0, scale: 0.95 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 transition={{ delay: (rowIndex * 5 + colIndex) * 0.02 }}
@@ -552,8 +569,8 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                                 {/* Content */}
                                                 <div className="relative z-10">
                                                   <h4 className="text-sm font-semibold text-white mb-2 leading-snug">
-                                                    {course.title}
-                                                  </h4>
+                                            {course.title}
+                                          </h4>
                                                   
                                                   <div className={`${jetBrainsMono.className} text-[10px] space-y-1`}>
                                                     <div 
@@ -565,9 +582,9 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                                     </div>
                                                     <div className="text-white/40">
                                                       {course.instructor}
-                                                    </div>
-                                                  </div>
-                                                </div>
+                                            </div>
+                                            </div>
+                                          </div>
                                               </motion.div>
                                             );
                                           })}
@@ -577,24 +594,27 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                           <span className="text-white/10 text-xs">—</span>
                                         </div>
                                       )}
-                                    </div>
-                                  );
-                                })}
+                                        </div>
+                                      );
+                                    })}
                               </motion.div>
                             ))
                           ) : (
                             <div className="text-center p-12 text-white/30 italic">
-                              {noCoursesText}
+                                {noCoursesText}
                             </div>
                           )}
                         </div>
                         
                         {/* Extra Platz am Ende */}
-                        <div className="h-24" />
+                        <div className="h-32" />
                       </div>
+                      
+                      {/* Scroll-Indikator unten */}
+                      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/90 to-transparent z-10" />
                     </motion.div>
-                  )}
-                </AnimatePresence>
+                )}
+              </AnimatePresence>
               </div>
             </motion.div>
           </motion.div>
