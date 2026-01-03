@@ -74,9 +74,12 @@
           "description": "50+ öğrenenler için özel olarak tasarlanmıştır. Hız ve metodoloji bu hedef kitleye uyarlanmıştır.",
           "price": "€ 2,50",
           "duration": "45 Dk",
+          "lessonBlock": "45 Dk",
+          "frequency": "Haftada 2 ders",
           "focus": "50+ başlangıç temelleri",
           "start": "Pzt 9:00-10:30 & Sal 10:30-12:00",
           "backDescription": "50 yaş ve üzeri öğrenenler için özel kurs. Rahatlatıcı atmosferde Almanca'nın temellerini öğrenin.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -86,9 +89,12 @@
           "description": "50+ öğrenenler için A1.1 kursunun devamı. Destekleyici bir ortamda bilginizi derinleştirin.",
           "price": "€ 2,50",
           "duration": "45 Dk",
+          "lessonBlock": "45 Dk",
+          "frequency": "Haftada 2 ders",
           "focus": "50+ için A1 seviyesi derinleştirme",
           "start": "Sal 9:00-10:30 & Çar 10:30-12:00",
           "backDescription": "A1.1 kursunun devamı. Yaşa uygun tempoda temel bilgilerinizi genişletin.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -98,9 +104,12 @@
           "description": "Ön bilgisi olan 50+ öğrenenler için. Günlük durumlar için kelime dağarcığınızı genişletin.",
           "price": "€ 2,50",
           "duration": "45 Dk",
+          "lessonBlock": "45 Dk",
+          "frequency": "Haftada 2 ders",
           "focus": "50+ için günlük iletişim",
           "start": "Pzt 10:30-12:00 & Çar 9:00-10:30",
           "backDescription": "Temel bilgilerinizin üzerine inşa edin ve günlük durumları ustaca yönetin.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -110,9 +119,12 @@
           "description": "Sözlü iletişime odaklanın. Telaffuz ve konuşma becerilerinizi geliştirin.",
           "price": "€ 3,50",
           "duration": "60 Dk",
+          "lessonBlock": "60 Dk",
+          "frequency": "Haftada 1 ders",
           "focus": "Sözlü iletişim A1",
           "start": "Sal 12:00-13:00 (1x 60 dk)",
           "backDescription": "Başlangıç seviyesi için yoğun konuşma pratiği. Küçük gruplarda telaffuzunuzu çalışın.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -122,9 +134,12 @@
           "description": "Konuşma pratiğinin devamı. A1 seviyesinde sözlü becerilerinizi derinleştirin.",
           "price": "€ 3,50",
           "duration": "60 Dk",
+          "lessonBlock": "60 Dk",
+          "frequency": "Haftada 1 ders",
           "focus": "Sözlü iletişim A1.2",
           "start": "Çar 12:00-13:00 (1x 60 dk)",
           "backDescription": "Günlük durumlarda akıcı konuşma ve doğru telaffuza odaklanan ileri seviye pratik.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -134,9 +149,12 @@
           "description": "A2 ön bilgisi olan öğrenenler için. Sözlü iletişiminizi mükemmelleştirin.",
           "price": "€ 3,50",
           "duration": "60 Dk",
+          "lessonBlock": "60 Dk",
+          "frequency": "Haftada 1 ders",
           "focus": "Sözlü iletişim A2",
           "start": "Pzt 12:00-13:00 (1x 60 dk)",
           "backDescription": "İleri seviye başlangıçlar için konuşma pratiği. Daha karmaşık konuşmaları çalışın.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -146,9 +164,12 @@
           "description": "Başlangıç seviyesi için online kurs. Almanca'nın temellerini evinizden rahatça öğrenin.",
           "price": "€ 7,50",
           "duration": "45 Dk",
+          "lessonBlock": "90 Dk. (2x 45 Dk.)",
+          "frequency": "Haftada 2 ders",
           "focus": "Online temeller A1.1",
           "start": "Per & Cum 19:00-20:30",
           "backDescription": "Akşam saatlerinde esnek online öğrenme. Çalışan profesyoneller için mükemmel.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
         {
@@ -158,9 +179,12 @@
           "description": "İleri seviye öğrenenler için online kurs. Evinizden rahatça sağlam bir orta seviyeye ulaşın.",
           "price": "€ 7,50",
           "duration": "45 Dk",
+          "lessonBlock": "90 Dk. (2x 45 Dk.)",
+          "frequency": "Haftada 2 ders",
           "focus": "Online orta seviye B1",
           "start": "Pzt & Sal 14:30-16:00",
           "backDescription": "Bağımsız dil kullanımı için online kurs. Temel bilgilere sahip öğrenenler için idealdir.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
         {
@@ -170,9 +194,12 @@
           "description": "İleri seviye öğrenenler için online kurs. Almanca'nızı yüksek seviyede mükemmelleştirin.",
           "price": "€ 7,50",
           "duration": "45 Dk",
+          "lessonBlock": "90 Dk. (2x 45 Dk.)",
+          "frequency": "Haftada 2 ders",
           "focus": "Online ileri seviye B2",
           "start": "Pzt & Çar 16:00-17:30",
           "backDescription": "Zorlu profesyonel ve akademik durumlar için yüksek kaliteli online kurs.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         }
       ]
@@ -192,6 +219,13 @@
       "price_label": "Fiyat",
       "flip_hint": "DETAY",
       "back_hint": "GERİ",
+      "backface_labels": {
+        "lesson_block": "Ders Bloğu",
+        "frequency": "Sıklık",
+        "appointments": "Randevular",
+        "focus": "Odak",
+        "teacher": "Eğitmen"
+      },
       "a1": {
         "name": "A1 Başlangıç",
         "desc": "Ön bilgi olmadan ideal başlangıç."

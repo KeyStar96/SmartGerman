@@ -74,9 +74,12 @@
           "description": "Specifically designed for learners 50+. Pace and methodology are tailored to this target group.",
           "price": "€ 2.50",
           "duration": "45 Min",
+          "lessonBlock": "45 Min",
+          "frequency": "2 sessions per week",
           "focus": "Basics for beginners 50+",
           "start": "Mon 9:00-10:30 & Tue 10:30-12:00",
           "backDescription": "Course for learners aged 50+. Learn the basics of German in a relaxed atmosphere.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -86,9 +89,12 @@
           "description": "Continuation of the A1.1 course for learners 50+. Deepen your knowledge in a supportive environment.",
           "price": "€ 2.50",
           "duration": "45 Min",
+          "lessonBlock": "45 Min",
+          "frequency": "2 sessions per week",
           "focus": "Advanced A1 level for 50+",
           "start": "Tue 9:00-10:30 & Wed 10:30-12:00",
           "backDescription": "Continuation of A1.1. Expand your basic knowledge at an age-appropriate pace.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -98,9 +104,12 @@
           "description": "For learners 50+ with prior knowledge. Expand your vocabulary for everyday situations.",
           "price": "€ 2.50",
           "duration": "45 Min",
+          "lessonBlock": "45 Min",
+          "frequency": "2 sessions per week",
           "focus": "Everyday communication for 50+",
           "start": "Mon 10:30-12:00 & Wed 9:00-10:30",
           "backDescription": "Build on your basic knowledge and master everyday situations.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -110,9 +119,12 @@
           "description": "Focus on oral communication. Improve your pronunciation and speaking skills.",
           "price": "€ 3.50",
           "duration": "60 Min",
+          "lessonBlock": "60 Min",
+          "frequency": "1 session per week",
           "focus": "Oral communication A1",
           "start": "Tue 12:00-13:00 (1x 60 min)",
           "backDescription": "Intensive speaking practice for beginners. Practice pronunciation in small groups.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -122,9 +134,12 @@
           "description": "Continuation of speaking practice. Deepen your oral skills at A1 level.",
           "price": "€ 3.50",
           "duration": "60 Min",
+          "lessonBlock": "60 Min",
+          "frequency": "1 session per week",
           "focus": "Oral communication A1.2",
           "start": "Wed 12:00-13:00 (1x 60 min)",
           "backDescription": "Advanced speaking practice focusing on fluent speech and correct pronunciation.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -134,9 +149,12 @@
           "description": "For learners with A2 prior knowledge. Perfect your oral communication.",
           "price": "€ 3.50",
           "duration": "60 Min",
+          "lessonBlock": "60 Min",
+          "frequency": "1 session per week",
           "focus": "Oral communication A2",
           "start": "Mon 12:00-13:00 (1x 60 min)",
           "backDescription": "Speaking practice for advanced beginners. Practice more complex conversations.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -146,9 +164,12 @@
           "description": "Online course for beginners. Learn the basics of German comfortably from home.",
           "price": "€ 7.50",
           "duration": "45 Min",
+          "lessonBlock": "90 Min. (2x 45 Min.)",
+          "frequency": "2 sessions per week",
           "focus": "Online basics A1.1",
           "start": "Thu & Fri 19:00-20:30",
           "backDescription": "Flexible online learning in the evening hours. Perfect for working professionals.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
         {
@@ -158,9 +179,12 @@
           "description": "Online course for advanced learners. Reach a solid intermediate level comfortably from home.",
           "price": "€ 7.50",
           "duration": "45 Min",
+          "lessonBlock": "90 Min. (2x 45 Min.)",
+          "frequency": "2 sessions per week",
           "focus": "Online intermediate B1",
           "start": "Mon & Tue 14:30-16:00",
           "backDescription": "Online course for independent language use. Ideal for learners with basic knowledge.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
         {
@@ -170,9 +194,12 @@
           "description": "Online course for advanced learners. Perfect your German at a high level.",
           "price": "€ 7.50",
           "duration": "45 Min",
+          "lessonBlock": "90 Min. (2x 45 Min.)",
+          "frequency": "2 sessions per week",
           "focus": "Online advanced B2",
           "start": "Mon & Wed 16:00-17:30",
           "backDescription": "High-quality online course for demanding professional and academic situations.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         }
       ]
@@ -192,6 +219,13 @@
       "price_label": "Price",
       "flip_hint": "DETAILS",
       "back_hint": "BACK",
+      "backface_labels": {
+        "lesson_block": "Lesson Block",
+        "frequency": "Frequency",
+        "appointments": "Appointments",
+        "focus": "Focus",
+        "teacher": "Instructor"
+      },
       "a1": {
         "name": "A1 Beginner",
         "desc": "The ideal start without prior knowledge."

@@ -34,16 +34,25 @@ export interface GlassCardProps {
   inverted?: boolean;
   // Backface-Content für Flip-Animation
   backfaceContent?: {
-    duration?: string;
+    lessonBlock?: string; // Unterrichtsblock: z.B. "90 Min. (2x 45 Min.)"
+    frequency?: string; // Frequenz: z.B. "2 Termine pro Woche"
     focus?: string;
     start?: string;
     description?: string;
     participants?: string; // Optional: Teilnehmerzahl
-    instructor?: string; // Optional: Dozenten-Info
+    teacher?: string; // Dozentin: z.B. "Anastasia Sitov"
   };
   // Hint-Labels für Expanding Flip-Indicator (übersetzbar)
   flipHintLabel?: string;
   backHintLabel?: string;
+  // Backface-Labels (übersetzbar)
+  backfaceLabels?: {
+    lessonBlock?: string;
+    frequency?: string;
+    appointments?: string;
+    focus?: string;
+    teacher?: string;
+  };
 }
 
 export default function GlassCard({
@@ -62,6 +71,7 @@ export default function GlassCard({
   backfaceContent,
   flipHintLabel = "DETAILS",
   backHintLabel = "ZURÜCK",
+  backfaceLabels,
 }: GlassCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipContainerRef = useRef<HTMLDivElement>(null);
@@ -119,7 +129,7 @@ export default function GlassCard({
       
       // Stagger-Effekt für Backface-Elemente
       gsap.fromTo(
-        back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-instructor'),
+        back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-teacher'),
         {
           opacity: 0,
           y: 10,
@@ -146,7 +156,7 @@ export default function GlassCard({
       }
       
       // Back Face ausblenden - auch Stagger-Elemente ausblenden
-      gsap.to(back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-instructor'), {
+      gsap.to(back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-teacher'), {
         opacity: 0,
         y: 10,
         duration: 0.2,
@@ -472,9 +482,9 @@ export default function GlassCard({
             </div>
           )}
           
-          {/* Level und Badge auf Rückseite - oben links wie auf der Vorderseite */}
+          {/* Level und Badge auf Rückseite - exakt an derselben Position wie Vorderseite (p-5 md:p-10 = 1.25rem/2.5rem = top-5 left-5 md:top-10 md:left-10) */}
           {(level || badge) && (
-            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20 flex items-center gap-3">
+            <div className="absolute top-5 left-5 md:top-10 md:left-10 z-20 flex items-center gap-3">
               {/* Level-Label auf Rückseite */}
               {level && (
                 <span 
@@ -513,53 +523,47 @@ export default function GlassCard({
             }}
           />
 
-          {/* Content Container - Asymmetrisches Layout */}
-          <div className="relative h-full flex flex-col pt-20 pb-8 px-6 md:pt-24 md:pb-10 md:px-10">
+          {/* Content Container - Vertikales Stacking */}
+          <div className="relative h-full flex flex-col pt-20 pb-8 px-6 md:pt-20 md:pb-10 md:px-10">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
-            <div className="relative z-10 flex flex-col h-full">
-              {/* Oben links: Kurzbeschreibung */}
+            <div className="relative z-10 flex flex-col h-full gap-6 md:gap-8">
+              {/* Oben: Kurzbeschreibung */}
               {backfaceContent?.description && (
-                <div className="backface-desc mb-6 md:mb-8 text-left max-w-md">
-                  <p className={`text-sm md:text-base text-white/80 leading-relaxed line-clamp-3 ${instrumentSerif.className}`}>
+                <div className="backface-desc text-left">
+                  <p className="text-sm md:text-base text-white/80 leading-relaxed line-clamp-3">
                     {backfaceContent.description}
                   </p>
                 </div>
               )}
               
               {/* Trennlinie */}
-              {(backfaceContent?.description || backfaceContent?.duration || backfaceContent?.start) && (
-                <div className="backface-divider h-px bg-white/10 mb-6 md:mb-8 w-full" />
+              {(backfaceContent?.description || backfaceContent?.lessonBlock || backfaceContent?.start) && (
+                <div className="backface-divider h-px bg-white/10 w-full" />
               )}
               
-              {/* Mitte: 2x2 Grid für harte Fakten */}
-              <div className="backface-grid grid grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8 flex-grow">
-                {/* Dauer */}
-                {backfaceContent?.duration && (
+              {/* Vertikales Stacking für harte Fakten */}
+              <div className="backface-grid flex flex-col gap-6 md:gap-8 flex-grow">
+                {/* Unterrichtsblock */}
+                {backfaceContent?.lessonBlock && (
                   <div className="backface-item">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Clock size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
-                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
-                        Dauer
-                      </span>
-                    </div>
-                    <p className="text-lg md:text-xl font-semibold text-white leading-tight">
-                      {backfaceContent.duration}
+                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-2`}>
+                      {backfaceLabels?.lessonBlock || "Unterrichtsblock"}
+                    </span>
+                    <p className="text-lg md:text-xl font-bold text-white leading-tight">
+                      {backfaceContent.lessonBlock}
                     </p>
                   </div>
                 )}
                 
-                {/* Teilnehmerzahl */}
-                {backfaceContent?.participants && (
+                {/* Frequenz */}
+                {backfaceContent?.frequency && (
                   <div className="backface-item">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Users size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
-                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
-                        Teilnehmer
-                      </span>
-                    </div>
-                    <p className="text-lg md:text-xl font-semibold text-white leading-tight">
-                      {backfaceContent.participants}
+                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-2`}>
+                      {backfaceLabels?.frequency || "Frequenz"}
+                    </span>
+                    <p className="text-lg md:text-xl font-bold text-white leading-tight">
+                      {backfaceContent.frequency}
                     </p>
                   </div>
                 )}
@@ -567,13 +571,10 @@ export default function GlassCard({
                 {/* Termine */}
                 {backfaceContent?.start && (
                   <div className="backface-item">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Calendar size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
-                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
-                        Termine
-                      </span>
-                    </div>
-                    <p className="text-sm md:text-base font-semibold text-white/90 leading-tight">
+                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-2`}>
+                      {backfaceLabels?.appointments || "Termine"}
+                    </span>
+                    <p className="text-lg md:text-xl font-bold text-white leading-tight">
                       {backfaceContent.start}
                     </p>
                   </div>
@@ -582,36 +583,30 @@ export default function GlassCard({
                 {/* Fokus */}
                 {backfaceContent?.focus && (
                   <div className="backface-item">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <GraduationCap size={14} style={{ color: `${color}CC` }} strokeWidth={2} />
-                      <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/30`}>
-                        Fokus
-                      </span>
-                    </div>
-                    <p className="text-sm md:text-base font-semibold text-white/90 leading-tight">
+                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-2`}>
+                      {backfaceLabels?.focus || "Fokus"}
+                    </span>
+                    <p className="text-lg md:text-xl font-bold text-white leading-tight">
                       {backfaceContent.focus}
                     </p>
                   </div>
                 )}
               </div>
               
-              {/* Unten: Dozenten-Info als Badge */}
-              {backfaceContent?.instructor && (
-                <div className="backface-instructor mt-auto">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap size={16} style={{ color }} />
-                    <span 
-                      className={`${jetBrainsMono.className} text-xs font-bold px-3 py-1.5 rounded-full border backdrop-blur-md badge-glow`}
-                      style={{
-                        color,
-                        borderColor: `${color}40`,
-                        backgroundColor: `${color}10`,
-                        '--badge-color': color,
-                      } as React.CSSProperties}
-                    >
-                      {backfaceContent.instructor}
-                    </span>
-                  </div>
+              {/* Trennlinie vor Dozentin */}
+              {backfaceContent?.teacher && (
+                <div className="backface-divider h-px w-full" style={{ background: `${color}40` }} />
+              )}
+              
+              {/* Unten: Dozentin mit Highlight */}
+              {backfaceContent?.teacher && (
+                <div className="backface-teacher mt-auto pb-2 border-b-2" style={{ borderColor: `${color}60` }}>
+                  <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-2`}>
+                    {backfaceLabels?.teacher || "Dozentin"}
+                  </span>
+                  <p className="text-lg md:text-xl font-bold text-white leading-tight">
+                    {backfaceContent.teacher}
+                  </p>
                 </div>
               )}
             </div>

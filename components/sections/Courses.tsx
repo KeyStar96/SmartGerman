@@ -35,6 +35,18 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         // Level extrahieren (z.B. "A1.1", "A1.2", "B1", "B2")
         const level = item.level || item.title?.match(/([AB]\d+\.?\d*)/)?.[1] || "";
         
+        // Unterrichtsblock berechnen (z.B. "90 Min. (2x 45 Min.)" für Online)
+        const lessonBlock = item.lessonBlock || 
+          (item.duration?.includes("90") ? "90 Min. (2x 45 Min.)" : item.duration || "45 Min");
+        
+        // Frequenz berechnen (z.B. "2 Termine pro Woche" wenn & im Start)
+        const frequency = item.frequency || 
+          (item.start?.includes("&") ? "2 Termine pro Woche" : 
+           item.start?.includes("Di") && item.start?.includes("Mi") ? "2 Termine pro Woche" :
+           item.start?.includes("Mo") && item.start?.includes("Di") ? "2 Termine pro Woche" :
+           item.start?.includes("Do") && item.start?.includes("Fr") ? "2 Termine pro Woche" :
+           "1 Termin pro Woche");
+        
         return {
           id: item.title?.toLowerCase().replace(/\s+/g, "-") || `course-${index}`,
           title: item.title,
@@ -46,10 +58,12 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
           color: item.color || "#FF5C00",
           watermark: level || item.title?.substring(0, 2) || String(index + 1).padStart(2, "0"),
           // Backface-Content für Flip-Animation
-          duration: item.duration || "45 Min",
+          lessonBlock: lessonBlock,
+          frequency: frequency,
           focus: item.focus || "Grundlagen",
           start: item.start || "Flexibel",
           backDescription: item.backDescription || item.description,
+          teacher: item.teacher || "Anastasia Sitov", // Default Dozentin
         };
       });
     }
@@ -121,11 +135,14 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                 watermark={course.watermark}
                 inverted={index % 2 === 0}
                 backfaceContent={{
-                  duration: course.duration,
+                  lessonBlock: course.lessonBlock,
+                  frequency: course.frequency,
                   focus: course.focus,
                   start: course.start,
                   description: course.backDescription,
+                  teacher: course.teacher,
                 }}
+                backfaceLabels={dictionary?.courses?.backface_labels}
                 flipHintLabel={dictionary?.courses?.flip_hint || "Details zeigen"}
                 backHintLabel={dictionary?.courses?.back_hint || "Zurück"}
               >

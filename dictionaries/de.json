@@ -74,9 +74,12 @@
           "description": "Speziell für Lernende 50+ konzipiert. Lerntempo und Methodik sind auf diese Zielgruppe abgestimmt.",
           "price": "€ 2,50",
           "duration": "45 Min",
+          "lessonBlock": "45 Min",
+          "frequency": "2 Termine pro Woche",
           "focus": "Grundlagen für Anfänger 50+",
           "start": "Mo 9:00-10:30 & Di 10:30-12:00",
           "backDescription": "Kurs für Lernende ab 50 Jahren. Erlernen Sie die Grundlagen in entspannter Atmosphäre.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -86,9 +89,12 @@
           "description": "Fortsetzung des A1.1 Kurses für Lernende 50+. Vertiefen Sie Ihre Kenntnisse in einem unterstützenden Umfeld.",
           "price": "€ 2,50",
           "duration": "45 Min",
+          "lessonBlock": "45 Min",
+          "frequency": "2 Termine pro Woche",
           "focus": "Vertiefung A1-Stufe für 50+",
           "start": "Di 9:00-10:30 & Mi 10:30-12:00",
           "backDescription": "Fortsetzung des A1.1 Kurses. Erweitern Sie Ihre Grundkenntnisse in altersgerechtem Tempo.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -98,9 +104,12 @@
           "description": "Für Lernende 50+ mit Vorkenntnissen. Erweitern Sie Ihren Wortschatz für den Alltag.",
           "price": "€ 2,50",
           "duration": "45 Min",
+          "lessonBlock": "45 Min",
+          "frequency": "2 Termine pro Woche",
           "focus": "Alltagskommunikation für 50+",
           "start": "Mo 10:30-12:00 & Mi 9:00-10:30",
           "backDescription": "Bauen Sie auf Ihren Grundkenntnissen auf und meistern Sie alltägliche Situationen.",
+          "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
         {
@@ -110,9 +119,12 @@
           "description": "Fokus auf mündliche Kommunikation. Verbessern Sie Ihre Aussprache und Sprechfähigkeit.",
           "price": "€ 3,50",
           "duration": "60 Min",
+          "lessonBlock": "60 Min",
+          "frequency": "1 Termin pro Woche",
           "focus": "Mündliche Kommunikation A1",
           "start": "Di 12:00-13:00 (1x 60 min)",
           "backDescription": "Intensives Sprechtraining für Anfänger. Üben Sie in kleinen Gruppen Ihre Aussprache.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -122,9 +134,12 @@
           "description": "Fortsetzung des Sprechtrainings. Vertiefen Sie Ihre mündlichen Fähigkeiten auf A1-Niveau.",
           "price": "€ 3,50",
           "duration": "60 Min",
+          "lessonBlock": "60 Min",
+          "frequency": "1 Termin pro Woche",
           "focus": "Mündliche Kommunikation A1.2",
           "start": "Mi 12:00-13:00 (1x 60 min)",
           "backDescription": "Weiterführendes Sprechtraining mit Fokus auf flüssiges Sprechen und korrekte Aussprache.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -134,9 +149,12 @@
           "description": "Für Lernende mit A2-Vorkenntnissen. Perfektionieren Sie Ihre mündliche Kommunikation.",
           "price": "€ 3,50",
           "duration": "60 Min",
+          "lessonBlock": "60 Min",
+          "frequency": "1 Termin pro Woche",
           "focus": "Mündliche Kommunikation A2",
           "start": "Mo 12:00-13:00 (1x 60 min)",
           "backDescription": "Sprechtraining für fortgeschrittene Anfänger. Trainieren Sie komplexere Gespräche.",
+          "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
         {
@@ -146,9 +164,12 @@
           "description": "Online-Kurs für Anfänger. Lernen Sie bequem von zu Hause aus die Grundlagen der deutschen Sprache.",
           "price": "€ 7,50",
           "duration": "45 Min",
+          "lessonBlock": "90 Min. (2x 45 Min.)",
+          "frequency": "2 Termine pro Woche",
           "focus": "Online Grundlagen A1.1",
           "start": "Do & Fr 19:00-20:30",
           "backDescription": "Flexibles Online-Lernen in den Abendstunden. Perfekt für Berufstätige.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
         {
@@ -158,9 +179,12 @@
           "description": "Online-Kurs für Fortgeschrittene. Erreichen Sie ein solides Mittelstufenniveau bequem von zu Hause.",
           "price": "€ 7,50",
           "duration": "45 Min",
+          "lessonBlock": "90 Min. (2x 45 Min.)",
+          "frequency": "2 Termine pro Woche",
           "focus": "Online Mittelstufe B1",
           "start": "Mo & Di 14:30-16:00",
           "backDescription": "Online-Kurs für selbstständige Sprachverwendung. Ideal für Lernende mit Grundkenntnissen.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
         {
@@ -170,9 +194,12 @@
           "description": "Online-Kurs für fortgeschrittene Lernende. Perfektionieren Sie Ihr Deutsch auf hohem Niveau.",
           "price": "€ 7,50",
           "duration": "45 Min",
+          "lessonBlock": "90 Min. (2x 45 Min.)",
+          "frequency": "2 Termine pro Woche",
           "focus": "Online Fortgeschritten B2",
           "start": "Mo & Mi 16:00-17:30",
           "backDescription": "Hochwertiger Online-Kurs für anspruchsvolle berufliche und akademische Situationen.",
+          "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         }
       ]
@@ -192,6 +219,13 @@
       "price_label": "Preis",
       "flip_hint": "DETAILS",
       "back_hint": "ZURÜCK",
+      "backface_labels": {
+        "lesson_block": "Unterrichtsblock",
+        "frequency": "Frequenz",
+        "appointments": "Termine",
+        "focus": "Fokus",
+        "teacher": "Dozentin"
+      },
       "a1": {
         "name": "A1 Anfänger",
         "desc": "Der ideale Einstieg ohne Vorkenntnisse."
