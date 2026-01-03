@@ -482,98 +482,92 @@ body {
       transition: opacity 0.3s ease;
     }
     
-    /* Glass Tab mit Flip-Icon - Container */
-    .flip-tab-container {
+    /* EXPANDING FLIP-INDICATOR (Expanding Pill Design) */
+    .flip-indicator-container {
       position: absolute;
       top: 1rem;
       right: 1rem;
       z-index: 30;
       cursor: pointer;
-    }
-    
-    /* Glass Tab - Das Tab selbst */
-    .flip-tab {
+      
+      /* Pill-Shape */
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: 40px;
+      width: 40px; /* Initial: Kreis */
+      border-radius: 9999px; /* Pill-Form */
+      
+      /* Glass-Effekt */
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      
+      /* Initial: Versteckt */
       opacity: 0;
       transform: scale(0.8);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      color: rgba(255, 255, 255, 0.6);
+      
+      /* Smooth Expansion */
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      
+      color: rgba(255, 255, 255, 0.8);
     }
     
-    /* Hover: Tab wird sichtbar */
-    .card-interactive-container:hover .flip-tab {
+    /* Hover auf Card: Indicator wird sichtbar */
+    .card-interactive-container:hover .flip-indicator-container {
       opacity: 1;
       transform: scale(1);
     }
     
-    /* Hover auf Tab selbst: Glow-Puls-Effekt */
-    .flip-tab:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--tab-color, #FF5C00);
-      color: var(--tab-color, #FF5C00);
+    /* Hover auf Indicator selbst: Expandiert zur Pill mit Text */
+    .flip-indicator-container:hover {
+      width: 160px; /* Expandiert für Text */
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--indicator-color, #FF5C00);
       box-shadow: 
-        0 0 15px var(--tab-color, #FF5C00),
-        0 0 30px rgba(255, 92, 0, 0.3);
-      animation: flip-tab-pulse 1.5s ease-in-out infinite;
+        0 0 20px var(--indicator-color, #FF5C00),
+        0 0 40px rgba(255, 92, 0, 0.2);
     }
     
-    /* Icon-Rotation bei Hover */
-    .flip-tab-icon {
-      transition: transform 0.3s ease;
+    /* Icon im Indicator */
+    .flip-indicator-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    .flip-tab:hover .flip-tab-icon {
+    /* Icon rotiert bei Hover um 180° */
+    .flip-indicator-container:hover .flip-indicator-icon {
       transform: rotate(-180deg);
     }
     
-    /* Puls-Animation für Glow-Effekt */
-    @keyframes flip-tab-pulse {
-      0%, 100% {
-        box-shadow: 
-          0 0 15px var(--tab-color, #FF5C00),
-          0 0 30px rgba(255, 92, 0, 0.3);
-      }
-      50% {
-        box-shadow: 
-          0 0 20px var(--tab-color, #FF5C00),
-          0 0 40px rgba(255, 92, 0, 0.5);
-      }
-    }
-    
-    /* MAGNETIC CURSOR HINT - Awwwards Style */
-    .magnetic-hint-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      mix-blend-mode: difference;
-      z-index: 50;
-      opacity: 0;
-      transform: scale(0.5);
-      transform-origin: center center;
-    }
-    
-    .hint-glow {
-      display: block;
+    /* Text im Indicator */
+    .flip-indicator-text {
       font-size: 10px;
-      font-weight: 900;
-      letter-spacing: 0.3em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: white;
-      filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8)) 
-              drop-shadow(0 0 8px var(--card-color, #FF5C00));
-      text-rendering: optimizeLegibility;
       white-space: nowrap;
-      transform: translate(-50%, -50%);
+      color: white;
+      
+      /* Initial versteckt */
+      max-width: 0;
+      opacity: 0;
+      margin-left: 0;
+      
+      /* Smooth reveal */
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Text wird bei Hover sichtbar */
+    .flip-indicator-container:hover .flip-indicator-text {
+      max-width: 120px;
+      opacity: 1;
+      margin-left: 8px;
     }
     
     /* Card Faces (Front & Back) - Verbesserte 3D-Drehung */

@@ -32,9 +32,8 @@ export interface GlassCardProps {
     start?: string;
     description?: string; // Bug 4: Beschreibung für Rückseite
   };
-  // Hint-Labels für Magnetic Cursor (übersetzbar)
+  // Hint-Label für Expanding Flip-Indicator (übersetzbar)
   flipHintLabel?: string;
-  backHintLabel?: string;
 }
 
 export default function GlassCard({
@@ -50,17 +49,14 @@ export default function GlassCard({
   trigger,
   inverted = true,
   backfaceContent,
-  flipHintLabel = "KLICK ZUM DREHEN",
-  backHintLabel = "ZURÜCK",
+  flipHintLabel = "Details zeigen",
 }: GlassCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const flipContainerRef = useRef<HTMLDivElement>(null);
   const frontFaceRef = useRef<HTMLDivElement>(null);
   const backFaceRef = useRef<HTMLDivElement>(null);
   const watermarkRef = useRef<HTMLDivElement>(null);
   const flipGlowRef = useRef<HTMLDivElement>(null);
-  const cursorHintRef = useRef<HTMLDivElement>(null);
 
   // 3D Flip-Animation mit GSAP - Verbesserte echte 180° Drehung
   // Nur aktiv wenn backfaceContent vorhanden ist
@@ -239,76 +235,6 @@ export default function GlassCard({
     }
   };
 
-  // MAGNETIC CURSOR HINT - Folgt dem Mauszeiger mit smoothem Easing
-  useEffect(() => {
-    if (!backfaceContent) return;
-    
-    const container = flipContainerRef.current?.closest(".card-interactive-container") as HTMLElement;
-    const hint = cursorHintRef.current;
-    if (!container || !hint) return;
-
-    // GSAP quickSetter für Performance
-    const setX = gsap.quickSetter(hint, "x", "px");
-    const setY = gsap.quickSetter(hint, "y", "px");
-    
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let rafId: number;
-    
-    const lerp = (start: number, end: number, factor: number) => {
-      return start + (end - start) * factor;
-    };
-    
-    const animate = () => {
-      currentX = lerp(currentX, targetX, 0.15);
-      currentY = lerp(currentY, targetY, 0.15);
-      setX(currentX);
-      setY(currentY);
-      rafId = requestAnimationFrame(animate);
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      targetX = e.clientX - rect.left;
-      targetY = e.clientY - rect.top;
-    };
-
-    const handleMouseEnter = () => {
-      setIsHovered(true);
-      // Start Animation
-      gsap.to(hint, {
-        opacity: 1,
-        scale: 1,
-        duration: 0.3,
-        ease: "power2.out",
-      });
-      rafId = requestAnimationFrame(animate);
-    };
-
-    const handleMouseLeave = () => {
-      setIsHovered(false);
-      gsap.to(hint, {
-        opacity: 0,
-        scale: 0.5,
-        duration: 0.2,
-        ease: "power2.in",
-      });
-      cancelAnimationFrame(rafId);
-    };
-
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseenter", handleMouseEnter);
-    container.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseenter", handleMouseEnter);
-      container.removeEventListener("mouseleave", handleMouseLeave);
-      cancelAnimationFrame(rafId);
-    };
-  }, [backfaceContent]);
 
   // DEBUGGING: Log GlassCard Props
   useEffect(() => {
@@ -352,38 +278,25 @@ export default function GlassCard({
           />
         )}
         
-        {/* Glass Tab mit Flip-Icon - nur bei Karten mit Backflip */}
+        {/* Expanding Flip-Indicator (Expanding Pill Design) - nur bei Karten mit Backflip */}
         {hasBackface && (
           <div 
-            className="flip-tab-container"
+            className="flip-indicator-container"
             onClick={(e) => {
               e.stopPropagation();
               setIsFlipped(!isFlipped);
             }}
-          >
-            <div 
-              className="flip-tab"
-              style={{ 
-                '--tab-color': color,
-                borderColor: `${color}30`,
-              } as React.CSSProperties}
-            >
-              <RotateCcw size={14} strokeWidth={2} className="flip-tab-icon" />
-            </div>
-          </div>
-        )}
-        
-        {/* MAGNETIC CURSOR HINT - Schwebt dem Cursor hinterher */}
-        {hasBackface && (
-          <div 
-            ref={cursorHintRef}
-            className="magnetic-hint-container"
-            style={{
-              '--card-color': color,
+            style={{ 
+              '--indicator-color': color,
             } as React.CSSProperties}
           >
-            <span className={`${jetBrainsMono.className} hint-glow`}>
-              {isFlipped ? backHintLabel : flipHintLabel}
+            {/* Icon Container - wird bei Hover nach links geschoben */}
+            <div className="flip-indicator-icon">
+              <RotateCcw size={16} strokeWidth={2} />
+            </div>
+            {/* Text - wird bei Hover sichtbar */}
+            <span className={`${jetBrainsMono.className} flip-indicator-text`}>
+              {flipHintLabel}
             </span>
           </div>
         )}

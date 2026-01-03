@@ -125,8 +125,7 @@
     "courses": {
       "title": "Our Courses",
       "subtitle": "From beginner to pro – we have the right course for you.",
-      "flip_hint": "CLICK TO FLIP",
-      "back_hint": "BACK",
+      "flip_hint": "Show details",
       "a1": {
         "name": "A1 Beginner",
         "desc": "The ideal start without prior knowledge."
