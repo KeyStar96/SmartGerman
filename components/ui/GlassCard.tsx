@@ -338,13 +338,14 @@ export default function GlassCard({
             )}
             <div className="flex justify-between items-start mb-4 md:mb-6 gap-3">
               <div className="flex items-center gap-3">
-                {/* Level-Label für Courses oder Icon für Features */}
+                {/* Level-Label für Courses als Badge-Pill */}
                 {level ? (
                   <span 
-                    className={`${jetBrainsMono.className} text-lg md:text-xl font-bold tracking-wider level-label-glow`}
+                    className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300 badge-glow`}
                     style={{ 
                       color,
-                      '--level-color': color,
+                      borderColor: `${color}40`,
+                      '--badge-color': color,
                     } as React.CSSProperties}
                   >
                     {level}
@@ -439,19 +440,35 @@ export default function GlassCard({
             </div>
           )}
           
-          {/* Badge auf Rückseite - oben links wie auf der Vorderseite */}
-          {badge && (
-            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
-              <span 
-                className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md badge-glow`}
-                style={{ 
-                  color,
-                  borderColor: `${color}40`,
-                  '--badge-color': color,
-                } as React.CSSProperties}
-              >
-                {badge}
-              </span>
+          {/* Level und Badge auf Rückseite - oben links wie auf der Vorderseite */}
+          {(level || badge) && (
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20 flex items-center gap-3">
+              {/* Level-Label auf Rückseite */}
+              {level && (
+                <span 
+                  className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md badge-glow`}
+                  style={{ 
+                    color,
+                    borderColor: `${color}40`,
+                    '--badge-color': color,
+                  } as React.CSSProperties}
+                >
+                  {level}
+                </span>
+              )}
+              {/* Badge auf Rückseite */}
+              {badge && (
+                <span 
+                  className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md badge-glow`}
+                  style={{ 
+                    color,
+                    borderColor: `${color}40`,
+                    '--badge-color': color,
+                  } as React.CSSProperties}
+                >
+                  {badge}
+                </span>
+              )}
             </div>
           )}
           
