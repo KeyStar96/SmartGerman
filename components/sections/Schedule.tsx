@@ -51,8 +51,12 @@ export default function Schedule({ dictionary, lang }: ScheduleProps) {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [hoveredDay, setHoveredDay] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [showFAB, setShowFAB] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const daySelectorRef = useRef<HTMLDivElement>(null);
+  const fabRef = useRef<HTMLButtonElement>(null);
+  const fabTextRef = useRef<HTMLSpanElement>(null);
 
   // Helper: Tag-Abkürzungen in verschiedenen Sprachen zu Standard-Tagen mappen
   const normalizeDay = (dayString: string): string => {
@@ -213,6 +217,89 @@ export default function Schedule({ dictionary, lang }: ScheduleProps) {
     return grouped;
   }, [scheduleData, activeDay, activeFilter]);
 
+  // Scroll-Detection: FAB erscheint erst nach Hero-Section
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroSection = document.querySelector('section[class*="relative flex flex-col justify-center"]');
+      if (heroSection) {
+        const heroBottom = heroSection.getBoundingClientRect().bottom;
+        // FAB erscheint, wenn Hero-Section aus dem Viewport ist
+        setShowFAB(heroBottom < 0);
+      } else {
+        // Fallback: Nach 100vh scrollen
+        setShowFAB(window.scrollY > window.innerHeight);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // GSAP Magnetic-Effect für FAB
+  useEffect(() => {
+    const fab = fabRef.current;
+    if (!fab) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = fab.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      
+      const distanceX = mouseX - centerX;
+      const distanceY = mouseY - centerY;
+      
+      // Magnetic-Effect: Button zieht sich zum Mauszeiger (max 15px)
+      const maxDistance = 100; // Radius für Magnetic-Effect
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      
+      if (distance < maxDistance) {
+        const strength = (1 - distance / maxDistance) * 0.5; // 0-0.5 Stärke
+        const moveX = distanceX * strength;
+        const moveY = distanceY * strength;
+        
+        gsap.to(fab, {
+          x: moveX,
+          y: moveY,
+          duration: 0.3,
+          ease: "power2.out",
+        });
+      } else {
+        // Zurück zur ursprünglichen Position
+        gsap.to(fab, {
+          x: 0,
+          y: 0,
+          duration: 0.5,
+          ease: "power2.out",
+        });
+      }
+    };
+
+    const handleMouseLeave = () => {
+      gsap.to(fab, {
+        x: 0,
+        y: 0,
+        duration: 0.5,
+        ease: "power2.out",
+      });
+    };
+
+    // Nur auf Desktop (mit Maus)
+    if (window.matchMedia('(pointer: fine)').matches) {
+      window.addEventListener('mousemove', handleMouseMove);
+      fab.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      fab.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
+
   // Modal öffnen/schließen mit GSAP-Animation
   useEffect(() => {
     if (isOpen && modalRef.current) {
@@ -240,28 +327,74 @@ export default function Schedule({ dictionary, lang }: ScheduleProps) {
 
   return (
     <>
-      {/* Sticky Button am unteren Rand */}
-      <motion.button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50
-          px-6 py-4 rounded-full
-          bg-white/10 backdrop-blur-md border border-white/20
-          hover:bg-white/20 hover:border-white/40
-          transition-all duration-300
-          shadow-lg shadow-black/20
-          flex items-center gap-3
-          group/btn"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-      >
-        <Calendar size={20} className="text-white" />
-        <span className={`${jetBrainsMono.className} text-sm font-bold text-white uppercase tracking-wider`}>
-          {scheduleDict.open_button || "Wochenplan öffnen"}
-        </span>
-      </motion.button>
+      {/* Floating Action Orb */}
+      <AnimatePresence>
+        {showFAB && (
+          <motion.button
+            ref={fabRef}
+            onClick={() => setIsOpen(true)}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="fixed bottom-6 right-6 z-50
+              w-14 h-14 md:w-16 md:h-16
+              rounded-full
+              bg-[#D4FF3F]/80 backdrop-blur-sm
+              border border-[#D4FF3F]
+              shadow-lg shadow-[#D4FF3F]/30
+              hover:bg-[#D4FF3F] hover:shadow-[#D4FF3F]/50
+              flex items-center justify-center
+              overflow-visible
+              group/fab
+              transition-all duration-300"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            {/* Icon - immer sichtbar */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              animate={{
+                scale: isHovered ? 0.85 : 1,
+                opacity: isHovered ? 0.7 : 1,
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              <Calendar size={24} className="text-black md:w-6 md:h-6" />
+            </motion.div>
+
+            {/* Text - nur auf Desktop bei Hover */}
+            <motion.span
+              ref={fabTextRef}
+              className={`${jetBrainsMono.className} absolute whitespace-nowrap
+                text-sm font-bold text-black uppercase tracking-wider
+                opacity-0 pointer-events-none
+                hidden md:block`}
+              animate={{
+                opacity: isHovered ? 1 : 0,
+                x: isHovered ? 0 : 20,
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              style={{
+                left: "calc(100% + 12px)",
+              }}
+            >
+              {scheduleDict.open_button || "Wochenplan"}
+            </motion.span>
+
+            {/* Expanded Background - nur auf Desktop bei Hover */}
+            <motion.div
+              className="absolute inset-0 rounded-full bg-[#D4FF3F]/30 backdrop-blur-sm hidden md:block -z-10"
+              animate={{
+                scale: isHovered ? 2 : 1,
+                opacity: isHovered ? 1 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Fullscreen Modal */}
       <AnimatePresence>
