@@ -459,7 +459,9 @@ body {
       position: relative;
       width: 100%;
       height: 100%;
-      overflow: hidden;
+      overflow: visible; /* Wichtig für Flip-Animation Glow */
+      perspective: 1200px; /* Perspective für 3D Flip */
+      perspective-origin: center center;
     }
     
     /* Spotlight-Glow Layer */
@@ -477,22 +479,52 @@ body {
       opacity: 1;
     }
     
+    /* Gradient-Glow in Akzentfarbe */
+    .card-accent-glow {
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 2rem;
+      border: 1px solid transparent;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      mix-blend-mode: screen;
+    }
+    
+    .card-interactive-container:hover .card-accent-glow {
+      opacity: 1;
+    }
+    
     /* Tilt-Effekt für 3D-Neigung */
     .card-tilt {
       transition: transform 0.1s ease-out;
       will-change: transform;
     }
     
-    /* 3D Flip-Container */
+    /* 3D Flip-Container - Verbesserte Perspective für echte 180° Drehung */
     .card-flip-container {
       position: relative;
       width: 100%;
       height: 100%;
       transform-style: preserve-3d;
-      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      /* Perspective wird inline gesetzt */
     }
     
-    /* Card Faces (Front & Back) */
+    /* Glow-Effekt während Flip-Animation */
+    .card-flip-glow {
+      position: absolute;
+      inset: -4px;
+      border-radius: 2rem;
+      border: 2px solid transparent;
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+      filter: blur(10px);
+      transition: opacity 0.3s ease;
+    }
+    
+    /* Card Faces (Front & Back) - Verbesserte 3D-Drehung */
     .card-face {
       position: absolute;
       width: 100%;
@@ -501,15 +533,21 @@ body {
       -webkit-backface-visibility: hidden;
       border-radius: 2rem;
       overflow: hidden;
+      /* Rahmen-Effekt während der Drehung */
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 20px 40px -20px rgba(0, 0, 0, 0.5);
     }
     
     .card-face-front {
-      transform: rotateY(0deg);
+      transform: rotateY(0deg) translateZ(1px);
     }
     
     .card-face-back {
-      transform: rotateY(180deg);
+      transform: rotateY(180deg) translateZ(1px);
     }
+    
     
     /* Shimmer-Effekt: Diagonaler Lichtstreifen bei Hover */
     .card-face-front::before {
@@ -547,6 +585,17 @@ body {
     
     .card-interactive-container:hover .watermark-glow {
       filter: drop-shadow(0 0 20px currentColor);
+    }
+    
+    /* Badge/Label Glow-Effekt (wie Watermark) */
+    .badge-glow {
+      filter: drop-shadow(0 0 0px var(--badge-color, currentColor));
+      transition: filter 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-interactive-container:hover .badge-glow {
+      filter: drop-shadow(0 0 15px var(--badge-color, currentColor));
+      box-shadow: 0 0 20px calc(var(--badge-color, currentColor) + "40");
     }
     
     /* Variable Font Weight für Price */

@@ -50,31 +50,85 @@ export default function GlassCard({
   const frontFaceRef = useRef<HTMLDivElement>(null);
   const backFaceRef = useRef<HTMLDivElement>(null);
   const watermarkRef = useRef<HTMLDivElement>(null);
+  const flipGlowRef = useRef<HTMLDivElement>(null);
 
-  // 3D Flip-Animation mit GSAP
+  // 3D Flip-Animation mit GSAP - Verbesserte echte 180° Drehung
   useEffect(() => {
     const container = flipContainerRef.current;
     const front = frontFaceRef.current;
     const back = backFaceRef.current;
+    const glow = flipGlowRef.current;
     
     if (!container || !front || !back) return;
 
     if (isFlipped) {
+      // Glow-Effekt während der Drehung
+      if (glow) {
+        gsap.to(glow, {
+          opacity: 0.6,
+          duration: 0.45,
+          ease: "power2.inOut",
+          yoyo: true,
+          repeat: 1,
+        });
+      }
+      
+      // Front Face ausblenden während der Drehung
+      gsap.to(front, {
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+        delay: 0.1,
+      });
+      
+      // Container drehen mit besserer Perspective
       gsap.to(container, {
         rotateY: 180,
-        duration: 0.8,
-        ease: "power2.inOut",
+        duration: 0.9,
+        ease: "power3.inOut",
       });
-      gsap.set(front, { opacity: 0 });
-      gsap.set(back, { opacity: 1 });
+      
+      // Back Face einblenden
+      gsap.to(back, {
+        opacity: 1,
+        duration: 0.3,
+        delay: 0.4,
+        ease: "power2.out",
+      });
     } else {
+      // Glow-Effekt während der Rückdrehung
+      if (glow) {
+        gsap.to(glow, {
+          opacity: 0.6,
+          duration: 0.45,
+          ease: "power2.inOut",
+          yoyo: true,
+          repeat: 1,
+        });
+      }
+      
+      // Back Face ausblenden
+      gsap.to(back, {
+        opacity: 0,
+        duration: 0.3,
+        ease: "power2.in",
+        delay: 0.1,
+      });
+      
+      // Container zurückdrehen
       gsap.to(container, {
         rotateY: 0,
-        duration: 0.8,
-        ease: "power2.inOut",
+        duration: 0.9,
+        ease: "power3.inOut",
       });
-      gsap.set(front, { opacity: 1 });
-      gsap.set(back, { opacity: 0 });
+      
+      // Front Face einblenden
+      gsap.to(front, {
+        opacity: 1,
+        duration: 0.3,
+        delay: 0.4,
+        ease: "power2.out",
+      });
     }
   }, [isFlipped]);
 
@@ -144,13 +198,27 @@ export default function GlassCard({
   };
 
   return (
-    <ScrollReveal3DGlass trigger={trigger} inverted={inverted} className={`h-full ${className}`}>
+    <ScrollReveal3DGlass 
+      trigger={trigger} 
+      inverted={inverted} 
+      className={`h-full ${className}`}
+      accentColor={color}
+    >
       <div 
         ref={flipContainerRef}
         className="card-flip-container"
         onClick={handleCardClick}
         style={{ cursor: "pointer" }}
       >
+        {/* Glow-Effekt während Flip */}
+        <div 
+          ref={flipGlowRef}
+          className="card-flip-glow"
+          style={{
+            background: `linear-gradient(135deg, ${color}40, transparent)`,
+            borderColor: color,
+          }}
+        />
         {/* Front Face */}
         <div 
           ref={frontFaceRef}
@@ -180,11 +248,12 @@ export default function GlassCard({
               )}
               {badge && (
                 <span 
-                  className={`${jetBrainsMono.className} text-xs font-bold tracking-widest px-3 py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300`}
+                  className={`${jetBrainsMono.className} text-xs font-bold tracking-widest px-3 py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300 badge-glow`}
                   style={{ 
                     color,
                     borderColor: `${color}40`,
-                  }}
+                    '--badge-color': color,
+                  } as React.CSSProperties}
                 >
                   {badge}
                 </span>

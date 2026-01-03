@@ -98,11 +98,11 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         const mouseY = e.clientY - centerY;
         const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
         
-        // Magnetic-Effekt im Umkreis von 50px
-        if (distance < 50) {
-          const strength = (50 - distance) / 50; // 0-1
-          const moveX = mouseX * strength * 0.3; // Max 30% Verschiebung
-          const moveY = mouseY * strength * 0.3;
+        // Magnetic-Effekt im Umkreis von 100px (verstärkt)
+        if (distance < 100) {
+          const strength = (100 - distance) / 100; // 0-1
+          const moveX = mouseX * strength * 0.5; // Max 50% Verschiebung (verstärkt)
+          const moveY = mouseY * strength * 0.5;
           
           gsap.to(button, {
             x: moveX,

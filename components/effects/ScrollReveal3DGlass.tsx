@@ -8,6 +8,7 @@ interface ScrollReveal3DGlassProps {
   className?: string;
   trigger?: React.RefObject<HTMLElement>;
   inverted?: boolean;
+  accentColor?: string; // Akzentfarbe für Gradient-Glow
 }
 
 export default function ScrollReveal3DGlass({
@@ -15,6 +16,7 @@ export default function ScrollReveal3DGlass({
   className = "",
   trigger,
   inverted = true,
+  accentColor = "#FF5C00",
 }: ScrollReveal3DGlassProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,13 +84,21 @@ export default function ScrollReveal3DGlass({
     <div 
       ref={containerRef}
       className={`${className} card-interactive-container`}
-      style={{ perspective: "1200px" }}
     >
       {/* Spotlight-Glow Layer */}
       <div 
         className="card-spotlight"
         style={{
           background: `radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.08), transparent 70%)`,
+        }}
+      />
+      
+      {/* Gradient-Glow in Akzentfarbe */}
+      <div 
+        className="card-accent-glow"
+        style={{
+          background: `radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), ${accentColor}15, transparent 60%)`,
+          borderColor: accentColor,
         }}
       />
       
