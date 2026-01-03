@@ -319,17 +319,26 @@ body {
       border-radius: 2rem;
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      /* Smooth transition für Hover-Effekte */
+      transition: all 0.4s ease, backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
       /* WICHTIG: Kein will-change hier - wird dynamisch von GSAP gesetzt */
     }
     
-    /* Hover-Effekt für Glass Card - mit integriertem Glow */
+    /* Hover-Effekt für Glass Card - Border-Glow statt Shimmer */
     .group\/card:hover .glass-card-bg {
-      border-color: rgba(255, 255, 255, 0.2);
-      background: rgba(25, 25, 25, 0.75);
+      /* Stärkerer Blur bei Hover */
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      backdrop-filter: blur(28px) saturate(200%);
+      /* Leuchtender Border mit Accent-Farbe */
+      border-color: var(--accent-color, #FF5C00);
+      border-width: 1px;
+      background: rgba(25, 25, 25, 0.8);
+      /* Subtiler Border-Glow */
       box-shadow: 
-        0 25px 50px -12px rgba(0, 0, 0, 0.4),
-        0 0 40px -10px var(--accent-color, #FF5C00),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 20px -5px var(--accent-color, #FF5C00),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      transition: all 0.4s ease;
     }
     
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
@@ -492,21 +501,21 @@ body {
       width: 40px; /* Initial: Kreis */
       border-radius: 9999px; /* Pill-Form */
       
-      /* Glass-Effekt */
-      background: rgba(255, 255, 255, 0.1);
+      /* Weniger transparent - solider Glass-Effekt */
+      background: rgba(40, 40, 40, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       
       /* Initial: Versteckt */
       opacity: 0;
       transform: scale(0.8);
       
       /* Smooth Expansion */
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
       
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(255, 255, 255, 0.9);
     }
     
     /* Hover auf Card: Indicator wird sichtbar */
@@ -515,14 +524,12 @@ body {
       transform: scale(1);
     }
     
-    /* Hover auf Indicator selbst: Expandiert zur Pill mit Text */
+    /* Hover auf Indicator selbst: Expandiert zur Pill mit Text - OHNE Glow */
     .flip-indicator-container:hover {
       width: 160px; /* Expandiert für Text */
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(50, 50, 50, 0.9);
       border-color: var(--indicator-color, #FF5C00);
-      box-shadow: 
-        0 0 20px var(--indicator-color, #FF5C00),
-        0 0 40px rgba(255, 92, 0, 0.2);
+      /* Kein box-shadow Glow mehr */
     }
     
     /* Icon im Indicator */
@@ -569,16 +576,14 @@ body {
        Flip-Indicator ist auf Touch-Geräten IMMER expandiert
        ============================================ */
     @media (hover: none) {
-      /* Flip-Indicator: Immer sichtbar und expandiert auf Touch */
+      /* Flip-Indicator: Immer sichtbar und expandiert auf Touch - OHNE Glow */
       .flip-indicator-container {
         opacity: 1 !important;
         transform: scale(1) !important;
         width: 110px; /* Kompaktere Breite für Mobile */
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(40, 40, 40, 0.9);
         border-color: var(--indicator-color, #FF5C00);
-        box-shadow: 
-          0 0 15px var(--indicator-color, #FF5C00),
-          0 0 30px rgba(255, 92, 0, 0.15);
+        /* Kein Glow mehr */
       }
       
       /* Text immer sichtbar auf Touch */
@@ -591,7 +596,7 @@ body {
       /* Active-State für Touch-Feedback */
       .flip-indicator-container:active {
         transform: scale(0.95) !important;
-        background: rgba(255, 255, 255, 0.25);
+        background: rgba(60, 60, 60, 0.95);
       }
     }
     
@@ -633,33 +638,7 @@ body {
     }
     
     
-    /* Shimmer-Effekt: Diagonaler Lichtstreifen bei Hover */
-    .card-face-front::before,
-    .card-face-back::before,
-    .card-face-simple::before {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        45deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.1) 50%,
-        transparent 70%
-      );
-      transform: translateX(-100%) translateY(-100%) rotate(45deg);
-      transition: transform 0.6s ease;
-      pointer-events: none;
-      z-index: 20;
-    }
-    
-    .card-interactive-container:hover .card-face-front::before,
-    .card-interactive-container:hover .card-face-back::before,
-    .card-interactive-container:hover .card-face-simple::before {
-      transform: translateX(100%) translateY(100%) rotate(45deg);
-    }
+    /* Shimmer-Effekt wurde entfernt - stattdessen Border-Glow auf .glass-card-bg */
     
     /* Watermark Parallax & Glow */
     .watermark-parallax {
