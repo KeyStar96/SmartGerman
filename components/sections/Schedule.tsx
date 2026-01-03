@@ -1,17 +1,34 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar, Download, Monitor, MapPin, ArrowRight } from "lucide-react";
+import { X, Calendar, Download, Monitor, MapPin } from "lucide-react";
 import { JetBrains_Mono, Instrument_Serif } from "next/font/google";
 
 const jetBrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "700"] });
 const instrumentSerif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "italic" });
 
-export default function Schedule({ dictionary, lang }: any) {
+interface ScheduleProps {
+  dictionary: any;
+  lang?: string;
+}
+
+export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredDay, setHoveredDay] = useState("Mo");
   const [isVisible, setIsVisible] = useState(false);
+  const [hasHover, setHasHover] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+
+  // Erkenne ob Gerät Hover unterstützt (Desktop mit Cursor)
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover)");
+    setHasHover(mediaQuery.matches);
+    
+    const handleChange = (e: MediaQueryListEvent) => setHasHover(e.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsVisible(window.scrollY > 400);
@@ -23,32 +40,119 @@ export default function Schedule({ dictionary, lang }: any) {
   
   // Mapping für Farben & Icons basierend auf deinem Spaceship-System
   const getCourseStyles = (type: string) => {
-    if (type.toLowerCase() === 'online') return { color: 'var(--accent-lime)', icon: <Monitor size={16} /> };
+    if (type?.toLowerCase() === 'online') return { color: 'var(--accent-lime)', icon: <Monitor size={16} /> };
     return { color: 'var(--primary-orange)', icon: <MapPin size={16} /> };
   };
 
-  const scheduleData = dictionary?.sections?.schedule?.items || {};
+  // Extrahiere Kurse aus courses.items und gruppiere nach Tagen
+  const scheduleData = useMemo(() => {
+    const courses = dictionary?.sections?.courses?.items || [];
+    const grouped: { [key: string]: any[] } = {
+      Mo: [],
+      Di: [],
+      Mi: [],
+      Do: [],
+      Fr: []
+    };
+
+    courses.forEach((course: any) => {
+      if (!course.start) return;
+      
+      // Parse Start-Zeiten (z.B. "Mo 9:00-10:30 & Di 10:30-12:00" oder "Di 12:00-13:00")
+      const dayMap: { [key: string]: string } = {
+        "Mo": "Mo",
+        "Mon": "Mo",
+        "Di": "Di",
+        "Tue": "Di",
+        "Mi": "Mi",
+        "Wed": "Mi",
+        "Do": "Do",
+        "Thu": "Do",
+        "Fr": "Fr",
+        "Fri": "Fr"
+      };
+
+      // Teile bei "&" auf für mehrere Tage
+      const parts = course.start.split("&").map((p: string) => p.trim());
+      
+      parts.forEach((part: string) => {
+        // Finde Tag-Abkürzung
+        for (const [key, day] of Object.entries(dayMap)) {
+          if (part.includes(key)) {
+            // Extrahiere Zeit (z.B. "9:00-10:30" oder "12:00-13:00")
+            const timeMatch = part.match(/(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/);
+            const time = timeMatch ? `${timeMatch[1]}-${timeMatch[2]}` : part.replace(key, "").trim();
+            
+            grouped[day].push({
+              title: course.title,
+              time: time,
+              type: course.badge || "Präsenz",
+              instructor: course.teacher || dictionary?.schedule?.instructor || "Dozentin",
+              location: course.badge === "Online" ? "Online" : "Hannover"
+            });
+            break;
+          }
+        }
+      });
+    });
+
+    return grouped;
+  }, [dictionary]);
+
+  // Text aus Dictionary
+  const scheduleTitle = dictionary?.schedule?.title || "Wochenplan";
+  // Extrahiere "Wochenplan" aus dem Titel (z.B. "Dein Weg zum Erfolg – Der Wochenplan" -> "Wochenplan")
+  const weekPlanText = useMemo(() => {
+    if (dictionary?.schedule?.open_button) {
+      return dictionary.schedule.open_button;
+    }
+    const match = scheduleTitle.match(/[–-]\s*(.+)$/);
+    if (match) {
+      return match[1].replace(/^(Der|Die|Das)\s+/i, "").trim();
+    }
+    return scheduleTitle.split(" ").pop() || "Wochenplan";
+  }, [dictionary, scheduleTitle]);
+  
+  const selectDayLabel = dictionary?.schedule?.subtitle 
+    ? dictionary.schedule.subtitle.toUpperCase().replace(/[^A-Z0-9]/g, "_")
+    : "SELECT_DAY";
+  const noCoursesText = dictionary?.schedule?.no_courses || "Keine Kurse für diesen Tag geplant.";
 
   return (
     <>
-      {/* TRIGGER: Expanding Button */}
+      {/* TRIGGER: Expanding Circle Button */}
       <AnimatePresence>
         {isVisible && !isOpen && (
           <motion.button
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 100, opacity: 0 }}
-            whileHover="hover"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-8 right-8 z-50 flex items-center bg-black border border-primary-orange/30 text-white rounded-full p-4 shadow-[0_0_20px_rgba(255,92,0,0.15)] backdrop-blur-md"
+            onMouseEnter={() => hasHover && setIsButtonHovered(true)}
+            onMouseLeave={() => setIsButtonHovered(false)}
+            className="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-black/80 border border-primary-orange/30 text-white rounded-full backdrop-blur-md overflow-hidden"
+            style={{
+              width: hasHover && isButtonHovered ? "auto" : "56px",
+              height: "56px",
+              paddingLeft: hasHover && isButtonHovered ? "20px" : "0",
+              paddingRight: hasHover && isButtonHovered ? "20px" : "0",
+            }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            <motion.span
-              variants={{ hover: { width: "auto", opacity: 1, marginRight: 12 }, initial: { width: 0, opacity: 0, marginRight: 0 } }}
-              className={`overflow-hidden whitespace-nowrap font-bold uppercase tracking-widest text-[10px] ${jetBrainsMono.className}`}
-            >
-              Wochenplan
-            </motion.span>
-            <Calendar size={22} className="text-primary-orange" />
+            <AnimatePresence>
+              {hasHover && isButtonHovered && (
+                <motion.span
+                  initial={{ width: 0, opacity: 0, marginRight: 0 }}
+                  animate={{ width: "auto", opacity: 1, marginRight: 12 }}
+                  exit={{ width: 0, opacity: 0, marginRight: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className={`overflow-hidden whitespace-nowrap font-bold uppercase tracking-widest text-[10px] ${jetBrainsMono.className}`}
+                >
+                  {weekPlanText}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <Calendar size={22} className="text-primary-orange flex-shrink-0" />
           </motion.button>
         )}
       </AnimatePresence>
@@ -59,6 +163,12 @@ export default function Schedule({ dictionary, lang }: any) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={(e) => {
+              // Schließe bei Klick auf Hintergrund (nicht auf Content)
+              if (e.target === e.currentTarget) {
+                setIsOpen(false);
+              }
+            }}
             className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex flex-col md:flex-row overflow-hidden"
           >
             {/* CLOSE BUTTON */}
@@ -70,9 +180,12 @@ export default function Schedule({ dictionary, lang }: any) {
             </button>
 
             {/* LEFT SIDE: Days (Scrollable on Mobile, Stacked on Desktop) */}
-            <div className="w-full md:w-[40%] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center p-8 md:p-20 bg-gradient-to-b from-white/[0.02] to-transparent">
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="w-full md:w-[40%] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center p-8 md:p-20 bg-gradient-to-b from-white/[0.02] to-transparent"
+            >
               <span className={`${jetBrainsMono.className} text-accent-cyan text-[10px] uppercase tracking-[0.4em] mb-8 block`}>
-                Select_Day
+                {selectDayLabel}
               </span>
               
               <div className="flex md:flex-col gap-4 md:gap-2 overflow-x-auto md:overflow-visible pb-4 md:pb-0 no-scrollbar">
@@ -94,7 +207,10 @@ export default function Schedule({ dictionary, lang }: any) {
             </div>
 
             {/* RIGHT SIDE: Courses Timeline */}
-            <div className="flex-1 overflow-y-auto p-8 md:p-20 custom-scrollbar relative">
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 overflow-y-auto p-8 md:p-20 custom-scrollbar relative"
+            >
               <div className="max-w-xl">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -131,20 +247,18 @@ export default function Schedule({ dictionary, lang }: any) {
                         );
                       })
                     ) : (
-                      <div className="text-white/20 italic text-xl">Keine Kurse für diesen Tag geplant.</div>
+                      <div className="text-white/20 italic text-xl">{noCoursesText}</div>
                     )}
                   </motion.div>
                 </AnimatePresence>
               </div>
-
-              {/* Decorative Watermark */}
-              <div className="absolute bottom-10 right-10 pointer-events-none opacity-[0.03] select-none hidden md:block">
-                <h1 className="text-[200px] font-bold leading-none uppercase">Schedule</h1>
-              </div>
             </div>
             
             {/* MOBILE PDF DOWNLOAD FLOATING */}
-            <div className="md:hidden p-6 border-t border-white/10 bg-black">
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="md:hidden p-6 border-t border-white/10 bg-black"
+            >
                <button className="w-full py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
                  <Download size={16} /> PDF Download
                </button>
