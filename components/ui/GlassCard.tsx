@@ -253,7 +253,7 @@ export default function GlassCard({
           className="card-face card-face-front"
         >
           {/* glass-card-bg für Front Face - fest mit Rotation verbunden */}
-          <div className="glass-card-bg" />
+          <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
           <div className="relative h-full flex flex-col p-8 md:p-10">
             {watermark && (
               <div 
@@ -310,7 +310,7 @@ export default function GlassCard({
           className="card-face card-face-back"
         >
           {/* glass-card-bg für Back Face - fest mit Rotation verbunden */}
-          <div className="glass-card-bg" />
+          <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
           <div className="relative h-full flex flex-col p-8 md:p-10 items-center justify-center text-center">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             

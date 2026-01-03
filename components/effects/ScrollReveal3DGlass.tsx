@@ -125,14 +125,7 @@ export default function ScrollReveal3DGlass({
           ref={cardRef}
           className="relative w-full h-full"
         >
-          {/* glass-card-bg wurde nach GlassCard.tsx verschoben - hier nur noch Content */}
-          <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
-          <div 
-            className="relative h-full w-full z-10"
-            style={{ transformStyle: "flat" }} // Chrome-Blur-Fix: Innerer Content auf flat
-          >
-            {children}
-          </div>
+          {children}
         </div>
       </div>
     </div>

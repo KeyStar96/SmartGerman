@@ -31,10 +31,10 @@ export default function Features({ dictionary }: FeaturesProps) {
   // DEBUGGING: Log Dictionary-Daten
   useEffect(() => {
     console.log("🔍 [Features] Dictionary:", dictionary);
-    console.log("🔍 [Features] Features Section:", dictionary?.sections?.features);
-    console.log("🔍 [Features] Native Speakers:", dictionary?.sections?.features?.native_speakers);
-    console.log("🔍 [Features] Flexibility:", dictionary?.sections?.features?.flexibility);
-    console.log("🔍 [Features] Methods:", dictionary?.sections?.features?.methods);
+    console.log("🔍 [Features] Features:", dictionary?.features);
+    console.log("🔍 [Features] Native Support:", dictionary?.features?.native_support);
+    console.log("🔍 [Features] Central Location:", dictionary?.features?.central_location);
+    console.log("🔍 [Features] Modern Learning:", dictionary?.features?.modern_learning);
   }, [dictionary]);
 
   // HARTES FALLBACK-ARRAY - Garantiert immer 3 Features
@@ -62,35 +62,34 @@ export default function Features({ dictionary }: FeaturesProps) {
   const features: FeatureProps[] = useMemo(() => {
     console.log("🔍 [Features] Building features array...");
     
-    // ABSOLUT SICHER: Prüfe jeden Pfad einzeln
+    // ABSOLUT SICHER: Prüfe jeden Pfad einzeln - dictionary.features (oberste Ebene)
     const hasDictionary = dictionary && typeof dictionary === 'object';
-    const hasSections = hasDictionary && dictionary.sections && typeof dictionary.sections === 'object';
-    const hasFeatures = hasSections && dictionary.sections.features && typeof dictionary.sections.features === 'object';
+    const hasFeatures = hasDictionary && dictionary.features && typeof dictionary.features === 'object';
 
     if (!hasFeatures) {
       console.warn("⚠️ [Features] Dictionary features missing, using fallback");
       return fallbackFeatures;
     }
 
-    const featuresData = dictionary.sections.features;
+    const featuresData = dictionary.features;
     
     // Sichere Extraktion mit Fallback auf jeden einzelnen Wert
     const featuresArray: FeatureProps[] = [
       {
-        title: featuresData.native_speakers?.title || fallbackFeatures[0].title,
-        description: featuresData.native_speakers?.description || fallbackFeatures[0].description,
+        title: featuresData.native_support || fallbackFeatures[0].title,
+        description: featuresData.native_desc || fallbackFeatures[0].description,
         Icon: UserCheck,
         color: "#FF5C00",
       },
       {
-        title: featuresData.flexibility?.title || fallbackFeatures[1].title,
-        description: featuresData.flexibility?.description || fallbackFeatures[1].description,
+        title: featuresData.central_location || fallbackFeatures[1].title,
+        description: featuresData.location_desc || fallbackFeatures[1].description,
         Icon: Clock,
         color: "#00D9FF",
       },
       {
-        title: featuresData.methods?.title || fallbackFeatures[2].title,
-        description: featuresData.methods?.description || fallbackFeatures[2].description,
+        title: featuresData.modern_learning || fallbackFeatures[2].title,
+        description: featuresData.modern_desc || fallbackFeatures[2].description,
         Icon: Target,
         color: "#FF5C00",
       }

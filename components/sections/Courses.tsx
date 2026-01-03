@@ -29,8 +29,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
   const gridRef = useRef<HTMLDivElement>(null);
 
   const courses = useMemo(() => {
-    if (dictionary?.sections?.courses?.items) {
-      return dictionary.sections.courses.items.map((item: any, index: number) => ({
+    if (dictionary?.courses?.items) {
+      return dictionary.courses.items.map((item: any, index: number) => ({
         id: item.level.toLowerCase(),
         level: item.level,
         title: item.title,
@@ -165,13 +165,13 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         {/* Header - Zentriert */}
         <div className="max-w-2xl mx-auto text-center mb-16 md:mb-24">
           <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
-            {dictionary?.sections?.courses?.title_part1 || "Master the"}{" "}
+            {dictionary?.courses?.title_part1 || "Master the"}{" "}
             <span className={`${instrumentSerif.className} text-[#FF5C00]`}>
-              {dictionary?.sections?.courses?.title_part2 || "Language"}
+              {dictionary?.courses?.title_part2 || "Language"}
             </span>
           </h2>
           <p className="text-lg text-white/60 leading-relaxed">
-            {dictionary?.sections?.courses?.intro}
+            {dictionary?.courses?.intro}
           </p>
         </div>
 
@@ -200,7 +200,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex flex-col">
                     <span className="text-xs text-white/40 uppercase tracking-wider mb-1">
-                      {dictionary?.sections?.courses?.price_label || "Invest"}
+                      {dictionary?.courses?.price_label || "Invest"}
                     </span>
                     <div className="flex items-baseline">
                       <span className="text-lg text-white/60 mr-1">€</span>
@@ -213,7 +213,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                   {/* Magnetic Button Animation */}
                   <MagneticButton
                     href={`/${lang}/anmeldung`}
-                    label={dictionary?.sections?.courses?.cta || "Buchen"}
+                    label={dictionary?.courses?.cta || "Buchen"}
                   />
                 </div>
               </GlassCard>
