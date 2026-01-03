@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useRef, useMemo, useEffect } from "react";
+import React, { useRef, useMemo } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
-import { gsap } from "@/lib/gsap";
 
 const instrumentSerif = Instrument_Serif({ 
   subsets: ["latin"],
@@ -96,100 +95,10 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
     ];
   }, [dictionary]);
 
-  // Magnetic Button Component - Bug 6 Fix: Kein Zittern bei Hover
-  function MagneticButton({ href, label }: { href: string; label: string }) {
-    const buttonRef = useRef<HTMLAnchorElement>(null);
-    const isHoveredRef = useRef(false); // Verhindert Zittern wenn Button gehovered ist
-    const initialRectRef = useRef<DOMRect | null>(null); // Speichert initiale Position
-
-    useEffect(() => {
-      const button = buttonRef.current;
-      if (!button) return;
-
-      const handleMouseEnterButton = () => {
-        isHoveredRef.current = true;
-        // Stoppe Animation und setze Button auf finale Position
-        gsap.killTweensOf(button);
-        gsap.set(button, { x: 0, y: 0 });
-      };
-
-      const handleMouseLeaveButton = () => {
-        isHoveredRef.current = false;
-        initialRectRef.current = null; // Reset initiale Rect
-      };
-
-      const handleMouseMove = (e: MouseEvent) => {
-        // Bug 6 Fix: Keine Magnetic-Animation wenn Button bereits gehovered ist
-        if (isHoveredRef.current) return;
-        
-        // Nutze initiale Rect für stabile Berechnung
-        if (!initialRectRef.current) {
-          initialRectRef.current = button.getBoundingClientRect();
-        }
-        const rect = initialRectRef.current;
-        
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        const mouseX = e.clientX - centerX;
-        const mouseY = e.clientY - centerY;
-        const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
-        
-        // Magnetic-Effekt im Umkreis von 100px
-        if (distance < 100) {
-          const strength = (100 - distance) / 100; // 0-1
-          const moveX = mouseX * strength * 0.4; // Leicht reduziert für Stabilität
-          const moveY = mouseY * strength * 0.4;
-          
-          gsap.to(button, {
-            x: moveX,
-            y: moveY,
-            duration: 0.3,
-            ease: "power2.out",
-          });
-        } else {
-          gsap.to(button, {
-            x: 0,
-            y: 0,
-            duration: 0.5,
-            ease: "power2.out",
-          });
-          initialRectRef.current = null; // Reset wenn außerhalb
-        }
-      };
-
-      const handleMouseLeave = () => {
-        initialRectRef.current = null;
-        gsap.to(button, {
-          x: 0,
-          y: 0,
-          duration: 0.5,
-          ease: "power2.out",
-        });
-      };
-
-      // Event-Listener auf dem Button selbst für Hover-Detection
-      button.addEventListener("mouseenter", handleMouseEnterButton);
-      button.addEventListener("mouseleave", handleMouseLeaveButton);
-
-      // Event-Listener auf dem Parent-Container (Card)
-      const cardContainer = button.closest(".card-interactive-container");
-      if (cardContainer) {
-        cardContainer.addEventListener("mousemove", handleMouseMove);
-        cardContainer.addEventListener("mouseleave", handleMouseLeave);
-        
-        return () => {
-          button.removeEventListener("mouseenter", handleMouseEnterButton);
-          button.removeEventListener("mouseleave", handleMouseLeaveButton);
-          cardContainer.removeEventListener("mousemove", handleMouseMove);
-          cardContainer.removeEventListener("mouseleave", handleMouseLeave);
-        };
-      }
-    }, []);
-
+  // Expanding Button Component - Nur Expansion, keine magnetische Anziehung
+  function ExpandingButton({ href, label }: { href: string; label: string }) {
     return (
       <Link
-        ref={buttonRef}
         href={href}
         className="group/btn relative flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-white/5 transition-all duration-300 hover:w-32 hover:bg-white hover:border-white overflow-hidden"
       >
@@ -258,8 +167,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                     </div>
                   </div>
 
-                  {/* Magnetic Button Animation */}
-                  <MagneticButton
+                  {/* Expanding Button */}
+                  <ExpandingButton
                     href={`/${lang}/anmeldung`}
                     label={dictionary?.courses?.cta || "Buchen"}
                   />
