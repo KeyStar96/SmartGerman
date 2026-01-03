@@ -423,6 +423,22 @@ export default function GlassCard({
             </div>
           )}
           
+          {/* Badge auf Rückseite - oben links wie auf der Vorderseite */}
+          {badge && (
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+              <span 
+                className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md badge-glow`}
+                style={{ 
+                  color,
+                  borderColor: `${color}40`,
+                  '--badge-color': color,
+                } as React.CSSProperties}
+              >
+                {badge}
+              </span>
+            </div>
+          )}
+          
           {/* Content Container - mit mehr Padding oben für den Flip-Indicator */}
           <div className="relative h-full flex flex-col pt-16 pb-8 px-8 md:pt-20 md:pb-10 md:px-10 items-center justify-center text-center">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
