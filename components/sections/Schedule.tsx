@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, Monitor, MapPin } from "lucide-react";
 import { JetBrains_Mono, Instrument_Serif } from "next/font/google";
@@ -20,6 +20,10 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
   const [hasHover, setHasHover] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [viewMode, setViewMode] = useState<"editorial" | "grid">("editorial");
+  
+  // Ref für mausbasiertes Scrollen
+  const coursesScrollRef = useRef<HTMLDivElement>(null);
+  const scrollAnimationRef = useRef<number | null>(null);
 
   // Erkenne ob Gerät Hover unterstützt (Desktop mit Cursor)
   useEffect(() => {
@@ -55,6 +59,75 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
       };
     }
   }, [isOpen]);
+
+  // Mausbasiertes Scrollen für Tagesansicht
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const container = coursesScrollRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const mouseY = e.clientY - rect.top;
+    const containerHeight = rect.height;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
+    
+    // Kann nicht scrollen wenn Content passt
+    if (scrollHeight <= clientHeight) return;
+
+    // Berechne relative Position (0 = oben, 1 = unten)
+    const relativeY = mouseY / containerHeight;
+    
+    // Dead zone in der Mitte (40-60%)
+    const deadZoneStart = 0.4;
+    const deadZoneEnd = 0.6;
+    
+    // Cancel vorherige Animation
+    if (scrollAnimationRef.current) {
+      cancelAnimationFrame(scrollAnimationRef.current);
+      scrollAnimationRef.current = null;
+    }
+
+    // Scroll-Geschwindigkeit berechnen
+    let scrollSpeed = 0;
+    const maxSpeed = 8; // Max Pixel pro Frame
+    
+    if (relativeY < deadZoneStart) {
+      // Nach oben scrollen
+      const intensity = 1 - (relativeY / deadZoneStart);
+      scrollSpeed = -maxSpeed * Math.pow(intensity, 1.5);
+    } else if (relativeY > deadZoneEnd) {
+      // Nach unten scrollen
+      const intensity = (relativeY - deadZoneEnd) / (1 - deadZoneEnd);
+      scrollSpeed = maxSpeed * Math.pow(intensity, 1.5);
+    }
+
+    // Animiere das Scrollen
+    if (scrollSpeed !== 0) {
+      const animate = () => {
+        if (container) {
+          container.scrollTop += scrollSpeed;
+          scrollAnimationRef.current = requestAnimationFrame(animate);
+        }
+      };
+      scrollAnimationRef.current = requestAnimationFrame(animate);
+    }
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (scrollAnimationRef.current) {
+      cancelAnimationFrame(scrollAnimationRef.current);
+      scrollAnimationRef.current = null;
+    }
+  }, []);
+
+  // Cleanup Animation on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollAnimationRef.current) {
+        cancelAnimationFrame(scrollAnimationRef.current);
+      }
+    };
+  }, []);
 
   const days = ["Mo", "Di", "Mi", "Do", "Fr"];
   const dayNames = {
@@ -96,7 +169,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
               location: course.badge === "Online" || course.badge?.toLowerCase() === "online" 
                 ? "Online" 
                 : "Freizeitheim Vahrenwald",
-              color: course.color || "#FF5C00", // Original-Farbe aus Dictionary
+              color: course.color || "#FF5C00",
               level: course.level || ""
             });
             break;
@@ -118,7 +191,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
 
   const noCoursesText = dictionary?.schedule?.no_courses || "Keine Kurse für diesen Tag geplant.";
   
-  // Bereite Grid-Daten vor
+  // Bereite Grid-Daten vor mit korrekter Zeitsortierung
   const gridData = useMemo(() => {
     const timeSlots: string[] = [];
     const gridCourses: { [key: string]: { [key: string]: any[] } } = {
@@ -133,10 +206,13 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
       });
     });
 
+    // KORRIGIERTE SORTIERUNG: Numerisch nach Startzeit
     timeSlots.sort((a, b) => {
-      const timeA = a.split("-")[0];
-      const timeB = b.split("-")[0];
-      return timeA.localeCompare(timeB);
+      const getMinutes = (timeStr: string) => {
+        const [hours, minutes] = timeStr.split("-")[0].split(":").map(Number);
+        return hours * 60 + minutes;
+      };
+      return getMinutes(a) - getMinutes(b);
     });
 
     days.forEach((day) => {
@@ -155,11 +231,9 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
 
   // Helper: Farbe zu RGB für Transparenz
   const hexToRgba = (hex: string, alpha: number) => {
-    // Handle HSL
     if (hex.startsWith('hsl')) {
       return hex.replace(')', `, ${alpha})`).replace('hsl', 'hsla');
     }
-    // Handle HEX
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     if (result) {
       return `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, ${alpha})`;
@@ -315,8 +389,17 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                         </div>
                       </div>
 
-                      {/* RIGHT: Courses */}
-                      <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16">
+                      {/* RIGHT: Courses - mit mausbasiertem Scrollen */}
+                      <div 
+                        ref={coursesScrollRef}
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                        className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16 relative"
+                        style={{ scrollBehavior: 'auto' }}
+                      >
+                        {/* Scroll-Indikator oben */}
+                        <div className="hidden md:block pointer-events-none absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/80 to-transparent z-10 opacity-50" />
+                        
                         <div className="max-w-xl">
                           <AnimatePresence mode="wait">
                             <motion.div
@@ -325,7 +408,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -15 }}
                               transition={{ duration: 0.25 }}
-                              className="space-y-6 md:space-y-8"
+                              className="space-y-6 md:space-y-8 pb-32"
                             >
                               {scheduleData[hoveredDay]?.length > 0 ? (
                                 scheduleData[hoveredDay].map((course: any, i: number) => {
@@ -381,6 +464,9 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                             </motion.div>
                           </AnimatePresence>
                         </div>
+                        
+                        {/* Scroll-Indikator unten */}
+                        <div className="hidden md:block pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 to-transparent z-10 opacity-50" />
                       </div>
                     </motion.div>
                   ) : (
@@ -390,7 +476,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="p-6 lg:p-8"
+                      className="p-6 lg:p-8 pb-16"
                     >
                       <div className="w-full">
                         {/* Grid Header */}
@@ -436,7 +522,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                                   return (
                                     <div 
                                       key={day}
-                                      className="p-2 min-h-[90px] border-l border-white/5"
+                                      className="p-2 min-h-[100px] border-l border-white/5"
                                     >
                                       {courses.length > 0 ? (
                                         <div className="space-y-2">
@@ -502,6 +588,9 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                             </div>
                           )}
                         </div>
+                        
+                        {/* Extra Platz am Ende */}
+                        <div className="h-24" />
                       </div>
                     </motion.div>
                   )}
