@@ -22,6 +22,17 @@ export default function ScrollReveal3DGlass({
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
 
+  // DEBUGGING: Log ScrollReveal3DGlass
+  useEffect(() => {
+    console.log("🔍 [ScrollReveal3DGlass] Rendering:", {
+      hasChildren: !!children,
+      className,
+      accentColor,
+      hasTrigger: !!trigger,
+      inverted,
+    });
+  }, [children, className, accentColor, trigger, inverted]);
+
   useScrollReveal3D(cardRef, {
     trigger: trigger || undefined,
     z: -100,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useEffect } from "react";
 import { UserCheck, Clock, Target } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif } from "next/font/google";
@@ -28,26 +28,69 @@ export default function Features({ dictionary }: FeaturesProps) {
   const headerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const features: FeatureProps[] = useMemo(() => [
-    {
-      title: dictionary.sections.features.native_speakers.title,
-      description: dictionary.sections.features.native_speakers.description,
-      Icon: UserCheck,
-      color: "#FF5C00",
-    },
-    {
-      title: dictionary.sections.features.flexibility.title,
-      description: dictionary.sections.features.flexibility.description,
-      Icon: Clock,
-      color: "#00D9FF",
-    },
-    {
-      title: dictionary.sections.features.methods.title,
-      description: dictionary.sections.features.methods.description,
-      Icon: Target,
-      color: "#FF5C00",
+  // DEBUGGING: Log Dictionary-Daten
+  useEffect(() => {
+    console.log("🔍 [Features] Dictionary:", dictionary);
+    console.log("🔍 [Features] Features Section:", dictionary?.sections?.features);
+    console.log("🔍 [Features] Native Speakers:", dictionary?.sections?.features?.native_speakers);
+    console.log("🔍 [Features] Flexibility:", dictionary?.sections?.features?.flexibility);
+    console.log("🔍 [Features] Methods:", dictionary?.sections?.features?.methods);
+  }, [dictionary]);
+
+  const features: FeatureProps[] = useMemo(() => {
+    console.log("🔍 [Features] Building features array...");
+    
+    // Fallback falls Dictionary-Daten fehlen
+    const fallbackFeatures: FeatureProps[] = [
+      {
+        title: "Muttersprachliche Lehrer",
+        description: "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz.",
+        Icon: UserCheck,
+        color: "#FF5C00",
+      },
+      {
+        title: "Flexible Kurszeiten",
+        description: "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen.",
+        Icon: Clock,
+        color: "#00D9FF",
+      },
+      {
+        title: "Praxisnahe Methoden",
+        description: "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen.",
+        Icon: Target,
+        color: "#FF5C00",
+      }
+    ];
+
+    if (!dictionary?.sections?.features) {
+      console.warn("⚠️ [Features] Dictionary features missing, using fallback");
+      return fallbackFeatures;
     }
-  ], [dictionary.sections.features]);
+
+    const featuresArray: FeatureProps[] = [
+      {
+        title: dictionary.sections.features.native_speakers?.title || fallbackFeatures[0].title,
+        description: dictionary.sections.features.native_speakers?.description || fallbackFeatures[0].description,
+        Icon: UserCheck,
+        color: "#FF5C00",
+      },
+      {
+        title: dictionary.sections.features.flexibility?.title || fallbackFeatures[1].title,
+        description: dictionary.sections.features.flexibility?.description || fallbackFeatures[1].description,
+        Icon: Clock,
+        color: "#00D9FF",
+      },
+      {
+        title: dictionary.sections.features.methods?.title || fallbackFeatures[2].title,
+        description: dictionary.sections.features.methods?.description || fallbackFeatures[2].description,
+        Icon: Target,
+        color: "#FF5C00",
+      }
+    ];
+
+    console.log("✅ [Features] Features array created:", featuresArray);
+    return featuresArray;
+  }, [dictionary]);
 
   useGSAP(() => {
     if (!headerRef.current) return;
@@ -99,25 +142,34 @@ export default function Features({ dictionary }: FeaturesProps) {
             hide-scrollbar
           "
         >
-          {features.map((feature, index) => (
-            <div 
-              key={index} 
-              className="
-                h-full min-w-[85vw] md:min-w-0
-                snap-center snap-always
-                flex-shrink-0 md:flex-shrink
-              "
-            >
-              <GlassCard
-                title={feature.title}
-                description={feature.description}
-                icon={feature.Icon}
-                color={feature.color}
-                trigger={gridRef}
-                inverted={index % 2 === 0}
-              />
+          {features.length === 0 ? (
+            <div className="col-span-3 text-center text-white/60 py-12">
+              <p>⚠️ Keine Features gefunden. Bitte Console prüfen.</p>
             </div>
-          ))}
+          ) : (
+            features.map((feature, index) => {
+              console.log(`🔍 [Features] Rendering feature ${index}:`, feature);
+              return (
+                <div 
+                  key={index} 
+                  className="
+                    h-full min-w-[85vw] md:min-w-0
+                    snap-center snap-always
+                    flex-shrink-0 md:flex-shrink
+                  "
+                >
+                  <GlassCard
+                    title={feature.title}
+                    description={feature.description}
+                    icon={feature.Icon}
+                    color={feature.color}
+                    trigger={gridRef}
+                    inverted={index % 2 === 0}
+                  />
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </section>

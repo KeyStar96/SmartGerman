@@ -209,6 +209,20 @@ export default function GlassCard({
     }
   };
 
+  // DEBUGGING: Log GlassCard Props
+  useEffect(() => {
+    console.log("🔍 [GlassCard] Rendering with props:", {
+      title,
+      description,
+      color,
+      hasIcon: !!Icon,
+      hasBadge: !!badge,
+      hasWatermark: !!watermark,
+      hasBackfaceContent: !!backfaceContent,
+      hasChildren: !!children,
+    });
+  }, [title, description, color, Icon, badge, watermark, backfaceContent, children]);
+
   return (
     <ScrollReveal3DGlass 
       trigger={trigger} 
