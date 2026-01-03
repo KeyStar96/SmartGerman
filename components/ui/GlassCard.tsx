@@ -129,7 +129,7 @@ export default function GlassCard({
       
       // Stagger-Effekt für Backface-Elemente
       gsap.fromTo(
-        back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-teacher'),
+        back.querySelectorAll('.backface-desc, .backface-divider, .backface-item'),
         {
           opacity: 0,
           y: 10,
@@ -156,7 +156,7 @@ export default function GlassCard({
       }
       
       // Back Face ausblenden - auch Stagger-Elemente ausblenden
-      gsap.to(back.querySelectorAll('.backface-desc, .backface-divider, .backface-item, .backface-teacher'), {
+      gsap.to(back.querySelectorAll('.backface-desc, .backface-divider, .backface-item'), {
         opacity: 0,
         y: 10,
         duration: 0.2,
@@ -633,23 +633,6 @@ export default function GlassCard({
                   </div>
                 )}
               </div>
-              
-              {/* Trennlinie vor Dozentin */}
-              {backfaceContent?.teacher && (
-                <div className="backface-divider h-px w-full flex-shrink-0" style={{ background: `${color}40` }} />
-              )}
-              
-              {/* Unten: Dozentin mit Highlight */}
-              {backfaceContent?.teacher && (
-                <div className="backface-teacher flex-shrink-0 pb-2 border-b-2" style={{ borderColor: `${color}60` }}>
-                  <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-1.5`}>
-                    {backfaceLabels?.teacher || "Dozentin"}
-                  </span>
-                  <p className="text-base md:text-lg font-bold text-white leading-tight">
-                    {backfaceContent.teacher}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
