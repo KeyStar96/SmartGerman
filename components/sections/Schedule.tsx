@@ -36,6 +36,28 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Verhindere Scrolling auf der Hauptseite, wenn Schedule offen ist
+  useEffect(() => {
+    if (isOpen) {
+      // Speichere die aktuelle Scroll-Position
+      const scrollY = window.scrollY;
+      // Blockiere Body-Scrolling
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        // Stelle Scrolling wieder her
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isOpen]);
+
   const days = ["Mo", "Di", "Mi", "Do", "Fr"];
   
   // Mapping für Farben & Icons basierend auf deinem Spaceship-System
@@ -72,6 +94,10 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
         "Fri": "Fr"
       };
 
+      // Extrahiere Zeit zuerst (z.B. "14:30-16:00")
+      const timeMatch = course.start.match(/(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/);
+      const time = timeMatch ? `${timeMatch[1]}-${timeMatch[2]}` : "";
+      
       // Teile bei "&" auf für mehrere Tage
       const parts = course.start.split("&").map((p: string) => p.trim());
       
@@ -79,10 +105,6 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
         // Finde Tag-Abkürzung
         for (const [key, day] of Object.entries(dayMap)) {
           if (part.includes(key)) {
-            // Extrahiere Zeit (z.B. "9:00-10:30" oder "12:00-13:00")
-            const timeMatch = part.match(/(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/);
-            const time = timeMatch ? `${timeMatch[1]}-${timeMatch[2]}` : part.replace(key, "").trim();
-            
             grouped[day].push({
               title: course.title,
               time: time,
@@ -113,9 +135,8 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
     return scheduleTitle.split(" ").pop() || "Wochenplan";
   }, [dictionary, scheduleTitle]);
   
-  const selectDayLabel = dictionary?.schedule?.subtitle 
-    ? dictionary.schedule.subtitle.toUpperCase().replace(/[^A-Z0-9]/g, "_")
-    : "SELECT_DAY";
+  // Einfaches "SELECT_DAY" Label oder weglassen
+  const selectDayLabel = "SELECT_DAY";
   const noCoursesText = dictionary?.schedule?.no_courses || "Keine Kurse für diesen Tag geplant.";
 
   return (
@@ -141,15 +162,15 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
           >
             <AnimatePresence>
               {hasHover && isButtonHovered && (
-                <motion.span
+            <motion.span
                   initial={{ width: 0, opacity: 0, marginRight: 0 }}
                   animate={{ width: "auto", opacity: 1, marginRight: 12 }}
                   exit={{ width: 0, opacity: 0, marginRight: 0 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  className={`overflow-hidden whitespace-nowrap font-bold uppercase tracking-widest text-[10px] ${jetBrainsMono.className}`}
-                >
+              className={`overflow-hidden whitespace-nowrap font-bold uppercase tracking-widest text-[10px] ${jetBrainsMono.className}`}
+            >
                   {weekPlanText}
-                </motion.span>
+            </motion.span>
               )}
             </AnimatePresence>
             <Calendar size={22} className="text-primary-orange flex-shrink-0" />
@@ -159,31 +180,34 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={(e) => {
               // Schließe bei Klick auf Hintergrund (nicht auf Content)
               if (e.target === e.currentTarget) {
                 setIsOpen(false);
               }
             }}
-            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex flex-col md:flex-row overflow-hidden"
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl"
           >
-            {/* CLOSE BUTTON */}
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="absolute top-6 right-6 z-[110] p-4 text-white/50 hover:text-primary-orange transition-colors"
-            >
-              <X size={32} strokeWidth={1.5} />
-            </button>
-
-            {/* LEFT SIDE: Days (Scrollable on Mobile, Stacked on Desktop) */}
-            <div 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full md:w-[40%] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center p-8 md:p-20 bg-gradient-to-b from-white/[0.02] to-transparent"
+              className="h-full flex flex-col md:flex-row overflow-hidden"
             >
+              {/* CLOSE BUTTON */}
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="absolute top-6 right-6 z-[110] p-4 text-white/50 hover:text-primary-orange transition-colors"
+              >
+                <X size={32} strokeWidth={1.5} />
+              </button>
+
+              {/* LEFT SIDE: Days (Scrollable on Mobile, Stacked on Desktop) */}
+              <div 
+                className="w-full md:w-[40%] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center p-8 md:p-20 bg-gradient-to-b from-white/[0.02] to-transparent"
+              >
               <span className={`${jetBrainsMono.className} text-accent-cyan text-[10px] uppercase tracking-[0.4em] mb-8 block`}>
                 {selectDayLabel}
               </span>
@@ -206,11 +230,10 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
               </div>
             </div>
 
-            {/* RIGHT SIDE: Courses Timeline */}
-            <div 
-              onClick={(e) => e.stopPropagation()}
-              className="flex-1 overflow-y-auto p-8 md:p-20 custom-scrollbar relative"
-            >
+              {/* RIGHT SIDE: Courses Timeline */}
+              <div 
+                className="flex-1 overflow-y-auto p-8 md:p-20 custom-scrollbar relative"
+              >
               <div className="max-w-xl">
                 <AnimatePresence mode="wait">
                   <motion.div
@@ -230,8 +253,8 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                             <div className="absolute -left-[5px] top-0 w-[9px] h-[9px] rounded-full bg-white/20 group-hover:bg-accent-cyan transition-colors" />
                             
                             <div className={`${jetBrainsMono.className} text-[11px] uppercase tracking-widest mb-3 flex items-center gap-3`} style={{ color: styles.color }}>
-                              <span>{course.time}</span>
-                              <span className="opacity-30">•</span>
+                              {course.time && <span>{course.time}</span>}
+                              {course.time && <span className="opacity-30">•</span>}
                               <span className="flex items-center gap-2">{styles.icon} {course.type}</span>
                             </div>
 
@@ -252,18 +275,18 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                   </motion.div>
                 </AnimatePresence>
               </div>
-            </div>
-            
-            {/* MOBILE PDF DOWNLOAD FLOATING */}
-            <div 
-              onClick={(e) => e.stopPropagation()}
-              className="md:hidden p-6 border-t border-white/10 bg-black"
-            >
-               <button className="w-full py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
-                 <Download size={16} /> PDF Download
-               </button>
-            </div>
-          </motion.div>
+              </div>
+              
+              {/* MOBILE PDF DOWNLOAD FLOATING */}
+              <div 
+                className="md:hidden p-6 border-t border-white/10 bg-black"
+              >
+                 <button className="w-full py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
+                   <Download size={16} /> PDF Download
+                 </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </>
