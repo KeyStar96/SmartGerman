@@ -220,10 +220,9 @@
       "flip_hint": "DETAY",
       "back_hint": "GERİ",
       "backface_labels": {
-        "lesson_block": "Ders Bloğu",
-        "frequency": "Sıklık",
-        "appointments": "Randevular",
-        "focus": "Odak",
+        "unit": "BİRİM",
+        "appointments": "RANDEVULAR",
+        "group": "GRUP",
         "teacher": "Eğitmen"
       },
       "a1": {

@@ -220,10 +220,9 @@
       "flip_hint": "DETAILS",
       "back_hint": "ZURÜCK",
       "backface_labels": {
-        "lesson_block": "Unterrichtsblock",
-        "frequency": "Frequenz",
-        "appointments": "Termine",
-        "focus": "Fokus",
+        "unit": "EINHEIT",
+        "appointments": "TERMINE",
+        "group": "GRUPPE",
         "teacher": "Dozentin"
       },
       "a1": {

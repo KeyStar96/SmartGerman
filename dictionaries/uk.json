@@ -220,10 +220,9 @@
       "flip_hint": "ДЕТАЛІ",
       "back_hint": "НАЗАД",
       "backface_labels": {
-        "lesson_block": "Урок",
-        "frequency": "Частота",
-        "appointments": "Розклад",
-        "focus": "Фокус",
+        "unit": "ОДИНИЦЯ",
+        "appointments": "РОЗКЛАД",
+        "group": "ГРУППА",
         "teacher": "Викладач"
       },
       "a1": {
