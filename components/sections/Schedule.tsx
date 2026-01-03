@@ -64,14 +64,8 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
     Do: dictionary?.schedule?.thursday || "Donnerstag",
     Fr: dictionary?.schedule?.friday || "Freitag"
   };
-  
-  // Mapping für Farben & Icons
-  const getCourseStyles = (type: string) => {
-    if (type?.toLowerCase() === 'online') return { color: 'var(--accent-lime)', icon: <Monitor size={14} /> };
-    return { color: 'var(--primary-orange)', icon: <MapPin size={14} /> };
-  };
 
-  // Extrahiere Kurse aus courses.items und gruppiere nach Tagen
+  // Extrahiere Kurse mit Original-Farben aus courses.items
   const scheduleData = useMemo(() => {
     const courses = dictionary?.sections?.courses?.items || [];
     const grouped: { [key: string]: any[] } = {
@@ -101,7 +95,9 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
               instructor: course.teacher || dictionary?.schedule?.instructor || "Dozentin",
               location: course.badge === "Online" || course.badge?.toLowerCase() === "online" 
                 ? "Online" 
-                : "Freizeitheim Vahrenwald"
+                : "Freizeitheim Vahrenwald",
+              color: course.color || "#FF5C00", // Original-Farbe aus Dictionary
+              level: course.level || ""
             });
             break;
           }
@@ -157,6 +153,20 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
     return { timeSlots, gridCourses };
   }, [scheduleData, days]);
 
+  // Helper: Farbe zu RGB für Transparenz
+  const hexToRgba = (hex: string, alpha: number) => {
+    // Handle HSL
+    if (hex.startsWith('hsl')) {
+      return hex.replace(')', `, ${alpha})`).replace('hsl', 'hsla');
+    }
+    // Handle HEX
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (result) {
+      return `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, ${alpha})`;
+    }
+    return hex;
+  };
+
   return (
     <>
       {/* TRIGGER: Floating Button */}
@@ -199,58 +209,82 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
       {/* MODAL */}
       <AnimatePresence>
         {isOpen && (
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={(e) => {
               if (e.target === e.currentTarget) setIsOpen(false);
             }}
             className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl"
           >
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               onClick={(e) => e.stopPropagation()}
               className="h-full flex flex-col overflow-hidden"
             >
-              {/* HEADER: Toggle & Close */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-                {/* Toggle Switcher */}
-                <div className="flex items-center gap-1 p-1 bg-white/5 rounded-lg">
+              {/* HEADER */}
+              <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+                {/* iOS-Style Pill Toggle - nur auf Desktop */}
+                <div className="hidden md:flex items-center relative p-1 bg-white/5 rounded-full">
+                  {/* Animated Pill Background */}
+                  <motion.div
+                    className="absolute h-[calc(100%-8px)] rounded-full bg-white/10"
+                    initial={false}
+                    animate={{
+                      x: viewMode === "editorial" ? 4 : "calc(100% + 4px)",
+                      width: viewMode === "editorial" ? "calc(50% - 4px)" : "calc(50% - 8px)"
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    style={{ top: 4 }}
+                  />
+                  
                   <button
                     onClick={() => setViewMode("editorial")}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    className={`relative z-10 px-5 py-2.5 rounded-full text-sm font-medium transition-colors duration-200 ${
                       viewMode === "editorial"
-                        ? "bg-primary-orange text-white"
-                        : "text-white/60 hover:text-white hover:bg-white/5"
+                        ? "text-white"
+                        : "text-white/40 hover:text-white/60"
                     }`}
                   >
                     {dictionary?.schedule?.view_day || "Tagesansicht"}
                   </button>
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    className={`relative z-10 px-5 py-2.5 rounded-full text-sm font-medium transition-colors duration-200 ${
                       viewMode === "grid"
-                        ? "bg-primary-orange text-white"
-                        : "text-white/60 hover:text-white hover:bg-white/5"
+                        ? "text-white"
+                        : "text-white/40 hover:text-white/60"
                     }`}
                   >
                     {dictionary?.schedule?.view_grid || "Wochenübersicht"}
                   </button>
                 </div>
 
+                {/* Mobile: Nur Titel */}
+                <div className="md:hidden">
+                  <h2 className={`${instrumentSerif.className} text-xl text-white/80`}>
+                    {dictionary?.schedule?.title?.split("–")[1]?.trim() || "Wochenplan"}
+                  </h2>
+                </div>
+
                 {/* Close Button */}
                 <button 
                   onClick={() => setIsOpen(false)}
-                  className="p-2 text-white/50 hover:text-white transition-colors"
+                  className="p-2 text-white/40 hover:text-white transition-colors rounded-full hover:bg-white/5"
                 >
-                  <X size={28} strokeWidth={1.5} />
+                  <X size={24} strokeWidth={1.5} />
                 </button>
               </div>
 
               {/* CONTENT */}
               <div className="flex-1 overflow-auto">
                 <AnimatePresence mode="wait">
-                  {viewMode === "editorial" ? (
+                  {/* Editorial View - Standard auf Mobile */}
+                  {(viewMode === "editorial" || !hasHover) ? (
                     <motion.div
                       key="editorial-view"
                       initial={{ opacity: 0 }}
@@ -259,65 +293,90 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                       className="h-full flex flex-col md:flex-row"
                     >
                       {/* LEFT: Days */}
-                      <div className="w-full md:w-[35%] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center p-6 md:p-12">
-                        <div className="flex md:flex-col gap-3 md:gap-1 overflow-x-auto md:overflow-visible pb-4 md:pb-0 no-scrollbar">
-                          {days.map((day) => (
-                            <button
+                      <div className="w-full md:w-[35%] lg:w-[30%] border-b md:border-b-0 md:border-r border-white/5 flex flex-col justify-center p-6 md:p-10 lg:p-16">
+                        <div className="flex md:flex-col gap-2 md:gap-0 overflow-x-auto md:overflow-visible pb-4 md:pb-0 no-scrollbar">
+                          {days.map((day, index) => (
+                            <motion.button
                               key={day}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.05 }}
                               onMouseEnter={() => setHoveredDay(day)}
                               onClick={() => setHoveredDay(day)}
-                              className={`text-4xl md:text-6xl lg:text-7xl font-medium transition-all duration-300 text-left px-3 py-1 ${
+                              className={`text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium transition-all duration-300 text-left px-4 py-2 md:py-3 whitespace-nowrap ${
                                 hoveredDay === day 
                                 ? "text-primary-orange opacity-100" 
-                                : "text-white opacity-25 hover:opacity-50"
+                                : "text-white/20 hover:text-white/40"
                               }`}
                             >
                               <span className={instrumentSerif.className}>{day}.</span>
-                            </button>
+                            </motion.button>
                           ))}
                         </div>
                       </div>
 
                       {/* RIGHT: Courses */}
-                      <div className="flex-1 overflow-y-auto p-6 md:p-12">
-                        <div className="max-w-lg">
+                      <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-16">
+                        <div className="max-w-xl">
                           <AnimatePresence mode="wait">
                             <motion.div
                               key={hoveredDay}
                               initial={{ opacity: 0, y: 15 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -15 }}
-                              transition={{ duration: 0.3 }}
-                              className="space-y-8"
+                              transition={{ duration: 0.25 }}
+                              className="space-y-6 md:space-y-8"
                             >
                               {scheduleData[hoveredDay]?.length > 0 ? (
                                 scheduleData[hoveredDay].map((course: any, i: number) => {
-                                  const styles = getCourseStyles(course.type);
+                                  const isOnline = course.type?.toLowerCase() === 'online';
                                   return (
-                                    <div key={i} className="group pl-6 border-l-2 border-white/20 hover:border-primary-orange/60 transition-colors">
-                                      <div className={`${jetBrainsMono.className} text-xs text-white/50 mb-2 flex items-center gap-2`}>
-                                        {course.time && <span>{course.time}</span>}
-                                        <span className="flex items-center gap-1.5" style={{ color: styles.color }}>
-                                          {styles.icon} {course.type}
+                                    <motion.div 
+                                      key={i} 
+                                      initial={{ opacity: 0, x: -10 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: i * 0.08 }}
+                                      className="group relative pl-5 md:pl-6"
+                                      style={{
+                                        borderLeft: `2px solid ${course.color}`
+                                      }}
+                                    >
+                                      {/* Time & Type Badge */}
+                                      <div className={`${jetBrainsMono.className} text-xs mb-3 flex items-center gap-3`}>
+                                        <span className="text-white/50">{course.time}</span>
+                                        <span 
+                                          className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider"
+                                          style={{ 
+                                            backgroundColor: hexToRgba(course.color, 0.15),
+                                            color: course.color 
+                                          }}
+                                        >
+                                          {isOnline ? <Monitor size={11} /> : <MapPin size={11} />}
+                                          {course.type}
                                         </span>
                                       </div>
 
-                                      <h3 className="text-xl md:text-2xl font-semibold text-white mb-2">
+                                      {/* Title */}
+                                      <h3 className="text-xl md:text-2xl font-semibold text-white mb-2 leading-tight">
                                         {course.title}
                                       </h3>
 
-                                      <div className="text-sm text-white/40 space-y-0.5">
-                                        <div>{course.instructor}</div>
-                                        <div className="flex items-center gap-1.5">
-                                          <MapPin size={12} />
+                                      {/* Meta */}
+                                      <div className="text-sm text-white/40 space-y-1">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-white/30">·</span>
+                                          {course.instructor}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-white/30">·</span>
                                           {course.location}
                                         </div>
                                       </div>
-                                    </div>
+                                    </motion.div>
                                   );
                                 })
                               ) : (
-                                <div className="text-white/30 italic">{noCoursesText}</div>
+                                <div className="text-white/30 italic py-8">{noCoursesText}</div>
                               )}
                             </motion.div>
                           </AnimatePresence>
@@ -325,90 +384,120 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                       </div>
                     </motion.div>
                   ) : (
+                    /* Grid View - nur auf Desktop */
                     <motion.div
                       key="grid-view"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="p-4 md:p-6"
+                      className="p-6 lg:p-8"
                     >
-                      {/* Responsive Grid */}
-                      <div className="w-full overflow-x-auto">
-                        <div className="min-w-[800px]">
-                          {/* Header */}
-                          <div className="grid grid-cols-[80px_repeat(5,1fr)] border-b border-white/10">
-                            <div className={`${jetBrainsMono.className} text-xs text-white/40 p-3`}>
-                              {dictionary?.schedule?.time || "Zeit"}
-                            </div>
-                            {days.map((day) => (
-                              <div
-                                key={day}
-                                className={`${jetBrainsMono.className} text-xs text-white/60 p-3 text-center font-medium`}
-                              >
-                                {dayNames[day as keyof typeof dayNames]}
-                              </div>
-                            ))}
+                      <div className="w-full">
+                        {/* Grid Header */}
+                        <div className="grid grid-cols-[90px_repeat(5,1fr)] mb-1">
+                          <div className={`${jetBrainsMono.className} text-[10px] uppercase tracking-wider text-white/30 p-3`}>
+                            {dictionary?.schedule?.time || "Zeit"}
                           </div>
+                          {days.map((day, index) => (
+                            <motion.div
+                              key={day}
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                              className="p-3 text-center"
+                            >
+                              <span className={`${instrumentSerif.className} text-lg text-white/60`}>
+                                {dayNames[day as keyof typeof dayNames]}
+                              </span>
+                            </motion.div>
+                          ))}
+                        </div>
 
-                          {/* Rows */}
+                        {/* Grid Body */}
+                        <div className="border-t border-white/5">
                           {gridData.timeSlots.length > 0 ? (
-                            gridData.timeSlots.map((timeSlot) => (
-                              <div key={timeSlot} className="grid grid-cols-[80px_repeat(5,1fr)] border-b border-white/5">
+                            gridData.timeSlots.map((timeSlot, rowIndex) => (
+                              <motion.div 
+                                key={timeSlot} 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: rowIndex * 0.03 }}
+                                className="grid grid-cols-[90px_repeat(5,1fr)] border-b border-white/5"
+                              >
                                 {/* Time */}
-                                <div className={`${jetBrainsMono.className} text-xs text-white/40 p-3 border-r border-white/5`}>
+                                <div className={`${jetBrainsMono.className} text-xs text-white/30 p-3 flex items-start pt-4`}>
                                   {timeSlot}
                                 </div>
 
                                 {/* Day Cells */}
-                                {days.map((day) => {
+                                {days.map((day, colIndex) => {
                                   const courses = gridData.gridCourses[day][timeSlot] || [];
                                   
                                   return (
                                     <div 
                                       key={day}
-                                      className="p-2 border-r border-white/5 last:border-r-0 min-h-[70px]"
+                                      className="p-2 min-h-[90px] border-l border-white/5"
                                     >
                                       {courses.length > 0 ? (
-                                        <div className="space-y-1.5">
+                                        <div className="space-y-2">
                                           {courses.map((course: any, i: number) => {
-                                            const styles = getCourseStyles(course.type);
                                             const isOnline = course.type?.toLowerCase() === 'online';
                                             
                                             return (
-                                              <div
+                                              <motion.div
                                                 key={i}
-                                                className={`p-2.5 rounded-md transition-colors ${
-                                                  isOnline 
-                                                    ? "bg-accent-lime/10 hover:bg-accent-lime/15 border-l-2 border-accent-lime" 
-                                                    : "bg-primary-orange/10 hover:bg-primary-orange/15 border-l-2 border-primary-orange"
-                                                }`}
+                                                initial={{ opacity: 0, scale: 0.95 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{ delay: (rowIndex * 5 + colIndex) * 0.02 }}
+                                                className="relative p-3 rounded-lg overflow-hidden group cursor-default"
+                                                style={{
+                                                  backgroundColor: hexToRgba(course.color, 0.08),
+                                                  borderLeft: `3px solid ${course.color}`
+                                                }}
                                               >
-                                                <h4 className="text-sm font-medium text-white mb-1 leading-tight">
-                                                  {course.title}
-                                                </h4>
-                                                <div className={`${jetBrainsMono.className} text-[10px] text-white/50 space-y-0.5`}>
-                                                  <div className="flex items-center gap-1" style={{ color: styles.color }}>
-                                                    {styles.icon}
-                                                    <span>{course.type}</span>
+                                                {/* Subtle gradient overlay */}
+                                                <div 
+                                                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                                  style={{
+                                                    background: `linear-gradient(135deg, ${hexToRgba(course.color, 0.1)} 0%, transparent 100%)`
+                                                  }}
+                                                />
+                                                
+                                                {/* Content */}
+                                                <div className="relative z-10">
+                                                  <h4 className="text-sm font-semibold text-white mb-2 leading-snug">
+                                                    {course.title}
+                                                  </h4>
+                                                  
+                                                  <div className={`${jetBrainsMono.className} text-[10px] space-y-1`}>
+                                                    <div 
+                                                      className="flex items-center gap-1.5"
+                                                      style={{ color: course.color }}
+                                                    >
+                                                      {isOnline ? <Monitor size={10} /> : <MapPin size={10} />}
+                                                      <span className="uppercase tracking-wider">{course.type}</span>
+                                                    </div>
+                                                    <div className="text-white/40">
+                                                      {course.instructor}
+                                                    </div>
                                                   </div>
-                                                  <div>{course.instructor}</div>
                                                 </div>
-                                              </div>
+                                              </motion.div>
                                             );
                                           })}
                                         </div>
                                       ) : (
-                                        <div className="h-full flex items-center justify-center text-white/10 text-xs">
-                                          —
+                                        <div className="h-full flex items-center justify-center">
+                                          <span className="text-white/10 text-xs">—</span>
                                         </div>
                                       )}
                                     </div>
                                   );
                                 })}
-                              </div>
+                              </motion.div>
                             ))
                           ) : (
-                            <div className="text-center p-8 text-white/30 italic">
+                            <div className="text-center p-12 text-white/30 italic">
                               {noCoursesText}
                             </div>
                           )}
@@ -419,7 +508,7 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                 </AnimatePresence>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
