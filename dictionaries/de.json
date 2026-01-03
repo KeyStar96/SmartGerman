@@ -78,7 +78,7 @@
           "frequency": "2 Termine pro Woche",
           "focus": "Grundlagen für Anfänger 50+",
           "start": "Mo 9:00-10:30 & Di 10:30-12:00",
-          "backDescription": "Kurs für Lernende ab 50 Jahren. Erlernen Sie die Grundlagen in entspannter Atmosphäre.",
+          "backDescription": "Grundlagenkurs für Lernende ab 50.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -168,7 +168,7 @@
           "frequency": "2 Termine pro Woche",
           "focus": "Online Grundlagen A1.1",
           "start": "Do & Fr 19:00-20:30",
-          "backDescription": "Flexibles Online-Lernen in den Abendstunden. Perfekt für Berufstätige.",
+          "backDescription": "Abendkurse für Berufstätige.",
           "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
@@ -183,7 +183,7 @@
           "frequency": "2 Termine pro Woche",
           "focus": "Online Mittelstufe B1",
           "start": "Mo & Di 14:30-16:00",
-          "backDescription": "Online-Kurs für selbstständige Sprachverwendung. Ideal für Lernende mit Grundkenntnissen.",
+          "backDescription": "Für selbstständige Sprachverwendung.",
           "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
@@ -198,8 +198,8 @@
           "frequency": "2 Termine pro Woche",
           "focus": "Online Fortgeschritten B2",
           "start": "Mo & Mi 16:00-17:30",
-          "backDescription": "Hochwertiger Online-Kurs für anspruchsvolle berufliche und akademische Situationen.",
-          "teacher": "Anastasia Sitov",
+          "backDescription": "Für berufliche und akademische Situationen.",
+          "teacher": "Lisa Kahl",
           "color": "hsl(65, 100%, 50%)"
         }
       ]

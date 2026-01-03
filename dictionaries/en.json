@@ -78,7 +78,7 @@
           "frequency": "2 sessions per week",
           "focus": "Basics for beginners 50+",
           "start": "Mon 9:00-10:30 & Tue 10:30-12:00",
-          "backDescription": "Course for learners aged 50+. Learn the basics of German in a relaxed atmosphere.",
+          "backDescription": "Basics course for learners 50+.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -168,7 +168,7 @@
           "frequency": "2 sessions per week",
           "focus": "Online basics A1.1",
           "start": "Thu & Fri 19:00-20:30",
-          "backDescription": "Flexible online learning in the evening hours. Perfect for working professionals.",
+          "backDescription": "Evening courses for professionals.",
           "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
@@ -183,7 +183,7 @@
           "frequency": "2 sessions per week",
           "focus": "Online intermediate B1",
           "start": "Mon & Tue 14:30-16:00",
-          "backDescription": "Online course for independent language use. Ideal for learners with basic knowledge.",
+          "backDescription": "For independent language use.",
           "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
@@ -198,8 +198,8 @@
           "frequency": "2 sessions per week",
           "focus": "Online advanced B2",
           "start": "Mon & Wed 16:00-17:30",
-          "backDescription": "High-quality online course for demanding professional and academic situations.",
-          "teacher": "Anastasia Sitov",
+          "backDescription": "For professional and academic situations.",
+          "teacher": "Lisa Kahl",
           "color": "hsl(65, 100%, 50%)"
         }
       ]

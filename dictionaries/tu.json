@@ -78,7 +78,7 @@
           "frequency": "Haftada 2 ders",
           "focus": "50+ başlangıç temelleri",
           "start": "Pzt 9:00-10:30 & Sal 10:30-12:00",
-          "backDescription": "50 yaş ve üzeri öğrenenler için özel kurs. Rahatlatıcı atmosferde Almanca'nın temellerini öğrenin.",
+          "backDescription": "50+ yaş için temel kurs.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -168,7 +168,7 @@
           "frequency": "Haftada 2 ders",
           "focus": "Online temeller A1.1",
           "start": "Per & Cum 19:00-20:30",
-          "backDescription": "Akşam saatlerinde esnek online öğrenme. Çalışan profesyoneller için mükemmel.",
+          "backDescription": "Çalışanlar için akşam kursları.",
           "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
@@ -183,7 +183,7 @@
           "frequency": "Haftada 2 ders",
           "focus": "Online orta seviye B1",
           "start": "Pzt & Sal 14:30-16:00",
-          "backDescription": "Bağımsız dil kullanımı için online kurs. Temel bilgilere sahip öğrenenler için idealdir.",
+          "backDescription": "Bağımsız dil kullanımı için.",
           "teacher": "Anastasia Sitov",
           "color": "hsl(65, 100%, 50%)"
         },
@@ -198,8 +198,8 @@
           "frequency": "Haftada 2 ders",
           "focus": "Online ileri seviye B2",
           "start": "Pzt & Çar 16:00-17:30",
-          "backDescription": "Zorlu profesyonel ve akademik durumlar için yüksek kaliteli online kurs.",
-          "teacher": "Anastasia Sitov",
+          "backDescription": "Profesyonel ve akademik durumlar için.",
+          "teacher": "Lisa Kahl",
           "color": "hsl(65, 100%, 50%)"
         }
       ]
