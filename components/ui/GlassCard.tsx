@@ -166,7 +166,7 @@ export default function GlassCard({
   }, [hasWatermark]);
 
   // Variable Font Weight Animation bei Hover (nur für Text-Watermark)
-  // Scale Animation für Icon-Watermark
+  // Opacity Animation für Icon-Watermark (kein Scale - verursacht Positionsverschiebung)
   useEffect(() => {
     if (!hasWatermark) return;
     
@@ -183,9 +183,8 @@ export default function GlassCard({
             ease: "power2.out",
           });
         } else if (WatermarkIcon) {
-          // Icon-Watermark: Scale Animation
+          // Icon-Watermark: Nur Opacity Animation (einheitlich mit Text-Watermark)
           gsap.to(watermarkRef.current, {
-            scale: 1.15,
             opacity: 0.08,
             duration: 0.5,
             ease: "power2.out",
@@ -205,7 +204,6 @@ export default function GlassCard({
           });
         } else if (WatermarkIcon) {
           gsap.to(watermarkRef.current, {
-            scale: 1,
             opacity: 0.04,
             duration: 0.5,
             ease: "power2.out",
@@ -296,14 +294,14 @@ export default function GlassCard({
                 {watermark}
               </div>
             )}
-            {/* Icon-Watermark (für Features) */}
+            {/* Icon-Watermark (für Features) - gleiche Position wie Text-Watermark */}
             {WatermarkIcon && !watermark && (
               <div 
                 ref={watermarkRef}
-                className="absolute top-1/2 right-4 -translate-y-1/2 opacity-[0.04] select-none pointer-events-none transition-all duration-700 watermark-parallax watermark-glow"
+                className="absolute top-4 right-6 opacity-[0.04] select-none pointer-events-none watermark-parallax watermark-glow"
                 style={{ color }}
               >
-                <WatermarkIcon size={180} strokeWidth={0.8} />
+                <WatermarkIcon size={160} strokeWidth={0.8} />
               </div>
             )}
             <div className="flex justify-between items-start mb-6">
