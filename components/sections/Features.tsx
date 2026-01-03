@@ -115,7 +115,6 @@ export default function Features({ dictionary }: FeaturesProps) {
                 color={feature.color}
                 trigger={gridRef}
                 inverted={index % 2 === 0}
-                spotlightClassName="feature-card-spotlight"
               />
             </div>
           ))}
