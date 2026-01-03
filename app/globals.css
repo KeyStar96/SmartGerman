@@ -291,13 +291,10 @@ body {
       text-rendering: optimizeLegibility;
     }
     
-    /* Hide Scrollbar für horizontale Scroll-Container */
+    /* Hide Scrollbar für Scroll-Container */
     .hide-scrollbar {
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none; /* IE/Edge */
-      /* WICHTIG für iOS: Verhindert, dass der Browser 
-         das vertikale Scrollen erzwingt, während wir horizontal wischen */
-      touch-action: pan-x;
     }
     
     .hide-scrollbar::-webkit-scrollbar {
