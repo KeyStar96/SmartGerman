@@ -115,12 +115,12 @@
     }
   },
     "features": {
-      "native_support": "Muttersprachliche Begleitung",
-      "native_desc": "Erklärungen auf Russisch/Ukrainisch bei komplexen Grammatikthemen.",
-      "central_location": "Zentral in Hannover",
-      "location_desc": "Unsere Schule ist perfekt erreichbar, direkt am Hauptbahnhof.",
-      "modern_learning": "Modernes Lernen",
-      "modern_desc": "Kleine Gruppen, modernste Technik und hocheffektive Methoden."
+      "native_support": "Muttersprachliche Lehrer",
+      "native_desc": "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz für ein authentisches Lernerlebnis.",
+      "central_location": "Flexible Kurszeiten",
+      "location_desc": "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends.",
+      "modern_learning": "Praxisnahe Methoden",
+      "modern_desc": "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg."
     },
     "courses": {
       "title": "Unsere Kurse",

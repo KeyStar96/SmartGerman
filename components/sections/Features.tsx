@@ -41,19 +41,19 @@ export default function Features({ dictionary }: FeaturesProps) {
   const fallbackFeatures: FeatureProps[] = [
     {
       title: "Muttersprachliche Lehrer",
-      description: "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz.",
+      description: "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz für ein authentisches Lernerlebnis.",
       Icon: UserCheck,
       color: "#FF5C00",
     },
     {
       title: "Flexible Kurszeiten",
-      description: "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen.",
+      description: "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends.",
       Icon: Clock,
       color: "#00D9FF",
     },
     {
       title: "Praxisnahe Methoden",
-      description: "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen.",
+      description: "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg.",
       Icon: Target,
       color: "#FF5C00",
     }

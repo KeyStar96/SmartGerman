@@ -115,12 +115,12 @@
     }
   },
     "features": {
-      "native_support": "Native Support",
-      "native_desc": "Explanations in Russian/Ukrainian for complex grammar topics.",
-      "central_location": "Central in Hannover",
-      "location_desc": "Our school is perfectly accessible, right at the main train station.",
-      "modern_learning": "Modern Learning",
-      "modern_desc": "Small groups, cutting-edge technology and highly effective methods."
+      "native_support": "Native Teachers",
+      "native_desc": "Our qualified native speakers combine professional teaching experience with intercultural competence for an authentic learning experience.",
+      "central_location": "Flexible Course Times",
+      "location_desc": "We offer courses at various times of day that adapt to your schedule - including evenings.",
+      "modern_learning": "Practical Methods",
+      "modern_desc": "Our interactive and communicative teaching methods focus on everyday situations for quick and sustainable learning success."
     },
     "courses": {
       "title": "Our Courses",

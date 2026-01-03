@@ -115,12 +115,12 @@
     }
   },
     "features": {
-      "native_support": "Ana Dili Desteği",
-      "native_desc": "Karmaşık dilbilgisi konularında Rusça/Ukraynaca açıklamalar.",
-      "central_location": "Hannover'de Merkezi Konum",
-      "location_desc": "Okulumuz ana tren istasyonunun hemen yanında, mükemmel erişilebilir.",
-      "modern_learning": "Modern Öğrenme",
-      "modern_desc": "Küçük gruplar, son teknoloji ve oldukça etkili yöntemler."
+      "native_support": "Ana Dili Öğretmenler",
+      "native_desc": "Nitelikli ana dili öğretmenlerimiz, otantik bir öğrenme deneyimi için profesyonel öğretim deneyimini kültürlerarası yeterlilikle birleştirir.",
+      "central_location": "Esnek Kurs Saatleri",
+      "location_desc": "Programınıza uyum sağlayan, günün farklı saatlerinde kurslar sunuyoruz - akşam saatleri dahil.",
+      "modern_learning": "Pratik Yöntemler",
+      "modern_desc": "Etkileşimli ve iletişimsel öğretim yöntemlerimiz, hızlı ve sürdürülebilir öğrenme başarısı için günlük durumlara odaklanır."
     },
     "courses": {
       "title": "Kurslarımız",
