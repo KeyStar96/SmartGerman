@@ -19,7 +19,8 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasHover, setHasHover] = useState(false);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
-  const [viewMode, setViewMode] = useState<"day" | "grid">("day");
+  const [viewMode, setViewMode] = useState<"editorial" | "classic">("editorial");
+  const [showLaserScan, setShowLaserScan] = useState(false);
 
   // Erkenne ob Gerät Hover unterstützt (Desktop mit Cursor)
   useEffect(() => {
@@ -255,33 +256,59 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
               <X size={32} strokeWidth={1.5} />
             </button>
 
-              {/* VIEW SWITCHER BUTTON */}
-              <button
-                onClick={() => setViewMode(viewMode === "day" ? "grid" : "day")}
-                className="absolute top-6 left-6 z-[110] flex items-center gap-2 px-4 py-2 bg-black/50 border border-white/10 rounded-full text-white/70 hover:text-white hover:border-primary-orange/50 transition-all backdrop-blur-md"
-                title={dictionary?.schedule?.switch_view || "Ansicht wechseln"}
-              >
-                {viewMode === "day" ? (
-                  <>
-                    <LayoutGrid size={18} />
-                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-wider hidden sm:inline`}>
-                      {dictionary?.schedule?.view_grid || "Raster"}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <CalendarDays size={18} />
-                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-wider hidden sm:inline`}>
-                      {dictionary?.schedule?.view_day || "Tag"}
-              </span>
-                  </>
-                )}
-              </button>
+              {/* VIEW SWITCHER: Pill-Shaped Toggle */}
+              <div className="absolute top-6 left-6 z-[110] flex items-center gap-1 p-1 bg-black/50 border border-white/10 rounded-full backdrop-blur-md relative">
+                <button
+                  onClick={() => {
+                    if (viewMode !== "editorial") {
+                      setViewMode("editorial");
+                    }
+                  }}
+                  className={`relative px-4 py-2 rounded-full transition-all duration-300 z-10 ${
+                    viewMode === "editorial"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-wider`}>
+                    {dictionary?.schedule?.view_day || "Editorial"}
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (viewMode !== "classic") {
+                      setViewMode("classic");
+                      setShowLaserScan(true);
+                      setTimeout(() => setShowLaserScan(false), 1000);
+                    }
+                  }}
+                  className={`relative px-4 py-2 rounded-full transition-all duration-300 z-10 ${
+                    viewMode === "classic"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-wider`}>
+                    {dictionary?.schedule?.view_grid || "Classic Grid"}
+                  </span>
+                </button>
+                <motion.div
+                  layoutId="activeView"
+                  className="absolute bg-primary-orange/20 border border-primary-orange/50 rounded-full"
+                  style={{
+                    left: viewMode === "editorial" ? "0.25rem" : "50%",
+                    right: viewMode === "editorial" ? "50%" : "0.25rem",
+                    top: "0.25rem",
+                    bottom: "0.25rem"
+                  }}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              </div>
               
               <AnimatePresence mode="wait">
-                {viewMode === "day" ? (
+                {viewMode === "editorial" ? (
                   <motion.div
-                    key="day-view"
+                    key="editorial-view"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -356,82 +383,165 @@ export default function Schedule({ dictionary, lang = "de" }: ScheduleProps) {
                   </motion.div>
                 ) : (
                   <motion.div
-                    key="grid-view"
+                    key="classic-grid-view"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex-1 overflow-auto p-8 md:p-12 custom-scrollbar"
+                    className="flex-1 overflow-auto p-8 md:p-12 custom-scrollbar relative"
                   >
-                    <div className="max-w-full">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr>
-                            <th className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-left p-4 bg-black/30 border border-white/10 text-accent-cyan sticky top-0 z-10`}>
-                              {dictionary?.schedule?.time || "Uhrzeit"}
-                            </th>
-                            {days.map((day) => (
-                              <th
-                                key={day}
-                                className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-center p-4 bg-black/30 border border-white/10 text-white sticky top-0 z-10`}
+                    {/* Laser-Scan Animation */}
+                    <AnimatePresence>
+                      {showLaserScan && (
+                        <motion.div
+                          initial={{ top: "0%", opacity: 1 }}
+                          animate={{ top: "100%" }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.8, ease: "easeInOut" }}
+                          className="absolute left-0 right-0 h-[2px] bg-primary-orange z-50 pointer-events-none"
+                          style={{
+                            boxShadow: "0 0 20px var(--primary-orange), 0 0 40px var(--primary-orange)"
+                          }}
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    <div className="max-w-full mx-auto">
+                      {/* CSS Grid Layout: 6 Columns (Time + 5 Days) */}
+                      <div 
+                        className="grid grid-cols-[120px_repeat(5,1fr)] gap-0 border-[0.5px] border-white/5"
+                        style={{
+                          borderWidth: "0.5px"
+                        }}
+                      >
+                        {/* Header Row */}
+                        <div className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-left p-4 bg-black/30 border-[0.5px] border-white/5 text-accent-cyan sticky top-0 z-10`}>
+                          {dictionary?.schedule?.time || "Uhrzeit"}
+                        </div>
+                        {days.map((day, dayIndex) => (
+                          <div
+                            key={day}
+                            className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-center p-4 bg-black/30 border-[0.5px] border-white/5 text-white sticky top-0 z-10 relative`}
+                          >
+                            {dayNames[day as keyof typeof dayNames]}
+                            {/* Coordinate Label: Top Right */}
+                            <span 
+                              className={`absolute top-1 right-1 ${jetBrainsMono.className} text-[8px] text-white/10`}
+                              style={{ opacity: 0.1 }}
+                            >
+                              {String.fromCharCode(65 + dayIndex)}0
+                            </span>
+                          </div>
+                        ))}
+
+                        {/* Grid Rows */}
+                        {gridData.timeSlots.length > 0 ? (
+                          gridData.timeSlots.map((timeSlot, rowIndex) => (
+                            <React.Fragment key={timeSlot}>
+                              {/* Time Column */}
+                              <div 
+                                className={`${jetBrainsMono.className} text-sm text-white/60 p-4 border-[0.5px] border-white/5 bg-black/10 align-top relative`}
                               >
-                                {dayNames[day as keyof typeof dayNames]}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {gridData.timeSlots.length > 0 ? (
-                            gridData.timeSlots.map((timeSlot) => (
-                              <tr key={timeSlot}>
-                                <td className={`${jetBrainsMono.className} text-sm text-white/60 p-4 border border-white/10 bg-black/10 align-top`}>
-                                  {timeSlot}
-                                </td>
-                                {days.map((day) => (
-                                  <td key={day} className="p-2 border border-white/10 bg-black/5 align-top min-w-[200px]">
-                                    {gridData.gridCourses[day][timeSlot]?.map((course: any, i: number) => {
-                                      const styles = getCourseStyles(course.type);
-                                      return (
-                                        <div
-                                          key={i}
-                                          className="mb-2 p-3 rounded-lg bg-black/40 border border-white/10 backdrop-blur-sm hover:border-primary-orange/50 transition-colors group"
-                                        >
-                                          <div className={`${jetBrainsMono.className} text-[9px] uppercase tracking-wider mb-2 flex items-center gap-2`} style={{ color: styles.color }}>
-                                            <span className="px-2 py-0.5 rounded bg-black/50 border border-current/30" style={{ color: styles.color }}>
-                                              {course.type}
-                                            </span>
-                                          </div>
-                                          <h4 className="text-sm font-bold text-white mb-2 group-hover:text-primary-orange transition-colors">
-                                            {course.title}
-                                          </h4>
-                                          <div className="text-xs text-white/50 space-y-1">
-                                            <div className="flex items-center gap-1.5">
-                                              <MapPin size={12} className="opacity-50" />
-                                              <span>{course.location}</span>
+                                {timeSlot}
+                                {/* Coordinate Label: Bottom Left */}
+                                <span 
+                                  className={`absolute bottom-1 left-1 ${jetBrainsMono.className} text-[8px] text-white/10`}
+                                  style={{ opacity: 0.1 }}
+                                >
+                                  {String.fromCharCode(65 + rowIndex)}1
+                                </span>
+                              </div>
+
+                              {/* Day Columns */}
+                              {days.map((day, dayIndex) => {
+                                const courses = gridData.gridCourses[day][timeSlot] || [];
+                                const coordinateLabel = `${String.fromCharCode(65 + rowIndex)}${dayIndex + 1}`;
+                                
+                                return (
+                                  <div 
+                                    key={day}
+                                    className="p-2 border-[0.5px] border-white/5 bg-black/5 align-top min-h-[80px] relative group hover:bg-white/[0.02] transition-colors"
+                                  >
+                                    {/* Coordinate Labels: All Corners */}
+                                    <span 
+                                      className={`absolute top-1 left-1 ${jetBrainsMono.className} text-[8px] text-white/10 pointer-events-none`}
+                                      style={{ opacity: 0.1 }}
+                                    >
+                                      {coordinateLabel}
+                                    </span>
+                                    <span 
+                                      className={`absolute top-1 right-1 ${jetBrainsMono.className} text-[8px] text-white/10 pointer-events-none`}
+                                      style={{ opacity: 0.1 }}
+                                    >
+                                      {coordinateLabel}
+                                    </span>
+                                    <span 
+                                      className={`absolute bottom-1 left-1 ${jetBrainsMono.className} text-[8px] text-white/10 pointer-events-none`}
+                                      style={{ opacity: 0.1 }}
+                                    >
+                                      {coordinateLabel}
+                                    </span>
+                                    <span 
+                                      className={`absolute bottom-1 right-1 ${jetBrainsMono.className} text-[8px] text-white/10 pointer-events-none`}
+                                      style={{ opacity: 0.1 }}
+                                    >
+                                      {coordinateLabel}
+                                    </span>
+
+                                    {courses.length > 0 ? (
+                                      <div className="space-y-2">
+                                        {courses.map((course: any, i: number) => {
+                                          const styles = getCourseStyles(course.type);
+                                          const borderColor = course.type?.toLowerCase() === 'online' 
+                                            ? 'var(--accent-lime)' 
+                                            : 'var(--accent-cyan)';
+                                          
+                                          return (
+                                            <div
+                                              key={i}
+                                              className="relative pl-3 pr-2 py-2 bg-black/20 hover:bg-white/[0.02] transition-colors group/card"
+                                              style={{
+                                                borderLeft: `2px solid ${borderColor}`
+                                              }}
+                                            >
+                                              {/* Course Title - Bold Sans-Serif */}
+                                              <h4 className="text-sm font-bold text-white mb-1.5 group-hover/card:text-primary-orange transition-colors">
+                                                {course.title}
+                                              </h4>
+                                              
+                                              {/* Sub-Info - Tiny Uppercase JetBrains Mono */}
+                                              <div className={`${jetBrainsMono.className} text-[9px] uppercase tracking-[0.15em] text-white/50 space-y-0.5`}>
+                                                <div className="flex items-center gap-1.5">
+                                                  {styles.icon}
+                                                  <span style={{ color: styles.color }}>
+                                                    {course.type}
+                                                  </span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                  <span>{course.instructor}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-white/40">
+                                                  <MapPin size={10} className="opacity-50" />
+                                                  <span className="truncate">{course.location}</span>
+                                                </div>
+                                              </div>
                                             </div>
-                                            <div className="flex items-center gap-1.5 italic">
-                                              <span>{dictionary?.schedule?.instructor || "Dozentin"}:</span>
-                                              <span>{course.instructor}</span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                    {(!gridData.gridCourses[day][timeSlot] || gridData.gridCourses[day][timeSlot].length === 0) && (
-                                      <div className="text-white/10 text-center py-4">—</div>
+                                          );
+                                        })}
+                                      </div>
+                                    ) : (
+                                      <div className="text-white/10 text-center py-4 text-xs">—</div>
                                     )}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan={6} className="text-center p-8 text-white/20 italic">
-                                {noCoursesText}
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
+                                  </div>
+                                );
+                              })}
+                            </React.Fragment>
+                          ))
+                        ) : (
+                          <div className="col-span-6 text-center p-8 text-white/20 italic">
+                            {noCoursesText}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 )}
