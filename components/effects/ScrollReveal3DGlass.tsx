@@ -32,7 +32,7 @@ export default function ScrollReveal3DGlass({
       className={className}
       style={{
         perspective: "1500px",
-        transformStyle: "preserve-3d",
+        // KEIN preserve-3d auf diesem Level - sonst bricht Chrome backdrop-filter
       }}
     >
       {/* 3D ANIMATED CONTAINER - Enthält Glass + Content */}
@@ -40,13 +40,14 @@ export default function ScrollReveal3DGlass({
         ref={cardRef}
         className="relative w-full h-full group/card"
         style={{
-          transformStyle: "preserve-3d",
-          willChange: "transform, opacity",
+          // KEIN will-change hier - wird dynamisch von GSAP gesetzt
+          // KEIN preserve-3d hier - wir nutzen nur transform für die Animation
           transform: "translate3d(0,0,0)", 
+          backfaceVisibility: "hidden",
         }}
       >
-        {/* GLASS LAYER - INNERHALB des animierten Containers
-            transform-style: flat verhindert, dass backdrop-filter bricht
+        {/* GLASS LAYER mit backdrop-filter
+            isolation: isolate erzwingt eigenen Stacking Context für Chrome
         */}
         <div 
           className="absolute inset-0 rounded-[2rem] border border-white/10 shadow-2xl transition-all duration-500 group-hover/card:border-white/20"
@@ -54,9 +55,7 @@ export default function ScrollReveal3DGlass({
             background: "rgba(255, 255, 255, 0.03)",
             backdropFilter: "blur(20px) saturate(180%)",
             WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            // CHROME FIX: flat verhindert 3D-Transform Vererbung auf diesen Layer
-            transformStyle: "flat",
-            // Kein eigener Transform, nur vom Parent geerbt
+            isolation: "isolate",
             zIndex: 0,
             boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.4)",
           }}
@@ -65,11 +64,7 @@ export default function ScrollReveal3DGlass({
         {/* CONTENT LAYER */}
         <div 
           className="relative h-full w-full overflow-hidden rounded-[2rem]"
-          style={{ 
-            zIndex: 10,
-            // Content kann 3D haben
-            transformStyle: "preserve-3d",
-          }}
+          style={{ zIndex: 10 }}
         >
           {children}
         </div>

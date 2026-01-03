@@ -63,10 +63,10 @@ export function useScrollReveal3D(
     
     // Initial Set (GPU hint)
     // WICHTIG: backface-visibility: hidden hilft Safari beim Compositing
+    // KEIN perspective hier - bricht Chrome backdrop-filter!
     gsap.set(element, { 
       transformOrigin,
       backfaceVisibility: "hidden",
-      perspective: 1000, // Hilft Safari Tiefe zu verstehen ohne komplexe Matrix
     });
 
     // Timeline Setup
