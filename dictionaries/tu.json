@@ -70,110 +70,110 @@
         {
           "badge": "Yüz yüze",
           "title": "Almanca 50+ A1.1",
+          "level": "A1.1",
           "description": "50+ öğrenenler için özel olarak tasarlanmıştır. Hız ve metodoloji bu hedef kitleye uyarlanmıştır.",
           "price": "€ 2,50",
           "duration": "45 Dk",
           "focus": "50+ başlangıç temelleri",
           "start": "Pzt 9:00-10:30 & Sal 10:30-12:00",
-          "backDescription": "50 yaş ve üzeri öğrenenler için özel bir kurs. Rahatlatıcı bir atmosferde Almanca'nın temellerini öğrenin. Kurs bu yaş grubunun özel ihtiyaçlarına göre uyarlanmıştır.",
-          "color": "#FF5C00",
-          "icon": "Users"
+          "backDescription": "50 yaş ve üzeri öğrenenler için özel kurs. Rahatlatıcı atmosferde Almanca'nın temellerini öğrenin.",
+          "color": "#FF5C00"
         },
         {
           "badge": "Yüz yüze",
           "title": "Almanca 50+ A1.2",
+          "level": "A1.2",
           "description": "50+ öğrenenler için A1.1 kursunun devamı. Destekleyici bir ortamda bilginizi derinleştirin.",
           "price": "€ 2,50",
           "duration": "45 Dk",
           "focus": "50+ için A1 seviyesi derinleştirme",
           "start": "Sal 9:00-10:30 & Çar 10:30-12:00",
-          "backDescription": "A1.1 kursunun devamı. Deneyimli öğretmenlerle yaşa uygun bir tempoda temel bilgilerinizi genişletin.",
-          "color": "#FF5C00",
-          "icon": "Users"
+          "backDescription": "A1.1 kursunun devamı. Yaşa uygun tempoda temel bilgilerinizi genişletin.",
+          "color": "#FF5C00"
         },
         {
           "badge": "Yüz yüze",
           "title": "Almanca 50+ A2",
+          "level": "A2",
           "description": "Ön bilgisi olan 50+ öğrenenler için. Günlük durumlar için kelime dağarcığınızı genişletin.",
           "price": "€ 2,50",
           "duration": "45 Dk",
           "focus": "50+ için günlük iletişim",
           "start": "Pzt 10:30-12:00 & Çar 9:00-10:30",
-          "backDescription": "Temel bilgilerinizin üzerine inşa edin ve günlük durumları ustaca yönetin. Kurs yaşlı öğrenenlerin ihtiyaçlarına göre uyarlanmıştır.",
-          "color": "#FF5C00",
-          "icon": "Users"
+          "backDescription": "Temel bilgilerinizin üzerine inşa edin ve günlük durumları ustaca yönetin.",
+          "color": "#FF5C00"
         },
         {
           "badge": "Yüz yüze",
           "title": "Konuşma Pratiği A1.1",
+          "level": "A1.1",
           "description": "Sözlü iletişime odaklanın. Telaffuz ve konuşma becerilerinizi geliştirin.",
           "price": "€ 3,50",
           "duration": "60 Dk",
           "focus": "Sözlü iletişim A1",
           "start": "Sal 12:00-13:00 (1x 60 dk)",
-          "backDescription": "Başlangıç seviyesi için yoğun konuşma pratiği. Küçük gruplarda telaffuzunuzu çalışın ve konuşmada güven kazanın.",
-          "color": "#00D9FF",
-          "icon": "MessageCircle"
+          "backDescription": "Başlangıç seviyesi için yoğun konuşma pratiği. Küçük gruplarda telaffuzunuzu çalışın.",
+          "color": "#00D9FF"
         },
         {
           "badge": "Yüz yüze",
           "title": "Konuşma Pratiği A1.2",
+          "level": "A1.2",
           "description": "Konuşma pratiğinin devamı. A1 seviyesinde sözlü becerilerinizi derinleştirin.",
           "price": "€ 3,50",
           "duration": "60 Dk",
           "focus": "Sözlü iletişim A1.2",
           "start": "Çar 12:00-13:00 (1x 60 dk)",
-          "backDescription": "Günlük durumlarda akıcı konuşma ve doğru telaffuza odaklanan ileri seviye konuşma pratiği.",
-          "color": "#00D9FF",
-          "icon": "MessageCircle"
+          "backDescription": "Günlük durumlarda akıcı konuşma ve doğru telaffuza odaklanan ileri seviye pratik.",
+          "color": "#00D9FF"
         },
         {
           "badge": "Yüz yüze",
           "title": "Konuşma Pratiği A2",
+          "level": "A2",
           "description": "A2 ön bilgisi olan öğrenenler için. Sözlü iletişiminizi mükemmelleştirin.",
           "price": "€ 3,50",
           "duration": "60 Dk",
           "focus": "Sözlü iletişim A2",
           "start": "Pzt 12:00-13:00 (1x 60 dk)",
-          "backDescription": "İleri seviye başlangıçlar için konuşma pratiği. Daha karmaşık konuşmaları çalışın ve aktif kelime dağarcığınızı genişletin.",
-          "color": "#00D9FF",
-          "icon": "MessageCircle"
+          "backDescription": "İleri seviye başlangıçlar için konuşma pratiği. Daha karmaşık konuşmaları çalışın.",
+          "color": "#00D9FF"
         },
         {
           "badge": "Online",
           "title": "Temeller A1.1",
+          "level": "A1.1",
           "description": "Başlangıç seviyesi için online kurs. Almanca'nın temellerini evinizden rahatça öğrenin.",
-          "price": "€ 15",
-          "duration": "90 Dk",
+          "price": "€ 7,50",
+          "duration": "45 Dk",
           "focus": "Online temeller A1.1",
           "start": "Per & Cum 19:00-20:30",
-          "backDescription": "Akşam saatlerinde esnek online öğrenme. Çalışan profesyoneller için mükemmel. Deneyimli öğretmenlerle etkileşimli oturumlar.",
-          "color": "#8B5CF6",
-          "icon": "Laptop"
+          "backDescription": "Akşam saatlerinde esnek online öğrenme. Çalışan profesyoneller için mükemmel.",
+          "color": "hsl(65, 100%, 50%)"
         },
         {
           "badge": "Online",
           "title": "Almanca B1",
+          "level": "B1",
           "description": "İleri seviye öğrenenler için online kurs. Evinizden rahatça sağlam bir orta seviyeye ulaşın.",
-          "price": "€ 15",
-          "duration": "90 Dk",
+          "price": "€ 7,50",
+          "duration": "45 Dk",
           "focus": "Online orta seviye B1",
           "start": "Pzt & Sal 14:30-16:00",
-          "backDescription": "Bağımsız dil kullanımı için online kurs. Zaten temel bilgilere sahip olan ve bunları genişletmek isteyen öğrenenler için idealdir.",
-          "color": "#8B5CF6",
-          "icon": "Laptop"
+          "backDescription": "Bağımsız dil kullanımı için online kurs. Temel bilgilere sahip öğrenenler için idealdir.",
+          "color": "hsl(65, 100%, 50%)"
         },
         {
           "badge": "Online",
           "title": "Almanca B2",
+          "level": "B2",
           "description": "İleri seviye öğrenenler için online kurs. Almanca'nızı yüksek seviyede mükemmelleştirin.",
-          "price": "€ 15",
-          "duration": "90 Dk",
+          "price": "€ 7,50",
+          "duration": "45 Dk",
           "focus": "Online ileri seviye B2",
           "start": "Pzt & Çar 16:00-17:30",
-          "backDescription": "Zorlu profesyonel ve akademik durumlar için yüksek kaliteli online kurs. Maksimum öğrenme verimliliği için esnek zamanlar.",
-          "color": "#8B5CF6",
-          "icon": "Laptop"
+          "backDescription": "Zorlu profesyonel ve akademik durumlar için yüksek kaliteli online kurs.",
+          "color": "hsl(65, 100%, 50%)"
         }
       ]
     }
@@ -189,6 +189,7 @@
     "courses": {
       "title": "Kurslarımız",
       "subtitle": "Başlangıçtan profesyonele – sizin için doğru kursa sahibiz.",
+      "price_label": "Fiyat",
       "flip_hint": "DETAY",
       "back_hint": "GERİ",
       "a1": {

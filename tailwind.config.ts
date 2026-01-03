@@ -18,6 +18,7 @@ const config: Config = {
             },
             accent: {
               cyan: "var(--accent-cyan)", // hsl(180, 100%, 50%)
+              lime: "var(--accent-lime)", // hsl(65, 100%, 50%) - Electric Lime
             },
             // Darkmode Spaceship Colors
             dm: {

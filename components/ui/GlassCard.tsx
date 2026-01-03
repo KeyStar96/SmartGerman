@@ -18,7 +18,8 @@ export interface GlassCardProps {
   description: string;
   children?: ReactNode;
   color: string;
-  icon?: LucideIcon;
+  icon?: LucideIcon; // Für Features behalten, für Courses optional
+  level?: string; // Level-Label wie "A1.1" für Courses
   badge?: string;
   watermark?: string;
   watermarkIcon?: LucideIcon; // Icon als Watermark (für Features)
@@ -43,6 +44,7 @@ export default function GlassCard({
   children,
   color,
   icon: Icon,
+  level,
   badge,
   watermark,
   watermarkIcon: WatermarkIcon,
@@ -334,27 +336,41 @@ export default function GlassCard({
                 <WatermarkIcon size={100} className="md:w-40 md:h-40" strokeWidth={0.8} />
               </div>
             )}
-            <div className="flex justify-between items-start mb-4 md:mb-6">
-              {Icon && (
-                <div 
-                  className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500" 
-                  style={{ color }}
-                >
-                  <Icon size={24} className="md:w-8 md:h-8" strokeWidth={1.5} />
-                </div>
-              )}
-              {badge && (
-                <span 
-                  className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300 badge-glow`}
-                  style={{ 
-                    color,
-                    borderColor: `${color}40`,
-                    '--badge-color': color,
-                  } as React.CSSProperties}
-                >
-                  {badge}
-                </span>
-              )}
+            <div className="flex justify-between items-start mb-4 md:mb-6 gap-3">
+              <div className="flex items-center gap-3">
+                {/* Level-Label für Courses oder Icon für Features */}
+                {level ? (
+                  <span 
+                    className={`${jetBrainsMono.className} text-lg md:text-xl font-bold tracking-wider level-label-glow`}
+                    style={{ 
+                      color,
+                      '--level-color': color,
+                    } as React.CSSProperties}
+                  >
+                    {level}
+                  </span>
+                ) : Icon ? (
+                  <div 
+                    className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500" 
+                    style={{ color }}
+                  >
+                    <Icon size={24} className="md:w-8 md:h-8" strokeWidth={1.5} />
+                  </div>
+                ) : null}
+                {/* Badge rechts neben Level-Label */}
+                {badge && (
+                  <span 
+                    className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300 badge-glow`}
+                    style={{ 
+                      color,
+                      borderColor: `${color}40`,
+                      '--badge-color': color,
+                    } as React.CSSProperties}
+                  >
+                    {badge}
+                  </span>
+                )}
+              </div>
             </div>
             <h3 className="text-xl md:text-3xl font-bold text-white mb-2 md:mb-4 group-hover:translate-x-1 transition-transform duration-300 drop-shadow-lg">
               {title}

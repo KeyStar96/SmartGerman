@@ -11,6 +11,7 @@
   /* Global/Core - Brand Colors */
   --primary-orange: hsl(14, 100%, 50%); /* #FF5C00 - Nur für kritische CTAs und Markenkerne */
   --accent-cyan: hsl(180, 100%, 50%); /* Für technische Micro-Interactions */
+  --accent-lime: hsl(65, 100%, 50%); /* Electric Lime - Für Online-Kurse, High-End Modern */
   
   /* Lightmode (Organic Scholar) */
   --lm-bg-bone: #E2D7CE; /* Haupt-Hintergrund */
@@ -736,6 +737,17 @@ body {
     .card-interactive-container:hover .badge-glow {
       filter: drop-shadow(0 0 15px var(--badge-color, currentColor));
       box-shadow: 0 0 20px calc(var(--badge-color, currentColor) + "40");
+    }
+    
+    /* Level-Label Glow-Effekt für Courses */
+    .level-label-glow {
+      filter: drop-shadow(0 0 0px var(--level-color, currentColor));
+      transition: filter 0.3s ease, text-shadow 0.3s ease;
+    }
+    
+    .card-interactive-container:hover .level-label-glow {
+      filter: drop-shadow(0 0 12px var(--level-color, currentColor));
+      text-shadow: 0 0 20px var(--level-color, currentColor);
     }
     
     /* Variable Font Weight für Price */

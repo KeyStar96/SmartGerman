@@ -70,110 +70,110 @@
         {
           "badge": "In-person",
           "title": "German 50+ A1.1",
+          "level": "A1.1",
           "description": "Specifically designed for learners 50+. Pace and methodology are tailored to this target group.",
           "price": "€ 2.50",
           "duration": "45 Min",
           "focus": "Basics for beginners 50+",
           "start": "Mon 9:00-10:30 & Tue 10:30-12:00",
-          "backDescription": "A course specifically for learners aged 50 and above. Learn the basics of German in a relaxed atmosphere. The course is tailored to the special needs of this age group.",
-          "color": "#FF5C00",
-          "icon": "Users"
+          "backDescription": "Course for learners aged 50+. Learn the basics of German in a relaxed atmosphere.",
+          "color": "#FF5C00"
         },
         {
           "badge": "In-person",
           "title": "German 50+ A1.2",
+          "level": "A1.2",
           "description": "Continuation of the A1.1 course for learners 50+. Deepen your knowledge in a supportive environment.",
           "price": "€ 2.50",
           "duration": "45 Min",
           "focus": "Advanced A1 level for 50+",
           "start": "Tue 9:00-10:30 & Wed 10:30-12:00",
-          "backDescription": "Continuation of the A1.1 course. Expand your basic knowledge at an age-appropriate pace with experienced teachers.",
-          "color": "#FF5C00",
-          "icon": "Users"
+          "backDescription": "Continuation of A1.1. Expand your basic knowledge at an age-appropriate pace.",
+          "color": "#FF5C00"
         },
         {
           "badge": "In-person",
           "title": "German 50+ A2",
+          "level": "A2",
           "description": "For learners 50+ with prior knowledge. Expand your vocabulary for everyday situations.",
           "price": "€ 2.50",
           "duration": "45 Min",
           "focus": "Everyday communication for 50+",
           "start": "Mon 10:30-12:00 & Wed 9:00-10:30",
-          "backDescription": "Build on your basic knowledge and master everyday situations. The course is tailored to the needs of older learners.",
-          "color": "#FF5C00",
-          "icon": "Users"
+          "backDescription": "Build on your basic knowledge and master everyday situations.",
+          "color": "#FF5C00"
         },
         {
           "badge": "In-person",
           "title": "Speaking Practice A1.1",
+          "level": "A1.1",
           "description": "Focus on oral communication. Improve your pronunciation and speaking skills.",
           "price": "€ 3.50",
           "duration": "60 Min",
           "focus": "Oral communication A1",
           "start": "Tue 12:00-13:00 (1x 60 min)",
-          "backDescription": "Intensive speaking practice for beginners. Practice pronunciation in small groups and gain confidence in speaking.",
-          "color": "#00D9FF",
-          "icon": "MessageCircle"
+          "backDescription": "Intensive speaking practice for beginners. Practice pronunciation in small groups.",
+          "color": "#00D9FF"
         },
         {
           "badge": "In-person",
           "title": "Speaking Practice A1.2",
+          "level": "A1.2",
           "description": "Continuation of speaking practice. Deepen your oral skills at A1 level.",
           "price": "€ 3.50",
           "duration": "60 Min",
           "focus": "Oral communication A1.2",
           "start": "Wed 12:00-13:00 (1x 60 min)",
-          "backDescription": "Advanced speaking practice focusing on fluent speech and correct pronunciation in everyday situations.",
-          "color": "#00D9FF",
-          "icon": "MessageCircle"
+          "backDescription": "Advanced speaking practice focusing on fluent speech and correct pronunciation.",
+          "color": "#00D9FF"
         },
         {
           "badge": "In-person",
           "title": "Speaking Practice A2",
+          "level": "A2",
           "description": "For learners with A2 prior knowledge. Perfect your oral communication.",
           "price": "€ 3.50",
           "duration": "60 Min",
           "focus": "Oral communication A2",
           "start": "Mon 12:00-13:00 (1x 60 min)",
-          "backDescription": "Speaking practice for advanced beginners. Practice more complex conversations and expand your active vocabulary.",
-          "color": "#00D9FF",
-          "icon": "MessageCircle"
+          "backDescription": "Speaking practice for advanced beginners. Practice more complex conversations.",
+          "color": "#00D9FF"
         },
         {
           "badge": "Online",
           "title": "Basics A1.1",
+          "level": "A1.1",
           "description": "Online course for beginners. Learn the basics of German comfortably from home.",
-          "price": "€ 15",
-          "duration": "90 Min",
+          "price": "€ 7.50",
+          "duration": "45 Min",
           "focus": "Online basics A1.1",
           "start": "Thu & Fri 19:00-20:30",
-          "backDescription": "Flexible online learning in the evening hours. Perfect for working professionals. Interactive sessions with experienced teachers.",
-          "color": "#8B5CF6",
-          "icon": "Laptop"
+          "backDescription": "Flexible online learning in the evening hours. Perfect for working professionals.",
+          "color": "hsl(65, 100%, 50%)"
         },
         {
           "badge": "Online",
           "title": "German B1",
+          "level": "B1",
           "description": "Online course for advanced learners. Reach a solid intermediate level comfortably from home.",
-          "price": "€ 15",
-          "duration": "90 Min",
+          "price": "€ 7.50",
+          "duration": "45 Min",
           "focus": "Online intermediate B1",
           "start": "Mon & Tue 14:30-16:00",
-          "backDescription": "Online course for independent language use. Ideal for learners who already have basic knowledge and want to expand it.",
-          "color": "#8B5CF6",
-          "icon": "Laptop"
+          "backDescription": "Online course for independent language use. Ideal for learners with basic knowledge.",
+          "color": "hsl(65, 100%, 50%)"
         },
         {
           "badge": "Online",
           "title": "German B2",
+          "level": "B2",
           "description": "Online course for advanced learners. Perfect your German at a high level.",
-          "price": "€ 15",
-          "duration": "90 Min",
+          "price": "€ 7.50",
+          "duration": "45 Min",
           "focus": "Online advanced B2",
           "start": "Mon & Wed 16:00-17:30",
-          "backDescription": "High-quality online course for demanding professional and academic situations. Flexible times for maximum learning efficiency.",
-          "color": "#8B5CF6",
-          "icon": "Laptop"
+          "backDescription": "High-quality online course for demanding professional and academic situations.",
+          "color": "hsl(65, 100%, 50%)"
         }
       ]
     }
@@ -189,6 +189,7 @@
     "courses": {
       "title": "Our Courses",
       "subtitle": "From beginner to pro – we have the right course for you.",
+      "price_label": "Price",
       "flip_hint": "DETAILS",
       "back_hint": "BACK",
       "a1": {

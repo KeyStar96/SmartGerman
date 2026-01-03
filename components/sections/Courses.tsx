@@ -2,7 +2,7 @@
 
 import React, { useRef, useMemo } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Users, MessageCircle, Laptop, GraduationCap } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
 
@@ -27,31 +27,24 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
   // WICHTIG: Wir nutzen gridRef für die Animation, damit es exakt wie bei Features ist
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Icon-Mapping basierend auf dem icon-String aus dem Dictionary
-  const iconMap: Record<string, typeof Users> = {
-    Users,
-    MessageCircle,
-    Laptop,
-    GraduationCap,
-  };
-
   const courses = useMemo(() => {
     // Korrekter Pfad zu sections.courses.items
     const coursesData = dictionary?.sections?.courses?.items;
     if (coursesData) {
       return coursesData.map((item: any, index: number) => {
-        // Icon aus dem Dictionary-String laden
-        const IconComponent = item.icon ? iconMap[item.icon] : undefined;
+        // Level extrahieren (z.B. "A1.1", "A1.2", "B1", "B2")
+        const level = item.level || item.title?.match(/([AB]\d+\.?\d*)/)?.[1] || "";
         
         return {
           id: item.title?.toLowerCase().replace(/\s+/g, "-") || `course-${index}`,
           title: item.title,
           desc: item.description,
           badge: item.badge || "Kurs",
+          level: level,
           price: item.price?.replace("€ ", "") || "0",
+          priceDuration: item.duration || "45 Min", // Für Preis-Label
           color: item.color || "#FF5C00",
-          watermark: item.title?.substring(0, 2) || String(index + 1).padStart(2, "0"),
-          icon: IconComponent,
+          watermark: level || item.title?.substring(0, 2) || String(index + 1).padStart(2, "0"),
           // Backface-Content für Flip-Animation
           duration: item.duration || "45 Min",
           focus: item.focus || "Grundlagen",
@@ -122,7 +115,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                 title={course.title}
                 description={course.desc}
                 badge={course.badge}
-                icon={course.icon}
+                level={course.level}
                 color={course.color}
                 trigger={gridRef} 
                 watermark={course.watermark}
@@ -140,7 +133,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex flex-col">
                     <span className="text-xs text-white/40 uppercase tracking-wider mb-1">
-                      {dictionary?.courses?.price_label || "Invest"}
+                      {dictionary?.courses?.price_label || "Preis"} / {course.priceDuration}
                     </span>
                     <div className="flex items-baseline">
                       <span className="text-lg text-white/60 mr-1">€</span>
