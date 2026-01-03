@@ -53,7 +53,10 @@ export default function GlassCard({
   const flipGlowRef = useRef<HTMLDivElement>(null);
 
   // 3D Flip-Animation mit GSAP - Verbesserte echte 180° Drehung
+  // Nur aktiv wenn backfaceContent vorhanden ist
   useEffect(() => {
+    if (!backfaceContent) return; // Keine Flip-Animation ohne Backface-Content
+    
     const container = flipContainerRef.current;
     const front = frontFaceRef.current;
     const back = backFaceRef.current;
@@ -130,10 +133,13 @@ export default function GlassCard({
         ease: "power2.out",
       });
     }
-  }, [isFlipped]);
+  }, [isFlipped, backfaceContent]);
 
   // Parallax Watermark & Variable Font Weight
+  // Nur aktiv wenn watermark vorhanden ist
   useEffect(() => {
+    if (!watermark) return;
+    
     const container = flipContainerRef.current?.closest(".card-interactive-container");
     if (!container || !watermarkRef.current) return;
 
@@ -152,10 +158,13 @@ export default function GlassCard({
 
     container.addEventListener("mousemove", handleMouseMove);
     return () => container.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  }, [watermark]);
 
   // Variable Font Weight Animation bei Hover
+  // Nur aktiv wenn watermark vorhanden ist
   useEffect(() => {
+    if (!watermark) return;
+    
     const container = flipContainerRef.current?.closest(".card-interactive-container");
     if (!container) return;
 
@@ -187,14 +196,17 @@ export default function GlassCard({
       container.removeEventListener("mouseenter", handleMouseEnter);
       container.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, []);
+  }, [watermark]);
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Ignoriere Klicks auf CTA-Buttons
     const target = e.target as HTMLElement;
     if (target.closest("a, button")) return;
     
-    setIsFlipped(!isFlipped);
+    // Flip nur wenn backfaceContent vorhanden ist
+    if (backfaceContent) {
+      setIsFlipped(!isFlipped);
+    }
   };
 
   return (
@@ -202,23 +214,25 @@ export default function GlassCard({
       trigger={trigger} 
       inverted={inverted} 
       className={`h-full ${className}`}
-      accentColor={color}
+      accentColor={color || "#FF5C00"}
     >
       <div 
         ref={flipContainerRef}
         className="card-flip-container"
         onClick={handleCardClick}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: backfaceContent ? "pointer" : "default" }}
       >
-        {/* Glow-Effekt während Flip */}
-        <div 
-          ref={flipGlowRef}
-          className="card-flip-glow"
-          style={{
-            background: `linear-gradient(135deg, ${color}40, transparent)`,
-            borderColor: color,
-          }}
-        />
+        {/* Glow-Effekt während Flip - nur wenn backfaceContent vorhanden */}
+        {backfaceContent && (
+          <div 
+            ref={flipGlowRef}
+            className="card-flip-glow"
+            style={{
+              background: `linear-gradient(135deg, ${color}40, transparent)`,
+              borderColor: color,
+            }}
+          />
+        )}
         {/* Front Face */}
         <div 
           ref={frontFaceRef}
@@ -273,7 +287,8 @@ export default function GlassCard({
           </div>
         </div>
 
-        {/* Back Face */}
+        {/* Back Face - nur wenn backfaceContent vorhanden */}
+        {backfaceContent && (
         <div 
           ref={backFaceRef}
           className="card-face card-face-back"
@@ -319,6 +334,7 @@ export default function GlassCard({
             </div>
           </div>
         </div>
+        )}
       </div>
     </ScrollReveal3DGlass>
   );

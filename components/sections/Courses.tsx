@@ -162,11 +162,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
     <section className="relative w-full py-24 md:py-32 overflow-hidden">
       <div className="container relative z-10 mx-auto px-4 md:px-6">
         
-        {/* Header */}
-        <div className="max-w-2xl mb-16 md:mb-24">
-          <span className={`${jetBrainsMono.className} text-[#FF5C00] text-sm tracking-widest uppercase mb-4 block`}>
-            {dictionary?.sections?.courses?.overline || "Curriculum"}
-          </span>
+        {/* Header - Zentriert */}
+        <div className="max-w-2xl mx-auto text-center mb-16 md:mb-24">
           <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white">
             {dictionary?.sections?.courses?.title_part1 || "Master the"}{" "}
             <span className={`${instrumentSerif.className} text-[#FF5C00]`}>
