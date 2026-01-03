@@ -42,10 +42,12 @@ export default function Features({ dictionary }: FeaturesProps) {
     const clientWidth = container.clientWidth;
     
     // Berechne aktiven Index basierend auf Scroll-Position
-    // Kartenbreite: 280px + 16px gap
-    const cardWidth = 296;
-    const newIndex = Math.round(scrollLeft / cardWidth);
-    setActiveIndex(Math.min(newIndex, 2)); // Max 3 Karten (0, 1, 2)
+    // Kartenbreite: viewport - 32px padding, Gap: 16px
+    const viewportWidth = window.innerWidth;
+    const cardWidth = viewportWidth - 32; // 100vw - 32px
+    const gap = 16;
+    const newIndex = Math.round(scrollLeft / (cardWidth + gap));
+    setActiveIndex(Math.min(Math.max(newIndex, 0), 2)); // Max 3 Karten (0, 1, 2)
     
     // Kann links/rechts scrollen?
     setCanScrollLeft(scrollLeft > 10);
@@ -67,11 +69,12 @@ export default function Features({ dictionary }: FeaturesProps) {
   // Programmatisches Scrollen zu bestimmter Karte
   const scrollToCard = (index: number) => {
     if (!gridRef.current) return;
-    const container = gridRef.current;
-    // Kartenbreite: 280px + 16px gap
-    const cardWidth = 296;
-    container.scrollTo({
-      left: index * cardWidth,
+    // Kartenbreite: viewport - 32px padding, Gap: 16px
+    const viewportWidth = window.innerWidth;
+    const cardWidth = viewportWidth - 32;
+    const gap = 16;
+    gridRef.current.scrollTo({
+      left: index * (cardWidth + gap),
       behavior: "smooth"
     });
   };
@@ -186,31 +189,7 @@ export default function Features({ dictionary }: FeaturesProps) {
 
         {/* Grid - Desktop: Grid, Mobile: Horizontal Scroll-Snap */}
         <div className="relative">
-          {/* Fade-Edge Links (nur Mobile, wenn scrollbar) */}
-          <div 
-            className={`
-              absolute left-0 top-0 bottom-0 w-12 z-20
-              bg-gradient-to-r from-[#0D0D0D] to-transparent
-              pointer-events-none
-              md:hidden
-              transition-opacity duration-300
-              ${canScrollLeft ? 'opacity-100' : 'opacity-0'}
-            `}
-          />
-          
-          {/* Fade-Edge Rechts (nur Mobile, wenn scrollbar) */}
-          <div 
-            className={`
-              absolute right-0 top-0 bottom-0 w-12 z-20
-              bg-gradient-to-l from-[#0D0D0D] to-transparent
-              pointer-events-none
-              md:hidden
-              transition-opacity duration-300
-              ${canScrollRight ? 'opacity-100' : 'opacity-0'}
-            `}
-          />
-
-          {/* Scroll-Container */}
+          {/* Scroll-Container mit Touch-Support */}
           <div 
             ref={gridRef} 
             className="
@@ -222,7 +201,11 @@ export default function Features({ dictionary }: FeaturesProps) {
               -mx-4 px-4 md:mx-0 md:px-0
               pb-4 md:pb-0
               hide-scrollbar
+              scroll-pl-4
             "
+            style={{ 
+              WebkitOverflowScrolling: 'touch',
+            }}
           >
             {features.length === 0 ? (
               <div className="col-span-3 text-center text-white/60 py-12">
@@ -235,10 +218,10 @@ export default function Features({ dictionary }: FeaturesProps) {
                   <div 
                     key={index} 
                     className="
-                      min-h-[320px] md:min-h-0
-                      w-[280px] md:w-auto
-                      min-w-[280px] md:min-w-0
-                      snap-center snap-always
+                      min-h-[340px] md:min-h-0
+                      w-[calc(100vw-32px)] md:w-auto
+                      min-w-[calc(100vw-32px)] md:min-w-0
+                      snap-start
                       flex-shrink-0 md:flex-shrink
                     "
                   >
