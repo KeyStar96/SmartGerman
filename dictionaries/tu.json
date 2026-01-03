@@ -249,7 +249,16 @@
       "filter_seniors": "Yaşlılar",
       "instructor": "Eğitmen",
       "no_courses": "Bu günde kurs yok",
-      "print_button": "Yazdırma Görünümü / PDF"
+      "print_button": "Yazdırma Görünümü / PDF",
+      "view_day": "Gün Görünümü",
+      "view_grid": "Izgara Görünümü",
+      "switch_view": "Görünümü Değiştir",
+      "time": "Saat",
+      "monday": "Pazartesi",
+      "tuesday": "Salı",
+      "wednesday": "Çarşamba",
+      "thursday": "Perşembe",
+      "friday": "Cuma"
     },
     "footer": {
       "rights": "© 2025 SmartGerman Hannover. Tüm hakları saklıdır.",

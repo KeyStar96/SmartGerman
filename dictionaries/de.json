@@ -249,7 +249,16 @@
       "filter_seniors": "Senioren",
       "instructor": "Dozentin",
       "no_courses": "Keine Kurse an diesem Tag",
-      "print_button": "Druckansicht / PDF"
+      "print_button": "Druckansicht / PDF",
+      "view_day": "Tagesansicht",
+      "view_grid": "Rasteransicht",
+      "switch_view": "Ansicht wechseln",
+      "time": "Uhrzeit",
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag"
     },
     "footer": {
       "rights": "© 2025 SmartGerman Hannover. Alle Rechte vorbehalten.",

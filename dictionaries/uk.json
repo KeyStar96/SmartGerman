@@ -249,7 +249,16 @@
       "filter_seniors": "Сеньйори",
       "instructor": "Викладач",
       "no_courses": "Немає курсів у цей день",
-      "print_button": "Друк / PDF"
+      "print_button": "Друк / PDF",
+      "view_day": "Вид за днями",
+      "view_grid": "Сітка",
+      "switch_view": "Перемкнути вид",
+      "time": "Час",
+      "monday": "Понеділок",
+      "tuesday": "Вівторок",
+      "wednesday": "Середа",
+      "thursday": "Четвер",
+      "friday": "П'ятниця"
     },
     "footer": {
       "rights": "© 2025 SmartGerman Ганновер. Всі права захищені.",

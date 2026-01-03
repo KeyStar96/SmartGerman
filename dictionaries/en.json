@@ -249,7 +249,16 @@
       "filter_seniors": "Seniors",
       "instructor": "Instructor",
       "no_courses": "No courses on this day",
-      "print_button": "Print View / PDF"
+      "print_button": "Print View / PDF",
+      "view_day": "Day View",
+      "view_grid": "Grid View",
+      "switch_view": "Switch View",
+      "time": "Time",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday"
     },
     "footer": {
       "rights": "© 2025 SmartGerman Hannover. All rights reserved.",
