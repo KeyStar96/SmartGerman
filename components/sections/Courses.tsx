@@ -63,7 +63,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
           focus: item.focus || "Grundlagen",
           start: item.start || "Flexibel",
           backDescription: item.backDescription || item.description,
-          teacher: item.teacher || "Anastasia Sitov", // Default Dozentin
+          // Instructor: Alle Kurse Anastasia Sitov, außer Online B2 → Lisa Kahl
+          instructor: (item.badge === "Online" && level === "B2") ? "Lisa Kahl" : (item.teacher || "Anastasia Sitov"),
         };
       });
     }
@@ -140,7 +141,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
                   focus: course.focus,
                   start: course.start,
                   description: course.backDescription,
-                  teacher: course.teacher,
+                  instructor: course.instructor,
                 }}
                 backfaceLabels={dictionary?.courses?.backface_labels}
                 flipHintLabel={dictionary?.courses?.flip_hint || "Details zeigen"}

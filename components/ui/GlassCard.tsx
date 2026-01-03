@@ -40,7 +40,7 @@ export interface GlassCardProps {
     start?: string;
     description?: string;
     participants?: string; // Optional: Teilnehmerzahl
-    teacher?: string; // Dozentin: z.B. "Anastasia Sitov"
+    instructor?: string; // Dozentin: z.B. "Anastasia Sitov"
   };
   // Hint-Labels für Expanding Flip-Indicator (übersetzbar)
   flipHintLabel?: string;
@@ -50,7 +50,7 @@ export interface GlassCardProps {
     unit?: string;
     appointments?: string;
     group?: string;
-    teacher?: string;
+    instructor?: string;
   };
 }
 
@@ -74,30 +74,37 @@ export default function GlassCard({
 }: GlassCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   
-  // Helper: Termine parsen und in Array umwandeln
+  // Helper: Termine parsen und in Array umwandeln (redundante Zeiten entfernen)
   const parseAppointments = (startString?: string): Array<{ day: string; time: string }> => {
     if (!startString) return [];
     
     const appointments: Array<{ day: string; time: string }> = [];
     
-    // Format: "Thu & Fri 19:00-20:30" (gemeinsame Zeit)
-    const sharedTimeMatch = startString.match(/^(.+?)\s+&\s+(.+?)\s+(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
-    if (sharedTimeMatch) {
-      const day1 = sharedTimeMatch[1].trim();
-      const day2 = sharedTimeMatch[2].trim();
-      const time = sharedTimeMatch[3];
-      appointments.push({ day: day1, time });
-      appointments.push({ day: day2, time });
-      return appointments;
-    }
-    
-    // Format: "Mo 9:00-10:30 & Di 10:30-12:00" (verschiedene Zeiten)
+    // Bei " & " splitten
     if (startString.includes(' & ')) {
       const parts = startString.split(' & ');
+      
+      // Format: "Thu & Fri 19:00-20:30" (gemeinsame Zeit am Ende)
+      const lastPart = parts[parts.length - 1];
+      const timeMatch = lastPart.match(/(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
+      
+      if (timeMatch && !parts[0].match(/\d{1,2}:\d{2}/)) {
+        // Gemeinsame Zeit für alle Tage
+        const time = timeMatch[1];
+        parts.forEach(part => {
+          const day = part.replace(time, '').replace(/\(.*?\)/g, '').trim();
+          if (day) {
+            appointments.push({ day, time });
+          }
+        });
+        return appointments;
+      }
+      
+      // Format: "Mo 9:00-10:30 & Di 10:30-12:00" (verschiedene Zeiten)
       parts.forEach(part => {
-        const timeMatch = part.match(/(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
-        if (timeMatch) {
-          const time = timeMatch[1];
+        const partTimeMatch = part.match(/(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
+        if (partTimeMatch) {
+          const time = partTimeMatch[1];
           const day = part.replace(time, '').replace(/\(.*?\)/g, '').trim();
           if (day) {
             appointments.push({ day, time });
@@ -107,8 +114,7 @@ export default function GlassCard({
       return appointments;
     }
     
-    // Einzelner Termin: "Mon 12:00-13:00 (1x 60 min)" oder "Di 12:00-13:00 (1x 60 min)"
-    // Unterstützt alle Unicode-Buchstaben (lateinisch, kyrillisch, etc.)
+    // Einzelner Termin: "Mon 12:00-13:00 (1x 60 min)"
     const singleMatch = startString.match(/([^\d\s&]+?)\s+(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
     if (singleMatch) {
       const day = singleMatch[1].trim();
@@ -639,12 +645,12 @@ export default function GlassCard({
             }}
           />
 
-          {/* Content Container - High-End Layout mit exaktem Padding wie Vorderseite */}
-          <div className="relative h-full flex flex-col p-5 md:p-10 overflow-hidden">
+          {/* Content Container - High-End Layout mit Padding p-8 */}
+          <div className="relative h-full flex flex-col p-8 overflow-hidden">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
-            <div className="relative z-10 flex flex-col h-full gap-4 md:gap-5 overflow-y-auto pt-16 md:pt-16">
-              {/* Block 1: Kurzbeschreibung */}
+            <div className="relative z-10 flex flex-col h-full gap-5 overflow-y-auto pt-16">
+              {/* Block 1: Beschreibung oben */}
               {backfaceContent?.description && (
                 <div className="backface-desc text-left flex-shrink-0">
                   <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
@@ -653,8 +659,8 @@ export default function GlassCard({
                 </div>
               )}
               
-              {/* Block 2: Kompaktes 2-Spalten-Grid - EINHEIT & TERMINE */}
-              <div className="backface-item grid grid-cols-2 gap-4 md:gap-6 flex-shrink-0">
+              {/* Block 2: Grid - EINHEIT (links) & GRUPPE (rechts) */}
+              <div className="backface-item grid grid-cols-2 gap-6 flex-shrink-0">
                 {/* Spalte 1: EINHEIT */}
                 {backfaceContent?.lessonBlock && (() => {
                   const formatted = formatLessonBlock(backfaceContent.lessonBlock);
@@ -665,7 +671,7 @@ export default function GlassCard({
                       </span>
                       <div className="space-y-0.5">
                         {formatted.parts.map((part, idx) => (
-                          <p key={idx} className={`${jetBrainsMono.className} text-sm md:text-base font-bold text-white leading-tight`}>
+                          <p key={idx} className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
                             {part}
                           </p>
                         ))}
@@ -679,58 +685,60 @@ export default function GlassCard({
                   ) : null;
                 })()}
                 
-                {/* Spalte 2: TERMINE */}
-                {backfaceContent?.start && (() => {
-                  const appointments = parseAppointments(backfaceContent.start);
-                  return appointments.length > 0 ? (
-                    <div>
-                      <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
-                        {backfaceLabels?.appointments || "TERMINE"}
-                      </span>
-                      <div className="space-y-1">
-                        {appointments.map((appt, idx) => (
-                          <div key={idx} className={`${jetBrainsMono.className} text-sm md:text-base leading-tight`}>
-                            <span className="font-bold text-white">{appt.day}</span>
-                            {appt.time && (
-                              <>
-                                {' '}
-                                <span className="text-white/60">{appt.time}</span>
-                              </>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
-                        {backfaceLabels?.appointments || "TERMINE"}
-                      </span>
-                      <p className={`${jetBrainsMono.className} text-sm md:text-base font-bold text-white leading-tight break-words`}>
-                        {backfaceContent.start}
-                      </p>
-                    </div>
-                  );
-                })()}
+                {/* Spalte 2: GRUPPE */}
+                <div>
+                  <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                    {backfaceLabels?.group || "GRUPPE"}
+                  </span>
+                  <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
+                    {backfaceContent?.participants || "Max. 20"}
+                  </p>
+                </div>
               </div>
               
-              {/* Block 3: GRUPPE */}
-              <div className="backface-item flex-shrink-0">
-                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
-                  {backfaceLabels?.group || "GRUPPE"}
-                </span>
-                <p className={`${jetBrainsMono.className} text-sm md:text-base font-bold text-white leading-tight`}>
-                  {backfaceContent?.participants || "Max. 20"}
-                </p>
-              </div>
+              {/* Block 3: TERMINE als voller Block */}
+              {backfaceContent?.start && (() => {
+                const appointments = parseAppointments(backfaceContent.start);
+                return appointments.length > 0 ? (
+                  <div className="backface-item flex-shrink-0">
+                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                      {backfaceLabels?.appointments || "TERMINE"}
+                    </span>
+                    <div className="space-y-1">
+                      {appointments.map((appt, idx) => (
+                        <div key={idx} className={`${jetBrainsMono.className} text-sm leading-tight`}>
+                          <span className="font-bold text-white">{appt.day}</span>
+                          {appt.time && (
+                            <>
+                              {' '}
+                              <span className="font-normal text-white/60">{appt.time}</span>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="backface-item flex-shrink-0">
+                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                      {backfaceLabels?.appointments || "TERMINE"}
+                    </span>
+                    <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight break-words`}>
+                      {backfaceContent.start}
+                    </p>
+                  </div>
+                );
+              })()}
               
-              {/* Dozenten-Footer - Ganz unten, eingrückt wie Textkörper */}
-              {backfaceContent?.teacher && (
+              {/* Dozentin-Footer - Ganz unten mit Label und Name in Akzentfarbe */}
+              {backfaceContent?.instructor && (
                 <div className="backface-item mt-auto pt-4 border-t border-white/10 flex-shrink-0">
-                  <div className="flex items-center gap-2">
-                    <User size={12} className="text-white/50" strokeWidth={2} />
-                    <p className="text-xs text-white/80 font-medium">
-                      {backfaceContent.teacher}
+                  <div className="flex flex-col gap-1">
+                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40`}>
+                      {backfaceLabels?.instructor || "DOZENTIN"}
+                    </span>
+                    <p className="text-sm font-medium leading-tight" style={{ color }}>
+                      {backfaceContent.instructor}
                     </p>
                   </div>
                 </div>

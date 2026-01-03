@@ -223,7 +223,7 @@
         "unit": "EINHEIT",
         "appointments": "TERMINE",
         "group": "GRUPPE",
-        "teacher": "Dozentin"
+        "instructor": "DOZENTIN"
       },
       "a1": {
         "name": "A1 Anfänger",
