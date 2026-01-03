@@ -19,9 +19,9 @@ export interface GlassCardProps {
   
   // Visual
   color: string; // z.B. "#FF5C00"
-  bgGradient?: string; // z.B. "from-orange-500/20 to-orange-900/0"
-  icon?: LucideIcon;
+  icon?: LucideIcon; // Nur für Features verwendet
   badge?: string; // z.B. "A1", "A2" für Level-Badges
+  watermark?: string; // Für großes Watermark-Text (z.B. "01", "02")
   
   // Layout
   className?: string;
@@ -37,9 +37,9 @@ export default function GlassCard({
   description,
   children,
   color,
-  bgGradient = "from-white/5 to-transparent",
   icon: Icon,
   badge,
+  watermark,
   className = "",
   trigger,
   inverted = true,
@@ -67,50 +67,41 @@ export default function GlassCard({
         onMouseMove={handleMouseMove}
         className={`${spotlightClassName} group relative h-full flex flex-col p-8 md:p-10`}
       >
-        {/* 1. Spotlight Border - folgt der Maus */}
+        {/* Spotlight Border - folgt der Maus (nur dieser Effekt bleibt) */}
         <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-[2rem]"
           style={{
-            background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.1), transparent 40%)`,
-            pointerEvents: "none",
-            borderRadius: "2rem",
-            zIndex: 0
+            background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), ${color}20, transparent 40%)`,
           }}
         />
 
-        {/* 2. Background Gradient (unten) */}
-        {bgGradient && (
+        {/* Watermark Text (optional) - Für Courses mit großem Level */}
+        {watermark && (
           <div 
-            className={`absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t ${bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-b-[2rem]`}
-            style={{ zIndex: 0 }}
-          />
+            className={`${jetBrainsMono.className} absolute -right-4 -top-4 text-[160px] font-bold leading-none select-none pointer-events-none transition-transform duration-700 ease-out group-hover:translate-x-2 group-hover:-translate-y-2 group-hover:scale-105`}
+            style={{
+              color: "transparent",
+              WebkitTextStroke: `1px ${color}15`,
+            }}
+          >
+            {watermark}
+          </div>
         )}
 
-        {/* 3. Innerer Farb-Glow (folgt Maus) */}
-        <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), ${color}15, transparent 40%)`,
-            pointerEvents: "none",
-            borderRadius: "2rem",
-            zIndex: 0
-          }}
-        />
-
-        {/* 4. Watermark Icon (optional) */}
-        {Icon && (
+        {/* Watermark Icon (optional) - Nur für Features */}
+        {Icon && !watermark && (
           <Icon 
-            className="absolute -right-8 -bottom-8 text-white/[0.02] transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-12"
+            className="absolute -right-8 -bottom-8 text-white/[0.02] transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-12 pointer-events-none"
             size={200}
             strokeWidth={1}
-            style={{ zIndex: 0 }}
           />
         )}
 
-        {/* 5. Content (Vordergrund) */}
+        {/* Content (Vordergrund) */}
         <div className="relative z-10 flex flex-col h-full">
-          {/* Header: Icon & Badge */}
+          {/* Header: Icon oder Badge */}
           <div className="flex justify-between items-start mb-6">
+            {/* Icon Box - Nur für Features */}
             {Icon && (
               <div 
                 className="inline-flex p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500"
@@ -120,12 +111,13 @@ export default function GlassCard({
               </div>
             )}
             
+            {/* Badge - Für Courses Level */}
             {badge && (
               <span 
-                className={`${jetBrainsMono.className} text-xs font-bold tracking-widest px-3 py-1.5 rounded-full border border-white/10 bg-white/5 group-hover:border-white/20 group-hover:bg-white/10 transition-all duration-300`}
+                className={`${jetBrainsMono.className} text-xs font-bold tracking-widest px-3 py-1.5 rounded-full border bg-transparent group-hover:bg-white/5 transition-all duration-300`}
                 style={{ 
                   color,
-                  boxShadow: `0 0 20px ${color}20`
+                  borderColor: `${color}40`,
                 }}
               >
                 {badge}
@@ -143,21 +135,12 @@ export default function GlassCard({
             {description}
           </p>
 
-          {/* Additional Content (z.B. Features-Liste) */}
+          {/* Additional Content (z.B. Features-Liste, Price Footer) */}
           {children && (
             <div className="mt-auto">
               {children}
             </div>
           )}
-
-          {/* Noise Overlay */}
-          <div 
-            className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay rounded-[2rem]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-              zIndex: 1
-            }}
-          />
         </div>
       </div>
     </ScrollReveal3DGlass>

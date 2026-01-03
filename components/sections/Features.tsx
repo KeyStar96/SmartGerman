@@ -17,7 +17,6 @@ interface FeatureProps {
   description: string;
   Icon: typeof UserCheck;
   color: string;
-  bgGradient: string;
 }
 
 interface FeaturesProps {
@@ -35,21 +34,18 @@ export default function Features({ dictionary }: FeaturesProps) {
       description: dictionary.sections.features.native_speakers.description,
       Icon: UserCheck,
       color: "#FF5C00",
-      bgGradient: "from-orange-500/20 to-orange-900/0"
     },
     {
       title: dictionary.sections.features.flexibility.title,
       description: dictionary.sections.features.flexibility.description,
       Icon: Clock,
       color: "#00D9FF",
-      bgGradient: "from-cyan-500/20 to-cyan-900/0"
     },
     {
       title: dictionary.sections.features.methods.title,
       description: dictionary.sections.features.methods.description,
       Icon: Target,
       color: "#FF5C00",
-      bgGradient: "from-orange-500/20 to-orange-900/0"
     }
   ], [dictionary.sections.features]);
 
@@ -117,7 +113,6 @@ export default function Features({ dictionary }: FeaturesProps) {
                 description={feature.description}
                 icon={feature.Icon}
                 color={feature.color}
-                bgGradient={feature.bgGradient}
                 trigger={gridRef}
                 inverted={index % 2 === 0}
                 spotlightClassName="feature-card-spotlight"

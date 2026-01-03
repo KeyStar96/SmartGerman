@@ -2,7 +2,7 @@
 
 import React, { useRef, useMemo } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Check, Users, Clock, Calendar } from "lucide-react";
+import { ArrowUpRight, Check } from "lucide-react";
 import GlassCard from "@/components/ui/GlassCard";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
 
@@ -34,13 +34,11 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         level: item.level,
         title: item.title,
         desc: item.description,
-        features: [], // Wird aus Dictionary erweitert falls verfügbar
+        features: [],
         price: item.price?.replace("€ ", "") || "299",
         color: item.color || "#FF5C00",
-        gradient: item.color === "#00D9FF" 
-          ? "from-cyan-500/20 to-cyan-600/5" 
-          : "from-orange-500/20 to-orange-600/5",
-        icon: index % 3 === 0 ? Users : index % 3 === 1 ? Clock : Calendar
+        // Watermark: 01, 02, 03...
+        watermark: String(index + 1).padStart(2, "0"),
       }));
     }
     
@@ -54,8 +52,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         features: ["Grundlagen Grammatik", "Erste Gespräche", "Kulturelle Basics"],
         price: "299",
         color: "#FF5C00",
-        gradient: "from-orange-500/20 to-orange-600/5",
-        icon: Users
+        watermark: "01",
       },
       {
         id: "a2",
@@ -65,8 +62,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         features: ["Alltagssituationen", "Briefe schreiben", "Flüssiger sprechen"],
         price: "349",
         color: "#00D9FF",
-        gradient: "from-cyan-500/20 to-cyan-600/5",
-        icon: Clock
+        watermark: "02",
       },
       {
         id: "b1",
@@ -76,8 +72,7 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
         features: ["Business Deutsch", "Komplexe Texte", "Diskussionen"],
         price: "399",
         color: "#FF5C00",
-        gradient: "from-orange-500/20 to-orange-600/5",
-        icon: Calendar
+        watermark: "03",
       }
     ];
   }, [dictionary]);
@@ -124,12 +119,11 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
               "
             >
               <GlassCard
-                title={course.title}
+                title={`Deutsch ${course.level}`}
                 description={course.desc}
-                icon={course.icon}
                 badge={course.level}
                 color={course.color}
-                bgGradient={course.gradient}
+                watermark={course.watermark}
                 trigger={containerRef}
                 inverted={index % 2 === 0}
                 spotlightClassName="course-card-spotlight"
