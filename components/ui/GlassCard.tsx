@@ -363,7 +363,17 @@ export default function GlassCard({
               {description}
             </p>
             {children && (
-              <div className="mt-auto" onClick={(e) => e.stopPropagation()}>
+              <div 
+                className="mt-auto" 
+                onClick={(e) => {
+                  // Nur bei Klicks auf Links/Buttons stopPropagation
+                  // Damit Klicks auf den Preis-Bereich trotzdem die Karte flippen
+                  const target = e.target as HTMLElement;
+                  if (target.closest("a, button")) {
+                    e.stopPropagation();
+                  }
+                }}
+              >
                 {children}
               </div>
             )}
