@@ -260,29 +260,6 @@ export default function GlassCard({
       className={`h-full ${className}`}
       accentColor={color || "#FF5C00"}
     >
-      {/* Expanding Flip-Indicator - AUSSERHALB des card-flip-container damit er nicht mit rotiert */}
-      {hasBackface && (
-        <div 
-          className="flip-indicator-container"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsFlipped(!isFlipped);
-          }}
-          style={{ 
-            '--indicator-color': color,
-          } as React.CSSProperties}
-        >
-          {/* Icon Container */}
-          <div className="flip-indicator-icon">
-            <RotateCcw size={16} strokeWidth={2} />
-          </div>
-          {/* Text - wird bei Hover sichtbar */}
-          <span className={`${jetBrainsMono.className} flip-indicator-text`}>
-            {flipHintLabel}
-          </span>
-        </div>
-      )}
-
       <div 
         ref={flipContainerRef}
         className={hasBackface ? "card-flip-container" : "card-simple-container"}
@@ -307,6 +284,30 @@ export default function GlassCard({
         >
           {/* glass-card-bg für Front Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
+          
+          {/* Expanding Flip-Indicator - INNERHALB der Front-Face, dreht sich mit */}
+          {hasBackface && (
+            <div 
+              className="flip-indicator-container"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsFlipped(!isFlipped);
+              }}
+              style={{ 
+                '--indicator-color': color,
+              } as React.CSSProperties}
+            >
+              {/* Icon Container */}
+              <div className="flip-indicator-icon">
+                <RotateCcw size={16} strokeWidth={2} />
+              </div>
+              {/* Text - wird bei Hover sichtbar */}
+              <span className={`${jetBrainsMono.className} flip-indicator-text`}>
+                {flipHintLabel}
+              </span>
+            </div>
+          )}
+          
           <div className="relative h-full flex flex-col p-8 md:p-10">
             {/* Text-Watermark (für Courses) */}
             {watermark && (
@@ -376,14 +377,13 @@ export default function GlassCard({
           {/* glass-card-bg für Back Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
           
-          {/* Watermark auf Rückseite - gespiegelt für korrekte Lesbarkeit nach Flip */}
+          {/* Watermark auf Rückseite - KEINE Spiegelung nötig, da card-face-back bereits rotateY(180deg) hat */}
           {watermark && (
             <div 
-              className={`${jetBrainsMono.className} absolute top-4 left-6 text-[8rem] font-normal opacity-[0.03] select-none pointer-events-none watermark-glow`}
+              className={`${jetBrainsMono.className} absolute top-4 right-6 text-[8rem] font-normal opacity-[0.03] select-none pointer-events-none watermark-glow`}
               style={{ 
                 color,
                 fontWeight: 400,
-                transform: 'scaleX(-1)', // Spiegeln für korrekte Lesbarkeit nach 180° Rotation
               }}
             >
               {watermark}
