@@ -47,7 +47,15 @@ export function useScrollReveal3D(
       timelineRef.current = null;
     }
 
-    const triggerElement = trigger && 'current' in trigger ? trigger.current : trigger;
+    // Fix für den TypeScript-Fehler: Target explizit validieren
+    let triggerTarget: HTMLElement = element;
+    if (trigger) {
+      if ('current' in trigger && trigger.current) {
+        triggerTarget = trigger.current;
+      } else if (!('current' in trigger)) {
+        triggerTarget = trigger;
+      }
+    }
 
     // Mehr Rotation für dramatischeren Effekt, da wir näher an der Kamera sind
     const initialRotateX = inverted ? -25 : 25; 
@@ -63,7 +71,7 @@ export function useScrollReveal3D(
 
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: triggerElement || element,
+        trigger: triggerTarget,
         start: "top bottom-=10%", 
         end: "bottom top+=10%",
         scrub: scrub,
@@ -125,10 +133,8 @@ export function useScrollReveal3D(
     // Speichere Timeline-Referenz für Cleanup
     timelineRef.current = tl;
 
-    timelineRef.current = tl;
-
     return () => {
       if (timelineRef.current) timelineRef.current.kill();
     };
-  }, [trigger, scrub, z, transformOrigin, inverted]);
+  }, [elementRef, trigger, scrub, z, transformOrigin, inverted]);
 }

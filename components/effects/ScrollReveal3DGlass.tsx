@@ -18,33 +18,22 @@ export default function ScrollReveal3DGlass({
 }: ScrollReveal3DGlassProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Hook steuert die Rotation
   useScrollReveal3D(cardRef, {
     trigger: trigger || undefined,
-    z: -100, // Nicht zu tief, sonst wird der Blur pixelig
-    transformOrigin: "center center",
+    z: -100,
     inverted,
-    scrub: 1.0, 
   });
 
   return (
-    <div
-      className={className}
-      // Perspective muss auf dem ELTERN-Container sein
-      style={{ perspective: "1200px" }}
-    >
-      {/* Das animierte Element.
-         WICHTIG: Kein 'preserve-3d' hier, das bricht den Blur in Chrome.
-         GSAP transformiert dieses Element direkt.
-      */}
+    <div className={className} style={{ perspective: "1200px" }}>
       <div
         ref={cardRef}
-        className="relative w-full h-full will-change-transform"
-        style={{
-          transformStyle: "flat", // Zwingt Chrome, den Inhalt flach zu rendern (gut für Blur)
-        }}
+        className="relative w-full h-full group/card"
+        style={{ transformStyle: "flat" }} // Wichtig für Chrome Blur
       >
-        {children}
+        <div className="glass-card-bg" />
+        <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
+        <div className="relative h-full w-full z-10">{children}</div>
       </div>
     </div>
   );
