@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode, useState, useRef, useEffect } from "react";
-import { LucideIcon, RotateCcw, Clock, Users, Calendar, GraduationCap } from "lucide-react";
+import { LucideIcon, RotateCcw, Clock, Users, Calendar, GraduationCap, User } from "lucide-react";
 import { JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import ScrollReveal3DGlass from "@/components/effects/ScrollReveal3DGlass";
 import { gsap } from "@/lib/gsap";
@@ -564,75 +564,87 @@ export default function GlassCard({
             }}
           />
 
-          {/* Content Container - Vertikales Stacking - Optimiert für bessere Platzierung */}
-          <div className="relative h-full flex flex-col pt-20 pb-6 px-6 md:pt-20 md:pb-8 md:px-10 overflow-hidden">
+          {/* Content Container - Kompaktes High-End Layout */}
+          <div className="relative h-full flex flex-col pt-20 pb-4 px-4 md:pt-20 md:pb-5 md:px-5 overflow-hidden">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
-            <div className="relative z-10 flex flex-col h-full gap-4 md:gap-5 overflow-y-auto">
-              {/* Oben: Kurzbeschreibung - Kompakter */}
+            <div className="relative z-10 flex flex-col h-full gap-3 overflow-y-auto">
+              {/* Block 1: Kurzbeschreibung */}
               {backfaceContent?.description && (
                 <div className="backface-desc text-left flex-shrink-0">
-                  <p className="text-xs md:text-sm text-white/80 leading-relaxed line-clamp-2">
+                  <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
                     {backfaceContent.description}
                   </p>
                 </div>
               )}
               
-              {/* Trennlinie */}
-              {(backfaceContent?.description || backfaceContent?.lessonBlock || backfaceContent?.start) && (
-                <div className="backface-divider h-px bg-white/10 w-full flex-shrink-0" />
+              {/* Block 2: Kompaktes 2-Spalten-Grid - EINHEIT & TERMINE */}
+              {(backfaceContent?.lessonBlock || backfaceContent?.frequency) && (
+                <div className="backface-item grid grid-cols-2 gap-3 md:gap-4 flex-shrink-0">
+                  {/* Spalte 1: EINHEIT */}
+                  {backfaceContent?.lessonBlock && (
+                    <div>
+                      <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                        EINHEIT
+                      </span>
+                      <p className="text-sm md:text-base font-bold text-white leading-tight">
+                        {backfaceContent.lessonBlock}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Spalte 2: TERMINE */}
+                  {backfaceContent?.frequency && (
+                    <div>
+                      <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                        TERMINE
+                      </span>
+                      <p className="text-sm md:text-base font-bold text-white leading-tight">
+                        {backfaceContent.frequency}
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
               
-              {/* Vertikales Stacking für harte Fakten - Kompakter */}
-              <div className="backface-grid flex flex-col gap-4 md:gap-5 flex-grow min-h-0">
-                {/* Unterrichtsblock */}
-                {backfaceContent?.lessonBlock && (
-                  <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-1.5`}>
-                      {backfaceLabels?.lessonBlock || "Unterrichtsblock"}
+              {/* Block 3: Kompaktes 2-Spalten-Grid - START & GRUPPE */}
+              {(backfaceContent?.start || backfaceContent?.participants) && (
+                <div className="backface-item grid grid-cols-2 gap-3 md:gap-4 flex-shrink-0">
+                  {/* Spalte 1: START */}
+                  {backfaceContent?.start && (
+                    <div>
+                      <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                        START
+                      </span>
+                      <p className="text-sm md:text-base font-bold text-white leading-tight break-words">
+                        {backfaceContent.start}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Spalte 2: GRUPPE */}
+                  <div>
+                    <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1`}>
+                      GRUPPE
                     </span>
-                    <p className="text-base md:text-lg font-bold text-white leading-tight">
-                      {backfaceContent.lessonBlock}
+                    <p className="text-sm md:text-base font-bold text-white leading-tight">
+                      {backfaceContent?.participants || "Max. 20"}
                     </p>
                   </div>
-                )}
-                
-                {/* Frequenz */}
-                {backfaceContent?.frequency && (
-                  <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-1.5`}>
-                      {backfaceLabels?.frequency || "Frequenz"}
-                    </span>
-                    <p className="text-base md:text-lg font-bold text-white leading-tight">
-                      {backfaceContent.frequency}
+                </div>
+              )}
+              
+              {/* Dozenten-Footer - Ganz unten */}
+              {backfaceContent?.teacher && (
+                <div className="backface-item mt-auto pt-3 border-t border-white/10 flex-shrink-0">
+                  <div className="flex items-center gap-2">
+                    <User size={14} className="text-white/60" strokeWidth={2} />
+                    <p className="text-xs text-white/80 font-medium">
+                      {backfaceContent.teacher}
                     </p>
                   </div>
-                )}
-                
-                {/* Termine */}
-                {backfaceContent?.start && (
-                  <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-1.5`}>
-                      {backfaceLabels?.appointments || "Termine"}
-                    </span>
-                    <p className="text-sm md:text-base font-bold text-white/90 leading-tight break-words">
-                      {backfaceContent.start}
-                    </p>
-                  </div>
-                )}
-                
-                {/* Fokus */}
-                {backfaceContent?.focus && (
-                  <div className="backface-item flex-shrink-0">
-                    <span className={`${jetBrainsMono.className} text-[10px] uppercase tracking-widest text-white/40 font-light block mb-1.5`}>
-                      {backfaceLabels?.focus || "Fokus"}
-                    </span>
-                    <p className="text-sm md:text-base font-bold text-white/90 leading-tight">
-                      {backfaceContent.focus}
-                    </p>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
