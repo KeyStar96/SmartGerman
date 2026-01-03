@@ -93,7 +93,7 @@
           "frequency": "2 sessions per week",
           "focus": "Advanced A1 level for 50+",
           "start": "Tue 9:00-10:30 & Wed 10:30-12:00",
-          "backDescription": "Continuation of A1.1. Expand your basic knowledge at an age-appropriate pace.",
+          "backDescription": "Continuation A1.1 for 50+.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -108,7 +108,7 @@
           "frequency": "2 sessions per week",
           "focus": "Everyday communication for 50+",
           "start": "Mon 10:30-12:00 & Wed 9:00-10:30",
-          "backDescription": "Build on your basic knowledge and master everyday situations.",
+          "backDescription": "Everyday communication for 50+.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -123,7 +123,7 @@
           "frequency": "1 session per week",
           "focus": "Oral communication A1",
           "start": "Tue 12:00-13:00 (1x 60 min)",
-          "backDescription": "Intensive speaking practice for beginners. Practice pronunciation in small groups.",
+          "backDescription": "Speaking practice for beginners.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -138,7 +138,7 @@
           "frequency": "1 session per week",
           "focus": "Oral communication A1.2",
           "start": "Wed 12:00-13:00 (1x 60 min)",
-          "backDescription": "Advanced speaking practice focusing on fluent speech and correct pronunciation.",
+          "backDescription": "Speaking practice A1.2.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -153,7 +153,7 @@
           "frequency": "1 session per week",
           "focus": "Oral communication A2",
           "start": "Mon 12:00-13:00 (1x 60 min)",
-          "backDescription": "Speaking practice for advanced beginners. Practice more complex conversations.",
+          "backDescription": "Speaking practice A2.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -223,7 +223,12 @@
         "unit": "UNIT",
         "appointments": "APPOINTMENTS",
         "group": "GROUP",
-        "instructor": "INSTRUCTOR"
+        "instructor": "INSTRUCTOR",
+        "location": "LOCATION",
+        "extras": "EXTRAS",
+        "contract": "CONTRACT",
+        "monthly_cancellable": "Monthly cancellable",
+        "telegram_materials": "Telegram Group & Materials"
       },
       "a1": {
         "name": "A1 Beginner",

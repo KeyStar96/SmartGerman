@@ -51,6 +51,11 @@ export interface GlassCardProps {
     appointments?: string;
     group?: string;
     instructor?: string;
+    location?: string;
+    extras?: string;
+    contract?: string;
+    monthly_cancellable?: string;
+    telegram_materials?: string;
   };
 }
 
@@ -650,16 +655,7 @@ export default function GlassCard({
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
             <div className="relative z-10 flex flex-col h-full gap-5 overflow-y-auto pt-16">
-              {/* Block 1: Beschreibung oben */}
-              {backfaceContent?.description && (
-                <div className="backface-desc text-left flex-shrink-0">
-                  <p className="text-sm text-white/80 leading-relaxed line-clamp-2">
-                    {backfaceContent.description}
-                  </p>
-                </div>
-              )}
-              
-              {/* Block 2: Grid - EINHEIT (links) & GRUPPE (rechts) */}
+              {/* Block 1: Grid - EINHEIT (links) & GRUPPE (rechts) */}
               <div className="backface-item grid grid-cols-2 gap-6 flex-shrink-0">
                 {/* Spalte 1: EINHEIT */}
                 {backfaceContent?.lessonBlock && (() => {
@@ -696,7 +692,25 @@ export default function GlassCard({
                 </div>
               </div>
               
-              {/* Block 3: TERMINE als voller Block */}
+              {/* Block 2: STANDORT */}
+              <div className="backface-item flex-shrink-0">
+                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                  {backfaceLabels?.location || "STANDORT"}
+                </span>
+                <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
+                  {(() => {
+                    const badgeLower = badge?.toLowerCase() || "";
+                    // Prüfe auf Online-Varianten in verschiedenen Sprachen
+                    if (badgeLower.includes("online") || badgeLower === "онлайн") {
+                      return "Microsoft Teams";
+                    }
+                    // Alle anderen sind Präsenz
+                    return "FZH Vahrenwald, Hannover";
+                  })()}
+                </p>
+              </div>
+              
+              {/* Block 3: TERMINE - vertikal gestapelt */}
               {backfaceContent?.start && (() => {
                 const appointments = parseAppointments(backfaceContent.start);
                 return appointments.length > 0 ? (
@@ -729,6 +743,26 @@ export default function GlassCard({
                   </div>
                 );
               })()}
+              
+              {/* Block 4: EXTRAS */}
+              <div className="backface-item flex-shrink-0">
+                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                  {backfaceLabels?.extras || "EXTRAS"}
+                </span>
+                <p className={`${jetBrainsMono.className} text-sm font-bold text-white leading-tight`}>
+                  {backfaceLabels?.telegram_materials || "Telegram-Gruppe & Materialien"}
+                </p>
+              </div>
+              
+              {/* Block 5: VERTRAG Badge - Prominent aber elegant */}
+              <div className="backface-item flex-shrink-0">
+                <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-2`}>
+                  {backfaceLabels?.contract || "VERTRAG"}
+                </span>
+                <p className={`${jetBrainsMono.className} text-sm font-medium text-white leading-tight`}>
+                  <span style={{ color }}>✓</span> {backfaceLabels?.monthly_cancellable || "Monatlich kündbar"}
+                </p>
+              </div>
               
               {/* Dozentin-Footer - Ganz unten mit Label und Name in Akzentfarbe */}
               {backfaceContent?.instructor && (

@@ -93,7 +93,7 @@
           "frequency": "Haftada 2 ders",
           "focus": "50+ için A1 seviyesi derinleştirme",
           "start": "Sal 9:00-10:30 & Çar 10:30-12:00",
-          "backDescription": "A1.1 kursunun devamı. Yaşa uygun tempoda temel bilgilerinizi genişletin.",
+          "backDescription": "A1.1 devamı 50+ için.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -108,7 +108,7 @@
           "frequency": "Haftada 2 ders",
           "focus": "50+ için günlük iletişim",
           "start": "Pzt 10:30-12:00 & Çar 9:00-10:30",
-          "backDescription": "Temel bilgilerinizin üzerine inşa edin ve günlük durumları ustaca yönetin.",
+          "backDescription": "Günlük iletişim 50+ için.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -123,7 +123,7 @@
           "frequency": "Haftada 1 ders",
           "focus": "Sözlü iletişim A1",
           "start": "Sal 12:00-13:00 (1x 60 dk)",
-          "backDescription": "Başlangıç seviyesi için yoğun konuşma pratiği. Küçük gruplarda telaffuzunuzu çalışın.",
+          "backDescription": "Konuşma pratiği başlangıç.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -138,7 +138,7 @@
           "frequency": "Haftada 1 ders",
           "focus": "Sözlü iletişim A1.2",
           "start": "Çar 12:00-13:00 (1x 60 dk)",
-          "backDescription": "Günlük durumlarda akıcı konuşma ve doğru telaffuza odaklanan ileri seviye pratik.",
+          "backDescription": "Konuşma pratiği A1.2.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -153,7 +153,7 @@
           "frequency": "Haftada 1 ders",
           "focus": "Sözlü iletişim A2",
           "start": "Pzt 12:00-13:00 (1x 60 dk)",
-          "backDescription": "İleri seviye başlangıçlar için konuşma pratiği. Daha karmaşık konuşmaları çalışın.",
+          "backDescription": "Konuşma pratiği A2.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -223,7 +223,12 @@
         "unit": "BİRİM",
         "appointments": "RANDEVULAR",
         "group": "GRUP",
-        "instructor": "EĞİTMEN"
+        "instructor": "EĞİTMEN",
+        "location": "KONUM",
+        "extras": "EKSTRALAR",
+        "contract": "SÖZLEŞME",
+        "monthly_cancellable": "Aylık iptal edilebilir",
+        "telegram_materials": "Telegram Grubu & Materyaller"
       },
       "a1": {
         "name": "A1 Başlangıç",

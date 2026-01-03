@@ -93,7 +93,7 @@
           "frequency": "2 Termine pro Woche",
           "focus": "Vertiefung A1-Stufe für 50+",
           "start": "Di 9:00-10:30 & Mi 10:30-12:00",
-          "backDescription": "Fortsetzung des A1.1 Kurses. Erweitern Sie Ihre Grundkenntnisse in altersgerechtem Tempo.",
+          "backDescription": "Fortsetzung A1.1 für 50+.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -108,7 +108,7 @@
           "frequency": "2 Termine pro Woche",
           "focus": "Alltagskommunikation für 50+",
           "start": "Mo 10:30-12:00 & Mi 9:00-10:30",
-          "backDescription": "Bauen Sie auf Ihren Grundkenntnissen auf und meistern Sie alltägliche Situationen.",
+          "backDescription": "Alltagskommunikation für 50+.",
           "teacher": "Anastasia Sitov",
           "color": "#FF5C00"
         },
@@ -123,7 +123,7 @@
           "frequency": "1 Termin pro Woche",
           "focus": "Mündliche Kommunikation A1",
           "start": "Di 12:00-13:00 (1x 60 min)",
-          "backDescription": "Intensives Sprechtraining für Anfänger. Üben Sie in kleinen Gruppen Ihre Aussprache.",
+          "backDescription": "Sprechtraining für Anfänger.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -138,7 +138,7 @@
           "frequency": "1 Termin pro Woche",
           "focus": "Mündliche Kommunikation A1.2",
           "start": "Mi 12:00-13:00 (1x 60 min)",
-          "backDescription": "Weiterführendes Sprechtraining mit Fokus auf flüssiges Sprechen und korrekte Aussprache.",
+          "backDescription": "Sprechtraining A1.2.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -153,7 +153,7 @@
           "frequency": "1 Termin pro Woche",
           "focus": "Mündliche Kommunikation A2",
           "start": "Mo 12:00-13:00 (1x 60 min)",
-          "backDescription": "Sprechtraining für fortgeschrittene Anfänger. Trainieren Sie komplexere Gespräche.",
+          "backDescription": "Sprechtraining A2.",
           "teacher": "Anastasia Sitov",
           "color": "#00D9FF"
         },
@@ -223,7 +223,12 @@
         "unit": "EINHEIT",
         "appointments": "TERMINE",
         "group": "GRUPPE",
-        "instructor": "DOZENTIN"
+        "instructor": "DOZENTIN",
+        "location": "STANDORT",
+        "extras": "EXTRAS",
+        "contract": "VERTRAG",
+        "monthly_cancellable": "Monatlich kündbar",
+        "telegram_materials": "Telegram-Gruppe & Materialien"
       },
       "a1": {
         "name": "A1 Anfänger",
