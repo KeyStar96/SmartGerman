@@ -111,11 +111,8 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
             overflow-x-auto md:overflow-x-visible
             snap-x snap-mandatory md:snap-none
             -mx-4 px-4 md:mx-0 md:px-0
+            hide-scrollbar
           "
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
         >
           {courses.map((course, index) => (
             <div 
@@ -186,13 +183,6 @@ export default function Courses({ dictionary, lang }: CoursesProps) {
           ))}
         </div>
       </div>
-
-      {/* Hide Scrollbar Styles */}
-      <style jsx>{`
-        div::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 }

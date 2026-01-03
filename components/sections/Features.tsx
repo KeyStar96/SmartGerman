@@ -100,11 +100,8 @@ export default function Features({ dictionary }: FeaturesProps) {
             overflow-x-auto md:overflow-x-visible
             snap-x snap-mandatory md:snap-none
             -mx-4 px-4 md:mx-0 md:px-0
+            hide-scrollbar
           "
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          }}
         >
           {features.map((feature, index) => (
             <div 
@@ -129,13 +126,6 @@ export default function Features({ dictionary }: FeaturesProps) {
           ))}
         </div>
       </div>
-
-      {/* Hide Scrollbar Styles */}
-      <style jsx>{`
-        div::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 }

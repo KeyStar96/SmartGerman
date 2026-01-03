@@ -248,6 +248,16 @@ body {
       text-rendering: optimizeLegibility;
     }
     
+    /* Hide Scrollbar für horizontale Scroll-Container */
+    .hide-scrollbar {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+    
     /* Laser-Glow-Effekt für "German" im Hero-Titel */
     .laser-text {
       position: relative;
