@@ -39,7 +39,7 @@ export default function ScrollReveal3DGlass({
   });
 
   return (
-    <div 
+    <div
       className={`${className} card-interactive-container`}
       style={{
         '--accent-color': accentColor,
