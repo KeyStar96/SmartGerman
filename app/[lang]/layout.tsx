@@ -54,11 +54,6 @@ export default async function RootLayout({
           <ArchitecturalBackground />
         </div>
 
-        {/* 2. Die mittlere Ebene: Das Neuronale Netz */}
-        <div className="fixed inset-0 neural-background-container" style={{ zIndex: 1 }}>
-          <NeuralBackground />
-        </div>
-
         {/* 3. Die oberste Ebene: Header (z-index: 50 für sticky) */}
         <Header lang={lang} dictionary={dictionary} />
 

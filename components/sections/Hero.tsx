@@ -106,12 +106,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   return (
     <section
       ref={container}
-      className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-40 pb-20 w-full"
+      className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-24 pb-20 w-full"
     >
-      {/* Glitch Overlay - Monitor look during typing */}
-      {isTyping && (
-        <div className="absolute inset-0 z-20 pointer-events-none scanline-overlay opacity-30 transition-opacity duration-500" />
-      )}
 
       {/* 12-Column Grid Container */}
       <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-30">
