@@ -126,14 +126,19 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           style={{ contain: 'paint' }} // Layout Stability Fix
         >
 
-          {/* Info Tag: Technical Status */}
-          <p
+          {/* Info Tag: Technical Status with Architectural Line */}
+          <div
             ref={infoTagRef}
-            className="font-mono text-[10px] md:text-xs text-[#2D3436]/60 dark:text-[#E2D7CE]/60 tracking-[0.2em] mb-6 opacity-0 translate-y-[-10px]"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="flex items-center gap-4 mb-6 opacity-0 translate-y-[-10px] w-full"
           >
-            [ STATUS: NÄCHSTER KURSSTART — 03. FEBRUAR 2026 ]
-          </p>
+            <span
+              className="font-mono text-[10px] text-[#FF5C00]/90 tracking-[0.2em] uppercase whitespace-nowrap"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              [ NÄCHSTER KURSSTART: 03. FEBRUAR 2026 ]
+            </span>
+            <div className="h-[1px] bg-[#FF5C00]/30 flex-grow transform translate-y-[1px]" />
+          </div>
 
           {/* Block A: Brand Split (Solid Colors) */}
           <h1
