@@ -94,31 +94,12 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300">
-      {/* 1. Ankündigungs-Banner - Endless Marquee (Primary Orange) */}
-      <div className="w-full bg-primary-orange py-2.5 overflow-hidden relative z-[60] border-b border-white/10">
-        <div className="flex whitespace-nowrap animate-marquee">
-          {/* Dupliziere den Content für nahtlosen Loop - gleichmäßige Abstände, mittige Punkte */}
-          {[1, 2, 3, 4].map((duplicate) => (
-            <div key={duplicate} className="flex items-center gap-6 text-white text-[12px] font-bold uppercase tracking-[0.2em] flex-shrink-0">
-              <span className="opacity-50 flex items-center">•</span>
-              <span>{dictionary.header.banner.next_course}</span>
-              <span className="opacity-50 flex items-center">•</span>
-              <span>{dictionary.header.banner.reserve_spot}</span>
-              <span className="opacity-50 flex items-center">•</span>
-              <span>{dictionary.header.banner.location}</span>
-              <span className="opacity-50 flex items-center">•</span>
-              <span>{dictionary.header.banner.native_teachers}</span>
-              <span className="opacity-50 flex items-center">•</span>
-              <span>{dictionary.header.banner.online_courses}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
       {/* 2. Navigation mit Glassmorphismus */}
       <nav className={`w-full transition-all duration-500 ${isScrolled
-          ? "py-3 bg-background/95 border-b border-black/5 dark:border-white/5"
-          : "py-6 bg-transparent border-b border-transparent"
+        ? "py-3 bg-background/95 border-b border-black/5 dark:border-white/5"
+        : "py-6 bg-transparent border-b border-transparent"
         }`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
 
@@ -187,8 +168,8 @@ export default function Header({ lang, dictionary }: HeaderProps) {
                         key={language.code}
                         onClick={() => switchLanguage(language.code)}
                         className={`w-full px-4 py-2 text-left text-xs font-medium uppercase tracking-widest transition-colors border-b border-black/5 dark:border-dm-border-slate/30 last:border-b-0 ${lang === language.code
-                            ? "bg-primary-orange/20 text-primary-orange dark:bg-primary-orange/10"
-                            : "text-foreground hover:bg-black/5 dark:hover:bg-dm-surface-teal"
+                          ? "bg-primary-orange/20 text-primary-orange dark:bg-primary-orange/10"
+                          : "text-foreground hover:bg-black/5 dark:hover:bg-dm-surface-teal"
                           }`}
                       >
                         {language.label}

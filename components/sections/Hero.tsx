@@ -11,6 +11,9 @@ interface HeroProps {
 
 export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const container = useRef<HTMLDivElement>(null);
+  const textContentRef = useRef<HTMLDivElement>(null); // New container for paint containment
+
+  const infoTagRef = useRef<HTMLParagraphElement>(null);
   const brandRef = useRef<HTMLHeadingElement>(null);
   const claimRef = useRef<HTMLHeadingElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
@@ -19,10 +22,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
   const [isTyping, setIsTyping] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [triggerLaser, setTriggerLaser] = useState(false);
 
   // Text Content
-  // Split Brand: Smart (Mono/Anthracite) + German (Orange/Laser)
   const claimText = "Spracherwerb durch Wissenschaft.";
   const claimChars = claimText.split("");
 
@@ -42,10 +43,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
     const tl = gsap.timeline({
       onComplete: () => {
         setIsTyping(false);
-        // Trigger Laser on "German"
-        setTriggerLaser(true);
-
-        // Cursor cleanup
+        // Clean cursor
         gsap.to(cursorRef.current, {
           opacity: 0,
           duration: 0.5,
@@ -59,44 +57,49 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
     const claimCharElements = claimRef.current.querySelectorAll(".char");
 
-    // Initial States
-    if (brandRef.current) gsap.set(brandRef.current, { opacity: 0, y: 10 });
-    gsap.set(claimCharElements, { opacity: 0, display: "none" });
-    if (sublineRef.current) gsap.set(sublineRef.current, { opacity: 0, y: 10 });
-    if (ctaRef.current) gsap.set(ctaRef.current, { opacity: 0, y: 10 });
+    // 1. Info Tag Fade In (Immediate) - Anti-Flicker using fromTo
+    if (infoTagRef.current) {
+      tl.fromTo(infoTagRef.current,
+        { opacity: 0, y: -10 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+        , 0);
+    }
 
-    // 1. Brand Fade In (Immediate)
-    tl.to(brandRef.current, {
+    // 2. Brand Fade In (simultaneous with Info Tag)
+    if (brandRef.current) {
+      tl.fromTo(brandRef.current,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 1.0, ease: "power2.out" }
+        , 0.1);
+    }
+
+    // 3. Typewriter + Slide Up for Claim
+    // We animate the claim container simply appearing/sliding
+    tl.fromTo(claimRef.current,
+      { opacity: 1, y: 20 }, // Started visible but shifted, chars hidden
+      { y: 0, duration: 2.0, ease: "power2.out" } // Slide up while typing happens
+      , 0.5);
+
+    // Actual Typewriter Effect on Chars
+    tl.to(claimCharElements, {
+      display: "inline-block",
       opacity: 1,
-      y: 0,
-      duration: 1.0,
-      ease: "power2.out"
-    })
+      duration: 0.1,
+      stagger: 0.12,
+      ease: "none",
+    }, 0.5) // Sync start with slide up
 
-      // 2. Typewriter for Claim (Delayed start 0.5s)
-      .to(claimCharElements, {
-        display: "inline-block",
-        opacity: 1,
-        duration: 0.1,
-        stagger: 0.12,  // Slower stagger (0.12s) for intellectual weight
-        ease: "none",
-      }, "+=0.5")
+      // 4. Subline Fade In
+      .fromTo(sublineRef.current,
+        { opacity: 0, y: 10 },
+        { opacity: 0.8, y: 0, duration: 1.5, ease: "power2.out" }
+        , "+=0.2")
 
-      // 3. Subline Fade In (Slow fade after typing)
-      .to(sublineRef.current, {
-        opacity: 0.8,
-        y: 0,
-        duration: 1.5,
-        ease: "power2.out",
-      }, "+=0.2")
-
-      // 4. CTA Fade In
-      .to(ctaRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 1.0,
-        ease: "power2.out",
-      }, "-=1.0");
+      // 5. CTA Fade In
+      .fromTo(ctaRef.current,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 1.0, ease: "power2.out" }
+        , "-=1.0");
 
   }, { scope: container, dependencies: [isLoaded] });
 
@@ -117,19 +120,31 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         <div className="hidden lg:block lg:col-span-1" />
 
         {/* Text Content (Cols 2-8) */}
-        <div className="col-span-1 lg:col-span-7 flex flex-col justify-start text-left">
+        <div
+          ref={textContentRef}
+          className="col-span-1 lg:col-span-7 flex flex-col justify-start text-left"
+          style={{ contain: 'paint' }} // Layout Stability Fix
+        >
 
-          {/* Block A: Brand Split */}
+          {/* Info Tag: Technical Status */}
+          <p
+            ref={infoTagRef}
+            className="font-mono text-[10px] md:text-xs text-[#2D3436]/60 dark:text-[#E2D7CE]/60 tracking-[0.2em] mb-6 opacity-0 translate-y-[-10px]"
+            style={{ fontFamily: 'var(--font-mono)' }}
+          >
+            [ STATUS: NÄCHSTER KURSSTART — 03. FEBRUAR 2026 ]
+          </p>
+
+          {/* Block A: Brand Split (Solid Colors) */}
           <h1
             ref={brandRef}
-            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline"
+            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline opacity-0 translate-y-[10px]"
           >
             <span className="font-bold text-[#2D3436] dark:text-[#E2D7CE]">Smart</span>
-            {/* German: Orange with Conditional Laser Scan */}
+            {/* German: Static Solid Orange */}
             <span
-              className={`font-bold text-[#FF5C00] ${triggerLaser ? 'animate-laser-scan' : ''}`}
-              style={{ paddingLeft: '2px' }} // Slight visual separation
-              onAnimationEnd={() => setTriggerLaser(false)} // CLEAN: Remove class after animation to ensure solid color
+              className="font-bold text-[#FF5C00]"
+              style={{ paddingLeft: '2px' }}
             >
               German
             </span>
@@ -138,7 +153,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Block B: Claim (Monospace Typewriter) */}
           <h2
             ref={claimRef}
-            className="text-2xl md:text-3xl font-normal leading-tight text-[#2D3436] dark:text-[#E2D7CE] font-mono opacity-90 mb-12 min-h-[2em]"
+            className="text-2xl md:text-3xl font-normal leading-tight text-[#2D3436] dark:text-[#E2D7CE] font-mono opacity-90 mb-12 min-h-[2em] translate-y-[20px]"
             style={{ fontFamily: 'var(--font-mono)' }}
           >
             {claimChars.map((char: string, index: number) => (
@@ -152,13 +167,16 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Subline: Clean Sans-Serif */}
           <p
             ref={sublineRef}
-            className="text-lg md:text-xl font-light tracking-wide leading-relaxed mb-16 max-w-xl text-[#2D3436] dark:text-[#E2D7CE]"
+            className="text-lg md:text-xl font-light tracking-wide leading-relaxed mb-16 max-w-xl text-[#2D3436] dark:text-[#E2D7CE] opacity-0 translate-y-[10px]"
           >
             {dictionary.hero.subline}
           </p>
 
           {/* CTAs: Scientific Protocol Style */}
-          <div ref={ctaRef} className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
+          <div
+            ref={ctaRef}
+            className="flex flex-col sm:flex-row gap-8 items-start sm:items-center opacity-0 translate-y-[10px]"
+          >
 
             {/* Primary Button: Orange (Brand Match), Square, Mono, Small */}
             <button
