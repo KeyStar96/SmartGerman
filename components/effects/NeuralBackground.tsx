@@ -200,22 +200,40 @@ class PulsePool {
 interface NeuralBackgroundProps {
   opacity?: number;
   variant?: "default" | "brain";
+  pulseTrigger?: number; // Jedes Mal wenn sich dieser Wert ändert, wird ein Pulse abgefeuert
 }
 
-// BRAIN POINTS: Grobe Silhouette (Normalisiert 0-1)
-// Ein Herz-ähnliches, aber oben breiteres Muster für das Gehirn
-const BRAIN_POINTS = [
-  // Links
-  { x: 0.35, y: 0.3 }, { x: 0.3, y: 0.4 }, { x: 0.3, y: 0.5 }, { x: 0.35, y: 0.6 }, { x: 0.45, y: 0.7 },
-  // Rechts
-  { x: 0.65, y: 0.3 }, { x: 0.7, y: 0.4 }, { x: 0.7, y: 0.5 }, { x: 0.65, y: 0.6 }, { x: 0.55, y: 0.7 },
-  // Oben (Frontallappen)
-  { x: 0.4, y: 0.25 }, { x: 0.5, y: 0.22 }, { x: 0.6, y: 0.25 },
-  // Mitte / Stamm
-  { x: 0.5, y: 0.5 }, { x: 0.5, y: 0.8 }, { x: 0.48, y: 0.9 }, { x: 0.52, y: 0.9 }
-];
+// BRAIN POINTS - Wir generieren diese jetzt mathematisch für einen 3D-Look
+// Ein Ellipsoid, der leicht "gehirnförmig" (oben breiter, unten schmaler) skaliert ist.
+const generateBrainPoints = (count: number) => {
+  const points = [];
+  for (let i = 0; i < count; i++) {
+    const phi = Math.random() * Math.PI * 2;
+    const theta = Math.acos(2 * Math.random() - 1);
 
-export default function NeuralBackground({ opacity = 0.08, variant = "default" }: NeuralBackgroundProps) {
+    // Ellipsoid-Parameter
+    const a = 0.25; // X (Breite)
+    const b = 0.35; // Y (Höhe)
+    const c = 0.2;  // Z (Tiefe)
+
+    let x = a * Math.sin(theta) * Math.cos(phi);
+    let y = b * Math.sin(theta) * Math.sin(phi);
+    let z = c * Math.cos(theta);
+
+    // "Hirn-Korrektur": Oben breiter (Y > 0), Unten schmaler
+    const taper = 1.0 + (y * 0.5);
+    x *= taper;
+    z *= taper;
+
+    // Zentriere auf 0.5 (Normalisiert)
+    points.push({ x: 0.5 + x, y: 0.5 + y, z });
+  }
+  return points;
+};
+
+const BRAIN_POINTS = generateBrainPoints(60); // 60 Ankerpunkte für die Form
+
+export default function NeuralBackground({ opacity = 0.08, variant = "default", pulseTrigger = 0 }: NeuralBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -226,6 +244,7 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
 
   const themeRef = useRef(THEME_COLORS.dark);
   const scrollPosRef = useRef(0);
+  const externalPulseRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Wenn variant "default", nutzen wir das klassische Hero-Verhalten
@@ -244,9 +263,18 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
       return () => window.removeEventListener('hero-animation-complete', handleHeroComplete);
     } else {
       // Für "brain" direkt einblenden
-      if (containerRef.current) containerRef.current.style.opacity = opacity.toString();
+      if (containerRef.current) {
+        containerRef.current.style.opacity = opacity.toString();
+      }
     }
   }, [variant, opacity]);
+
+  // Effekt für externen Pulse-Trigger
+  useEffect(() => {
+    if (pulseTrigger > 0) {
+      externalPulseRef.current = Date.now();
+    }
+  }, [pulseTrigger]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -494,8 +522,6 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
       const mouseForce = CONFIG.mouseForce;
       const wanderRadius = CONFIG.wanderRadius;
 
-      // PERFORMANCE: Pre-compute damping factor (pow is expensive)
-      // Für timeScale ≈ 1 (60fps) ist dampingFactor ≈ CONFIG.damping
       const dampingFactor = Math.abs(timeScale - 1) < 0.01
         ? CONFIG.damping
         : Math.pow(CONFIG.damping, timeScale);
@@ -503,16 +529,35 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
       // BRAIN MORPH LOGIC
       const isBrainMode = variant === "brain";
       let morphStrength = 0;
+      let rotationAngle = 0;
+
       if (isBrainMode) {
-        // Morphing-Stärke basierend auf Sichtbarkeit/Scroll (vereinfacht)
-        // Wir ziehen Partikel zu den BRAIN_POINTS
-        morphStrength = 0.4; // Konstanter Test-Wert für Science-Section
+        // Wir nehmen an dass wir in einer Sektion sind. 
+        // Morphing-Stärke ist 1.0 wenn wir in der Science-Section sind (variant="brain")
+        morphStrength = 0.9;
+        rotationAngle = Date.now() * 0.0005; // Langsame Rotation
+      }
+
+      // Check external pulse
+      if (externalPulseRef.current) {
+        const now = Date.now();
+        if (now - externalPulseRef.current < 100) {
+          // Trigger 2-3 random pulses
+          for (let i = 0; i < 3; i++) {
+            const startIdx = Math.floor(Math.random() * numNeurons);
+            const connections = neurons[startIdx]?.connections;
+            if (connections && connections.length > 0) {
+              const endIdx = connections[Math.floor(Math.random() * connections.length)];
+              spawnPulse(startIdx, endIdx, 2.0);
+            }
+          }
+          externalPulseRef.current = null;
+        }
       }
 
       for (let i = 0; i < numNeurons; i++) {
         const n = neurons[i];
 
-        // PERFORMANCE: Use fastSin/fastCos lookup tables
         n.wanderAngle += (Math.random() - 0.5) * wanderSpeedScaled;
         const wanderX = fastCos(n.wanderAngle) * wanderRadius;
         const wanderY = fastSin(n.wanderAngle) * wanderRadius;
@@ -520,39 +565,48 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
         n.vx += wanderX * timeScale;
         n.vy += wanderY * timeScale;
 
-        // Spring force to base position
         let targetX = n.baseX;
         let targetY = n.baseY;
         let targetZ = n.baseZ;
 
-        // Wenn Brain-Mode, überschreibe Target-Pos für einige Neuronen
-        if (isBrainMode && i < BRAIN_POINTS.length * 10) {
+        if (isBrainMode && i < BRAIN_POINTS.length * 8) {
           const pointIdx = i % BRAIN_POINTS.length;
           const p = BRAIN_POINTS[pointIdx];
-          // Streue die Punkte etwas um das Ziel herum für organischen Look
-          const offsetX = (Math.random() - 0.5) * 40;
-          const offsetY = (Math.random() - 0.5) * 40;
 
-          // Transformiere normalisierte Punkte in Canvas-Space (Center)
-          const brainX = p.x * width;
+          // Rotation um Y
+          const cosR = Math.cos(rotationAngle);
+          const sinR = Math.sin(rotationAngle);
+
+          // Zentriere P vor Rotation
+          const px = p.x - 0.5;
+          const pz = p.z;
+
+          const rotX = px * cosR - pz * sinR;
+          const rotZ = px * sinR + pz * cosR;
+
+          // Transformiere zurück und in Pixel
+          const brainX = (rotX + 0.5) * width;
           const brainY = p.y * height;
+          const brainZ = rotZ * CONFIG.zDepthRange;
+
+          const offsetX = (Math.random() - 0.5) * 50;
+          const offsetY = (Math.random() - 0.5) * 50;
 
           targetX = targetX * (1 - morphStrength) + brainX * morphStrength + offsetX;
           targetY = targetY * (1 - morphStrength) + brainY * morphStrength + offsetY;
+          targetZ = targetZ * (1 - morphStrength) + brainZ * morphStrength;
         }
 
         n.vx += (targetX - n.x) * springScaled;
         n.vy += (targetY - n.y) * springScaled;
         n.vz += (targetZ - n.z) * springScaled;
 
-        // Mouse interaction
         if (mouseSquared > 0) {
           const dxMouse = mouseX - n.x;
           const dyMouse = mouseY - n.y;
           const distMouseSquared = dxMouse * dxMouse + dyMouse * dyMouse;
 
           if (distMouseSquared < mouseSquared) {
-            // PERFORMANCE: Fast inverse sqrt approximation for distance
             const distMouse = Math.sqrt(distMouseSquared);
             const force = (1 - distMouse / mouseRadius) * mouseForce * timeScale;
             n.vx += dxMouse * force;
@@ -560,7 +614,6 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
           }
         }
 
-        // Apply damping and update position
         n.vx *= dampingFactor;
         n.vy *= dampingFactor;
         n.vz *= dampingFactor;
@@ -568,7 +621,6 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
         n.y += n.vy * timeScale;
         n.z += n.vz * timeScale;
 
-        // Flash decay (time-based)
         if (n.flash > 0) {
           n.flash = Math.max(0, n.flash - flashDecay);
         }
@@ -588,21 +640,27 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
       const pulsePool = pulsePoolRef.current;
       const pulses = pulsePool.getActivePulses();
       const theme = themeRef.current;
+      const isBrainMode = variant === "brain";
 
-      // PERFORMANCE: Pre-compute bounds
       const viewportPadding = 100;
       const boundsLeft = -viewportPadding;
       const boundsRight = width + viewportPadding;
       const boundsTop = -viewportPadding;
       const boundsBottom = height + viewportPadding;
 
-      // PERFORMANCE: Inline filtering statt .filter() für weniger Overhead
       const visibleNeurons: Neuron[] = [];
+      const visibleNeuronIndicesCache = new Set<number>();
+
       for (let i = 0; i < neurons.length; i++) {
         const n = neurons[i];
         if (n.x >= boundsLeft && n.x <= boundsRight &&
           n.y >= boundsTop && n.y <= boundsBottom) {
+
+          // Wenn Brain-Mode, zeichnen wir nur die Partikel die zum Gehirn gehören
+          if (isBrainMode && i >= BRAIN_POINTS.length * 8) continue;
+
           visibleNeurons.push(n);
+          visibleNeuronIndicesCache.add(i);
         }
       }
 
@@ -1378,18 +1436,12 @@ export default function NeuralBackground({ opacity = 0.08, variant = "default" }
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 -z-10"
-      style={{
-        opacity: 0,
-      }}
+      className={`absolute inset-0 z-0 pointer-events-none transition-opacity duration-1000 overflow-hidden`}
+      style={{ opacity: 0 }}
     >
       <canvas
         ref={canvasRef}
-        className="w-full h-full"
-        style={{
-          opacity: 0.4,
-          pointerEvents: "auto",
-        }}
+        className="block w-full h-full"
       />
     </div>
   );
