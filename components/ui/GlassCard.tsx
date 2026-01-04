@@ -24,28 +24,25 @@ export interface GlassCardProps {
   description: string;
   children?: ReactNode;
   color: string;
-  icon?: LucideIcon; // Für Features behalten, für Courses optional
-  level?: string; // Level-Label wie "A1.1" für Courses
+  icon?: LucideIcon;
+  level?: string;
   badge?: string;
   watermark?: string;
-  watermarkIcon?: LucideIcon; // Icon als Watermark (für Features)
+  watermarkIcon?: LucideIcon;
   className?: string;
   trigger?: React.RefObject<HTMLElement>;
   inverted?: boolean;
-  // Backface-Content für Flip-Animation
   backfaceContent?: {
-    lessonBlock?: string; // Unterrichtsblock: z.B. "90 Min. (2x 45 Min.)"
-    frequency?: string; // Frequenz: z.B. "2 Termine pro Woche"
+    lessonBlock?: string;
+    frequency?: string;
     focus?: string;
     start?: string;
     description?: string;
-    participants?: string; // Optional: Teilnehmerzahl
-    instructor?: string; // Dozentin: z.B. "Anastasia Sitov"
+    participants?: string;
+    instructor?: string;
   };
-  // Hint-Labels für Expanding Flip-Indicator (übersetzbar)
   flipHintLabel?: string;
   backHintLabel?: string;
-  // Backface-Labels (übersetzbar)
   backfaceLabels?: {
     unit?: string;
     appointments?: string;
@@ -81,22 +78,18 @@ export default function GlassCard({
 }: GlassCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   
-  // Helper: Termine parsen und in Array umwandeln (redundante Zeiten entfernen)
+  // Helper: Termine parsen und in Array umwandeln
   const parseAppointments = (startString?: string): Array<{ day: string; time: string }> => {
     if (!startString) return [];
     
     const appointments: Array<{ day: string; time: string }> = [];
     
-    // Bei " & " splitten
     if (startString.includes(' & ')) {
       const parts = startString.split(' & ');
-      
-      // Format: "Thu & Fri 19:00-20:30" (gemeinsame Zeit am Ende)
       const lastPart = parts[parts.length - 1];
       const timeMatch = lastPart.match(/(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
       
       if (timeMatch && !parts[0].match(/\d{1,2}:\d{2}/)) {
-        // Gemeinsame Zeit für alle Tage
         const time = timeMatch[1];
         parts.forEach(part => {
           const day = part.replace(time, '').replace(/\(.*?\)/g, '').trim();
@@ -107,7 +100,6 @@ export default function GlassCard({
         return appointments;
       }
       
-      // Format: "Mo 9:00-10:30 & Di 10:30-12:00" (verschiedene Zeiten)
       parts.forEach(part => {
         const partTimeMatch = part.match(/(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
         if (partTimeMatch) {
@@ -121,7 +113,6 @@ export default function GlassCard({
       return appointments;
     }
     
-    // Einzelner Termin: "Mon 12:00-13:00 (1x 60 min)"
     const singleMatch = startString.match(/([^\d\s&]+?)\s+(\d{1,2}:\d{2}[–-]\d{1,2}:\d{2})/);
     if (singleMatch) {
       const day = singleMatch[1].trim();
@@ -130,16 +121,14 @@ export default function GlassCard({
       return appointments;
     }
     
-    // Fallback: Ganzer String
     appointments.push({ day: startString.replace(/\(.*?\)/g, '').trim(), time: '' });
     return appointments;
   };
   
-  // Helper: Unterrichtseinheit formatieren - Kompakte Version
+  // Helper: Unterrichtseinheit formatieren
   const formatLessonBlock = (lessonBlock?: string): string | null => {
     if (!lessonBlock) return null;
     
-    // Format: "90 Min. (2x 45 Min.)" → "90m (2x45)"
     const match = lessonBlock.match(/(\d+)\s*Min\.?\s*\((\d+)x\s*(\d+)\s*Min\.?\)/i);
     if (match) {
       const total = match[1];
@@ -148,7 +137,6 @@ export default function GlassCard({
       return `${total}m (${count}x${unit})`;
     }
     
-    // Format: "45 Min" → "45m"
     const simpleMatch = lessonBlock.match(/(\d+)\s*Min\.?/i);
     if (simpleMatch) {
       return `${simpleMatch[1]}m`;
@@ -156,16 +144,16 @@ export default function GlassCard({
     
     return lessonBlock;
   };
+
   const flipContainerRef = useRef<HTMLDivElement>(null);
   const frontFaceRef = useRef<HTMLDivElement>(null);
   const backFaceRef = useRef<HTMLDivElement>(null);
   const watermarkRef = useRef<HTMLDivElement>(null);
   const flipGlowRef = useRef<HTMLDivElement>(null);
 
-  // 3D Flip-Animation mit GSAP - Verbesserte echte 180° Drehung
-  // Nur aktiv wenn backfaceContent vorhanden ist
+  // 3D Flip-Animation mit GSAP
   useEffect(() => {
-    if (!backfaceContent) return; // Keine Flip-Animation ohne Backface-Content
+    if (!backfaceContent) return;
     
     const container = flipContainerRef.current;
     const front = frontFaceRef.current;
@@ -175,7 +163,6 @@ export default function GlassCard({
     if (!container || !front || !back) return;
 
     if (isFlipped) {
-      // Glow-Effekt während der Drehung
       if (glow) {
         gsap.to(glow, {
           opacity: 0.6,
@@ -186,7 +173,6 @@ export default function GlassCard({
         });
       }
       
-      // Front Face ausblenden während der Drehung
       gsap.to(front, {
         opacity: 0,
         duration: 0.3,
@@ -194,14 +180,12 @@ export default function GlassCard({
         delay: 0.1,
       });
       
-      // Container drehen mit besserer Perspective
       gsap.to(container, {
         rotateY: 180,
         duration: 0.9,
         ease: "power3.inOut",
       });
       
-      // Back Face einblenden
       gsap.to(back, {
         opacity: 1,
         duration: 0.3,
@@ -212,21 +196,17 @@ export default function GlassCard({
       // Stagger-Effekt für Backface-Elemente
       gsap.fromTo(
         back.querySelectorAll('.backface-desc, .backface-divider, .backface-item'),
-        {
-          opacity: 0,
-          y: 10,
-        },
+        { opacity: 0, y: 10 },
         {
           opacity: 1,
           y: 0,
           duration: 0.4,
           delay: 0.5,
           stagger: 0.08,
-          ease: "power2.out",
+          ease: "expo.out",
         }
       );
     } else {
-      // Glow-Effekt während der Rückdrehung
       if (glow) {
         gsap.to(glow, {
           opacity: 0.6,
@@ -237,7 +217,6 @@ export default function GlassCard({
         });
       }
       
-      // Back Face ausblenden - auch Stagger-Elemente ausblenden
       gsap.to(back.querySelectorAll('.backface-desc, .backface-divider, .backface-item'), {
         opacity: 0,
         y: 10,
@@ -252,14 +231,12 @@ export default function GlassCard({
         delay: 0.1,
       });
       
-      // Container zurückdrehen
       gsap.to(container, {
         rotateY: 0,
         duration: 0.9,
         ease: "power3.inOut",
       });
       
-      // Front Face einblenden
       gsap.to(front, {
         opacity: 1,
         duration: 0.3,
@@ -267,27 +244,23 @@ export default function GlassCard({
         ease: "power2.out",
       });
       
-      // Stagger-Effekt für Front-Face-Elemente beim Zurückflip
+      // Stagger für Front-Elemente beim Zurückflip
       gsap.fromTo(
-        front.querySelectorAll('.frontface-badge, .frontface-title, .frontface-description, .frontface-children'),
-        {
-          opacity: 0,
-          y: 15,
-        },
+        front.querySelectorAll('.reveal-stagger'),
+        { opacity: 0, y: 15 },
         {
           opacity: 1,
           y: 0,
           duration: 0.4,
           delay: 0.5,
           stagger: 0.06,
-          ease: "power2.out",
+          ease: "expo.out",
         }
       );
     }
   }, [isFlipped, backfaceContent]);
 
-  // Parallax Watermark & Variable Font Weight
-  // Aktiv wenn watermark ODER watermarkIcon vorhanden ist
+  // Watermark Parallax (vereinfacht - nur bei Hover)
   const hasWatermark = !!watermark || !!WatermarkIcon;
   
   useEffect(() => {
@@ -300,9 +273,7 @@ export default function GlassCard({
       const rect = container.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const width = rect.width;
-      
-      // Parallax: Maus nach links = Watermark nach rechts (entgegengesetzt)
-      const parallaxOffset = ((mouseX - width / 2) / width) * 20; // Max 20px Verschiebung
+      const parallaxOffset = ((mouseX - width / 2) / width) * 15; // Reduziert von 20
       
       if (watermarkRef.current) {
         watermarkRef.current.style.transform = `translateX(${-parallaxOffset}px)`;
@@ -313,8 +284,7 @@ export default function GlassCard({
     return () => container.removeEventListener("mousemove", handleMouseMove);
   }, [hasWatermark]);
 
-  // Variable Font Weight Animation bei Hover (nur für Text-Watermark)
-  // Opacity Animation für Icon-Watermark (kein Scale - verursacht Positionsverschiebung)
+  // Hover-Effekt für Watermark
   useEffect(() => {
     if (!hasWatermark) return;
     
@@ -324,14 +294,12 @@ export default function GlassCard({
     const handleMouseEnter = () => {
       if (watermarkRef.current) {
         if (watermark) {
-          // Text-Watermark: Font-Weight Animation
           gsap.to(watermarkRef.current, {
             fontWeight: 700,
             duration: 0.5,
             ease: "power2.out",
           });
         } else if (WatermarkIcon) {
-          // Icon-Watermark: Nur Opacity Animation (einheitlich mit Text-Watermark)
           gsap.to(watermarkRef.current, {
             opacity: 0.08,
             duration: 0.5,
@@ -339,7 +307,6 @@ export default function GlassCard({
           });
         }
       }
-      // Price Variable Font wird über CSS gehandhabt (.price-variable-font)
     };
 
     const handleMouseLeave = () => {
@@ -370,57 +337,15 @@ export default function GlassCard({
   }, [hasWatermark, watermark, WatermarkIcon]);
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Ignoriere Klicks auf CTA-Buttons
     const target = e.target as HTMLElement;
     if (target.closest("a, button")) return;
     
-    // Flip nur wenn backfaceContent vorhanden ist
     if (backfaceContent) {
       setIsFlipped(!isFlipped);
     }
   };
 
-
-  // Bug 1: Wenn kein backfaceContent, nutze einfaches Layout ohne absolute Positioning
   const hasBackface = !!backfaceContent;
-
-  // DEBUGGING: Log GlassCard Props
-  useEffect(() => {
-    console.log("🔍 [GlassCard] Rendering with props:", {
-      title,
-      description,
-      color,
-      hasIcon: !!Icon,
-      hasBadge: !!badge,
-      hasWatermark: !!watermark,
-      hasBackfaceContent: !!backfaceContent,
-      hasChildren: !!children,
-    });
-  }, [title, description, color, Icon, badge, watermark, backfaceContent, children]);
-
-  // Stagger-Animation für Front-Face-Elemente beim ersten Erscheinen
-  useEffect(() => {
-    const front = frontFaceRef.current;
-    if (!front || !hasBackface) return; // Nur wenn es eine Rückseite gibt (Cards mit Flip)
-    
-    const frontElements = front.querySelectorAll('.frontface-badge, .frontface-title, .frontface-description, .frontface-children');
-    
-    // Initial state: Elemente sind unsichtbar
-    gsap.set(frontElements, {
-      opacity: 0,
-      y: 15,
-    });
-    
-    // Animation: Elemente erscheinen nacheinander
-    gsap.to(frontElements, {
-      opacity: 1,
-      y: 0,
-      duration: 0.5,
-      delay: 0.2,
-      stagger: 0.06,
-      ease: "power2.out",
-    });
-  }, [hasBackface]);
 
   return (
     <ScrollReveal3DGlass 
@@ -435,7 +360,7 @@ export default function GlassCard({
         onClick={handleCardClick}
         style={{ cursor: hasBackface ? "pointer" : "default" }}
       >
-        {/* Glow-Effekt während Flip - nur wenn backfaceContent vorhanden */}
+        {/* Glow-Effekt während Flip */}
         {hasBackface && (
           <div 
             ref={flipGlowRef}
@@ -446,15 +371,15 @@ export default function GlassCard({
             }}
           />
         )}
+
         {/* Front Face */}
         <div 
           ref={frontFaceRef}
           className={hasBackface ? "card-face card-face-front" : "card-face-simple"}
         >
-          {/* glass-card-bg für Front Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
           
-          {/* Expanding Flip-Indicator - INNERHALB der Front-Face, dreht sich mit */}
+          {/* Flip-Indicator */}
           {hasBackface && (
             <div 
               className="flip-indicator-container"
@@ -462,15 +387,11 @@ export default function GlassCard({
                 e.stopPropagation();
                 setIsFlipped(!isFlipped);
               }}
-              style={{ 
-                '--indicator-color': color,
-              } as React.CSSProperties}
+              style={{ '--indicator-color': color } as React.CSSProperties}
             >
-              {/* Icon Container */}
               <div className="flip-indicator-icon">
                 <RotateCcw size={16} strokeWidth={2} />
               </div>
-              {/* Text - wird bei Hover sichtbar */}
               <span className={`${jetBrainsMono.className} flip-indicator-text`}>
                 {flipHintLabel}
               </span>
@@ -478,20 +399,18 @@ export default function GlassCard({
           )}
           
           <div className="relative h-full flex flex-col p-5 md:p-10">
-            {/* Text-Watermark (für Courses) */}
+            {/* Text-Watermark */}
             {watermark && (
               <div 
                 ref={watermarkRef}
-                className={`${jetBrainsMono.className} absolute top-4 right-4 md:right-6 text-[5rem] md:text-[8rem] font-normal opacity-[0.03] select-none pointer-events-none transition-all duration-700 group-hover/card:scale-110 watermark-parallax watermark-glow`}
-                style={{ 
-                  color,
-                  fontWeight: 400,
-                }}
+                className={`${jetBrainsMono.className} absolute top-4 right-4 md:right-6 text-[5rem] md:text-[8rem] font-normal opacity-[0.03] select-none pointer-events-none transition-all duration-700 watermark-parallax watermark-glow`}
+                style={{ color, fontWeight: 400 }}
               >
                 {watermark}
               </div>
             )}
-            {/* Icon-Watermark (für Features) - gleiche Position wie Text-Watermark */}
+            
+            {/* Icon-Watermark */}
             {WatermarkIcon && !watermark && (
               <div 
                 ref={watermarkRef}
@@ -501,12 +420,13 @@ export default function GlassCard({
                 <WatermarkIcon size={100} className="md:w-40 md:h-40" strokeWidth={0.8} />
               </div>
             )}
+            
+            {/* Badge Row - reveal-stagger für Text-Animation */}
             <div className="flex justify-between items-start mb-4 md:mb-6 gap-3">
-              <div className="flex items-center gap-3 frontface-badge">
-                {/* Level-Label für Courses als Badge-Pill */}
+              <div className="flex items-center gap-3 reveal-stagger">
                 {level ? (
                   <span 
-                    className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300 badge-glow`}
+                    className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 glass-card-badge group-hover/card:bg-white/10 transition-all duration-300 badge-glow`}
                     style={{ 
                       color,
                       borderColor: `${color}40`,
@@ -517,16 +437,16 @@ export default function GlassCard({
                   </span>
                 ) : Icon ? (
                   <div 
-                    className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500" 
+                    className="p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 group-hover/card:scale-110 group-hover/card:bg-white/10 transition-all duration-500" 
                     style={{ color }}
                   >
                     <Icon size={24} className="md:w-8 md:h-8" strokeWidth={1.5} />
                   </div>
                 ) : null}
-                {/* Badge rechts neben Level-Label */}
+                
                 {badge && (
                   <span 
-                    className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md group-hover:bg-white/10 transition-all duration-300 badge-glow`}
+                    className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 glass-card-badge group-hover/card:bg-white/10 transition-all duration-300 badge-glow`}
                     style={{ 
                       color,
                       borderColor: `${color}40`,
@@ -538,18 +458,22 @@ export default function GlassCard({
                 )}
               </div>
             </div>
-            <h3 className="frontface-title text-xl md:text-3xl font-bold text-white mb-2 md:mb-4 group-hover:translate-x-1 transition-transform duration-300 drop-shadow-lg">
+            
+            {/* Title - reveal-stagger */}
+            <h3 className="reveal-stagger text-xl md:text-3xl font-bold text-white mb-2 md:mb-4 group-hover/card:translate-x-1 transition-transform duration-300 drop-shadow-lg">
               {title}
             </h3>
-            <p className="frontface-description text-sm md:text-base text-white/60 leading-relaxed mb-4 md:mb-6 flex-grow">
+            
+            {/* Description - reveal-stagger */}
+            <p className="reveal-stagger text-sm md:text-base text-white/60 leading-relaxed mb-4 md:mb-6 flex-grow">
               {description}
             </p>
+            
+            {/* Children (CTA etc.) - reveal-stagger */}
             {children && (
               <div 
-                className="frontface-children mt-auto" 
+                className="reveal-stagger mt-auto" 
                 onClick={(e) => {
-                  // Nur bei Klicks auf Links/Buttons stopPropagation
-                  // Damit Klicks auf den Preis-Bereich trotzdem die Karte flippen
                   const target = e.target as HTMLElement;
                   if (target.closest("a, button")) {
                     e.stopPropagation();
@@ -562,56 +486,47 @@ export default function GlassCard({
           </div>
         </div>
 
-        {/* Back Face - nur wenn backfaceContent vorhanden */}
+        {/* Back Face */}
         {hasBackface && (
         <div 
           ref={backFaceRef}
           className="card-face card-face-back"
         >
-          {/* glass-card-bg für Back Face - fest mit Rotation verbunden */}
           <div className="glass-card-bg absolute inset-0 rounded-[2rem] -z-10" />
           
-          {/* Flip-Indicator auch auf der Rückseite */}
+          {/* Flip-Indicator Rückseite */}
           <div 
             className="flip-indicator-container"
             onClick={(e) => {
               e.stopPropagation();
               setIsFlipped(!isFlipped);
             }}
-            style={{ 
-              '--indicator-color': color,
-            } as React.CSSProperties}
+            style={{ '--indicator-color': color } as React.CSSProperties}
           >
-            {/* Icon Container */}
             <div className="flip-indicator-icon">
               <RotateCcw size={16} strokeWidth={2} />
             </div>
-            {/* Text - wird bei Hover sichtbar */}
             <span className={`${jetBrainsMono.className} flip-indicator-text`}>
               {backHintLabel}
             </span>
           </div>
           
-          {/* Watermark auf Rückseite - KEINE Spiegelung nötig, da card-face-back bereits rotateY(180deg) hat */}
+          {/* Watermark Rückseite */}
           {watermark && (
             <div 
               className={`${jetBrainsMono.className} absolute top-4 right-6 text-[8rem] font-normal opacity-[0.03] select-none pointer-events-none watermark-glow`}
-              style={{ 
-                color,
-                fontWeight: 400,
-              }}
+              style={{ color, fontWeight: 400 }}
             >
               {watermark}
             </div>
           )}
           
-          {/* Level und Badge auf Rückseite - exakt an derselben Position wie Vorderseite (p-5 md:p-10 = 1.25rem/2.5rem = top-5 left-5 md:top-10 md:left-10) */}
+          {/* Level/Badge Rückseite */}
           {(level || badge) && (
             <div className="absolute top-5 left-5 md:top-10 md:left-10 z-20 flex items-center gap-3">
-              {/* Level-Label auf Rückseite */}
               {level && (
                 <span 
-                  className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md badge-glow`}
+                  className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 glass-card-badge badge-glow`}
                   style={{ 
                     color,
                     borderColor: `${color}40`,
@@ -621,10 +536,9 @@ export default function GlassCard({
                   {level}
                 </span>
               )}
-              {/* Badge auf Rückseite */}
               {badge && (
                 <span 
-                  className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 backdrop-blur-md badge-glow`}
+                  className={`${jetBrainsMono.className} text-[10px] md:text-xs font-bold tracking-widest px-2.5 py-1 md:px-3 md:py-1.5 rounded-full border border-white/10 text-white/80 bg-black/20 glass-card-badge badge-glow`}
                   style={{ 
                     color,
                     borderColor: `${color}40`,
@@ -637,7 +551,7 @@ export default function GlassCard({
             </div>
           )}
           
-          {/* Subtiler Glow-Punkt im Hintergrund mit Akzentfarbe */}
+          {/* Glow-Punkt */}
           <div 
             className="absolute top-1/2 right-1/4 w-32 h-32 rounded-full opacity-[0.03] blur-3xl"
             style={{
@@ -646,15 +560,14 @@ export default function GlassCard({
             }}
           />
 
-          {/* Content Container - High-End Layout mit exaktem Padding wie Vorderseite */}
+          {/* Content Container */}
           <div className="relative h-full flex flex-col p-5 md:p-10 overflow-hidden">
             <div className="absolute inset-0 bg-noise rounded-[2rem] z-0" />
             
-            {/* Kompaktes 2-Spalten-Grid Layout - Kein Scrolling */}
+            {/* Grid Layout */}
             <div className="relative z-10 flex flex-col h-full gap-y-2 gap-x-4 pt-16 pb-24 overflow-hidden">
-              {/* Zeile 1: EINHEIT (links) | GRUPPE (rechts) */}
+              {/* EINHEIT | GRUPPE */}
               <div className="backface-item grid grid-cols-2 gap-x-4 gap-y-2 flex-shrink-0">
-                {/* Spalte 1: EINHEIT */}
                 {backfaceContent?.lessonBlock && (() => {
                   const formatted = formatLessonBlock(backfaceContent.lessonBlock);
                   return formatted ? (
@@ -669,7 +582,6 @@ export default function GlassCard({
                   ) : null;
                 })()}
                 
-                {/* Spalte 2: GRUPPE */}
                 <div>
                   <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                     {backfaceLabels?.group || "GRUPPE"}
@@ -680,9 +592,8 @@ export default function GlassCard({
                 </div>
               </div>
               
-              {/* Zeile 2: STANDORT (links) | VERTRAG (rechts) */}
+              {/* STANDORT | VERTRAG */}
               <div className="backface-item grid grid-cols-2 gap-x-4 gap-y-2 flex-shrink-0">
-                {/* STANDORT */}
                 <div>
                   <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                     {backfaceLabels?.location || "STANDORT"}
@@ -690,17 +601,14 @@ export default function GlassCard({
                   <p className={`${jetBrainsMono.className} text-[13px] font-bold text-white leading-tight whitespace-nowrap`}>
                     {(() => {
                       const badgeLower = badge?.toLowerCase() || "";
-                      // Prüfe auf Online-Varianten in verschiedenen Sprachen
                       if (badgeLower.includes("online") || badgeLower === "онлайн") {
                         return "Microsoft Teams";
                       }
-                      // Alle anderen sind Präsenz
                       return "FZH Vahrenwald";
                     })()}
                   </p>
                 </div>
                 
-                {/* VERTRAG */}
                 <div>
                   <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                     {backfaceLabels?.contract || "VERTRAG"}
@@ -711,7 +619,7 @@ export default function GlassCard({
                 </div>
               </div>
               
-              {/* Zeile 3: EXTRAS (ganzbreitig) */}
+              {/* EXTRAS */}
               <div className="backface-item flex-shrink-0">
                 <span className={`${jetBrainsMono.className} text-[9px] font-bold uppercase tracking-widest text-white/40 block mb-1.5`}>
                   {backfaceLabels?.extras || "EXTRAS"}
@@ -721,7 +629,7 @@ export default function GlassCard({
                 </p>
               </div>
               
-              {/* Zeile 4: TERMINE (ganzbreitig, Tage kompakt untereinander) */}
+              {/* TERMINE */}
               {backfaceContent?.start && (() => {
                 const appointments = parseAppointments(backfaceContent.start);
                 return appointments.length > 0 ? (
@@ -756,7 +664,7 @@ export default function GlassCard({
               })()}
             </div>
               
-            {/* Dozentin-Footer - Absolut positioniert ganz unten */}
+            {/* Dozentin-Footer */}
             {backfaceContent?.instructor && (
               <div className="absolute bottom-4 left-5 right-5 md:left-8 md:right-8 md:bottom-4 z-20 backface-item border-t border-white/10 pt-2">
                 <div className="flex flex-col gap-0.5">
@@ -776,4 +684,3 @@ export default function GlassCard({
     </ScrollReveal3DGlass>
   );
 }
-

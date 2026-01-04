@@ -3,51 +3,47 @@
 import { RefObject, useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
-interface UseScrollReveal3DOptions {
+interface UseScrollRevealOptions {
   trigger?: RefObject<HTMLElement> | HTMLElement | null;
   scrub?: number | boolean;
-  z?: number;
-  transformOrigin?: string;
-  inverted?: boolean; // Invertierte Bewegung: Entgegengesetzte Neigung beim Ein-/Ausfliegen
+  stagger?: boolean; // Aktiviert Stagger für innere Elemente
+  staggerSelector?: string; // CSS-Selector für Stagger-Elemente
 }
 
 /**
- * Hook für elegante Fluid 3D Reveal Scroll-Animationen
+ * FLUID REVEAL HOOK - Performance-Optimiert für MBP 2017 & Mobile
  * 
- * PERFORMANCE OPTIMIERT:
- * - Minimale Re-Renders durch useRef für Timeline
- * - force3D: true für GPU-Beschleunigung
- * - Optimierte Timeline-Struktur
+ * DESIGN-PRINZIP:
+ * - KEINE 3D-Transforms (rotateX, z-transform) - spart GPU-Last
+ * - Nur opacity + translateY für butterweiche 60fps
+ * - expo.out Easing für physikalisch korrekte Bewegung
  * 
- * Die Karten bauen sich beim Scrollen sanft aus der Tiefe des Raumes auf
- * und kommen dem Nutzer entgegen - keine harten Rotationen mehr.
+ * Luxus entsteht durch Präzision, nicht durch technische Spielereien.
  */
 export function useScrollReveal3D(
   elementRef: RefObject<HTMLElement>,
-  options: UseScrollReveal3DOptions = {}
+  options: UseScrollRevealOptions = {}
 ) {
   const {
     trigger,
-    scrub = 1,
-    z = -100, // Etwas subtiler
-    transformOrigin = "center center",
-    inverted = false,
+    scrub = 0.5, // Schnellere Response als vorher
+    stagger = false,
+    staggerSelector = ".reveal-stagger",
   } = options;
   
-  // PERFORMANCE: Speichere Timeline-Referenz für sauberes Cleanup
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
-    // PERFORMANCE: Cleanup alte Timeline falls vorhanden
+    // Cleanup alte Timeline
     if (timelineRef.current) {
       timelineRef.current.kill();
       timelineRef.current = null;
     }
 
-    // FIX: TypeScript-Fehler permanent behoben - Type Guard für RefObject mit expliziter Typisierung
+    // Trigger-Element bestimmen
     let triggerTarget: HTMLElement = element;
     if (options.trigger) {
       if ('current' in options.trigger && options.trigger.current) {
@@ -56,86 +52,69 @@ export function useScrollReveal3D(
         triggerTarget = options.trigger as HTMLElement;
       }
     }
-
-    // Mehr Rotation für dramatischeren Effekt, da wir näher an der Kamera sind
-    const initialRotateX = inverted ? -25 : 25; 
-    const finalRotateX = inverted ? 25 : -25;
     
-    // Initial Setup
-    // WICHTIG: Kein 'perspective' hier setzen, das macht Chrome kaputt
+    // Initial State: Sanft versteckt
     gsap.set(element, { 
-      transformOrigin: transformOrigin,
-      backfaceVisibility: "hidden", 
-      transformStyle: "flat", // "flat" hilft Chrome beim Blurren
-      pointerEvents: "auto" // WICHTIG: Immer interaktiv, auch während Animation
+      opacity: 0,
+      y: 30, // Kurzer, präziser Slide
+      willChange: "transform, opacity",
     });
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerTarget,
-        start: "top bottom-=10%", 
-        end: "bottom top+=10%",
+        start: "top bottom-=15%", // Später starten für klareren Moment
+        end: "top center",
         scrub: scrub,
         markers: false,
-        onToggle: (self) => {
-          // Will-change nur während der aktiven Phase
-          if (self.isActive) {
-            element.style.willChange = "transform, opacity";
-          } else {
-            element.style.willChange = "auto";
-          }
+        onEnter: () => {
+          element.style.willChange = "transform, opacity";
+        },
+        onLeave: () => {
+          element.style.willChange = "auto";
+        },
+        onEnterBack: () => {
+          element.style.willChange = "transform, opacity";
+        },
+        onLeaveBack: () => {
+          element.style.willChange = "auto";
         }
       },
     });
 
-    // Intro
-    tl.fromTo(element, 
-      {
-        rotateX: initialRotateX,
-        y: 60,
-        z: z,
-        scale: 0.95,
-        opacity: 0,
-      },
-      {
-        rotateX: 0,
-        y: 0,
-        z: 0,
-        scale: 1,
-        opacity: 1,
-        ease: "power1.out",
-        duration: 0.25,
-      }, 
-      0
-    );
-
-    // Stable
+    // Fluid Reveal: Sanft einblenden mit physikalisch korrektem Easing
     tl.to(element, {
-      rotateX: 0,
-      y: 0,
-      z: 0,
-      scale: 1,
       opacity: 1,
-      ease: "none",
-      duration: 0.5,
-    }, 0.25);
+      y: 0,
+      duration: 1,
+      ease: "expo.out", // Schneller Start, sanftes Ausklingen
+    }, 0);
 
-    // Outro
-    tl.to(element, {
-      rotateX: finalRotateX,
-      y: -60,
-      z: z, 
-      scale: 0.95,
-      opacity: 0,
-      ease: "power1.in",
-      duration: 0.25,
-    }, 0.75);
+    // Optional: Stagger-Animation für innere Elemente
+    if (stagger) {
+      const staggerElements = element.querySelectorAll(staggerSelector);
+      if (staggerElements.length > 0) {
+        gsap.set(staggerElements, {
+          opacity: 0,
+          y: 15,
+        });
+        
+        tl.to(staggerElements, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08, // 80ms Versatz zwischen Elementen
+          ease: "expo.out",
+        }, 0.1); // Kurze Verzögerung nach Card-Reveal
+      }
+    }
     
-    // Speichere Timeline-Referenz für Cleanup
     timelineRef.current = tl;
 
     return () => {
-      if (timelineRef.current) timelineRef.current.kill();
+      if (timelineRef.current) {
+        timelineRef.current.kill();
+      }
     };
-  }, [elementRef, trigger, scrub, z, transformOrigin, inverted]);
+  }, [elementRef, trigger, scrub, stagger, staggerSelector]);
 }
