@@ -126,18 +126,23 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           style={{ contain: 'paint' }} // Layout Stability Fix
         >
 
-          {/* Info Tag: Technical Status with Architectural Line */}
+          {/* Scientific Status Badge */}
           <div
             ref={infoTagRef}
-            className="flex items-center gap-4 mb-6 opacity-0 translate-y-[-10px] w-full"
+            className="inline-flex items-center gap-3 mb-8 px-4 py-2 border-[0.5px] border-[#FF5C00]/30 rounded-sm bg-[#FF5C00]/5 backdrop-blur-sm opacity-0 translate-y-[-10px] w-fit"
           >
+            {/* Pulsating Status Dot */}
+            <div className="relative flex h-2 w-2">
+              <span className="animate-status-pulse absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
+            </div>
+
             <span
-              className="font-mono text-[10px] text-[#FF5C00]/90 tracking-[0.2em] uppercase whitespace-nowrap"
+              className="font-mono text-[10px] text-[#2D3436] dark:text-[#E2D7CE] tracking-[0.2em] uppercase whitespace-nowrap"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
-              [ NÄCHSTER KURSSTART: 03. FEBRUAR 2026 ]
+              Next Session: 03. Feb 2026.
             </span>
-            <div className="h-[1px] bg-[#FF5C00]/30 flex-grow transform translate-y-[1px]" />
           </div>
 
           {/* Block A: Brand Split (Solid Colors) */}
