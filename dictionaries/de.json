@@ -1,62 +1,62 @@
 {
-    "meta": {
-      "title": "Deutsch lernen in Hannover | Spezialisiert auf Ukrainer & Russischsprachige | SmartGerman",
-      "description": "Deutschkurse in Hannover mit muttersprachlicher Lehrerin. Für alle, die Deutsch lernen möchten. A1-B2 Kurse, Online & Präsenz. Jetzt anmelden!",
-      "keywords": "Deutschkurse Hannover, Sprachschule Hannover, Deutsch lernen Hannover, muttersprachliche Unterstützung, Integrationskurs Hannover, Deutsch für Ukrainer & Russischsprachige, A1 Kurs Hannover, A2 Kurs Hannover, B1 Kurs Hannover, Online Deutschkurs, Deutsch 50 Plus"
+  "meta": {
+    "title": "Deutsch lernen in Hannover | Spezialisiert auf Ukrainer & Russischsprachige | SmartGerman",
+    "description": "Deutschkurse in Hannover mit muttersprachlicher Lehrerin. Für alle, die Deutsch lernen möchten. A1-B2 Kurse, Online & Präsenz. Jetzt anmelden!",
+    "keywords": "Deutschkurse Hannover, Sprachschule Hannover, Deutsch lernen Hannover, muttersprachliche Unterstützung, Integrationskurs Hannover, Deutsch für Ukrainer & Russischsprachige, A1 Kurs Hannover, A2 Kurs Hannover, B1 Kurs Hannover, Online Deutschkurs, Deutsch 50 Plus"
+  },
+  "header": {
+    "banner": {
+      "next_course": "Nächster Kursstart: 03. Februar 2026",
+      "reserve_spot": "Jetzt Platz sichern",
+      "location": "SmartGerman Hannover",
+      "native_teachers": "Muttersprachliche Lehrer",
+      "online_courses": "Online-Kurse"
     },
-    "header": {
-      "banner": {
-        "next_course": "Nächster Kursstart: 03. Februar 2026",
-        "reserve_spot": "Jetzt Platz sichern",
-        "location": "SmartGerman Hannover",
-        "native_teachers": "Muttersprachliche Lehrer",
-        "online_courses": "Online-Kurse"
-      },
-      "nav": {
-        "home": "Home",
-        "courses": "Kurse",
-        "prices": "Preise",
-        "enroll": "Anmelden"
-      },
-      "language_switcher": {
-        "de": "DE",
-        "en": "EN",
-        "uk": "UK",
-        "ru": "RU",
-        "tu": "TU"
-      }
+    "nav": {
+      "home": "Home",
+      "courses": "Kurse",
+      "prices": "Preise",
+      "enroll": "Anmelden"
     },
-    "hero": {
-      "brand_name_part1": "Smart",
-      "brand_name_part2": "German",
-      "badge": "Evidenzbasiert • Neuro-Didaktik • Master-Expertise",
-      "headline": "Spracherwerb auf Basis der Wissenschaft.",
-      "subline": "Sprachen lernen ist keine Frage des Alters, sondern eine Frage der Methode.",
-      "cta_primary": "Die Methode entdecken",
-      "cta_secondary": "Kursplan 2026",
-      "scroll_label": "SCROLL"
+    "language_switcher": {
+      "de": "DE",
+      "en": "EN",
+      "uk": "UK",
+      "ru": "RU",
+      "tu": "TU"
+    }
+  },
+  "hero": {
+    "brand_name_part1": "Smart",
+    "brand_name_part2": "German",
+    "badge": "Evidenzbasiert • Neuro-Didaktik • Master-Expertise",
+    "headline": "SmartGerman. Spracherwerb durch Wissenschaft.",
+    "subline": "Sprachen lernen ist keine Frage des Alters, sondern eine Frage der Methode.",
+    "cta_primary": "Die Methode entdecken",
+    "cta_secondary": "Kursplan 2026",
+    "scroll_label": "SCROLL"
+  },
+  "sections": {
+    "quality_success": {
+      "title": "Qualität & Erfolg",
+      "description": "Unsere Kurse sind auf maximale Effizienz ausgelegt. Erlebe modernes Lernen in einer inspirierenden Umgebung."
     },
-    "sections": {
-      "quality_success": {
-        "title": "Qualität & Erfolg",
-        "description": "Unsere Kurse sind auf maximale Effizienz ausgelegt. Erlebe modernes Lernen in einer inspirierenden Umgebung."
+    "modern_methods": {
+      "title": "Moderne Methoden",
+      "description": "Innovative Lernmethoden für schnelle Fortschritte. Unser Team begleitet dich auf deinem Weg zum Erfolg."
+    },
+    "features": {
+      "title_part1": "Was uns",
+      "title_part2": "auszeichnet",
+      "intro": "SmartGerman bietet Ihnen einen modernen und effektiven Weg, Deutsch zu lernen – fokussiert auf Qualität und Flexibilität.",
+      "native_speakers": {
+        "title": "Muttersprachliche Lehrer",
+        "description": "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz für ein authentisches Lernerlebnis."
       },
-      "modern_methods": {
-        "title": "Moderne Methoden",
-        "description": "Innovative Lernmethoden für schnelle Fortschritte. Unser Team begleitet dich auf deinem Weg zum Erfolg."
+      "flexibility": {
+        "title": "Flexible Kurszeiten",
+        "description": "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends."
       },
-      "features": {
-        "title_part1": "Was uns",
-        "title_part2": "auszeichnet",
-        "intro": "SmartGerman bietet Ihnen einen modernen und effektiven Weg, Deutsch zu lernen – fokussiert auf Qualität und Flexibilität.",
-        "native_speakers": {
-          "title": "Muttersprachliche Lehrer",
-          "description": "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz für ein authentisches Lernerlebnis."
-        },
-        "flexibility": {
-          "title": "Flexible Kurszeiten",
-          "description": "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends."
-        },
       "methods": {
         "title": "Praxisnahe Methoden",
         "description": "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg."
@@ -205,67 +205,67 @@
       ]
     }
   },
-    "features": {
-      "native_support": "Muttersprachliche Lehrer",
-      "native_desc": "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz für ein authentisches Lernerlebnis.",
-      "central_location": "Flexible Kurszeiten",
-      "location_desc": "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends.",
-      "modern_learning": "Praxisnahe Methoden",
-      "modern_desc": "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg."
+  "features": {
+    "native_support": "Muttersprachliche Lehrer",
+    "native_desc": "Unsere qualifizierten Muttersprachler kombinieren professionelle Lehrerfahrung mit interkultureller Kompetenz für ein authentisches Lernerlebnis.",
+    "central_location": "Flexible Kurszeiten",
+    "location_desc": "Wir bieten Kurse zu verschiedenen Tageszeiten an, die sich Ihrem Zeitplan anpassen - auch abends.",
+    "modern_learning": "Praxisnahe Methoden",
+    "modern_desc": "Unsere interaktiven und kommunikativen Lehrmethoden fokussieren sich auf Alltagssituationen für einen schnellen und nachhaltigen Lernerfolg."
+  },
+  "courses": {
+    "title": "Unsere Kurse",
+    "subtitle": "Vom Anfänger bis zum Profi – wir haben den richtigen Kurs für dich.",
+    "price_label": "Preis",
+    "flip_hint": "DETAILS",
+    "back_hint": "ZURÜCK",
+    "backface_labels": {
+      "unit": "EINHEIT",
+      "appointments": "TERMINE",
+      "group": "GRUPPE",
+      "instructor": "DOZENTIN",
+      "location": "STANDORT",
+      "extras": "EXTRAS",
+      "contract": "VERTRAG",
+      "monthly_cancellable": "Monatlich kündbar",
+      "monthly_cancellable_short": "Monatl. kündbar",
+      "telegram_materials": "Telegram-Gruppe & Materialien",
+      "extras_short": "Inkl. Material & Telegram"
     },
-    "courses": {
-      "title": "Unsere Kurse",
-      "subtitle": "Vom Anfänger bis zum Profi – wir haben den richtigen Kurs für dich.",
-      "price_label": "Preis",
-      "flip_hint": "DETAILS",
-      "back_hint": "ZURÜCK",
-      "backface_labels": {
-        "unit": "EINHEIT",
-        "appointments": "TERMINE",
-        "group": "GRUPPE",
-        "instructor": "DOZENTIN",
-        "location": "STANDORT",
-        "extras": "EXTRAS",
-        "contract": "VERTRAG",
-        "monthly_cancellable": "Monatlich kündbar",
-        "monthly_cancellable_short": "Monatl. kündbar",
-        "telegram_materials": "Telegram-Gruppe & Materialien",
-        "extras_short": "Inkl. Material & Telegram"
-      },
-      "a1": {
-        "name": "A1 Anfänger",
-        "desc": "Der ideale Einstieg ohne Vorkenntnisse."
-      },
-      "b2": {
-        "name": "B2 Fortgeschrittene",
-        "desc": "Sicheres Auftreten im Beruf und Alltag."
-      }
+    "a1": {
+      "name": "A1 Anfänger",
+      "desc": "Der ideale Einstieg ohne Vorkenntnisse."
     },
-    "schedule": {
-      "title": "Dein Weg zum Erfolg – Der Wochenplan",
-      "subtitle": "Wähle einen Tag aus, um die Kurse zu sehen",
-      "open_button": "Wochenplan öffnen",
-      "filter_all": "Alle",
-      "filter_seniors": "Senioren",
-      "instructor": "Dozentin",
-      "no_courses": "Keine Kurse an diesem Tag",
-      "print_button": "Druckansicht / PDF",
-      "view_day": "Tagesansicht",
-      "view_grid": "Rasteransicht",
-      "switch_view": "Ansicht wechseln",
-      "time": "Uhrzeit",
-      "monday": "Montag",
-      "tuesday": "Dienstag",
-      "wednesday": "Mittwoch",
-      "thursday": "Donnerstag",
-      "friday": "Freitag"
-    },
-    "footer": {
-      "rights": "© 2025 SmartGerman Hannover. Alle Rechte vorbehalten.",
-      "links": {
-        "imprint": "Impressum",
-        "privacy": "Datenschutz",
-        "agb": "AGB"
-      }
+    "b2": {
+      "name": "B2 Fortgeschrittene",
+      "desc": "Sicheres Auftreten im Beruf und Alltag."
+    }
+  },
+  "schedule": {
+    "title": "Dein Weg zum Erfolg – Der Wochenplan",
+    "subtitle": "Wähle einen Tag aus, um die Kurse zu sehen",
+    "open_button": "Wochenplan öffnen",
+    "filter_all": "Alle",
+    "filter_seniors": "Senioren",
+    "instructor": "Dozentin",
+    "no_courses": "Keine Kurse an diesem Tag",
+    "print_button": "Druckansicht / PDF",
+    "view_day": "Tagesansicht",
+    "view_grid": "Rasteransicht",
+    "switch_view": "Ansicht wechseln",
+    "time": "Uhrzeit",
+    "monday": "Montag",
+    "tuesday": "Dienstag",
+    "wednesday": "Mittwoch",
+    "thursday": "Donnerstag",
+    "friday": "Freitag"
+  },
+  "footer": {
+    "rights": "© 2025 SmartGerman Hannover. Alle Rechte vorbehalten.",
+    "links": {
+      "imprint": "Impressum",
+      "privacy": "Datenschutz",
+      "agb": "AGB"
     }
   }
+}
