@@ -50,6 +50,11 @@ body {
   /* Wichtig für ScrollTrigger */
 }
 
+html {
+  overflow-y: scroll;
+  /* Prevents layout shift when scrollbar appears */
+}
+
 /* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
 .bg-background {
   background-color: var(--background) !important;

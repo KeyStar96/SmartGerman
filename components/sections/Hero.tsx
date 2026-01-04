@@ -103,7 +103,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   return (
     <section
       ref={container}
-      className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-52 pb-20"
+      className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-52 pb-20 w-full"
     >
       {/* Glitch Overlay - Monitor look during typing */}
       {isTyping && (
@@ -129,6 +129,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             <span
               className={`font-bold text-[#FF5C00] ${triggerLaser ? 'animate-laser-scan' : ''}`}
               style={{ paddingLeft: '2px' }} // Slight visual separation
+              onAnimationEnd={() => setTriggerLaser(false)} // CLEAN: Remove class after animation to ensure solid color
             >
               German
             </span>
