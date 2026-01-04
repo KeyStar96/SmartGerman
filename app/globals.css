@@ -56,6 +56,70 @@ body {
 }
 
 /* ============================================
+   TYPEWRITER & SCIENTIFIC EFFECTS
+   ============================================ */
+
+/* Blinking Cursor for Typewriter */
+.cursor-blink {
+  animation: blink-animation 1s step-end infinite;
+}
+
+@keyframes blink-animation {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Subtle Scanline Overlay */
+.scanline-overlay {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanline-overlay::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0) 50%,
+      rgba(0, 0, 0, 0.02) 50%,
+      rgba(0, 0, 0, 0.02));
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
+  animation: scanline-move 10s linear infinite;
+}
+
+.dark .scanline-overlay::before {
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(255, 255, 255, 0.02));
+}
+
+@keyframes scanline-move {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+/* ============================================
    AWWWARDS STYLE: PREMIUM GLASS
    ============================================ */
 
@@ -164,8 +228,6 @@ body {
     background: transparent;
   }
 
-  /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
-  /* Orange-Glow für kritische Features */
   /* Glows and Glass Removed for Swiss Scientific Design */
 
   /* GPU-Acceleration für High-Performance Animationen */
@@ -375,11 +437,6 @@ body {
           rgba(22, 22, 26, 0.92) 50%,
           rgba(26, 26, 30, 0.89) 100%);
     }
-  }
-
-  /* Laser/Neon removed for Swiss Scientific Design */
-  .laser-text {
-    color: var(--primary-orange);
   }
 
   /* Laser/Neon removed */
@@ -736,14 +793,3 @@ body {
 }
 
 /* Scrollbar Hide Utility */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari and Opera */
-}

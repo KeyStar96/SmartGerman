@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
@@ -8,6 +8,10 @@ import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 
 const inter = Inter({ subsets: ["latin"] });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: '--font-mono',
+});
 
 // Wir machen die Funktion 'async'
 export default async function RootLayout({
@@ -37,7 +41,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} bg-background text-foreground antialiased`}>
+      <body className={`${inter.className} ${jetbrainsMono.variable} bg-background text-foreground antialiased`}>
         {/* 
           CHROME FIX für backdrop-filter:
           - Hintergründe mit z-index: 0/1 statt negativen Werten
