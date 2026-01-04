@@ -12,7 +12,7 @@ import { gsap } from "@/lib/gsap";
 const CONFIG = {
   // Gitter & Dichte - REDUZIERT für bessere Performance
   neuronDensity: 0.0004,      // 50% weniger Partikel (war 0.0008)
-  connectionDistance: 100,    // Kürzere Verbindungen (war 120)
+  connectionDistance: 120,    // Kürzere Verbindungen (war 120)
   viewportPadding: 150,       // Weniger Padding (war 200)
   gridCellSize: 200,          // Größere Zellen = weniger Partikel (war 150)          
 
