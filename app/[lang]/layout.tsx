@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
-import LiquidBackground from "@/components/effects/LiquidBackground";
+import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
 import NeuralBackground from "@/components/effects/NeuralBackground";
 import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
@@ -44,10 +44,10 @@ export default async function RootLayout({
           - Main Content OHNE z-index, damit kein isolierter Stacking-Context entsteht
           - Das erlaubt backdrop-filter, die Hintergründe zu bluren
         */}
-        
-        {/* 1. Die unterste Ebene: Der Liquid Background (statische Farbe) */}
+
+        {/* 1. Die unterste Ebene: Der Architectural Background (Bilder) */}
         <div className="fixed inset-0 liquid-background-container" style={{ zIndex: 0 }}>
-          <LiquidBackground />
+          <ArchitecturalBackground />
         </div>
 
         {/* 2. Die mittlere Ebene: Das Neuronale Netz */}
@@ -57,7 +57,7 @@ export default async function RootLayout({
 
         {/* 3. Die oberste Ebene: Header (z-index: 50 für sticky) */}
         <Header lang={lang} dictionary={dictionary} />
-        
+
         {/* 4. Main Content: KEIN z-index damit backdrop-filter funktioniert! */}
         <SmoothScroll>
           <main id="main-content" className="pt-32 scroll-3d-container min-h-screen relative">

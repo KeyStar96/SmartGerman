@@ -37,13 +37,13 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     let scrollRafId: number | null = null;
     const handleScroll = () => {
       if (scrollRafId !== null) return;
-      
+
       scrollRafId = requestAnimationFrame(() => {
         setIsScrolled(window.scrollY > 50);
         scrollRafId = null;
       });
     };
-    
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       if (scrollRafId !== null) {
@@ -116,19 +116,18 @@ export default function Header({ lang, dictionary }: HeaderProps) {
       </div>
 
       {/* 2. Navigation mit Glassmorphismus */}
-      <nav className={`w-full transition-all duration-500 border-b ${
-        isScrolled 
-        ? `py-3 glass-header border-black/10 dark:border-white/10` 
-        : "py-6 bg-transparent border-transparent"
-      }`}>
+      <nav className={`w-full transition-all duration-500 ${isScrolled
+          ? "py-3 bg-background/95 border-b border-black/5 dark:border-white/5"
+          : "py-6 bg-transparent border-b border-transparent"
+        }`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          
+
           {/* Logo Section - Logo-Farbe gekoppelt an Header-Hintergrund */}
           <Link href={`/${lang}`} className="group block">
-            <Image 
-              src="/Bilder/SmartGerman-bg-remove.png" 
-              alt="SmartGerman Logo" 
-              width={192} 
+            <Image
+              src="/Bilder/SmartGerman-bg-remove.png"
+              alt="SmartGerman Logo"
+              width={192}
               height={40}
               className={`h-auto object-contain transition-all duration-500 group-hover:scale-105 ${logoClasses}`}
               priority={true}
@@ -138,22 +137,22 @@ export default function Header({ lang, dictionary }: HeaderProps) {
           {/* Menu & Actions */}
           <div className="flex items-center gap-4 md:gap-8">
             <div className="hidden md:flex items-center gap-8 mr-4">
-              <Link href="#home" 
+              <Link href="#home"
                 className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
                 {dictionary.header.nav.home}
               </Link>
-              <Link href="#courses" 
+              <Link href="#courses"
                 className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
                 {dictionary.header.nav.courses}
               </Link>
-              <Link href="#prices" 
+              <Link href="#prices"
                 className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
                 {dictionary.header.nav.prices}
               </Link>
             </div>
 
             {/* Theme Toggle Button */}
-            <button 
+            <button
               onClick={toggleTheme}
               className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${textColor}`}
               aria-label="Toggle Theme"
@@ -167,7 +166,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
             {/* Language Switcher */}
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
                 className={`flex items-center gap-1 text-xs font-medium uppercase tracking-widest ${textColor}`}
               >
@@ -175,11 +174,11 @@ export default function Header({ lang, dictionary }: HeaderProps) {
                 <span>{currentLanguage.label}</span>
                 <ChevronDown className={`w-3 h-3 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {isLanguageDropdownOpen && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40" 
+                  <div
+                    className="fixed inset-0 z-40"
                     onClick={() => setIsLanguageDropdownOpen(false)}
                   />
                   <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-dm-surface-teal rounded-lg border border-black/10 dark:border-dm-border-slate z-50 overflow-hidden">
@@ -187,11 +186,10 @@ export default function Header({ lang, dictionary }: HeaderProps) {
                       <button
                         key={language.code}
                         onClick={() => switchLanguage(language.code)}
-                        className={`w-full px-4 py-2 text-left text-xs font-medium uppercase tracking-widest transition-colors border-b border-black/5 dark:border-dm-border-slate/30 last:border-b-0 ${
-                          lang === language.code
+                        className={`w-full px-4 py-2 text-left text-xs font-medium uppercase tracking-widest transition-colors border-b border-black/5 dark:border-dm-border-slate/30 last:border-b-0 ${lang === language.code
                             ? "bg-primary-orange/20 text-primary-orange dark:bg-primary-orange/10"
                             : "text-foreground hover:bg-black/5 dark:hover:bg-dm-surface-teal"
-                        }`}
+                          }`}
                       >
                         {language.label}
                       </button>
@@ -200,8 +198,8 @@ export default function Header({ lang, dictionary }: HeaderProps) {
                 </>
               )}
             </div>
-            
-            <Link 
+
+            <Link
               href={`/${lang}/anmeldung`}
               className="btn-primary px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105"
             >

@@ -4,43 +4,36 @@
 
 :root {
   /* ============================================
-     SPACESHIP INSTRUCTION MANUAL COLOR SYSTEM
-     HSL-basiert für mathematische Harmonie
+     SWISS SCIENTIFIC DESIGN COLOR SYSTEM
      ============================================ */
-  
+
   /* Global/Core - Brand Colors */
-  --primary-orange: hsl(14, 100%, 50%); /* #FF5C00 - Nur für kritische CTAs und Markenkerne */
-  --accent-cyan: hsl(180, 100%, 50%); /* Für technische Micro-Interactions */
-  --accent-lime: hsl(65, 100%, 50%); /* Electric Lime - Für Online-Kurse, High-End Modern */
-  
-  /* Lightmode (Organic Scholar) */
-  --lm-bg-bone: #E2D7CE; /* Haupt-Hintergrund */
-  --lm-text-espresso: hsl(0, 10%, 27%); /* #4B3D3D - Für Serif-Headlines und Fließtext */
-  --lm-accent-sage: hsl(158, 55%, 78%); /* #A8E6CF - Für Erfolgsmeldungen/Icons */
-  
-  /* Legacy Support - wird via Lightmode-Variablen überschrieben */
-  --background: var(--lm-bg-bone);
-  --foreground: var(--lm-text-espresso);
-  
-  /* Laser-Effekt: Warmes Hellgelb für Lightmode (sichtbar auf hellem Hintergrund) */
-  --laser-core: #FFF5E6;
+  --primary-orange: hsl(14, 100%, 50%);
+  /* Kept for CTAs */
+
+  /* Lightmode */
+  --background: #FCF4E6;
+  /* Sand/Off-White */
+  --foreground: #2D3436;
+  /* Deep Charcoal */
+
+  /* Legacy/Helper */
+  --lm-bg-bone: #FCF4E6;
+  --lm-text-espresso: #2D3436;
 }
 
 .dark {
-  /* WICHTIG: Hintergrund bleibt UNVERÄNDERT (#0D0D0D) */
-  --background: #0D0D0D;
-  
-  /* Darkmode Surface & Borders (Spaceship UI) */
-  --dm-surface-teal: hsl(184, 96%, 9%); /* #012A2E - Für Card-Hintergründe oder Sektionstrennung */
-  --dm-border-slate: hsl(225, 17%, 26%); /* #383E4E - Für feine "Spaceship"-Linien */
-  --dm-text-main: hsl(0, 0%, 95%); /* Haupttext */
-  --dm-text-muted: hsl(225, 10%, 60%); /* Sekundärtext */
-  
-  /* Legacy Support */
-  --foreground: var(--dm-text-main);
-  
-  /* Laser-Effekt: Gleißendes Weiß für Darkmode */
-  --laser-core: #ffffff;
+  /* Darkmode */
+  --background: #1A1C1E;
+  /* Deep Sea Blue/Dark Slate */
+  --foreground: #E2D7CE;
+
+  /* Darkmode Surface & Borders */
+  --dm-surface-teal: #1A1C1E;
+  --dm-border-slate: #2D3436;
+  --dm-text-main: #E2D7CE;
+  --dm-text-muted: #A0A0A0;
+  /* Subtler gray */
 }
 
 body {
@@ -51,7 +44,10 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden; /* Wichtig für ScrollTrigger */
+  font-size: 18px;
+  /* Swiss Scientific Base Size */
+  overflow-x: hidden;
+  /* Wichtig für ScrollTrigger */
 }
 
 /* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
@@ -76,27 +72,31 @@ body {
 .glass-panel {
   /* Basis-Transparenz */
   background: rgba(255, 255, 255, 0.03);
-  
+
   /* Der kritische Blur */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  
+
   /* Ränder für Tiefe */
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05), /* Innerer Glanz */
-    0 20px 40px -20px rgba(0, 0, 0, 0.5); /* Weicher Schatten */
-    
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    /* Innerer Glanz */
+    0 20px 40px -20px rgba(0, 0, 0, 0.5);
+  /* Weicher Schatten */
+
   /* CHROME FIXES: */
-  transform: translateZ(0); /* Zwingt GPU Layer */
-  backface-visibility: hidden; /* Verhindert Flickering */
+  transform: translateZ(0);
+  /* Zwingt GPU Layer */
+  backface-visibility: hidden;
+  /* Verhindert Flickering */
 }
 
 /* Hover-Status für Glas */
 .group\/card:hover .glass-panel {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 
+  box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.1),
     0 30px 60px -30px rgba(0, 0, 0, 0.6);
 }
@@ -108,701 +108,642 @@ body {
    Instruction Manual Aesthetic
    ============================================ */
 @layer components {
-    /* Basis Glass-Panel: 1px präzise Linien, keine Schatten */
-    .glass-panel {
-      @apply backdrop-blur-xl rounded-2xl transition-all duration-500;
-      /* Lightmode: Subtile Linien */
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: rgba(255, 255, 255, 0.4);
-      /* Darkmode: Spaceship-Borders */
-    }
-    
-    .dark .glass-panel {
-      border: 1px solid var(--dm-border-slate);
-      background: var(--dm-surface-teal);
-    }
-    
-    /* CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
+
+  /* Basis Glass-Panel: 1px präzise Linien, keine Schatten */
+  .glass-panel {
+    @apply backdrop-blur-xl rounded-2xl transition-all duration-500;
+    /* Lightmode: Subtile Linien */
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.4);
+    /* Darkmode: Spaceship-Borders */
+  }
+
+  .dark .glass-panel {
+    border: 1px solid var(--dm-border-slate);
+    background: var(--dm-surface-teal);
+  }
+
+  /* CHROME FIX: backdrop-filter funktioniert NICHT auf Elementen mit 3D-Transforms!
      * Lösung: backdrop-filter auf separatem Layer ohne Transforms
      */
-    .glass-panel-backdrop {
-      /* Lightmode: Feine Linien */
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      /* Hintergrund mit höherer Opazität als Fallback */
-      background: rgba(255, 255, 255, 0.5);
-      /* Blur-Effekt: -webkit zuerst für Safari - auf Header-Niveau reduziert */
-      -webkit-backdrop-filter: blur(8px) saturate(150%);
-      backdrop-filter: blur(8px) saturate(150%);
-      /* WICHTIG: KEINE Transforms auf diesem Element! */
-    }
-    
-    .dark .glass-panel-backdrop {
-      border: 1px solid var(--dm-border-slate);
-      /* Höhere Opazität als Fallback */
-      background: rgba(13, 13, 13, 0.5);
-      -webkit-backdrop-filter: blur(8px) saturate(150%);
-      backdrop-filter: blur(8px) saturate(150%);
-    }
-    
-    /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
-    /* CHROME FIX: backdrop-filter wurde auf .glass-panel-backdrop verschoben */
-    /* Dieses Element hat nur noch Styling, KEIN backdrop-filter mehr */
-    .glass-panel-enhanced {
-      @apply rounded-2xl transition-all duration-500;
-      /* Position relative für stabile Positionierung */
-      position: relative;
-      /* Verhindert 3D-Vererbung auf das Element selbst */
-      transform-style: flat;
-      /* Border wird jetzt vom backdrop-Layer gehandhabt */
-      border: none;
-      background: transparent;
-    }
-    
-    .dark .glass-panel-enhanced {
-      border: none;
-      background: transparent;
-    }
-    
-    /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
-    /* Orange-Glow für kritische Features */
-    .glass-panel-enhanced.card-glow-orange:hover {
-      box-shadow: 0 0 15px rgba(255, 92, 0, 0.1); /* Lightmode: Subtiler Orange-Glow */
-    }
-    
-    .dark .glass-panel-enhanced.card-glow-orange:hover {
-      box-shadow: 0 0 20px rgba(255, 92, 0, 0.15); /* Darkmode: Dezenter Orange-Glow */
-    }
-    
-    /* Cyan-Glow für technische Micro-Interactions */
-    .glass-panel-enhanced.card-glow-cyan:hover {
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); /* Lightmode: Subtiler Cyan-Glow */
-    }
-    
-    .dark .glass-panel-enhanced.card-glow-cyan:hover {
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.15); /* Darkmode: Dezenter Cyan-Glow */
-    }
-    
-    /* Glassmorphismus für Header: Sanfter Blur mit mehr Durchscheinen */
-    /* Chrome benötigt position:relative für backdrop-filter */
-    .glass-header {
-      position: relative;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      background: rgba(255, 255, 255, 0.45); /* Mehr Transparenz für sanfteren Effekt */
-      -webkit-backdrop-filter: blur(8px) saturate(150%);
-      backdrop-filter: blur(8px) saturate(150%);
-    }
-    
-    .dark .glass-header {
-      border-bottom: 1px solid var(--dm-border-slate);
-      background: rgba(13, 13, 13, 0.55); /* Mehr Transparenz für sanfteren Effekt */
-      -webkit-backdrop-filter: blur(8px) saturate(150%);
-      backdrop-filter: blur(8px) saturate(150%);
-    }
-    
-    /* GPU-Acceleration für High-Performance Animationen */
-    /* CHROME-BUG FIX: will-change entfernt - bricht backdrop-filter bei Kind-Elementen! */
-    .gpu-render {
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      /* will-change: transform, opacity; ← ENTFERNT wegen Chrome backdrop-filter Bug */
-    }
-    
-    /* Performance: Reduziere Re-Paints bei statischen Elementen */
-    .hero-content-fade {
-      contain: layout style paint;
-    }
-    
-    /* Performance: contain entfernt - kann Scroll-Probleme verursachen */
-    
-    /* Hero-Text initial versteckt - verhindert FOUC */
-    .hero-text-reveal {
-      clip-path: inset(100% 0 0 0);
-      transform-origin: center bottom;
-    }
-    
-    /* Hero-Content initial versteckt - verhindert FOUC */
-    .hero-content-fade {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    
-    /* Spaceship UI: Button-System */
-    /* Primär: Solid Orange mit präziser Linie */
-    .btn-primary {
-      background: var(--primary-orange);
-      color: white;
-      border: 1px solid var(--primary-orange);
-      transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-      background: hsl(14, 100%, 45%);
-      border-color: hsl(14, 100%, 45%);
-      /* Dezenter Glow nur im Darkmode */
-    }
-    
-    .dark .btn-primary:hover {
-      box-shadow: 0 0 20px hsla(14, 100%, 50%, 0.25);
-    }
-    
-    /* Sekundär: Ghost-Button mit Slate-Kontur und Cyan-Hover */
-    .btn-secondary {
-      background: transparent;
-      color: var(--foreground);
-      transition: all 0.3s ease;
-      /* Lightmode: Espresso-Border */
-      border: 1px solid rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-secondary:hover {
-      /* Lightmode: Espresso-Hover */
-      border-color: var(--lm-text-espresso);
-      color: var(--lm-text-espresso);
-    }
-    
-    /* Darkmode: Slate-Border mit Cyan-Hover */
-    .dark .btn-secondary {
-      border-color: var(--dm-border-slate);
-    }
-    
-    .dark .btn-secondary:hover {
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      box-shadow: 0 0 15px hsla(180, 100%, 50%, 0.2);
-    }
-    
-    
-    /* Texturierte Oberfläche: Paper-Feel mit weichem Theme-Übergang */
-    .textured-surface {
-      background-color: var(--background);
-      transition: background-color 0.5s ease;
-    }
-    
-    /* Optionaler Hard-Fix für Safari: Deaktiviere Filter-Effekte während des Scrollens */
-    /* .is-scrolling .cinematic-overlay-container { pointer-events: none; } */
-    
-    /* 3D Perspective Container für Fluid Reveal Scroll-Animationen */
-    /* CHROME FIX: perspective und preserve-3d entfernt - bricht backdrop-filter! */
-    /* Die perspective wird jetzt direkt in den GSAP-Animationen auf Element-Ebene gesetzt */
-    
-    /* Verbessert das Subpixel-Rendering */
-    #main-content {
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-    }
-    
-    /* Hide Scrollbar für Scroll-Container */
-    .hide-scrollbar {
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE/Edge */
-    }
-    
-    .hide-scrollbar::-webkit-scrollbar {
-      display: none; /* Chrome/Safari */
-    }
-    
-    /* GLASS CARD BACKGROUND - PERFORMANCE OPTIMIERT
+  .glass-panel-backdrop {
+    /* Lightmode: Feine Linien */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    /* Hintergrund mit höherer Opazität als Fallback */
+    background: rgba(255, 255, 255, 0.5);
+    /* Blur-Effekt: -webkit zuerst für Safari - auf Header-Niveau reduziert */
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    backdrop-filter: blur(8px) saturate(150%);
+    /* WICHTIG: KEINE Transforms auf diesem Element! */
+  }
+
+  .dark .glass-panel-backdrop {
+    border: 1px solid var(--dm-border-slate);
+    /* Höhere Opazität als Fallback */
+    background: rgba(13, 13, 13, 0.5);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    backdrop-filter: blur(8px) saturate(150%);
+  }
+
+  /* Erweiterter Glas-Effekt für Fluid 3D Reveal Cards */
+  /* CHROME FIX: backdrop-filter wurde auf .glass-panel-backdrop verschoben */
+  /* Dieses Element hat nur noch Styling, KEIN backdrop-filter mehr */
+  .glass-panel-enhanced {
+    @apply rounded-2xl transition-all duration-500;
+    /* Position relative für stabile Positionierung */
+    position: relative;
+    /* Verhindert 3D-Vererbung auf das Element selbst */
+    transform-style: flat;
+    /* Border wird jetzt vom backdrop-Layer gehandhabt */
+    border: none;
+    background: transparent;
+  }
+
+  .dark .glass-panel-enhanced {
+    border: none;
+    background: transparent;
+  }
+
+  /* Dynamischer Glow-Effekt für Karten (Darkmode & Lightmode) */
+  /* Orange-Glow für kritische Features */
+  /* Glows and Glass Removed for Swiss Scientific Design */
+
+  /* GPU-Acceleration für High-Performance Animationen */
+  /* CHROME-BUG FIX: will-change entfernt - bricht backdrop-filter bei Kind-Elementen! */
+  .gpu-render {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* will-change: transform, opacity; ← ENTFERNT wegen Chrome backdrop-filter Bug */
+  }
+
+  /* Performance: Reduziere Re-Paints bei statischen Elementen */
+  .hero-content-fade {
+    contain: layout style paint;
+  }
+
+  /* Performance: contain entfernt - kann Scroll-Probleme verursachen */
+
+  /* Hero-Text initial versteckt - verhindert FOUC */
+  .hero-text-reveal {
+    clip-path: inset(100% 0 0 0);
+    transform-origin: center bottom;
+  }
+
+  /* Hero-Content initial versteckt - verhindert FOUC */
+  .hero-content-fade {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  /* Spaceship UI: Button-System */
+  /* Primär: Solid Orange mit präziser Linie */
+  .btn-primary {
+    background: var(--primary-orange);
+    color: white;
+    border: 1px solid var(--primary-orange);
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: hsl(14, 100%, 45%);
+    border-color: hsl(14, 100%, 45%);
+    /* Dezenter Glow nur im Darkmode */
+  }
+
+  .dark .btn-primary:hover {
+    box-shadow: 0 0 20px hsla(14, 100%, 50%, 0.25);
+  }
+
+  /* Sekundär: Ghost-Button mit Slate-Kontur und Cyan-Hover */
+  .btn-secondary {
+    background: transparent;
+    color: var(--foreground);
+    transition: all 0.3s ease;
+    /* Lightmode: Espresso-Border */
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-secondary:hover {
+    /* Lightmode: Espresso-Hover */
+    border-color: var(--lm-text-espresso);
+    color: var(--lm-text-espresso);
+  }
+
+  /* Darkmode: Slate-Border mit Cyan-Hover */
+  .dark .btn-secondary {
+    border-color: var(--dm-border-slate);
+  }
+
+  .dark .btn-secondary:hover {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 15px hsla(180, 100%, 50%, 0.2);
+  }
+
+
+  /* Texturierte Oberfläche: Paper-Feel mit weichem Theme-Übergang */
+  .textured-surface {
+    background-color: var(--background);
+    transition: background-color 0.5s ease;
+  }
+
+  /* Optionaler Hard-Fix für Safari: Deaktiviere Filter-Effekte während des Scrollens */
+  /* .is-scrolling .cinematic-overlay-container { pointer-events: none; } */
+
+  /* 3D Perspective Container für Fluid Reveal Scroll-Animationen */
+  /* CHROME FIX: perspective und preserve-3d entfernt - bricht backdrop-filter! */
+  /* Die perspective wird jetzt direkt in den GSAP-Animationen auf Element-Ebene gesetzt */
+
+  /* Verbessert das Subpixel-Rendering */
+  #main-content {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Hide Scrollbar für Scroll-Container */
+  .hide-scrollbar {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+  }
+
+  /* GLASS CARD BACKGROUND - PERFORMANCE OPTIMIERT
        Mobile: Solides RGBA ohne backdrop-filter (spart GPU)
        Desktop: Sanfter Blur als Enhancement
     */
+  .glass-card-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 2rem;
+    overflow: hidden;
+
+    /* Solider Hintergrund als Basis - Mobile-First */
+    background: rgba(15, 15, 15, 0.88);
+
+    /* Border und Schatten */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 20px 40px -15px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+    /* Smooth transition */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  /* Desktop Enhancement: Backdrop-Blur nur wenn hover unterstützt wird */
+  @media (hover: hover) and (min-width: 768px) {
     .glass-card-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      border-radius: 2rem;
-      overflow: hidden;
-      
-      /* Solider Hintergrund als Basis - Mobile-First */
-      background: rgba(15, 15, 15, 0.88);
-      
-      /* Border und Schatten */
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 
-        0 20px 40px -15px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.03);
-      
-      /* Smooth transition */
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    /* Desktop Enhancement: Backdrop-Blur nur wenn hover unterstützt wird */
-    @media (hover: hover) and (min-width: 768px) {
-      .glass-card-bg {
-        background: linear-gradient(
-          135deg,
+      background: linear-gradient(135deg,
           rgba(25, 25, 30, 0.85) 0%,
           rgba(18, 18, 22, 0.90) 50%,
-          rgba(22, 22, 26, 0.87) 100%
-        );
-        -webkit-backdrop-filter: blur(12px) saturate(120%);
-        backdrop-filter: blur(12px) saturate(120%);
-      }
-    }
-    
-    /* Badge-Styles für Mobile ohne Blur */
-    .glass-card-badge {
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-      background: rgba(0, 0, 0, 0.4);
-    }
-    
-    @media (hover: hover) and (min-width: 768px) {
-      .glass-card-badge {
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-        background: rgba(0, 0, 0, 0.25);
-      }
-    }
-    
-    /* Noise-Textur - NUR auf Desktop mit hover */
-    @media (hover: hover) and (min-width: 768px) {
-      .glass-card-bg::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: 2rem;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        background-size: 150px 150px;
-        opacity: 0.05;
-        mix-blend-mode: soft-light;
-        pointer-events: none;
-        z-index: 1;
-      }
-      
-      /* Innerer Glanz-Effekt (nur Desktop) */
-      .glass-card-bg::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 35%;
-        border-radius: 2rem 2rem 50% 50%;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.04) 0%,
-          rgba(255, 255, 255, 0.01) 50%,
-          transparent 100%
-        );
-        pointer-events: none;
-        z-index: 2;
-      }
-    }
-    
-    /* Hover-Effekt für Glass Card - Subtiler Border-Glow */
-    .group\/card:hover .glass-card-bg {
-      border-color: var(--accent-color, #FF5C00);
-      box-shadow: 
-        0 20px 40px -15px rgba(0, 0, 0, 0.5),
-        0 0 20px -8px var(--accent-color, #FF5C00),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    }
-    
-    /* Desktop: Etwas hellerer Hintergrund bei Hover */
-    @media (hover: hover) and (min-width: 768px) {
-      .group\/card:hover .glass-card-bg {
-        background: linear-gradient(
-          135deg,
-          rgba(30, 30, 35, 0.88) 0%,
-          rgba(22, 22, 26, 0.92) 50%,
-          rgba(26, 26, 30, 0.89) 100%
-        );
-      }
-    }
-    
-    /* Laser-Glow-Effekt für "German" im Hero-Titel */
-    .laser-text {
-      position: relative;
-      display: inline-block;
-      
-      /* Basis-Gradient: Wir nutzen CSS-Variablen für den Laser-Kern */
-      background: linear-gradient(
-        90deg,
-        #FF5C00 0%,
-        #FF5C00 42%,
-        var(--laser-core) 50%,
-        #FF5C00 58%,
-        #FF5C00 100%
-      );
-      
-      background-size: 200% 100%;
-      
-      /* Maskierung auf den Text */
-      -webkit-background-clip: text;
-      background-clip: text;
-      
-      /* Füllung komplett weg, damit nur der Gradient-Background zählt */
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-      
-      /* Animation: Schneller und linearer für mehr "Energie" */
-      animation: text-laser-sweep 2.5s infinite linear;
-      
-      /* Kein Filter außen, um die Buchstabenkanten sauber zu halten */
-      filter: none;
-      
-      /* Verhindert Rendering-Artefakte an den Rändern */
-      -webkit-font-smoothing: antialiased;
-      
-      /* GPU-Beschleunigung für flüssige Animation */
-      transform: translateZ(0);
-      will-change: background-position;
-    }
-    
-    /* Keyframes für Laser-Sweep-Animation */
-    @keyframes text-laser-sweep {
-      0% {
-        background-position: 150% 0;
-      }
-      100% {
-        background-position: -50% 0;
-      }
-    }
-    
-    /* Cinematic Overlay: Grain-Shift Animation (GPU-beschleunigt) */
-    @keyframes grain-shift {
-      0%, 100% { 
-        transform: translate(0, 0) translateZ(0); 
-      }
-      25% { 
-        transform: translate(-2px, 2px) translateZ(0); 
-      }
-      50% { 
-        transform: translate(2px, -2px) translateZ(0); 
-      }
-      75% { 
-        transform: translate(-1px, -1px) translateZ(0); 
-      }
-    }
-    
-    /* ============================================
-       PERFORMANCE OPTIMIERUNGEN
-       CPU/GPU Entlastung ohne visuelle Änderungen
-       ============================================ */
-    
-    /* PERFORMANCE: Hintergrund-Container - isolierter Rendering-Layer */
-    /* WICHTIG: Kein "contain" - das bricht backdrop-filter auf Kind-Elementen! */
-    .liquid-background-container,
-    .neural-background-container {
-      /* Verhindere unnötige Pointer-Events */
-      pointer-events: none;
-      /* GPU-Layer */
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      /* Verhindere Overflow-Berechnungen */
-      overflow: hidden;
-    }
-    
-    /* PERFORMANCE: Canvas-Elemente */
-    .liquid-background-container canvas,
-    .neural-background-container canvas {
-      /* Optimiere Rendering-Pipeline */
-      image-rendering: optimizeSpeed;
-    }
-    
-    /* PERFORMANCE: Marquee-Animation - nur transform, kein Repaint */
-    .animate-marquee {
-      will-change: transform;
-      backface-visibility: hidden;
-    }
-    
-    /* PERFORMANCE & UTILS */
-    /* hide-scrollbar wurde oben bereits definiert */
-    
-    /* ============================================
-       PREMIUM INTERACTIVE CARD FEATURES
-       Awwwards-Standard: 3D Flip, Spotlight, Tilt
-       ============================================ */
-    
-    /* Interactive Container - Vereinfacht ohne Tilt */
-    .card-interactive-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      /* Perspective nur für Flip-Animation (wenn vorhanden) */
-      perspective: 1200px;
-      perspective-origin: center center;
-      pointer-events: auto !important;
-    }
-    
-    /* Dekorative Elemente ohne Interaktion */
-    .card-interactive-container .watermark-parallax,
-    .card-interactive-container .watermark-glow,
-    .card-interactive-container .card-flip-glow {
-      pointer-events: none;
-    }
-    
-    /* 3D Flip-Container - Verbesserte Perspective für echte 180° Drehung */
-    .card-flip-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transform-style: preserve-3d;
-      /* Perspective wird inline gesetzt */
-    }
-    
-    /* Glow-Effekt während Flip-Animation */
-    .card-flip-glow {
-      position: absolute;
-      inset: -4px;
-      border-radius: 2rem;
-      border: 2px solid transparent;
-      opacity: 0;
-      pointer-events: none;
-      z-index: -1;
-      filter: blur(10px);
-      transition: opacity 0.3s ease;
-    }
-    
-    /* EXPANDING FLIP-INDICATOR (Expanding Pill Design) */
-    .flip-indicator-container {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      z-index: 30;
-      cursor: pointer;
-      
-      /* Pill-Shape */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 40px;
-      width: 40px; /* Initial: Kreis */
-      border-radius: 9999px; /* Pill-Form */
-      
-      /* Sehr intransparent - solider, herausstechender Button */
-      background: rgba(25, 25, 30, 0.95);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: none; /* KEIN Border */
-      
-      /* Initial: Versteckt */
-      opacity: 0;
-      transform: scale(0.8);
-      
-      /* Smooth Expansion */
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
-      
-      color: rgba(255, 255, 255, 0.95);
-      /* KEIN Glow-Effekt */
-      box-shadow: none;
-    }
-    
-    /* Hover auf Card: Indicator wird sichtbar */
-    .card-interactive-container:hover .flip-indicator-container {
-      opacity: 1;
-      transform: scale(1);
-    }
-    
-    /* Hover auf Indicator selbst: Expandiert zur Pill mit Text - OHNE Border */
-    .flip-indicator-container:hover {
-      width: 160px; /* Expandiert für Text */
-      background: rgba(30, 30, 35, 0.98);
-      border: none; /* KEIN Border */
-      /* KEIN Glow - nur solider, intransparenter Button */
-      box-shadow: none;
-    }
-    
-    /* Icon im Indicator */
-    .flip-indicator-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Icon rotiert bei Hover um 180° */
-    .flip-indicator-container:hover .flip-indicator-icon {
-      transform: rotate(-180deg);
-    }
-    
-    /* Text im Indicator */
-    .flip-indicator-text {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      color: white;
-      
-      /* Initial versteckt */
-      max-width: 0;
-      opacity: 0;
-      margin-left: 0;
-      
-      /* Smooth reveal */
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* Text wird bei Hover sichtbar */
-    .flip-indicator-container:hover .flip-indicator-text {
-      max-width: 120px;
-      opacity: 1;
-      margin-left: 8px;
-    }
-    
-    /* ============================================
-       MOBILE TOUCH SUPPORT (hover: none)
-       Flip-Indicator ist auf Touch-Geräten IMMER expandiert
-       ============================================ */
-    @media (hover: none) {
-      /* Flip-Indicator: Immer sichtbar und expandiert auf Touch - OHNE Border */
-      .flip-indicator-container {
-        opacity: 1 !important;
-        transform: scale(1) !important;
-        width: 110px; /* Kompaktere Breite für Mobile */
-        background: rgba(25, 25, 30, 0.95);
-        border: none; /* KEIN Border */
-        /* KEIN Glow - solider, intransparenter Button */
-        box-shadow: none;
-      }
-      
-      /* Text immer sichtbar auf Touch */
-      .flip-indicator-container .flip-indicator-text {
-        max-width: 80px;
-        opacity: 1;
-        margin-left: 6px;
-      }
-      
-      /* Active-State für Touch-Feedback */
-      .flip-indicator-container:active {
-        transform: scale(0.95) !important;
-        background: rgba(35, 35, 40, 0.98);
-      }
-    }
-    
-    /* Card Faces (Front & Back) - Verbesserte 3D-Drehung */
-    .card-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border-radius: 2rem;
-      overflow: hidden;
-      /* Kein Rahmen hier - nur der dynamische Rahmen am glass-card-bg */
-      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
-    }
-    
-    .card-face-front {
-      transform: rotateY(0deg) translateZ(1px);
-    }
-    
-    .card-face-back {
-      transform: rotateY(180deg) translateZ(1px);
-    }
-    
-    /* Bug 1 Fix: Simple Card ohne Flip-Animation - für Feature-Karten */
-    .card-simple-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .card-face-simple {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: 2rem;
-      overflow: hidden;
-      box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
-    }
-    
-    
-    /* Shimmer-Effekt wurde entfernt - stattdessen Border-Glow auf .glass-card-bg */
-    
-    /* Watermark Parallax & Glow */
-    .watermark-parallax {
-      transition: transform 0.1s ease-out;
-    }
-    
-    .watermark-glow {
-      filter: drop-shadow(0 0 0px currentColor);
-      transition: filter 0.3s ease;
-    }
-    
-    .card-interactive-container:hover .watermark-glow {
-      filter: drop-shadow(0 0 20px currentColor);
-    }
-    
-    /* Badge/Label Glow-Effekt (wie Watermark) */
-    .badge-glow {
-      filter: drop-shadow(0 0 0px var(--badge-color, currentColor));
-      transition: filter 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .card-interactive-container:hover .badge-glow {
-      filter: drop-shadow(0 0 15px var(--badge-color, currentColor));
-      box-shadow: 0 0 20px calc(var(--badge-color, currentColor) + "40");
-    }
-    
-    /* Level-Label Glow-Effekt für Courses */
-    .level-label-glow {
-      filter: drop-shadow(0 0 0px var(--level-color, currentColor));
-      transition: filter 0.3s ease, text-shadow 0.3s ease;
-    }
-    
-    .card-interactive-container:hover .level-label-glow {
-      filter: drop-shadow(0 0 12px var(--level-color, currentColor));
-      text-shadow: 0 0 20px var(--level-color, currentColor);
-    }
-    
-    /* Variable Font Weight für Price */
-    .price-variable-font {
-      transition: font-weight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      font-weight: 400;
-    }
-    
-    .card-interactive-container:hover .price-variable-font {
-      font-weight: 700;
-    }
-    
-    /* PERFORMANCE: Reduziere Animationen bei Präferenz */
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-      
-      .animate-marquee {
-        animation: none !important;
-      }
-      
-      .laser-text {
-        animation: none !important;
-        background: var(--primary-orange) !important;
-        -webkit-background-clip: text !important;
-        background-clip: text !important;
-      }
-      
-      .card-flip-container {
-        transition: none !important;
-      }
-      
-      .card-tilt {
-        transform: none !important;
-      }
-      
-      .watermark-parallax {
-        transform: none !important;
-      }
+          rgba(22, 22, 26, 0.87) 100%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+      backdrop-filter: blur(12px) saturate(120%);
     }
   }
 
-  /* Scrollbar Hide Utility */
-  .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  /* Badge-Styles für Mobile ohne Blur */
+  .glass-card-badge {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.4);
   }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
+
+  @media (hover: hover) and (min-width: 768px) {
+    .glass-card-badge {
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.25);
+    }
   }
+
+  /* Noise-Textur - NUR auf Desktop mit hover */
+  @media (hover: hover) and (min-width: 768px) {
+    .glass-card-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 2rem;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 150px 150px;
+      opacity: 0.05;
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Innerer Glanz-Effekt (nur Desktop) */
+    .glass-card-bg::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 35%;
+      border-radius: 2rem 2rem 50% 50%;
+      background: linear-gradient(180deg,
+          rgba(255, 255, 255, 0.04) 0%,
+          rgba(255, 255, 255, 0.01) 50%,
+          transparent 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+  }
+
+  /* Hover-Effekt für Glass Card - Subtiler Border-Glow */
+  .group\/card:hover .glass-card-bg {
+    border-color: var(--accent-color, #FF5C00);
+    box-shadow:
+      0 20px 40px -15px rgba(0, 0, 0, 0.5),
+      0 0 20px -8px var(--accent-color, #FF5C00),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* Desktop: Etwas hellerer Hintergrund bei Hover */
+  @media (hover: hover) and (min-width: 768px) {
+    .group\/card:hover .glass-card-bg {
+      background: linear-gradient(135deg,
+          rgba(30, 30, 35, 0.88) 0%,
+          rgba(22, 22, 26, 0.92) 50%,
+          rgba(26, 26, 30, 0.89) 100%);
+    }
+  }
+
+  /* Laser/Neon removed for Swiss Scientific Design */
+  .laser-text {
+    color: var(--primary-orange);
+  }
+
+  /* Laser/Neon removed */
+
+  /* Cinematic Overlay: Grain-Shift Animation (GPU-beschleunigt) */
+  @keyframes grain-shift {
+
+    0%,
+    100% {
+      transform: translate(0, 0) translateZ(0);
+    }
+
+    25% {
+      transform: translate(-2px, 2px) translateZ(0);
+    }
+
+    50% {
+      transform: translate(2px, -2px) translateZ(0);
+    }
+
+    75% {
+      transform: translate(-1px, -1px) translateZ(0);
+    }
+  }
+
+  /* ============================================
+       PERFORMANCE OPTIMIERUNGEN
+       CPU/GPU Entlastung ohne visuelle Änderungen
+       ============================================ */
+
+  /* PERFORMANCE: Hintergrund-Container - isolierter Rendering-Layer */
+  /* WICHTIG: Kein "contain" - das bricht backdrop-filter auf Kind-Elementen! */
+  .liquid-background-container,
+  .neural-background-container {
+    /* Verhindere unnötige Pointer-Events */
+    pointer-events: none;
+    /* GPU-Layer */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Verhindere Overflow-Berechnungen */
+    overflow: hidden;
+  }
+
+  /* PERFORMANCE: Canvas-Elemente */
+  .liquid-background-container canvas,
+  .neural-background-container canvas {
+    /* Optimiere Rendering-Pipeline */
+    image-rendering: optimizeSpeed;
+  }
+
+  /* PERFORMANCE: Marquee-Animation - nur transform, kein Repaint */
+  .animate-marquee {
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* PERFORMANCE & UTILS */
+  /* hide-scrollbar wurde oben bereits definiert */
+
+  /* ============================================
+       PREMIUM INTERACTIVE CARD FEATURES
+       Awwwards-Standard: 3D Flip, Spotlight, Tilt
+       ============================================ */
+
+  /* Interactive Container - Vereinfacht ohne Tilt */
+  .card-interactive-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    /* Perspective nur für Flip-Animation (wenn vorhanden) */
+    perspective: 1200px;
+    perspective-origin: center center;
+    pointer-events: auto !important;
+  }
+
+  /* Dekorative Elemente ohne Interaktion */
+  .card-interactive-container .watermark-parallax,
+  .card-interactive-container .watermark-glow,
+  .card-interactive-container .card-flip-glow {
+    pointer-events: none;
+  }
+
+  /* 3D Flip-Container - Verbesserte Perspective für echte 180° Drehung */
+  .card-flip-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    /* Perspective wird inline gesetzt */
+  }
+
+  /* Glow-Effekt während Flip-Animation */
+  .card-flip-glow {
+    position: absolute;
+    inset: -4px;
+    border-radius: 2rem;
+    border: 2px solid transparent;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(10px);
+    transition: opacity 0.3s ease;
+  }
+
+  /* EXPANDING FLIP-INDICATOR (Expanding Pill Design) */
+  .flip-indicator-container {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 30;
+    cursor: pointer;
+
+    /* Pill-Shape */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    /* Initial: Kreis */
+    border-radius: 9999px;
+    /* Pill-Form */
+
+    /* Sehr intransparent - solider, herausstechender Button */
+    background: rgba(25, 25, 30, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: none;
+    /* KEIN Border */
+
+    /* Initial: Versteckt */
+    opacity: 0;
+    transform: scale(0.8);
+
+    /* Smooth Expansion */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+
+    color: rgba(255, 255, 255, 0.95);
+    /* KEIN Glow-Effekt */
+    box-shadow: none;
+  }
+
+  /* Hover auf Card: Indicator wird sichtbar */
+  .card-interactive-container:hover .flip-indicator-container {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Hover auf Indicator selbst: Expandiert zur Pill mit Text - OHNE Border */
+  .flip-indicator-container:hover {
+    width: 160px;
+    /* Expandiert für Text */
+    background: rgba(30, 30, 35, 0.98);
+    border: none;
+    /* KEIN Border */
+    /* KEIN Glow - nur solider, intransparenter Button */
+    box-shadow: none;
+  }
+
+  /* Icon im Indicator */
+  .flip-indicator-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Icon rotiert bei Hover um 180° */
+  .flip-indicator-container:hover .flip-indicator-icon {
+    transform: rotate(-180deg);
+  }
+
+  /* Text im Indicator */
+  .flip-indicator-text {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: white;
+
+    /* Initial versteckt */
+    max-width: 0;
+    opacity: 0;
+    margin-left: 0;
+
+    /* Smooth reveal */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Text wird bei Hover sichtbar */
+  .flip-indicator-container:hover .flip-indicator-text {
+    max-width: 120px;
+    opacity: 1;
+    margin-left: 8px;
+  }
+
+  /* ============================================
+       MOBILE TOUCH SUPPORT (hover: none)
+       Flip-Indicator ist auf Touch-Geräten IMMER expandiert
+       ============================================ */
+  @media (hover: none) {
+
+    /* Flip-Indicator: Immer sichtbar und expandiert auf Touch - OHNE Border */
+    .flip-indicator-container {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+      width: 110px;
+      /* Kompaktere Breite für Mobile */
+      background: rgba(25, 25, 30, 0.95);
+      border: none;
+      /* KEIN Border */
+      /* KEIN Glow - solider, intransparenter Button */
+      box-shadow: none;
+    }
+
+    /* Text immer sichtbar auf Touch */
+    .flip-indicator-container .flip-indicator-text {
+      max-width: 80px;
+      opacity: 1;
+      margin-left: 6px;
+    }
+
+    /* Active-State für Touch-Feedback */
+    .flip-indicator-container:active {
+      transform: scale(0.95) !important;
+      background: rgba(35, 35, 40, 0.98);
+    }
+  }
+
+  /* Card Faces (Front & Back) - Verbesserte 3D-Drehung */
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 2rem;
+    overflow: hidden;
+    /* Kein Rahmen hier - nur der dynamische Rahmen am glass-card-bg */
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+  }
+
+  .card-face-front {
+    transform: rotateY(0deg) translateZ(1px);
+  }
+
+  .card-face-back {
+    transform: rotateY(180deg) translateZ(1px);
+  }
+
+  /* Bug 1 Fix: Simple Card ohne Flip-Animation - für Feature-Karten */
+  .card-simple-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .card-face-simple {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 2rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+  }
+
+
+  /* Shimmer-Effekt wurde entfernt - stattdessen Border-Glow auf .glass-card-bg */
+
+  /* Watermark Parallax & Glow */
+  .watermark-parallax {
+    transition: transform 0.1s ease-out;
+  }
+
+  .watermark-glow {
+    filter: drop-shadow(0 0 0px currentColor);
+    transition: filter 0.3s ease;
+  }
+
+  .card-interactive-container:hover .watermark-glow {
+    filter: drop-shadow(0 0 20px currentColor);
+  }
+
+  /* Badge/Label Glow-Effekt (wie Watermark) */
+  .badge-glow {
+    filter: drop-shadow(0 0 0px var(--badge-color, currentColor));
+    transition: filter 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card-interactive-container:hover .badge-glow {
+    filter: drop-shadow(0 0 15px var(--badge-color, currentColor));
+    box-shadow: 0 0 20px calc(var(--badge-color, currentColor) + "40");
+  }
+
+  /* Level-Label Glow-Effekt für Courses */
+  .level-label-glow {
+    filter: drop-shadow(0 0 0px var(--level-color, currentColor));
+    transition: filter 0.3s ease, text-shadow 0.3s ease;
+  }
+
+  .card-interactive-container:hover .level-label-glow {
+    filter: drop-shadow(0 0 12px var(--level-color, currentColor));
+    text-shadow: 0 0 20px var(--level-color, currentColor);
+  }
+
+  /* Variable Font Weight für Price */
+  .price-variable-font {
+    transition: font-weight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 400;
+  }
+
+  .card-interactive-container:hover .price-variable-font {
+    font-weight: 700;
+  }
+
+  /* PERFORMANCE: Reduziere Animationen bei Präferenz */
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .animate-marquee {
+      animation: none !important;
+    }
+
+    .laser-text {
+      animation: none !important;
+      background: var(--primary-orange) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+    }
+
+    .card-flip-container {
+      transition: none !important;
+    }
+
+    .card-tilt {
+      transform: none !important;
+    }
+
+    .watermark-parallax {
+      transform: none !important;
+    }
+  }
+}
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}

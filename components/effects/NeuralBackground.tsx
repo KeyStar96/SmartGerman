@@ -10,32 +10,31 @@ import { gsap } from "@/lib/gsap";
  * auf allen Bildschirmgrößen und Browsern
  */
 const CONFIG = {
-  // Gitter & Dichte - REDUZIERT für bessere Performance
-  neuronDensity: 0.0004,      // 50% weniger Partikel (war 0.0008)
-  connectionDistance: 120,    // Kürzere Verbindungen (war 120)
-  viewportPadding: 150,       // Weniger Padding (war 200)
-  gridCellSize: 200,          // Größere Zellen = weniger Partikel (war 150)          
+  // Gitter & Dichte
+  neuronDensity: 0.0004,
+  connectionDistance: 120,
+  viewportPadding: 150,
+  gridCellSize: 200,
 
-  // "Freies Schwimmen"
+  // "Freies Schwimmen" - EXTREM LANGSAM (Drift)
   wanderRadius: 1,
-  wanderSpeed: 0.015,
+  wanderSpeed: 0.002, // Fast unmerklich
   springStiffness: 0.04,
 
   // Sanfte Maus-Interaktion
   mouseInteractionRadius: 250,
-  mouseForce: 0.003,
+  mouseForce: 0.001, // Reduziert
   damping: 0.95,
 
-  // Signale - ZEIT-BASIERT für konsistente Geschwindigkeit
-  // signalSpeedPixelsPerSecond: Absolute Geschwindigkeit in Pixeln pro Sekunde
-  signalSpeedPixelsPerSecond: 150,  // Pixel pro Sekunde
-  signalLength: 120,
-  signalDecay: 0.6,
-  minSignalStrength: 0.15,
+  // Signale - DEAKTIVIERT
+  signalSpeedPixelsPerSecond: 0,
+  signalLength: 0,
+  signalDecay: 0,
+  minSignalStrength: 1,
 
   // Optik Basis
   particleSize: 2,
-  flashDecayPerSecond: 2.0,   // Flash klingt mit 2.0 pro Sekunde ab
+  flashDecayPerSecond: 2.0,
 
   // 3D Z-Dimension
   zDepthRange: 400,
@@ -43,19 +42,17 @@ const CONFIG = {
   zSizeScale: 0.8,
   zBlurLayers: 3,
 
-  // Auto-Impulse
-  autoPulseEnabled: true,
-  autoPulseMinDelay: 2000,
-  autoPulseMaxDelay: 4000,
+  // Auto-Impulse - DEAKTIVIERT
+  autoPulseEnabled: false,
+  autoPulseMinDelay: 999999,
+  autoPulseMaxDelay: 999999,
 
-  // Ruhe-Puls-Animation
-  idlePulseEnabled: true,
-  idlePulseIntensity: 0.6,
-  idlePulseSpeed: 0.05,
+  // Ruhe-Puls-Animation - DEAKTIVIERT
+  idlePulseEnabled: false,
+  idlePulseIntensity: 0,
+  idlePulseSpeed: 0,
 
-  // Trail-Effekt: Wie schnell der Glow hinter dem Impuls über ZEIT verblasst
-  // Niedrigerer Wert = länger sichtbarer Trail (langsameres Verblassen)
-  trailDecayPerSecond: 1.2,  // Intensität pro Sekunde, die abgezogen wird (erhöht für kürzeren Trail)
+  trailDecayPerSecond: 1.2,
 } as const;
 
 // PERFORMANCE: Pre-computed Math constants
@@ -88,14 +85,14 @@ const fastCos = (angle: number): number => {
 // Farb-Konfigurationen für Light/Dark
 const THEME_COLORS = {
   dark: {
-    neuron: "255, 255, 255",
-    signal: "255, 92, 0",
-    lineOpacity: 0.06,
+    neuron: "226, 215, 206", // Bone
+    signal: "226, 215, 206",
+    lineOpacity: 0.2, // Höher, da global opacity niedrig ist
   },
   light: {
-    neuron: "10, 10, 10",
-    signal: "235, 80, 0",
-    lineOpacity: 0.04,
+    neuron: "30, 58, 138", // Deep Blue (e.g. Blue 900)
+    signal: "30, 58, 138",
+    lineOpacity: 0.2,
   }
 };
 
@@ -215,7 +212,7 @@ export default function NeuralBackground() {
     const handleHeroComplete = () => {
       if (containerRef.current) {
         gsap.to(containerRef.current, {
-          opacity: 1,
+          opacity: 0.08, // Extrem subtil
           duration: 1.5,
           ease: "power2.out",
         });
