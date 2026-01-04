@@ -19,10 +19,10 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
   const [isTyping, setIsTyping] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [triggerLaser, setTriggerLaser] = useState(false);
 
   // Text Content
-  const brandText = "SmartGerman.";
-  // We use the claim from the user request, which matches the second part of the previous headline
+  // Split Brand: Smart (Mono/Anthracite) + German (Orange/Laser)
   const claimText = "Spracherwerb durch Wissenschaft.";
   const claimChars = claimText.split("");
 
@@ -42,6 +42,9 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
     const tl = gsap.timeline({
       onComplete: () => {
         setIsTyping(false);
+        // Trigger Laser on "German"
+        setTriggerLaser(true);
+
         // Cursor cleanup
         gsap.to(cursorRef.current, {
           opacity: 0,
@@ -74,8 +77,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       .to(claimCharElements, {
         display: "inline-block",
         opacity: 1,
-        duration: 0.1, // Slower type speed effect visually
-        stagger: 0.1,  // Slow stagger for "mechanical" feel
+        duration: 0.1,
+        stagger: 0.12,  // Slower stagger (0.12s) for intellectual weight
         ease: "none",
       }, "+=0.5")
 
@@ -102,7 +105,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       ref={container}
       className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-52 pb-20"
     >
-      {/* Glitch Overlay - Active only during typing for the 'Monitor' look */}
+      {/* Glitch Overlay - Monitor look during typing */}
       {isTyping && (
         <div className="absolute inset-0 z-20 pointer-events-none scanline-overlay opacity-30 transition-opacity duration-500" />
       )}
@@ -116,12 +119,19 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         {/* Text Content (Cols 2-8) */}
         <div className="col-span-1 lg:col-span-7 flex flex-col justify-start text-left">
 
-          {/* Block A: Brand (Sans-Serif Bold) */}
+          {/* Block A: Brand Split */}
           <h1
             ref={brandRef}
-            className="text-6xl md:text-8xl font-bold tracking-tighter leading-none text-[#2D3436] dark:text-[#E2D7CE] font-sans mb-4"
+            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline"
           >
-            {brandText}
+            <span className="font-bold text-[#2D3436] dark:text-[#E2D7CE]">Smart</span>
+            {/* German: Orange with Conditional Laser Scan */}
+            <span
+              className={`font-bold text-[#FF5C00] ${triggerLaser ? 'animate-laser-scan' : ''}`}
+              style={{ paddingLeft: '2px' }} // Slight visual separation
+            >
+              German
+            </span>
           </h1>
 
           {/* Block B: Claim (Monospace Typewriter) */}
@@ -135,7 +145,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
                 {char === " " ? "\u00A0" : char}
               </span>
             ))}
-            <span ref={cursorRef} className="cursor-blink inline-block text-[#2D3436] dark:text-[#E2D7CE] font-bold ml-1">_</span>
+            <span ref={cursorRef} className="cursor-blink inline-block text-[#FF5C00] font-bold ml-1">_</span>
           </h2>
 
           {/* Subline: Clean Sans-Serif */}
@@ -149,9 +159,9 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* CTAs: Scientific Protocol Style */}
           <div ref={ctaRef} className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
 
-            {/* Primary Button: Square, Mono, Small */}
+            {/* Primary Button: Orange (Brand Match), Square, Mono, Small */}
             <button
-              className="bg-[#2D3436] text-[#FCF4E6] hover:bg-[#1A1A1A] dark:bg-[#E2D7CE] dark:text-[#1A1C1E] dark:hover:bg-[#F0E6DD] px-8 py-4 rounded-sm font-mono text-xs uppercase tracking-widest transition-all duration-300"
+              className="bg-[#FF5C00] text-white hover:bg-[#E05200] px-8 py-4 rounded-sm font-mono text-xs uppercase tracking-widest transition-all duration-300 shadow-sm hover:shadow-md"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
               {dictionary.hero.cta_primary}
@@ -159,7 +169,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
             {/* Secondary Button: Mono Link */}
             <button
-              className="group flex items-center gap-3 text-[#2D3436] dark:text-[#E2D7CE] hover:text-[#000] dark:hover:text-[#FFF] transition-colors duration-300 font-mono text-xs uppercase tracking-widest border-b border-transparent hover:border-current py-2"
+              className="group flex items-center gap-3 text-[#2D3436] dark:text-[#E2D7CE] hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors duration-300 font-mono text-xs uppercase tracking-widest border-b border-transparent hover:border-current py-2"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
               <span>{dictionary.hero.cta_secondary}</span>

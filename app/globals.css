@@ -119,6 +119,32 @@ body {
   }
 }
 
+/* Laser Scan Animation for "German" */
+@keyframes laser-scan {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-laser-scan {
+  background: linear-gradient(90deg,
+      #FF5C00 0%,
+      #FF5C00 45%,
+      #FFFFFF 50%,
+      #FF5C00 55%,
+      #FF5C00 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: laser-scan 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 /* ============================================
    AWWWARDS STYLE: PREMIUM GLASS
    ============================================ */
