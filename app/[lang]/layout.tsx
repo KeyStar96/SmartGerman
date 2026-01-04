@@ -3,7 +3,6 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
-import NeuralBackground from "@/components/effects/NeuralBackground";
 import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 
