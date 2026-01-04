@@ -172,9 +172,19 @@ html {
   animation: status-pulse 2s infinite;
 }
 
-/* ============================================
-   AWWWARDS STYLE: PREMIUM GLASS
-   ============================================ */
+@keyframes scan-slow {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(1000%);
+  }
+}
+
+.animate-scan-slow {
+  animation: scan-slow 8s linear infinite;
+}
 
 /* 1. Die Noise-Textur macht das Glas "physisch" und verhindert Color-Banding */
 .bg-noise {

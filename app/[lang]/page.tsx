@@ -1,4 +1,5 @@
 import Hero from "@/components/sections/Hero";
+import ScienceSection from "@/components/sections/ScienceSection";
 import Features from "@/components/sections/Features";
 import Courses from "@/components/sections/Courses";
 import Schedule from "@/components/sections/Schedule";
@@ -15,6 +16,7 @@ export default async function HomePage({
   return (
     <div className="flex flex-col items-center w-full overflow-visible relative bg-transparent">
       <Hero dictionary={dictionary} lang={lang} />
+      <ScienceSection dictionary={dictionary} />
       <Features dictionary={dictionary} />
       <Courses dictionary={dictionary} lang={lang} />
       <Schedule dictionary={dictionary} lang={lang} />

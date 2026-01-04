@@ -197,7 +197,25 @@ class PulsePool {
   }
 }
 
-export default function NeuralBackground() {
+interface NeuralBackgroundProps {
+  opacity?: number;
+  variant?: "default" | "brain";
+}
+
+// BRAIN POINTS: Grobe Silhouette (Normalisiert 0-1)
+// Ein Herz-ähnliches, aber oben breiteres Muster für das Gehirn
+const BRAIN_POINTS = [
+  // Links
+  { x: 0.35, y: 0.3 }, { x: 0.3, y: 0.4 }, { x: 0.3, y: 0.5 }, { x: 0.35, y: 0.6 }, { x: 0.45, y: 0.7 },
+  // Rechts
+  { x: 0.65, y: 0.3 }, { x: 0.7, y: 0.4 }, { x: 0.7, y: 0.5 }, { x: 0.65, y: 0.6 }, { x: 0.55, y: 0.7 },
+  // Oben (Frontallappen)
+  { x: 0.4, y: 0.25 }, { x: 0.5, y: 0.22 }, { x: 0.6, y: 0.25 },
+  // Mitte / Stamm
+  { x: 0.5, y: 0.5 }, { x: 0.5, y: 0.8 }, { x: 0.48, y: 0.9 }, { x: 0.52, y: 0.9 }
+];
+
+export default function NeuralBackground({ opacity = 0.08, variant = "default" }: NeuralBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -207,23 +225,36 @@ export default function NeuralBackground() {
   const pulsePoolRef = useRef<PulsePool>(new PulsePool());
 
   const themeRef = useRef(THEME_COLORS.dark);
+  const scrollPosRef = useRef(0);
 
   useEffect(() => {
-    const handleHeroComplete = () => {
-      if (containerRef.current) {
-        gsap.to(containerRef.current, {
-          opacity: 0.08, // Extrem subtil
-          duration: 1.5,
-          ease: "power2.out",
-        });
-      }
-    };
+    // Wenn variant "default", nutzen wir das klassische Hero-Verhalten
+    if (variant === "default") {
+      const handleHeroComplete = () => {
+        if (containerRef.current) {
+          gsap.to(containerRef.current, {
+            opacity: opacity, // Nutzt Prop
+            duration: 1.5,
+            ease: "power2.out",
+          });
+        }
+      };
 
-    window.addEventListener('hero-animation-complete', handleHeroComplete);
+      window.addEventListener('hero-animation-complete', handleHeroComplete);
+      return () => window.removeEventListener('hero-animation-complete', handleHeroComplete);
+    } else {
+      // Für "brain" direkt einblenden
+      if (containerRef.current) containerRef.current.style.opacity = opacity.toString();
+    }
+  }, [variant, opacity]);
 
-    return () => {
-      window.removeEventListener('hero-animation-complete', handleHeroComplete);
+  useEffect(() => {
+    const handleScroll = () => {
+      // Berechne Scroll-Fortschritt relativ zum Fenster (für Brain-Morphing)
+      scrollPosRef.current = window.scrollY;
     };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -469,6 +500,15 @@ export default function NeuralBackground() {
         ? CONFIG.damping
         : Math.pow(CONFIG.damping, timeScale);
 
+      // BRAIN MORPH LOGIC
+      const isBrainMode = variant === "brain";
+      let morphStrength = 0;
+      if (isBrainMode) {
+        // Morphing-Stärke basierend auf Sichtbarkeit/Scroll (vereinfacht)
+        // Wir ziehen Partikel zu den BRAIN_POINTS
+        morphStrength = 0.4; // Konstanter Test-Wert für Science-Section
+      }
+
       for (let i = 0; i < numNeurons; i++) {
         const n = neurons[i];
 
@@ -481,9 +521,29 @@ export default function NeuralBackground() {
         n.vy += wanderY * timeScale;
 
         // Spring force to base position
-        n.vx += (n.baseX - n.x) * springScaled;
-        n.vy += (n.baseY - n.y) * springScaled;
-        n.vz += (n.baseZ - n.z) * springScaled;
+        let targetX = n.baseX;
+        let targetY = n.baseY;
+        let targetZ = n.baseZ;
+
+        // Wenn Brain-Mode, überschreibe Target-Pos für einige Neuronen
+        if (isBrainMode && i < BRAIN_POINTS.length * 10) {
+          const pointIdx = i % BRAIN_POINTS.length;
+          const p = BRAIN_POINTS[pointIdx];
+          // Streue die Punkte etwas um das Ziel herum für organischen Look
+          const offsetX = (Math.random() - 0.5) * 40;
+          const offsetY = (Math.random() - 0.5) * 40;
+
+          // Transformiere normalisierte Punkte in Canvas-Space (Center)
+          const brainX = p.x * width;
+          const brainY = p.y * height;
+
+          targetX = targetX * (1 - morphStrength) + brainX * morphStrength + offsetX;
+          targetY = targetY * (1 - morphStrength) + brainY * morphStrength + offsetY;
+        }
+
+        n.vx += (targetX - n.x) * springScaled;
+        n.vy += (targetY - n.y) * springScaled;
+        n.vz += (targetZ - n.z) * springScaled;
 
         // Mouse interaction
         if (mouseSquared > 0) {

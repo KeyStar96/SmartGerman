@@ -60,24 +60,24 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
     // 1. Info Tag Fade In (Immediate) - Anti-Flicker using fromTo
     if (infoTagRef.current) {
       tl.fromTo(infoTagRef.current,
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+        { autoAlpha: 0, y: -10 },
+        { autoAlpha: 1, y: 0, duration: 0.8, ease: "power2.out" }
         , 0);
     }
 
     // 2. Brand Fade In (simultaneous with Info Tag)
     if (brandRef.current) {
       tl.fromTo(brandRef.current,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 1.0, ease: "power2.out" }
+        { autoAlpha: 0, y: 10 },
+        { autoAlpha: 1, y: 0, duration: 1.0, ease: "power2.out" }
         , 0.1);
     }
 
     // 3. Typewriter + Slide Up for Claim
     // We animate the claim container simply appearing/sliding
     tl.fromTo(claimRef.current,
-      { opacity: 1, y: 20 }, // Started visible but shifted, chars hidden
-      { y: 0, duration: 2.0, ease: "power2.out" } // Slide up while typing happens
+      { autoAlpha: 0, y: 20 }, // Started invisible but shifted, chars hidden
+      { autoAlpha: 1, y: 0, duration: 2.0, ease: "power2.out" } // Slide up while typing happens
       , 0.5);
 
     // Actual Typewriter Effect on Chars
@@ -91,14 +91,14 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
       // 4. Subline Fade In
       .fromTo(sublineRef.current,
-        { opacity: 0, y: 10 },
-        { opacity: 0.8, y: 0, duration: 1.5, ease: "power2.out" }
+        { autoAlpha: 0, y: 10 },
+        { autoAlpha: 0.8, y: 0, duration: 1.5, ease: "power2.out" }
         , "+=0.2")
 
       // 5. CTA Fade In
       .fromTo(ctaRef.current,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 1.0, ease: "power2.out" }
+        { autoAlpha: 0, y: 10 },
+        { autoAlpha: 1, y: 0, duration: 1.0, ease: "power2.out" }
         , "-=1.0");
 
   }, { scope: container, dependencies: [isLoaded] });
@@ -106,7 +106,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   return (
     <section
       ref={container}
-      className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-52 pb-20 w-full"
+      className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-40 pb-20 w-full"
     >
       {/* Glitch Overlay - Monitor look during typing */}
       {isTyping && (
@@ -129,7 +129,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Scientific Status Badge */}
           <div
             ref={infoTagRef}
-            className="inline-flex items-center gap-3 mb-8 px-4 py-2 border-[0.5px] border-[#FF5C00]/30 rounded-sm bg-[#FF5C00]/5 backdrop-blur-sm opacity-0 translate-y-[-10px] w-fit"
+            className="inline-flex items-center gap-3 mb-8 px-4 py-2 border-[0.5px] border-[#FF5C00]/30 rounded-none bg-[#FF5C00]/5 backdrop-blur-sm w-fit"
+            style={{ opacity: 0, visibility: 'hidden' }}
           >
             {/* Pulsating Status Dot */}
             <div className="relative flex h-2 w-2">
@@ -148,7 +149,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Block A: Brand Split (Solid Colors) */}
           <h1
             ref={brandRef}
-            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline opacity-0 translate-y-[10px]"
+            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline"
+            style={{ opacity: 0, visibility: 'hidden' }}
           >
             <span className="font-bold text-[#2D3436] dark:text-[#E2D7CE]">Smart</span>
             {/* German: Static Solid Orange */}
@@ -163,8 +165,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Block B: Claim (Monospace Typewriter) */}
           <h2
             ref={claimRef}
-            className="text-2xl md:text-3xl font-normal leading-tight text-[#2D3436] dark:text-[#E2D7CE] font-mono opacity-90 mb-12 min-h-[2em] translate-y-[20px]"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="text-2xl md:text-3xl font-normal leading-tight text-[#2D3436] dark:text-[#E2D7CE] font-mono opacity-90 mb-12 min-h-[2em]"
+            style={{ fontFamily: 'var(--font-mono)', opacity: 0, visibility: 'hidden' }} // Keep h2 visible for layout but shifted via GSAP
           >
             {claimChars.map((char: string, index: number) => (
               <span key={index} className="char opacity-0 w-auto">
@@ -177,7 +179,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Subline: Clean Sans-Serif */}
           <p
             ref={sublineRef}
-            className="text-lg md:text-xl font-light tracking-wide leading-relaxed mb-16 max-w-xl text-[#2D3436] dark:text-[#E2D7CE] opacity-0 translate-y-[10px]"
+            className="text-lg md:text-xl font-light tracking-wide leading-relaxed mb-12 max-w-xl text-[#2D3436] dark:text-[#E2D7CE]"
+            style={{ opacity: 0, visibility: 'hidden' }}
           >
             {dictionary.hero.subline}
           </p>
@@ -185,12 +188,13 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* CTAs: Scientific Protocol Style */}
           <div
             ref={ctaRef}
-            className="flex flex-col sm:flex-row gap-8 items-start sm:items-center opacity-0 translate-y-[10px]"
+            className="flex flex-col sm:flex-row gap-8 items-start sm:items-center mt-8"
+            style={{ opacity: 0, visibility: 'hidden' }}
           >
 
             {/* Primary Button: Orange (Brand Match), Square, Mono, Small */}
             <button
-              className="bg-[#FF5C00] text-white hover:bg-[#E05200] px-8 py-4 rounded-sm font-mono text-xs uppercase tracking-widest transition-all duration-300 shadow-sm hover:shadow-md"
+              className="bg-[#FF5C00] text-white hover:bg-[#E05200] px-8 py-4 rounded-none font-mono text-xs uppercase tracking-widest transition-all duration-300 shadow-sm hover:shadow-md"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
               {dictionary.hero.cta_primary}
