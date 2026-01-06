@@ -295,6 +295,7 @@ export default function NeuralBrain() {
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
                 uOpacityBase: { value: 0.08 }, // Slightly higher base opacity
             },
+            transparent: true, // Required for alpha to work with NormalBlending
             vertexShader: `
                 attribute float aLineProgress;
                 attribute vec2 aSignal; 
