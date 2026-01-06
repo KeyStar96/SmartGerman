@@ -75,24 +75,33 @@ export default function NeuralBrain() {
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.enableZoom = false;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.5;
+        controls.autoRotate = false; // Disabled to keep alignment with head mask
+        controls.minPolarAngle = Math.PI / 2 - 0.2; // Restrict vertical movement
+        controls.maxPolarAngle = Math.PI / 2 + 0.2;
+        controls.minAzimuthAngle = -0.2; // Restrict horizontal movement slightly
+        controls.maxAzimuthAngle = 0.2;
 
         // --- 2. GENERATE BRAIN STRUCTURE ---
+        // Adjusted for Side Profile (Left Facing Head -> Visual Right Cavity)
+        // Since container is mirrored, Visual Right = Negative X in Three.js ?
+        // Let's stick to centering it and moving the camera or using offset.
+        // Actually, we can just shape it to look like a brain profile.
+
+        const brainOffset = new THREE.Vector3(-0.35, 0.15, 0); // Shift to match image cavity
+
         const brainVolumes = [
-            // Left Hemisphere Main
-            { center: new THREE.Vector3(-0.4, 0.1, 0), radius: new THREE.Vector3(0.5, 0.65, 0.8) },
-            // Right Hemisphere Main
-            { center: new THREE.Vector3(0.4, 0.1, 0), radius: new THREE.Vector3(0.5, 0.65, 0.8) },
-            // Left Temporal Lobe (Side/Bottom)
-            { center: new THREE.Vector3(-0.5, -0.2, 0.2), radius: new THREE.Vector3(0.3, 0.3, 0.5) },
-            // Right Temporal Lobe
-            { center: new THREE.Vector3(0.5, -0.2, 0.2), radius: new THREE.Vector3(0.3, 0.3, 0.5) },
-            // Cerebellum (Back/Bottom)
-            { center: new THREE.Vector3(-0.2, -0.5, -0.4), radius: new THREE.Vector3(0.25, 0.25, 0.3) },
-            { center: new THREE.Vector3(0.2, -0.5, -0.4), radius: new THREE.Vector3(0.25, 0.25, 0.3) },
-            // Frontal bump
-            { center: new THREE.Vector3(0, 0.2, 0.5), radius: new THREE.Vector3(0.6, 0.5, 0.35) },
+            // Main Cerebrum (Upper mass)
+            { center: new THREE.Vector3(0, 0.15, 0).add(brainOffset), radius: new THREE.Vector3(0.65, 0.55, 0.5) },
+            // Frontal Lobe (Forward/Top)
+            { center: new THREE.Vector3(-0.4, 0.1, 0).add(brainOffset), radius: new THREE.Vector3(0.4, 0.35, 0.45) },
+            // Occipital (Back)
+            { center: new THREE.Vector3(0.4, 0.0, 0).add(brainOffset), radius: new THREE.Vector3(0.4, 0.4, 0.45) },
+            // Temporal (Lower Side)
+            { center: new THREE.Vector3(0.1, -0.25, 0).add(brainOffset), radius: new THREE.Vector3(0.45, 0.3, 0.45) },
+            // Cerebellum (Back Bottom Tucked)
+            { center: new THREE.Vector3(0.3, -0.45, 0).add(brainOffset), radius: new THREE.Vector3(0.3, 0.25, 0.25) },
+            // Brainstem connection
+            { center: new THREE.Vector3(0.1, -0.5, 0).add(brainOffset), radius: new THREE.Vector3(0.15, 0.3, 0.15) },
         ];
 
         const isInsideEllipsoid = (p: THREE.Vector3, center: THREE.Vector3, radius: THREE.Vector3) => {
