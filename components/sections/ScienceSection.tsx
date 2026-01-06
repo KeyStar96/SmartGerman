@@ -16,7 +16,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
         left: 45,
         width: 42,
         height: 38,
-        borderRadius: 0
+        borderRadius: 50,
+        rotate: 0
     });
 
     return (
@@ -80,6 +81,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                 width: `${brainPos.width}%`,
                                 height: `${brainPos.height}%`,
                                 borderRadius: `${brainPos.borderRadius}%`,
+                                transform: `rotate(${brainPos.rotate}deg)`,
                             }}
                         >
                             {/* Placeholder for Calibration */}
@@ -115,8 +117,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             </div>
                             <input
                                 type="range"
-                                min="0"
-                                max="100"
+                                min={key === 'rotate' ? -180 : 0}
+                                max={key === 'rotate' ? 180 : 100}
                                 value={val}
                                 onChange={(e) => setBrainPos(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
                                 className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#FF5C00]"
