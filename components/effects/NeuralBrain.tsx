@@ -1,26 +1,26 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
 
 // --- CONFIG ---
 const CONFIG = {
     neuronDensity: 0.0004,
-    connectionDistance: 1.2, // Adapted for 3D scale (approx. similar relative distance)
-    wanderRadius: 0.1,       // 3D scale
-    wanderSpeed: 0.5,        // Speed of wandering
+    connectionDistance: 1.2,
+    wanderRadius: 0.05,       // Reduced for "shiver"
+    wanderSpeed: 0.2,        // Slower movement
     springStiffness: 0.04,
 
     // Signals
-    signalSpeed: 2.5,        // Units per second
-    signalDecay: 0.7,        // Retain 70% intensity on hop
+    signalSpeed: 2.5,
+    signalDecay: 0.7,
     minSignalStrength: 0.1,
-    trailDecay: 2.0,         // Trail fades out speed
+    trailDecay: 2.0,
 
-    particleSize: 0.035, // Base size
-    colorNeuron: 0xFFFFFF,   // White structure (ScienceSection compatible)
-    colorSignal: 0xFF5C00,   // Orange signal (ScienceSection compatible)
+    particleSize: 0.035,
+    colorNeuron: 0xFFFFFF,
+    colorSignal: 0xFF5C00,
 
     // Auto Pulse
     autoPulseEnabled: true,
@@ -48,6 +48,7 @@ interface Pulse {
 
 export default function NeuralBrain() {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [opacity, setOpacity] = useState(0);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -69,17 +70,11 @@ export default function NeuralBrain() {
         });
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0); // Explicitly clear to transparent
         containerRef.current.appendChild(renderer.domElement);
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.enableZoom = false;
-        controls.autoRotate = false; // Disabled to keep alignment with head mask
-        controls.minPolarAngle = Math.PI / 2 - 0.2; // Restrict vertical movement
-        controls.maxPolarAngle = Math.PI / 2 + 0.2;
-        controls.minAzimuthAngle = -0.2; // Restrict horizontal movement slightly
-        controls.maxAzimuthAngle = 0.2;
+        // Trigger fade-in after a short delay
+        setTimeout(() => setOpacity(1), 100);
 
         // --- 2. GENERATE BRAIN STRUCTURE (Full Container Fill) ---
         // The container is now masked by CSS (border-radius), so we just fill the space.
@@ -233,7 +228,7 @@ export default function NeuralBrain() {
             const dt = Math.min(clock.getDelta(), 0.1); // Cap dt
             const time = clock.getElapsedTime();
 
-            controls.update();
+            // controls.update(); // Removed controls
 
             // A. PHYSICS UPDATE (Wander & Spring)
             const posAttr = particlesGeo.attributes.position as THREE.BufferAttribute;
@@ -402,7 +397,7 @@ export default function NeuralBrain() {
 
         return () => {
             resizeObserver.disconnect();
-            if (controls) controls.dispose();
+            // if (controls) controls.dispose();
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);
             }
@@ -415,5 +410,11 @@ export default function NeuralBrain() {
 
     }, []);
 
-    return <div ref={containerRef} className="w-full h-full cursor-crosshair" />;
+    return (
+        <div
+            ref={containerRef}
+            className="w-full h-full transition-opacity duration-1000 ease-in-out"
+            style={{ opacity: opacity }}
+        />
+    );
 }
