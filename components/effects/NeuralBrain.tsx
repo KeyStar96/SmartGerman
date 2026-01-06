@@ -361,7 +361,7 @@ export default function NeuralBrain() {
                                 vec3 trailColor = getHeatColor(signalStrength);
                                 
                                 // Make head hotter?
-                                if (dist < 0.1) {
+                                if (distWorld < 0.1) {
                                      trailColor = mix(trailColor, uColorHigh, 0.5);
                                 }
                                 
