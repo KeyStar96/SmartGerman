@@ -43,9 +43,10 @@ interface Pulse {
     active: boolean;
     fromIdx: number;
     toIdx: number;
-    progress: number; // 0 to 1
+    progress: number; // 0 to >1 (overshoot for trail)
     strength: number;
-    trailIntensity: number; // For visual fade
+    trailIntensity: number;
+    hasTriggered: boolean; // To trigger target only once
 }
 
 export default function NeuralBrain() {
@@ -311,23 +312,28 @@ export default function NeuralBrain() {
                         // Calculate distance from head based on direction
                         float dist = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
-                        // Trail Length increased to 0.4 for clearer visibility
-                        if (dist >= 0.0 && dist < 0.4) {
-                            // Calculate Glow Factor
-                            float glow = 1.0 - (dist / 0.4);
-                            glow = pow(glow, 1.0); // Linear falloff for stronger trail
+                        // EXTENDED TRAIL: dist >= 0.0 check ensures we don't draw ahead of signal
+                        if (dist >= 0.0) {
+                            // Long tail fade
+                            // Brightness = 1.0 at head (dist=0)
+                            // Fades to 0 at dist=1.5 (very long tail)
+                            float tailLen = 1.5;
+                            float glow = max(0.0, 1.0 - (dist / tailLen));
                             
-                            // Hot Head Effect:
-                            // If close to head (dist < 0.1), mix towards High Color
-                            vec3 trailColor = uColorSignal;
-                            if (dist < 0.1) {
-                                float headHeat = 1.0 - (dist / 0.1);
-                                trailColor = mix(uColorSignal, uColorHigh, headHeat * 0.8);
+                            if (glow > 0.0) {
+                                // Hot Head Effect:
+                                // If close to head (dist < 0.15), mix towards High Color
+                                vec3 trailColor = uColorSignal;
+                                if (dist < 0.15) {
+                                    float headHeat = 1.0 - (dist / 0.15);
+                                    trailColor = mix(uColorSignal, uColorHigh, headHeat);
+                                }
+                                
+                                // Apply additive glow
+                                // Use max to prevent base line opacity from overriding bright tails
+                                finalColor = mix(uColorBase, trailColor, glow * signalStrength);
+                                finalOpacity = max(finalOpacity, glow * signalStrength);
                             }
-                            
-                            // Apply additive glow
-                            finalColor = mix(uColorBase, trailColor, glow * signalStrength);
-                            finalOpacity = max(finalOpacity, glow * signalStrength);
                         }
                     }
                     
@@ -352,7 +358,7 @@ export default function NeuralBrain() {
         const pulsePool: Pulse[] = [];
         const maxPulses = 200;
         for (let i = 0; i < maxPulses; i++) {
-            pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0 });
+            pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false });
         }
 
         const spawnPulse = (from: number, to: number, strength: number) => {
@@ -364,6 +370,7 @@ export default function NeuralBrain() {
                 p.progress = 0;
                 p.strength = strength;
                 p.trailIntensity = strength; // Start full strength
+                p.hasTriggered = false;
             }
         };
 
@@ -529,8 +536,8 @@ export default function NeuralBrain() {
                 signalAttr.setXY(lineIdx * 2, shaderProgress, encodedStrength);
                 signalAttr.setXY(lineIdx * 2 + 1, shaderProgress, encodedStrength);
 
-                if (p.progress >= 1.0) {
-                    p.active = false;
+                // CHECK TRIGGER (Target Reached)
+                if (!p.hasTriggered && p.progress >= 1.0) {
                     // Flash the target neuron (Accumulate!)
                     const targetN = neurons[p.toIdx];
                     targetN.flash += 1.0;
@@ -542,6 +549,13 @@ export default function NeuralBrain() {
                             }
                         });
                     }
+                    p.hasTriggered = true;
+                }
+
+                // CHECK DEATH (Trail fully faded)
+                // If trailLen = 1.5, we kill it when progress > 1.0 + 1.5 = 2.5
+                if (p.progress > 2.5) {
+                    p.active = false;
                 }
             });
 
