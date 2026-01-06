@@ -77,30 +77,21 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
 
                     {/* Data Points overlay */}
-                    {/* Top Right Data Block */}
-                    <div className="relative w-full lg:absolute lg:top-10 lg:right-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-center lg:text-right space-y-2 z-30 mt-8 lg:mt-0">
-                        <div className="grid grid-cols-2 lg:block gap-x-4">
-                            <div>{dictionary.science.data_points.data_stream_label}: <span className="lg:hidden">{dictionary.science.data_points.data_stream_value}</span></div>
-                            <div className="hidden lg:block">{dictionary.science.data_points.data_stream_value}</div>
-
-                            <div>{dictionary.science.data_points.neuron_count_label}: <span className="lg:hidden">{dictionary.science.data_points.neuron_count_value}</span></div>
-                            <div className="hidden lg:block">{dictionary.science.data_points.neuron_count_value}</div>
-
-                            <div>{dictionary.science.data_points.signal_speed_label}: <span className="lg:hidden">{dictionary.science.data_points.signal_speed_value}</span></div>
-                            <div className="hidden lg:block">{dictionary.science.data_points.signal_speed_value}</div>
-
-                            <div className="text-[#FF5C00] col-span-2 lg:col-span-1 mt-2 lg:mt-0">{dictionary.science.data_points.synapse_firing_label}: {dictionary.science.data_points.synapse_firing_value}</div>
+                    {/* Top Right Data Block - Pushed further to the right edge and up */}
+                    <div className="relative w-full lg:absolute lg:top-0 lg:right-[-20px] font-mono text-[9px] uppercase tracking-widest opacity-60 text-center lg:text-right space-y-2 z-30 mt-8 lg:mt-0 pointer-events-none">
+                        <div className="grid grid-cols-1 gap-1">
+                            <div>{dictionary.science.data_points.data_stream_label}: {dictionary.science.data_points.data_stream_value}</div>
+                            <div>{dictionary.science.data_points.neuron_count_label}: {dictionary.science.data_points.neuron_count_value}</div>
+                            <div>{dictionary.science.data_points.signal_speed_label}: {dictionary.science.data_points.signal_speed_value}</div>
+                            <div className="text-[#FF5C00]">{dictionary.science.data_points.synapse_firing_label}: {dictionary.science.data_points.synapse_firing_value}</div>
                         </div>
                     </div>
 
-                    {/* Bottom Left Data Block */}
-                    <div className="relative w-full lg:absolute lg:bottom-10 lg:left-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-center lg:text-left space-y-2 z-30 mt-4 lg:mt-0">
-                        <div className="grid grid-cols-2 lg:block gap-x-4">
-                            <div>{dictionary.science.data_points.hemisphere_label}: <span className="lg:hidden">{dictionary.science.data_points.hemisphere_value}</span></div>
-                            <div className="hidden lg:block">{dictionary.science.data_points.hemisphere_value}</div>
-
-                            <div>{dictionary.science.data_points.plasticity_label}: <span className="lg:hidden">{dictionary.science.data_points.plasticity_value}</span></div>
-                            <div className="hidden lg:block">{dictionary.science.data_points.plasticity_value}</div>
+                    {/* Bottom Left Data Block - Pushed further to the left edge and down */}
+                    <div className="relative w-full lg:absolute lg:bottom-0 lg:left-[-20px] font-mono text-[9px] uppercase tracking-widest opacity-60 text-center lg:text-left space-y-2 z-30 mt-4 lg:mt-0 pointer-events-none">
+                        <div className="grid grid-cols-1 gap-1">
+                            <div>{dictionary.science.data_points.hemisphere_label}: {dictionary.science.data_points.hemisphere_value}</div>
+                            <div>{dictionary.science.data_points.plasticity_label}: {dictionary.science.data_points.plasticity_value}</div>
                         </div>
                     </div>
                 </div>
