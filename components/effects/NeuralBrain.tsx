@@ -465,5 +465,5 @@ export default function NeuralBrain() {
 
     }, []);
 
-    return <div ref={containerRef} className="w-full h-full cursor-not-allowed pointer-events-none" />;
+    return <div ref={containerRef} className="w-full h-full cursor-crosshair" />;
 }
