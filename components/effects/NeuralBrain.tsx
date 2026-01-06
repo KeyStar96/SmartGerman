@@ -88,7 +88,7 @@ export default function NeuralBrain() {
         // --- 2. GENERATE BRAIN STRUCTURE (Full Container Fill) ---
         // The container is now masked by CSS (border-radius), so we just fill the space.
 
-        const particleCount = 400;
+        const particleCount = Math.floor(400 * CONFIG.neuronDensity);
         const neurons: Neuron[] = [];
         const depthRange = 0.6; // Thin depth for 2.5D look
 
@@ -243,7 +243,8 @@ export default function NeuralBrain() {
                     
                     // 3. Mix (Idle -> Heat)
                     // We want even a small flash to quickly warm up the color
-                    float warmth = smoothstep(0.0, 0.4, vFlash); 
+                    // Expanded range to keep color visible longer during cooling
+                    float warmth = smoothstep(0.0, 1.0, vFlash);   
                     vec3 finalColor = mix(idleState, heatState, warmth);
                     
                     // Additive white core (Reduced to keep color)
@@ -269,18 +270,22 @@ export default function NeuralBrain() {
         const linePositions = new Float32Array(connectionPairs.length * 2 * 3);
         const lineProgress = new Float32Array(connectionPairs.length * 2); // 0 for start, 1 for end
         const signalData = new Float32Array(connectionPairs.length * 2 * 2); // [Progress, Strength] per vertex
+        const distData = new Float32Array(connectionPairs.length * 2); // Distance per vertex
 
         // Pre-fill static attributes
         for (let i = 0; i < connectionPairs.length; i++) {
             // Vertex 0
             lineProgress[i * 2] = 0.0;
+            distData[i * 2] = connectionPairs[i].dist;
             // Vertex 1
             lineProgress[i * 2 + 1] = 1.0;
+            distData[i * 2 + 1] = connectionPairs[i].dist;
         }
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
         linesGeo.setAttribute('aLineProgress', new THREE.BufferAttribute(lineProgress, 1));
         linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2)); // Dynamic
+        linesGeo.setAttribute('aDist', new THREE.BufferAttribute(distData, 1)); // Physical Length
 
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
@@ -293,12 +298,16 @@ export default function NeuralBrain() {
             vertexShader: `
                 attribute float aLineProgress;
                 attribute vec2 aSignal; 
+                attribute float aDist; // World length
+                
                 varying float vProgress;
                 varying vec2 vSignal;
+                varying float vDist;
                 
                 void main() {
                     vProgress = aLineProgress;
                     vSignal = aSignal;
+                    vDist = aDist;
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                 }
@@ -312,6 +321,7 @@ export default function NeuralBrain() {
                 
                 varying float vProgress;
                 varying vec2 vSignal;
+                varying float vDist;
                 
                 vec3 getHeatColor(float i) {
                      // Gradient mapping for Signal Strength
@@ -336,11 +346,14 @@ export default function NeuralBrain() {
                         finalColor = mix(finalColor, uColorMid, ambientGlow * 0.5); // Tint wire orange
 
                         bool isReverse = rawStrength < 0.0;
-                        float dist = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
+                        float distUV = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
-                        if (dist >= 0.0) {
-                            float tailLen = 3.0; // Slower decay (Longer tail)
-                            float glow = max(0.0, 1.0 - (dist / tailLen));
+                        // Convert to World Distance
+                        float distWorld = distUV * vDist;
+
+                        if (distWorld >= 0.0) {
+                            float tailLen = 1.8; // World Units length (constant physical size)
+                            float glow = max(0.0, 1.0 - (distWorld / tailLen));
                             
                             if (glow > 0.0) {
                                 // Dynamic Color based on Strength
@@ -471,9 +484,9 @@ export default function NeuralBrain() {
 
                 posAttr.setXYZ(i, n.vec.x, n.vec.y, n.vec.z);
 
-                // Flash Decay
+                // Flash Decay (Thermal Cooling)
                 if (n.flash > 0) {
-                    n.flash = Math.max(0, n.flash - dt * 2.0);
+                    n.flash = Math.max(0, n.flash - dt * 0.5); // Slower cooling (was 2.0)
                     n.flash = Math.min(n.flash, 4.0);
                 }
                 flashAttr.setX(i, n.flash);
