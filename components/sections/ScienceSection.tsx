@@ -49,45 +49,43 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
                 </div>
 
-                {/* Right: Neural Brain Layered Component (60%) */}
-                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative aspect-[4/3] lg:aspect-square w-full select-none">
-                    {/* 
-                      Layering Strategy:
-                      1. Bottom: Neural Brain (Canvas) - Scale/Position adjusted to fit head
-                      2. Top: Image of Head with transparent brain area OR Multiply blend mode if white background
-                     */}
+                {/* Right: The Brain Composition */}
+                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative w-full">
 
-                    {/* LAYER 1: 3D BRAIN (Bottom) */}
-                    <div className="absolute inset-x-0 bottom-0 top-[10%] z-0 scale-x-[-1]">
-                        {/* 
-                           Adjust margins/padding here to align the 3D cluster 
-                           perfectly with the head image's brain cavity 
-                         */}
-                        <NeuralBrain />
-                    </div>
+                    {/* Sandwich Wrapper: Constrains aspect ratio based on image */}
+                    <div className="relative w-full max-w-[600px] mx-auto">
 
-                    {/* LAYER 2: MASK IMAGE (Top) */}
-                    <div className="absolute inset-0 z-10 flex items-center justify-center">
+                        {/* Layer 2 (Top): Head Image with Transparency */}
                         <img
                             src="/Bilder/SG_Brain-Compressed.webp"
                             alt="Human Head Structure"
-                            className="w-[60%] h-auto object-contain scale-x-[-1]"
+                            className="relative z-20 w-full h-auto pointer-events-none select-none scale-x-[-1]"
                         />
-                        {/* 
-                           User Request: 60% size, Mirrored, No Transparency options.
-                           Assumes image has alpha channel for brain area if 3D is behind.
-                         */}
+
+                        {/* Layer 1 (Bottom): Neural Brain Container */}
+                        {/* TODO: Calibrate these % values to match the specific transparency hole in the image */}
+                        <div
+                            className="absolute z-10"
+                            style={{
+                                top: '23%',
+                                left: '45%',
+                                width: '42%',
+                                height: '38%',
+                            }}
+                        >
+                            <NeuralBrain />
+                        </div>
                     </div>
 
-                    {/* Minimalist Data Points (Overlaid on top) */}
-                    <div className="absolute top-10 right-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-right space-y-2 z-20">
+                    {/* Data Points overlay */}
+                    <div className="absolute top-10 right-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-right space-y-2 z-30">
                         <div>DATA_STREAM: ACTIVE</div>
-                        <div>NEURON_COUNT: 1,200</div>
+                        <div>NEURON_COUNT: 400</div>
                         <div>SIGNAL_SPEED: 2.5m/s</div>
                         <div className="text-[#FF5C00]">SYNAPSE_FIRING...</div>
                     </div>
 
-                    <div className="absolute bottom-10 left-0 font-mono text-[9px] uppercase tracking-widest opacity-30 space-y-2 z-20">
+                    <div className="absolute bottom-10 left-0 font-mono text-[9px] uppercase tracking-widest opacity-30 space-y-2 z-30">
                         <div>HEMISPHERE: DUAL_SYNC</div>
                         <div>PLASTICITY_INDEX: 0.94</div>
                     </div>

@@ -130,7 +130,7 @@ export default function NeuralBrain() {
             return inside;
         };
 
-        const particleCount = 1200;
+        const particleCount = 400;
         const neurons: Neuron[] = [];
         const depthRange = 0.6; // Thin depth for 2.5D look
 
@@ -438,21 +438,21 @@ export default function NeuralBrain() {
         animate();
 
         // --- 7. RESIZE & CLEANUP ---
-        const handleResize = () => {
+        // Adaptation at ResizeObserver (better than window 'resize' event)
+        const resizeObserver = new ResizeObserver(() => {
             if (!containerRef.current) return;
             const newW = containerRef.current.clientWidth;
             const newH = containerRef.current.clientHeight;
+
             camera.aspect = newW / newH;
             camera.updateProjectionMatrix();
             renderer.setSize(newW, newH);
-        };
+        });
 
-
-
-        window.addEventListener("resize", handleResize);
+        resizeObserver.observe(containerRef.current);
 
         return () => {
-            window.removeEventListener("resize", handleResize);
+            resizeObserver.disconnect();
             if (controls) controls.dispose();
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);
