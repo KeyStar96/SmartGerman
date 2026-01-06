@@ -81,87 +81,36 @@ export default function NeuralBrain() {
         controls.minAzimuthAngle = -0.2; // Restrict horizontal movement slightly
         controls.maxAzimuthAngle = 0.2;
 
-        // --- 2. GENERATE BRAIN STRUCTURE (POLYGON MASK) ---
-        // User provided coordinates (Screen pixels -> Normalized Shape)
-        const RAW_POINTS = [
-            { x: 838, y: 268 }, { x: 848, y: 255 }, { x: 856, y: 248 }, { x: 867, y: 237 }, { x: 879, y: 226 },
-            { x: 896, y: 214 }, { x: 910, y: 205 }, { x: 925, y: 199 }, { x: 947, y: 193 }, { x: 964, y: 193 },
-            { x: 977, y: 191 }, { x: 992, y: 191 }, { x: 1007, y: 192 }, { x: 1025, y: 194 }, { x: 1043, y: 197 },
-            { x: 1055, y: 202 }, { x: 1069, y: 208 }, { x: 1082, y: 215 }, { x: 1093, y: 224 }, { x: 1102, y: 232 },
-            { x: 1118, y: 250 }, { x: 1121, y: 256 }, { x: 1127, y: 273 }, { x: 1142, y: 316 }, { x: 1142, y: 338 },
-            { x: 1136, y: 361 }, { x: 1130, y: 371 }, { x: 1126, y: 374 }, { x: 1118, y: 379 }, { x: 1110, y: 387 },
-            { x: 1105, y: 398 }, { x: 1095, y: 411 }, { x: 1085, y: 420 }, { x: 1072, y: 425 }, { x: 1065, y: 431 },
-            { x: 1048, y: 433 }, { x: 1045, y: 434 }, { x: 1048, y: 447 }, { x: 1048, y: 456 }, { x: 1025, y: 467 },
-            { x: 1000, y: 430 }, { x: 991, y: 418 }, { x: 975, y: 403 }, { x: 938, y: 405 }, { x: 908, y: 391 },
-            { x: 892, y: 369 }, { x: 861, y: 359 }, { x: 846, y: 348 }, { x: 837, y: 332 }, { x: 834, y: 313 },
-            { x: 834, y: 293 }, { x: 840, y: 272 }
-        ];
-
-        // Normalize points to center around (0,0) with range roughly [-1, 1]
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        RAW_POINTS.forEach(p => {
-            if (p.x < minX) minX = p.x;
-            if (p.x > maxX) maxX = p.x;
-            if (p.y < minY) minY = p.y;
-            if (p.y > maxY) maxY = p.y;
-        });
-
-        const centerX = (minX + maxX) / 2;
-        const centerY = (minY + maxY) / 2;
-        const scaleRef = Math.max(maxX - minX, maxY - minY) * 0.55; // Scaling factor
-
-        const polygonPoints = RAW_POINTS.map(p => ({
-            x: (p.x - centerX) / scaleRef,
-            // Invert Y because screen coords y goes down, 3D y goes up
-            y: -(p.y - centerY) / scaleRef
-        }));
-
-        // Ray-casting algorithm for Point in Polygon
-        const isPointInPolygon = (test: { x: number, y: number }, poly: { x: number, y: number }[]) => {
-            let inside = false;
-            for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-                const xi = poly[i].x, yi = poly[i].y;
-                const xj = poly[j].x, yj = poly[j].y;
-
-                const intersect = ((yi > test.y) !== (yj > test.y))
-                    && (test.x < (xj - xi) * (test.y - yi) / (yj - yi) + xi);
-                if (intersect) inside = !inside;
-            }
-            return inside;
-        };
+        // --- 2. GENERATE BRAIN STRUCTURE (Full Container Fill) ---
+        // The container is now masked by CSS (border-radius), so we just fill the space.
 
         const particleCount = 400;
         const neurons: Neuron[] = [];
         const depthRange = 0.6; // Thin depth for 2.5D look
 
-        // Bounding box for generation (slightly larger than polygon)
-        const genBounds = { x: 2.0, y: 2.0 };
+        // Bounding box for generation - covers the view
+        const genBounds = { x: 2.2, y: 1.8 }; // Adjusted to cover standard aspect ratio
 
-        let attempts = 0;
-        while (neurons.length < particleCount && attempts < 100000) {
-            attempts++;
-            // Generate random point
+        for (let i = 0; i < particleCount; i++) {
             const testP = {
                 x: (Math.random() - 0.5) * 2 * genBounds.x,
                 y: (Math.random() - 0.5) * 2 * genBounds.y
             };
 
-            if (isPointInPolygon(testP, polygonPoints)) {
-                // Valid 2D point, add z-depth
-                const z = (Math.random() - 0.5) * depthRange;
+            // Valid 2D point, add z-depth
+            const z = (Math.random() - 0.5) * depthRange;
 
-                neurons.push({
-                    id: neurons.length,
-                    vec: new THREE.Vector3(testP.x, testP.y, z),
-                    baseVec: new THREE.Vector3(testP.x, testP.y, z),
-                    velocity: new THREE.Vector3(0, 0, 0),
-                    wanderAngle: {
-                        theta: Math.random() * Math.PI * 2,
-                        phi: Math.acos(2 * Math.random() - 1)
-                    },
-                    connections: []
-                });
-            }
+            neurons.push({
+                id: neurons.length,
+                vec: new THREE.Vector3(testP.x, testP.y, z),
+                baseVec: new THREE.Vector3(testP.x, testP.y, z),
+                velocity: new THREE.Vector3(0, 0, 0),
+                wanderAngle: {
+                    theta: Math.random() * Math.PI * 2,
+                    phi: Math.acos(2 * Math.random() - 1)
+                },
+                connections: []
+            });
         }
 
         // --- 3. CREATE CONNECTIONS ---
