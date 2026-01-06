@@ -1,214 +1,118 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
-
-interface Point {
-    x: number;
-    y: number;
-    z: number;
-    origX: number;
-    origY: number;
-    origZ: number;
-    opacity: number;
-    size: number;
-    brightness: number;
-}
+import { useRef, useEffect } from "react";
+import * as THREE from "three";
 
 export default function NeuralBrain() {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const mouseRef = useRef({ x: 0, y: 0, active: false });
-
-    // Brain parameters
-    const pointCount = 1200;
-    const brainSize = 180;
-    const rotationSpeed = 0.005;
-
-    const points = useMemo(() => {
-        const pts: Point[] = [];
-        for (let i = 0; i < pointCount; i++) {
-            // Spherical coordinates
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
-
-            // Ellipsoid factors (human brain shape is roughly 1.0, 1.2, 0.9)
-            const a = 1.0; // Left-Right
-            const b = 1.2; // Front-Back
-            const c = 0.9; // Top-Bottom
-
-            // Gyri (Windungen) simulation using sine waves
-            const gyrusAmplitude = 0.08;
-            const gyrusFreq = 10;
-            const distortion = 1 + Math.sin(theta * gyrusFreq) * Math.sin(phi * gyrusFreq) * gyrusAmplitude;
-
-            // Two hemispheres gap
-            let xPos = Math.sin(phi) * Math.cos(theta) * a * distortion;
-            const yPos = Math.sin(phi) * Math.sin(theta) * b * distortion;
-            const zPos = Math.cos(phi) * c * distortion;
-
-            // Add a small gap between hemispheres
-            const hemisphereGap = 0.05;
-            if (xPos > 0) xPos += hemisphereGap;
-            else xPos -= hemisphereGap;
-
-            pts.push({
-                x: xPos * brainSize,
-                y: yPos * brainSize,
-                z: zPos * brainSize,
-                origX: xPos * brainSize,
-                origY: yPos * brainSize,
-                origZ: zPos * brainSize,
-                opacity: 0.2 + Math.random() * 0.6,
-                size: 1 + Math.random() * 1.5,
-                brightness: 0
-            });
-        }
-        return pts;
-    }, []);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!containerRef.current) return;
 
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
+        // --- 1. SETUP ---
+        const width = containerRef.current.clientWidth;
+        const height = containerRef.current.clientHeight;
 
-        let animationFrameId: number;
-        let rotationX = 0;
-        let rotationY = 0;
-        let time = 0;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        camera.position.z = 3.5;
 
-        const resize = () => {
-            const container = canvas.parentElement;
-            if (container) {
-                canvas.width = container.clientWidth;
-                canvas.height = container.clientHeight;
-            }
+        const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true // Wichtig für den transparenten Hintergrund
+        });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        containerRef.current.appendChild(renderer.domElement);
+
+        // --- 2. DAS GEHIRN-MODELL (DIE HÜLLE) ---
+        const brainGroup = new THREE.Group();
+
+        // Material für die Hülle: Wissenschaftlich-Transparent
+        const shellMaterial = new THREE.MeshPhongMaterial({
+            color: 0xFF5C00, // Dein Brand-Orange
+            transparent: true,
+            opacity: 0.1,
+            wireframe: true, // Erzeugt den technischen Look
+            shininess: 100,
+        });
+
+        // Funktion zum Erstellen einer Hemisphäre
+        const createHemisphere = (isLeft: boolean) => {
+            const geometry = new THREE.SphereGeometry(1, 32, 32);
+
+            // Die Kugel mathematisch zu einer Gehirnhälfte verformen (Ellipsoid)
+            geometry.scale(0.8, 1.2, 1);
+
+            const mesh = new THREE.Mesh(geometry, shellMaterial);
+            mesh.position.x = isLeft ? -0.45 : 0.45; // Abstand zwischen den Hälften
+            return mesh;
         };
 
-        window.addEventListener("resize", resize);
-        resize();
+        const leftHemi = createHemisphere(true);
+        const rightHemi = createHemisphere(false);
 
-        const handleMouseMove = (e: MouseEvent) => {
-            const rect = canvas.getBoundingClientRect();
-            mouseRef.current = {
-                x: e.clientX - rect.left - canvas.width / 2,
-                y: e.clientY - rect.top - canvas.height / 2,
-                active: true
-            };
+        brainGroup.add(leftHemi);
+        brainGroup.add(rightHemi);
+        scene.add(brainGroup);
+
+        // --- 3. BELEUCHTUNG ---
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+        mainLight.position.set(5, 5, 5);
+        scene.add(mainLight);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        // --- 4. ANIMATION & ROTATION ---
+        let mouseX = 0;
+        let mouseY = 0;
+
+        const handleMouseMove = (event: MouseEvent) => {
+            // Normierte Mauskoordinaten (-1 bis 1)
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (event.clientY / window.innerHeight) * 2 - 1;
         };
 
-        const handleMouseLeave = () => {
-            mouseRef.current.active = false;
+        window.addEventListener("mousemove", handleMouseMove);
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+
+            // Permanente langsame Rotation
+            brainGroup.rotation.y += 0.005;
+
+            // Subtile Reaktion auf Mausbewegung
+            brainGroup.rotation.x += (mouseY * 0.2 - brainGroup.rotation.x) * 0.05;
+            brainGroup.rotation.y += (mouseX * 0.2 - brainGroup.rotation.y) * 0.05;
+
+            renderer.render(scene, camera);
         };
 
-        canvas.addEventListener("mousemove", handleMouseMove);
-        canvas.addEventListener("mouseleave", handleMouseLeave);
+        animate();
 
-        const render = () => {
-            time += 0.02;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // --- 5. CLEANUP & RESIZE ---
+        const handleResize = () => {
+            if (!containerRef.current) return;
+            const newW = containerRef.current.clientWidth;
+            const newH = containerRef.current.clientHeight;
 
-            rotationY += rotationSpeed;
-
-            // Breathing effect
-            const breath = Math.sin(time * 0.5) * 5;
-
-            // Projection setup
-            const fov = 400;
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-
-            // Sort points by Z for depth (painter's algorithm)
-            const projectedPoints = points.map(p => {
-                // Breathing in Z
-                const zWithBreath = p.origZ + Math.sin(time + p.origX * 0.01) * 3;
-
-                // Rotation around Y
-                let x = p.origX * Math.cos(rotationY) - zWithBreath * Math.sin(rotationY);
-                let z = p.origX * Math.sin(rotationY) + zWithBreath * Math.cos(rotationY);
-                let y = p.origY;
-
-                // Simple auto-rotation in X too
-                const ry = y * Math.cos(0.2) - z * Math.sin(0.2);
-                const rz = y * Math.sin(0.2) + z * Math.cos(0.2);
-                y = ry;
-                z = rz;
-
-                // Mouse interaction
-                const dx = x - mouseRef.current.x;
-                const dy = y - mouseRef.current.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (mouseRef.current.active && dist < 100) {
-                    p.brightness = Math.max(p.brightness, (1 - dist / 100) * 2);
-                } else {
-                    p.brightness *= 0.95;
-                }
-
-                // Project
-                const scale = fov / (fov + z + 200);
-                const px = x * scale + centerX;
-                const py = y * scale + centerY;
-
-                return { px, py, pz: z, opacity: p.opacity, size: p.size, brightness: p.brightness };
-            });
-
-            // Draw connections first (only if close)
-            ctx.beginPath();
-            ctx.strokeStyle = "rgba(255, 92, 0, 0.05)";
-            ctx.lineWidth = 0.5;
-            for (let i = 0; i < projectedPoints.length; i += 4) { // Sample for performance
-                for (let j = i + 1; j < i + 15 && j < projectedPoints.length; j++) {
-                    const p1 = projectedPoints[i];
-                    const p2 = projectedPoints[j];
-                    const dx = p1.px - p2.px;
-                    const dy = p1.py - p2.py;
-                    const dist = dx * dx + dy * dy;
-
-                    if (dist < 1500) {
-                        ctx.moveTo(p1.px, p1.py);
-                        ctx.lineTo(p2.px, p2.py);
-                    }
-                }
-            }
-            ctx.stroke();
-
-            // Draw points
-            projectedPoints.forEach(p => {
-                const finalOpacity = Math.min(1, p.opacity + p.brightness);
-                const finalSize = p.size * (1 + p.brightness * 0.5);
-
-                ctx.fillStyle = `rgba(255, 92, 0, ${finalOpacity})`;
-                ctx.beginPath();
-                ctx.arc(p.px, p.py, finalSize, 0, Math.PI * 2);
-                ctx.fill();
-
-                if (p.brightness > 0.1) {
-                    ctx.shadowBlur = 10 * p.brightness;
-                    ctx.shadowColor = "#FF5C00";
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-            });
-
-            animationFrameId = requestAnimationFrame(render);
+            camera.aspect = newW / newH;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newW, newH);
         };
 
-        render();
+        window.addEventListener("resize", handleResize);
 
         return () => {
-            window.removeEventListener("resize", resize);
-            cancelAnimationFrame(animationFrameId);
-            canvas.removeEventListener("mousemove", handleMouseMove);
-            canvas.removeEventListener("mouseleave", handleMouseLeave);
+            window.removeEventListener("resize", handleResize);
+            window.removeEventListener("mousemove", handleMouseMove);
+            if (containerRef.current) {
+                containerRef.current.removeChild(renderer.domElement);
+            }
+            renderer.dispose();
         };
-    }, [points]);
+    }, []);
 
-    return (
-        <canvas
-            ref={canvasRef}
-            className="w-full h-full cursor-crosshair"
-            style={{ filter: "drop-shadow(0 0 20px rgba(255, 92, 0, 0.1))" }}
-        />
-    );
+    return <div ref={containerRef} className="w-full h-full" />;
 }
