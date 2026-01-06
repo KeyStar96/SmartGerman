@@ -6,14 +6,14 @@ import * as THREE from "three";
 
 // --- CONFIG ---
 const CONFIG = {
-    neuronDensity: 1,
+    neuronDensity: 5,
     connectionDistance: 1.2,
     wanderRadius: 0.2,       // Increased for visible movement
     wanderSpeed: 0.4,        // Faster movement
     springStiffness: 0.04,
 
     // Signals
-    signalSpeed: 1.00,
+    signalSpeed: 1.25,
     signalDecay: 0.85, // Slower decay for longer life
     minSignalStrength: 0.05,
     trailDecay: 2.0,
