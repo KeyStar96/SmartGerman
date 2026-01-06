@@ -160,9 +160,9 @@ export default function NeuralBrain() {
             phases[i] = Math.random() * Math.PI * 2;
             flashes[i] = 0.0;
         });
-        particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
         particlesGeo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
-        particlesGeo.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 1));
+        particlesGeo.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 1).setUsage(THREE.DynamicDrawUsage));
 
         // Custom Shader for Pulsating Particles with Heat Gradient
         const particlesMat = new THREE.ShaderMaterial({
@@ -285,9 +285,9 @@ export default function NeuralBrain() {
             distData[i * 2 + 1] = connectionPairs[i].dist;
         }
 
-        linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+        linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
         linesGeo.setAttribute('aLineProgress', new THREE.BufferAttribute(lineProgress, 1));
-        linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2)); // Dynamic
+        linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2).setUsage(THREE.DynamicDrawUsage)); // Dynamic
         linesGeo.setAttribute('aDist', new THREE.BufferAttribute(distData, 1)); // Physical Length
 
         const linesMat = new THREE.ShaderMaterial({
@@ -468,6 +468,11 @@ export default function NeuralBrain() {
         let autoPulseTimer = 0;
         const tempVec = new THREE.Vector3();
 
+        // Optimized Random LUT (Key for performance "under the hood")
+        const randLUT = new Float32Array(8192); // Power of 2
+        for (let i = 0; i < 8192; i++) randLUT[i] = Math.random() - 0.5;
+        let randIdx = 0;
+
         const animate = () => {
             requestAnimationFrame(animate);
             const dt = Math.min(clock.getDelta(), 0.1);
@@ -475,17 +480,23 @@ export default function NeuralBrain() {
 
             particlesMat.uniforms.uTime.value = time;
 
-            const posAttr = particlesGeo.attributes.position as THREE.BufferAttribute;
-            const flashAttr = particlesGeo.attributes.aFlash as THREE.BufferAttribute;
-            const linePosAttr = linesGeo.attributes.position as THREE.BufferAttribute;
+            // Direct Array Access - Huge CPU saver
+            const posArray = particlesGeo.attributes.position.array as Float32Array;
+            const flashArray = particlesGeo.attributes.aFlash.array as Float32Array;
+            const linePosArray = linesGeo.attributes.position.array as Float32Array;
 
             // Update Neurons
             for (let i = 0; i < neurons.length; i++) {
                 const n = neurons[i];
 
-                // Wander
-                n.wanderAngle.theta += (Math.random() - 0.5) * CONFIG.wanderSpeed * dt;
-                n.wanderAngle.phi += (Math.random() - 0.5) * CONFIG.wanderSpeed * dt;
+                // Wander (using LUT)
+                // Use bitwise AND for fast wrap-around
+                const r1 = randLUT[randIdx++ & 8191];
+                const r2 = randLUT[randIdx++ & 8191];
+
+                n.wanderAngle.theta += r1 * CONFIG.wanderSpeed * dt;
+                n.wanderAngle.phi += r2 * CONFIG.wanderSpeed * dt;
+
                 const wx = Math.sin(n.wanderAngle.phi) * Math.cos(n.wanderAngle.theta);
                 const wy = Math.sin(n.wanderAngle.phi) * Math.sin(n.wanderAngle.theta);
                 const wz = Math.cos(n.wanderAngle.phi);
@@ -498,36 +509,51 @@ export default function NeuralBrain() {
                 n.velocity.multiplyScalar(0.95);
                 n.vec.addScaledVector(n.velocity, dt * 20);
 
-                posAttr.setXYZ(i, n.vec.x, n.vec.y, n.vec.z);
+                // Direct assignment (No function call overhead)
+                const i3 = i * 3;
+                posArray[i3] = n.vec.x;
+                posArray[i3 + 1] = n.vec.y;
+                posArray[i3 + 2] = n.vec.z;
 
                 // Flash Decay (Thermal Cooling)
                 if (n.flash > 0) {
-                    n.flash = Math.max(0, n.flash - dt * 0.5); // Slower cooling (was 2.0)
+                    n.flash = Math.max(0, n.flash - dt * 0.5); // Slower cooling
                     n.flash = Math.min(n.flash, 4.0);
                 }
-                flashAttr.setX(i, n.flash);
+                flashArray[i] = n.flash;
             }
-            posAttr.needsUpdate = true;
-            flashAttr.needsUpdate = true;
+            (particlesGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+            (particlesGeo.attributes.aFlash as THREE.BufferAttribute).needsUpdate = true;
 
             // Update Connection Geometry
             for (let i = 0; i < connectionPairs.length; i++) {
                 const pair = connectionPairs[i];
                 const n1 = neurons[pair.from];
                 const n2 = neurons[pair.to];
-                linePosAttr.setXYZ(i * 2, n1.vec.x, n1.vec.y, n1.vec.z);
-                linePosAttr.setXYZ(i * 2 + 1, n2.vec.x, n2.vec.y, n2.vec.z);
+
+                const idx = i * 6; // 2 vertices * 3 coords
+                // Vertex 1
+                linePosArray[idx] = n1.vec.x;
+                linePosArray[idx + 1] = n1.vec.y;
+                linePosArray[idx + 2] = n1.vec.z;
+                // Vertex 2
+                linePosArray[idx + 3] = n2.vec.x;
+                linePosArray[idx + 4] = n2.vec.y;
+                linePosArray[idx + 5] = n2.vec.z;
             }
-            linePosAttr.needsUpdate = true;
+            (linesGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
 
             // Signal Logic
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
+            const signalArray = signalAttr.array as Float32Array;
 
             // Optimization: Only clear dirty lines from previous frame
             for (let i = 0; i < dirtyLines.length; i++) {
                 const idx = dirtyLines[i];
-                signalAttr.setY(idx * 2, 0);
-                signalAttr.setY(idx * 2 + 1, 0);
+                // 2 vertices * 2 floats (vec2) = stride 4
+                // We want to clear Y (strength) which is at offset +1 and +3
+                signalArray[idx * 4 + 1] = 0;
+                signalArray[idx * 4 + 3] = 0;
             }
             dirtyLines.length = 0;
 
@@ -547,8 +573,14 @@ export default function NeuralBrain() {
                 let encodedStrength = p.strength;
                 if (isReverse) encodedStrength = -p.strength;
 
-                signalAttr.setXY(lineIdx * 2, shaderProgress, encodedStrength);
-                signalAttr.setXY(lineIdx * 2 + 1, shaderProgress, encodedStrength);
+                // Direct array assignment
+                const v1 = lineIdx * 4;
+                signalArray[v1] = shaderProgress;
+                signalArray[v1 + 1] = encodedStrength;
+
+                const v2 = v1 + 2;
+                signalArray[v2] = shaderProgress;
+                signalArray[v2 + 1] = encodedStrength;
 
                 // Mark as dirty for cleanup next frame
                 dirtyLines.push(lineIdx);
