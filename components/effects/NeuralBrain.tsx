@@ -13,7 +13,7 @@ const CONFIG = {
     springStiffness: 0.04,
 
     // Signals
-    signalSpeed: 2.5,
+    signalSpeed: 1.25, // Slower (Half of 2.5)
     signalDecay: 0.7,
     minSignalStrength: 0.1,
     trailDecay: 2.0,
@@ -35,6 +35,7 @@ interface Neuron {
     velocity: THREE.Vector3;
     wanderAngle: { theta: number; phi: number }; // Spherical coords for wander
     connections: number[];   // Indices of connected neurons
+    flash: number;           // 0..1 activation level
 }
 
 interface Pulse {
@@ -104,7 +105,8 @@ export default function NeuralBrain() {
                     theta: Math.random() * Math.PI * 2,
                     phi: Math.acos(2 * Math.random() - 1)
                 },
-                connections: []
+                connections: [],
+                flash: 0
             });
         }
 
@@ -137,6 +139,7 @@ export default function NeuralBrain() {
         const particlesGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(neurons.length * 3);
         const phases = new Float32Array(neurons.length); // For individual pulsating
+        const flashes = new Float32Array(neurons.length); // For visual activation
 
         // Fill initial positions and phases
         neurons.forEach((n, i) => {
@@ -144,22 +147,27 @@ export default function NeuralBrain() {
             positions[i * 3 + 1] = n.vec.y;
             positions[i * 3 + 2] = n.vec.z;
             phases[i] = Math.random() * Math.PI * 2;
+            flashes[i] = 0.0;
         });
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         particlesGeo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
+        particlesGeo.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 1));
 
-        // Custom Shader for Pulsating Particles with DoF
+        // Custom Shader for Pulsating Particles with DoF and Flash
         const particlesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
                 uColor: { value: new THREE.Color(CONFIG.colorNeuron) },
+                uColorSignal: { value: new THREE.Color(CONFIG.colorSignal) },
                 uSize: { value: CONFIG.particleSize * 450 } // Slightly increased base scale
             },
             vertexShader: `
                 uniform float uTime;
                 uniform float uSize;
                 attribute float aPhase;
+                attribute float aFlash;
                 varying float vDepth;
+                varying float vFlash;
                 
                 void main() {
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
@@ -167,9 +175,12 @@ export default function NeuralBrain() {
                     
                     // Pass depth to fragment (positive view Z distance)
                     vDepth = -mvPosition.z;
+                    vFlash = aFlash;
 
                     // Pulsate size: organic sine wave
+                    // Flash increases size significantly
                     float pulse = 1.0 + 0.3 * sin(uTime * 1.5 + aPhase);
+                    pulse += aFlash * 0.5; // Grow when flashing
                     
                     // Std size attenuation
                     gl_PointSize = uSize * pulse * (1.0 / vDepth);
@@ -177,7 +188,9 @@ export default function NeuralBrain() {
             `,
             fragmentShader: `
                 uniform vec3 uColor;
+                uniform vec3 uColorSignal;
                 varying float vDepth;
+                varying float vFlash;
                 
                 void main() {
                     vec2 coord = gl_PointCoord - vec2(0.5);
@@ -206,7 +219,14 @@ export default function NeuralBrain() {
                     // Usually Blur implies clearer transparency? 
                     // Let's just output the mixed alpha.
                     
-                    gl_FragColor = vec4(uColor, finalAlpha * 0.8);
+                    // Color Mix (Base vs Signal)
+                    // Flash makes it orange
+                    vec3 finalColor = mix(uColor, uColorSignal, vFlash);
+                    
+                    // Enhance alpha when flashing
+                    finalAlpha = max(finalAlpha, finalAlpha * (1.0 + vFlash));
+
+                    gl_FragColor = vec4(finalColor, finalAlpha * 0.8);
                 }
             `,
             transparent: true,
@@ -281,11 +301,11 @@ export default function NeuralBrain() {
                         // Calculate distance from head based on direction
                         float dist = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
-                        // Trail Length approx 0.3 (30% of connection)
-                        if (dist >= 0.0 && dist < 0.3) {
-                            // Calculate Glow Factor (1.0 at head, 0.0 at tail)
-                            float glow = 1.0 - (dist / 0.3);
-                            glow = pow(glow, 2.0); // Sharper falloff
+                        // Trail Length increased to 0.4 for clearer visibility
+                        if (dist >= 0.0 && dist < 0.4) {
+                            // Calculate Glow Factor
+                            float glow = 1.0 - (dist / 0.4);
+                            glow = pow(glow, 1.0); // Linear falloff for stronger trail
                             
                             // Mix colors
                             // Additive glow
@@ -333,6 +353,7 @@ export default function NeuralBrain() {
         const triggerNeuron = () => {
             const idx = Math.floor(Math.random() * neurons.length);
             const n = neurons[idx];
+            n.flash = 1.0; // Trigger start flash
             // Fire to all neighbors
             n.connections.forEach(target => spawnPulse(idx, target, 1.0));
         };
@@ -356,6 +377,7 @@ export default function NeuralBrain() {
 
             // A. PHYSICS UPDATE (Wander & Spring)
             const posAttr = particlesGeo.attributes.position as THREE.BufferAttribute;
+            const flashAttr = particlesGeo.attributes.aFlash as THREE.BufferAttribute;
             const linePosAttr = linesGeo.attributes.position as THREE.BufferAttribute;
 
             for (let i = 0; i < neurons.length; i++) {
@@ -386,8 +408,15 @@ export default function NeuralBrain() {
 
                 // Update Buffer
                 posAttr.setXYZ(i, n.vec.x, n.vec.y, n.vec.z);
+
+                // Flash Decay
+                if (n.flash > 0) {
+                    n.flash = Math.max(0, n.flash - dt * 2.5); // Decay speed
+                }
+                flashAttr.setX(i, n.flash);
             }
             posAttr.needsUpdate = true;
+            flashAttr.needsUpdate = true;
 
             // B. UPDATE CONNECTIONS GEOMETRY
             // Needs to move with neurons
@@ -483,8 +512,11 @@ export default function NeuralBrain() {
 
                 if (p.progress >= 1.0) {
                     p.active = false;
+                    // Flash the target neuron
+                    const targetN = neurons[p.toIdx];
+                    targetN.flash = 1.0;
+
                     if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
-                        const targetN = neurons[p.toIdx];
                         targetN.connections.forEach(nextTarget => {
                             if (nextTarget !== p.fromIdx) {
                                 spawnPulse(p.toIdx, nextTarget, p.strength * CONFIG.signalDecay);
