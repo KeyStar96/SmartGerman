@@ -21,36 +21,34 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                 <div className="col-span-1 lg:col-span-4 order-2 lg:order-1">
                     <div className="inline-block mb-6">
                         <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
-                            // COGNITIVE_PROTOCOL_v0.4
+                            {dictionary.science.protocol}
                         </span>
                     </div>
 
                     <h2 className="text-4xl md:text-5xl mb-10 tracking-tighter uppercase font-bold text-[#2D3436] dark:text-[#E2D7CE] leading-none">
-                        Wissenschaft <br />
-                        <span className="text-[#FF5C00]">trifft Plastizität.</span>
+                        {dictionary.science.title_part1} <br />
+                        <span className="text-[#FF5C00]">{dictionary.science.title_part2}</span>
                     </h2>
 
                     <div className="space-y-8 text-xl font-light leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
                         <p className="opacity-90">
-                            Spracherwerb ist kein bloßes Auswendiglernen. Es ist die physische Umstrukturierung Ihres Gehirns.
-                            Wir nutzen wissenschaftlich fundierte Methoden, um die neuronale Plastizität gezielt zu stimulieren.
+                            {dictionary.science.description_1}
                         </p>
                         <p className="opacity-70 text-lg">
-                            Durch adaptive Lernalgorithmen und kognitive Trigger schaffen wir neue synaptische Verbindungen,
-                            die besonders im Erwachsenenalter den entscheidenden Unterschied machen.
+                            {dictionary.science.description_2}
                         </p>
                     </div>
 
                     <div className="mt-16 flex items-center gap-6">
                         <div className="h-[1px] w-12 bg-[#FF5C00]" />
                         <span className="font-mono text-[9px] tracking-[0.4em] uppercase opacity-40">
-                            Neural Mapping Layer Active
+                            {dictionary.science.layer_active}
                         </span>
                     </div>
                 </div>
 
                 {/* Right: The Brain Composition */}
-                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative w-full">
+                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative w-full flex flex-col items-center lg:block">
 
                     {/* Sandwich Wrapper: Reduced to 70% size (approx 420px) */}
                     <div className="relative w-full max-w-[420px] mx-auto">
@@ -79,16 +77,31 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
 
                     {/* Data Points overlay */}
-                    <div className="absolute top-10 right-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-right space-y-2 z-30">
-                        <div>DATA_STREAM: ACTIVE</div>
-                        <div>NEURON_COUNT: 400</div>
-                        <div>SIGNAL_SPEED: 2.5m/s</div>
-                        <div className="text-[#FF5C00]">SYNAPSE_FIRING...</div>
+                    {/* Top Right Data Block */}
+                    <div className="relative w-full lg:absolute lg:top-10 lg:right-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-center lg:text-right space-y-2 z-30 mt-8 lg:mt-0">
+                        <div className="grid grid-cols-2 lg:block gap-x-4">
+                            <div>{dictionary.science.data_points.data_stream_label}: <span className="lg:hidden">{dictionary.science.data_points.data_stream_value}</span></div>
+                            <div className="hidden lg:block">{dictionary.science.data_points.data_stream_value}</div>
+
+                            <div>{dictionary.science.data_points.neuron_count_label}: <span className="lg:hidden">{dictionary.science.data_points.neuron_count_value}</span></div>
+                            <div className="hidden lg:block">{dictionary.science.data_points.neuron_count_value}</div>
+
+                            <div>{dictionary.science.data_points.signal_speed_label}: <span className="lg:hidden">{dictionary.science.data_points.signal_speed_value}</span></div>
+                            <div className="hidden lg:block">{dictionary.science.data_points.signal_speed_value}</div>
+
+                            <div className="text-[#FF5C00] col-span-2 lg:col-span-1 mt-2 lg:mt-0">{dictionary.science.data_points.synapse_firing_label}: {dictionary.science.data_points.synapse_firing_value}</div>
+                        </div>
                     </div>
 
-                    <div className="absolute bottom-10 left-0 font-mono text-[9px] uppercase tracking-widest opacity-30 space-y-2 z-30">
-                        <div>HEMISPHERE: DUAL_SYNC</div>
-                        <div>PLASTICITY_INDEX: 0.94</div>
+                    {/* Bottom Left Data Block */}
+                    <div className="relative w-full lg:absolute lg:bottom-10 lg:left-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-center lg:text-left space-y-2 z-30 mt-4 lg:mt-0">
+                        <div className="grid grid-cols-2 lg:block gap-x-4">
+                            <div>{dictionary.science.data_points.hemisphere_label}: <span className="lg:hidden">{dictionary.science.data_points.hemisphere_value}</span></div>
+                            <div className="hidden lg:block">{dictionary.science.data_points.hemisphere_value}</div>
+
+                            <div>{dictionary.science.data_points.plasticity_label}: <span className="lg:hidden">{dictionary.science.data_points.plasticity_value}</span></div>
+                            <div className="hidden lg:block">{dictionary.science.data_points.plasticity_value}</div>
+                        </div>
                     </div>
                 </div>
             </div>

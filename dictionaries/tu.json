@@ -1,62 +1,62 @@
 {
-    "meta": {
-      "title": "Hannover'de Almanca Öğrenin | Ukraynalılar ve Rusça Konuşanlar İçin Uzmanlaşmış | SmartGerman",
-      "description": "Hannover'de ana dili öğretmen ile Almanca kursları. Almanca öğrenmek isteyen herkes için. A1-B2 kursları, Online ve Yüz yüze. Hemen kaydolun!",
-      "keywords": "Hannover Almanca kursları, Hannover dil okulu, Hannover'de Almanca öğrenin, ana dili desteği, Hannover entegrasyon kursu, Ukraynalılar ve Rusça konuşanlar için Almanca, Hannover A1 kursu, Hannover A2 kursu, Hannover B1 kursu, online Almanca kursu, Almanca 50 Plus"
+  "meta": {
+    "title": "Hannover'de Almanca Öğrenin | Ukraynalılar ve Rusça Konuşanlar İçin Uzmanlaşmış | SmartGerman",
+    "description": "Hannover'de ana dili öğretmen ile Almanca kursları. Almanca öğrenmek isteyen herkes için. A1-B2 kursları, Online ve Yüz yüze. Hemen kaydolun!",
+    "keywords": "Hannover Almanca kursları, Hannover dil okulu, Hannover'de Almanca öğrenin, ana dili desteği, Hannover entegrasyon kursu, Ukraynalılar ve Rusça konuşanlar için Almanca, Hannover A1 kursu, Hannover A2 kursu, Hannover B1 kursu, online Almanca kursu, Almanca 50 Plus"
+  },
+  "header": {
+    "banner": {
+      "next_course": "Sonraki kurs başlangıcı: 3 Şubat 2026",
+      "reserve_spot": "Şimdi yerinizi ayırın",
+      "location": "SmartGerman Hannover",
+      "native_teachers": "Ana dili öğretmenler",
+      "online_courses": "Online kurslar"
     },
-    "header": {
-      "banner": {
-        "next_course": "Sonraki kurs başlangıcı: 3 Şubat 2026",
-        "reserve_spot": "Şimdi yerinizi ayırın",
-        "location": "SmartGerman Hannover",
-        "native_teachers": "Ana dili öğretmenler",
-        "online_courses": "Online kurslar"
-      },
-      "nav": {
-        "home": "Ana Sayfa",
-        "courses": "Kurslar",
-        "prices": "Fiyatlar",
-        "enroll": "Kayıt Ol"
-      },
-      "language_switcher": {
-        "de": "DE",
-        "en": "EN",
-        "uk": "UK",
-        "ru": "RU",
-        "tu": "TU"
-      }
+    "nav": {
+      "home": "Ana Sayfa",
+      "courses": "Kurslar",
+      "prices": "Fiyatlar",
+      "enroll": "Kayıt Ol"
     },
-    "hero": {
-      "brand_name_part1": "Smart",
-      "brand_name_part2": "German",
-      "badge": "Kanıta Dayalı • Nöro-Didaktik • Uzmanlık",
-      "headline": "Bilime Dayalı Dil Edinimi.",
-      "subline": "Dil öğrenmek yaş meselesi değil, yöntem meselesidir.",
-      "cta_primary": "Yöntemi Keşfet",
-      "cta_secondary": "2026 Kurs Programı",
-      "scroll_label": "KAYDIR"
+    "language_switcher": {
+      "de": "DE",
+      "en": "EN",
+      "uk": "UK",
+      "ru": "RU",
+      "tu": "TU"
+    }
+  },
+  "hero": {
+    "brand_name_part1": "Smart",
+    "brand_name_part2": "German",
+    "badge": "Kanıta Dayalı • Nöro-Didaktik • Uzmanlık",
+    "headline": "Bilime Dayalı Dil Edinimi.",
+    "subline": "Dil öğrenmek yaş meselesi değil, yöntem meselesidir.",
+    "cta_primary": "Yöntemi Keşfet",
+    "cta_secondary": "2026 Kurs Programı",
+    "scroll_label": "KAYDIR"
+  },
+  "sections": {
+    "quality_success": {
+      "title": "Kalite ve Başarı",
+      "description": "Kurslarımız maksimum verimlilik için tasarlanmıştır. İlham verici bir ortamda modern öğrenmeyi deneyimleyin."
     },
-    "sections": {
-      "quality_success": {
-        "title": "Kalite ve Başarı",
-        "description": "Kurslarımız maksimum verimlilik için tasarlanmıştır. İlham verici bir ortamda modern öğrenmeyi deneyimleyin."
+    "modern_methods": {
+      "title": "Modern Yöntemler",
+      "description": "Hızlı ilerleme için yenilikçi öğrenme yöntemleri. Ekibimiz başarı yolculuğunuzda size eşlik eder."
+    },
+    "features": {
+      "title_part1": "Bizi",
+      "title_part2": "farklı kılan",
+      "intro": "SmartGerman, size Almanca öğrenmenin modern ve etkili bir yolunu sunar – kalite ve esnekliğe odaklanır.",
+      "native_speakers": {
+        "title": "Ana Dili Öğretmenler",
+        "description": "Nitelikli ana dili öğretmenlerimiz, otantik bir öğrenme deneyimi için profesyonel öğretim deneyimini kültürlerarası yeterlilikle birleştirir."
       },
-      "modern_methods": {
-        "title": "Modern Yöntemler",
-        "description": "Hızlı ilerleme için yenilikçi öğrenme yöntemleri. Ekibimiz başarı yolculuğunuzda size eşlik eder."
+      "flexibility": {
+        "title": "Esnek Kurs Saatleri",
+        "description": "Programınıza uyum sağlayan, günün farklı saatlerinde kurslar sunuyoruz - akşam saatleri dahil."
       },
-      "features": {
-        "title_part1": "Bizi",
-        "title_part2": "farklı kılan",
-        "intro": "SmartGerman, size Almanca öğrenmenin modern ve etkili bir yolunu sunar – kalite ve esnekliğe odaklanır.",
-        "native_speakers": {
-          "title": "Ana Dili Öğretmenler",
-          "description": "Nitelikli ana dili öğretmenlerimiz, otantik bir öğrenme deneyimi için profesyonel öğretim deneyimini kültürlerarası yeterlilikle birleştirir."
-        },
-        "flexibility": {
-          "title": "Esnek Kurs Saatleri",
-          "description": "Programınıza uyum sağlayan, günün farklı saatlerinde kurslar sunuyoruz - akşam saatleri dahil."
-        },
       "methods": {
         "title": "Pratik Yöntemler",
         "description": "Etkileşimli ve iletişimsel öğretim yöntemlerimiz, hızlı ve sürdürülebilir öğrenme başarısı için günlük durumlara odaklanır."
@@ -205,68 +205,89 @@
       ]
     }
   },
-    "features": {
-      "native_support": "Ana Dili Öğretmenler",
-      "native_desc": "Nitelikli ana dili öğretmenlerimiz, otantik bir öğrenme deneyimi için profesyonel öğretim deneyimini kültürlerarası yeterlilikle birleştirir.",
-      "central_location": "Esnek Kurs Saatleri",
-      "location_desc": "Programınıza uyum sağlayan, günün farklı saatlerinde kurslar sunuyoruz - akşam saatleri dahil.",
-      "modern_learning": "Pratik Yöntemler",
-      "modern_desc": "Etkileşimli ve iletişimsel öğretim yöntemlerimiz, hızlı ve sürdürülebilir öğrenme başarısı için günlük durumlara odaklanır."
+  "features": {
+    "native_support": "Ana Dili Öğretmenler",
+    "native_desc": "Nitelikli ana dili öğretmenlerimiz, otantik bir öğrenme deneyimi için profesyonel öğretim deneyimini kültürlerarası yeterlilikle birleştirir.",
+    "central_location": "Esnek Kurs Saatleri",
+    "location_desc": "Programınıza uyum sağlayan, günün farklı saatlerinde kurslar sunuyoruz - akşam saatleri dahil.",
+    "modern_learning": "Pratik Yöntemler",
+    "modern_desc": "Etkileşimli ve iletişimsel öğretim yöntemlerimiz, hızlı ve sürdürülebilir öğrenme başarısı için günlük durumlara odaklanır."
+  },
+  "courses": {
+    "title": "Kurslarımız",
+    "subtitle": "Başlangıçtan profesyonele – sizin için doğru kursa sahibiz.",
+    "price_label": "Fiyat",
+    "flip_hint": "DETAY",
+    "back_hint": "GERİ",
+    "backface_labels": {
+      "unit": "BİRİM",
+      "appointments": "RANDEVULAR",
+      "group": "GRUP",
+      "instructor": "EĞİTMEN",
+      "location": "KONUM",
+      "extras": "EKSTRALAR",
+      "contract": "SÖZLEŞME",
+      "monthly_cancellable": "Aylık iptal edilebilir",
+      "monthly_cancellable_short": "Aylık iptal edilebilir",
+      "telegram_materials": "Telegram Grubu & Materyaller",
+      "extras_short": "Dahil Materyal & Telegram"
     },
-    "courses": {
-      "title": "Kurslarımız",
-      "subtitle": "Başlangıçtan profesyonele – sizin için doğru kursa sahibiz.",
-      "price_label": "Fiyat",
-      "flip_hint": "DETAY",
-      "back_hint": "GERİ",
-      "backface_labels": {
-        "unit": "BİRİM",
-        "appointments": "RANDEVULAR",
-        "group": "GRUP",
-        "instructor": "EĞİTMEN",
-        "location": "KONUM",
-        "extras": "EKSTRALAR",
-        "contract": "SÖZLEŞME",
-        "monthly_cancellable": "Aylık iptal edilebilir",
-        "monthly_cancellable_short": "Aylık iptal edilebilir",
-        "telegram_materials": "Telegram Grubu & Materyaller",
-        "extras_short": "Dahil Materyal & Telegram"
-      },
-      "a1": {
-        "name": "A1 Başlangıç",
-        "desc": "Ön bilgi olmadan ideal başlangıç."
-      },
-      "b2": {
-        "name": "B2 İleri",
-        "desc": "İş ve günlük yaşamda güvenli performans."
-      }
+    "a1": {
+      "name": "A1 Başlangıç",
+      "desc": "Ön bilgi olmadan ideal başlangıç."
     },
-    "schedule": {
-      "title": "Başarıya Giden Yolunuz – Haftalık Program",
-      "subtitle": "Kursları görmek için bir gün seçin",
-      "open_button": "Haftalık Programı Aç",
-      "filter_all": "Tümü",
-      "filter_seniors": "Yaşlılar",
-      "instructor": "Eğitmen",
-      "no_courses": "Bu günde kurs yok",
-      "print_button": "Yazdırma Görünümü / PDF",
-      "view_day": "Gün Görünümü",
-      "view_grid": "Izgara Görünümü",
-      "switch_view": "Görünümü Değiştir",
-      "time": "Saat",
-      "monday": "Pazartesi",
-      "tuesday": "Salı",
-      "wednesday": "Çarşamba",
-      "thursday": "Perşembe",
-      "friday": "Cuma"
-    },
-    "footer": {
-      "rights": "© 2025 SmartGerman Hannover. Tüm hakları saklıdır.",
-      "links": {
-        "imprint": "İçindekiler",
-        "privacy": "Gizlilik",
-        "agb": "Şartlar"
-      }
+    "b2": {
+      "name": "B2 İleri",
+      "desc": "İş ve günlük yaşamda güvenli performans."
+    }
+  },
+  "schedule": {
+    "title": "Başarıya Giden Yolunuz – Haftalık Program",
+    "subtitle": "Kursları görmek için bir gün seçin",
+    "open_button": "Haftalık Programı Aç",
+    "filter_all": "Tümü",
+    "filter_seniors": "Yaşlılar",
+    "instructor": "Eğitmen",
+    "no_courses": "Bu günde kurs yok",
+    "print_button": "Yazdırma Görünümü / PDF",
+    "view_day": "Gün Görünümü",
+    "view_grid": "Izgara Görünümü",
+    "switch_view": "Görünümü Değiştir",
+    "time": "Saat",
+    "monday": "Pazartesi",
+    "tuesday": "Salı",
+    "wednesday": "Çarşamba",
+    "thursday": "Perşembe",
+    "friday": "Cuma"
+  },
+  "science": {
+    "protocol": "// COGNITIVE_PROTOCOL_v0.4",
+    "title_part1": "Bilim",
+    "title_part2": "Plastisite ile Buluşuyor.",
+    "description_1": "Dil öğrenimi sadece ezberlemek değildir. Beyninizin fiziksel olarak yeniden yapılandırılmasıdır. Nöronal plastisiteyi özel olarak uyarmak için bilimsel olarak kanıtlanmış yöntemler kullanıyoruz.",
+    "description_2": "Uyarlanabilir öğrenme algoritmaları ve bilişsel tetikleyiciler sayesinde, özellikle yetişkinlikte belirleyici farkı yaratan yeni sinaptik bağlantılar oluşturuyoruz.",
+    "layer_active": "Nöronal Haritalama Katmanı Aktif",
+    "data_points": {
+      "data_stream_label": "VERİ_AKIŞI",
+      "data_stream_value": "AKTİF",
+      "neuron_count_label": "NÖRON_SAYISI",
+      "neuron_count_value": "86.4 MLYR",
+      "signal_speed_label": "SİNYAL_HIZI",
+      "signal_speed_value": "110 m/sn",
+      "synapse_firing_label": "SİNAPS_ATEŞLEME",
+      "synapse_firing_value": "40Hz (GAMA)",
+      "hemisphere_label": "YARIMKÜRE",
+      "hemisphere_value": "UYUMLULUK 0.88",
+      "plasticity_label": "PLASTİSİTE",
+      "plasticity_value": "0.94 İNDEKS"
+    }
+  },
+  "footer": {
+    "rights": "© 2025 SmartGerman Hannover. Tüm hakları saklıdır.",
+    "links": {
+      "imprint": "İçindekiler",
+      "privacy": "Gizlilik",
+      "agb": "Şartlar"
     }
   }
-
+}

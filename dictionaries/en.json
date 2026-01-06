@@ -1,62 +1,62 @@
 {
-    "meta": {
-      "title": "Learn German in Hannover | Specialized for Ukrainians & Russian Speakers | SmartGerman",
-      "description": "German courses in Hannover with native teacher. For everyone who wants to learn German. A1-B2 courses, Online & In-person. Sign up now!",
-      "keywords": "German courses Hannover, language school Hannover, learn German Hannover, native support, integration course Hannover, German for Ukrainians & Russian speakers, A1 course Hannover, A2 course Hannover, B1 course Hannover, online German course, German 50 Plus"
+  "meta": {
+    "title": "Learn German in Hannover | Specialized for Ukrainians & Russian Speakers | SmartGerman",
+    "description": "German courses in Hannover with native teacher. For everyone who wants to learn German. A1-B2 courses, Online & In-person. Sign up now!",
+    "keywords": "German courses Hannover, language school Hannover, learn German Hannover, native support, integration course Hannover, German for Ukrainians & Russian speakers, A1 course Hannover, A2 course Hannover, B1 course Hannover, online German course, German 50 Plus"
+  },
+  "header": {
+    "banner": {
+      "next_course": "Next course start: February 3, 2026",
+      "reserve_spot": "Reserve your spot now",
+      "location": "SmartGerman Hannover",
+      "native_teachers": "Native teachers",
+      "online_courses": "Online courses"
     },
-    "header": {
-      "banner": {
-        "next_course": "Next course start: February 3, 2026",
-        "reserve_spot": "Reserve your spot now",
-        "location": "SmartGerman Hannover",
-        "native_teachers": "Native teachers",
-        "online_courses": "Online courses"
-      },
-      "nav": {
-        "home": "Home",
-        "courses": "Courses",
-        "prices": "Prices",
-        "enroll": "Enroll"
-      },
-      "language_switcher": {
-        "de": "DE",
-        "en": "EN",
-        "uk": "UK",
-        "ru": "RU",
-        "tu": "TU"
-      }
+    "nav": {
+      "home": "Home",
+      "courses": "Courses",
+      "prices": "Prices",
+      "enroll": "Enroll"
     },
-    "hero": {
-      "brand_name_part1": "Smart",
-      "brand_name_part2": "German",
-      "badge": "Evidence-Based • Neuro-Didactics • Master Expertise",
-      "headline": "Language Acquisition Based on Science.",
-      "subline": "Learning languages is not a question of age, but a question of method.",
-      "cta_primary": "Discover the Method",
-      "cta_secondary": "Course Schedule 2026",
-      "scroll_label": "SCROLL"
+    "language_switcher": {
+      "de": "DE",
+      "en": "EN",
+      "uk": "UK",
+      "ru": "RU",
+      "tu": "TU"
+    }
+  },
+  "hero": {
+    "brand_name_part1": "Smart",
+    "brand_name_part2": "German",
+    "badge": "Evidence-Based • Neuro-Didactics • Master Expertise",
+    "headline": "Language Acquisition Based on Science.",
+    "subline": "Learning languages is not a question of age, but a question of method.",
+    "cta_primary": "Discover the Method",
+    "cta_secondary": "Course Schedule 2026",
+    "scroll_label": "SCROLL"
+  },
+  "sections": {
+    "quality_success": {
+      "title": "Quality & Success",
+      "description": "Our courses are designed for maximum efficiency. Experience modern learning in an inspiring environment."
     },
-    "sections": {
-      "quality_success": {
-        "title": "Quality & Success",
-        "description": "Our courses are designed for maximum efficiency. Experience modern learning in an inspiring environment."
+    "modern_methods": {
+      "title": "Modern Methods",
+      "description": "Innovative learning methods for rapid progress. Our team accompanies you on your path to success."
+    },
+    "features": {
+      "title_part1": "What makes us",
+      "title_part2": "stand out",
+      "intro": "SmartGerman offers you a modern and effective way to learn German – focused on quality and flexibility.",
+      "native_speakers": {
+        "title": "Native Teachers",
+        "description": "Our qualified native speakers combine professional teaching experience with intercultural competence for an authentic learning experience."
       },
-      "modern_methods": {
-        "title": "Modern Methods",
-        "description": "Innovative learning methods for rapid progress. Our team accompanies you on your path to success."
+      "flexibility": {
+        "title": "Flexible Course Times",
+        "description": "We offer courses at various times of day that adapt to your schedule - including evenings."
       },
-      "features": {
-        "title_part1": "What makes us",
-        "title_part2": "stand out",
-        "intro": "SmartGerman offers you a modern and effective way to learn German – focused on quality and flexibility.",
-        "native_speakers": {
-          "title": "Native Teachers",
-          "description": "Our qualified native speakers combine professional teaching experience with intercultural competence for an authentic learning experience."
-        },
-        "flexibility": {
-          "title": "Flexible Course Times",
-          "description": "We offer courses at various times of day that adapt to your schedule - including evenings."
-        },
       "methods": {
         "title": "Practical Methods",
         "description": "Our interactive and communicative teaching methods focus on everyday situations for quick and sustainable learning success."
@@ -205,68 +205,89 @@
       ]
     }
   },
-    "features": {
-      "native_support": "Native Teachers",
-      "native_desc": "Our qualified native speakers combine professional teaching experience with intercultural competence for an authentic learning experience.",
-      "central_location": "Flexible Course Times",
-      "location_desc": "We offer courses at various times of day that adapt to your schedule - including evenings.",
-      "modern_learning": "Practical Methods",
-      "modern_desc": "Our interactive and communicative teaching methods focus on everyday situations for quick and sustainable learning success."
+  "features": {
+    "native_support": "Native Teachers",
+    "native_desc": "Our qualified native speakers combine professional teaching experience with intercultural competence for an authentic learning experience.",
+    "central_location": "Flexible Course Times",
+    "location_desc": "We offer courses at various times of day that adapt to your schedule - including evenings.",
+    "modern_learning": "Practical Methods",
+    "modern_desc": "Our interactive and communicative teaching methods focus on everyday situations for quick and sustainable learning success."
+  },
+  "courses": {
+    "title": "Our Courses",
+    "subtitle": "From beginner to pro – we have the right course for you.",
+    "price_label": "Price",
+    "flip_hint": "DETAILS",
+    "back_hint": "BACK",
+    "backface_labels": {
+      "unit": "UNIT",
+      "appointments": "APPOINTMENTS",
+      "group": "GROUP",
+      "instructor": "INSTRUCTOR",
+      "location": "LOCATION",
+      "extras": "EXTRAS",
+      "contract": "CONTRACT",
+      "monthly_cancellable": "Monthly cancellable",
+      "monthly_cancellable_short": "Monthly cancellable",
+      "telegram_materials": "Telegram Group & Materials",
+      "extras_short": "Incl. Material & Telegram"
     },
-    "courses": {
-      "title": "Our Courses",
-      "subtitle": "From beginner to pro – we have the right course for you.",
-      "price_label": "Price",
-      "flip_hint": "DETAILS",
-      "back_hint": "BACK",
-      "backface_labels": {
-        "unit": "UNIT",
-        "appointments": "APPOINTMENTS",
-        "group": "GROUP",
-        "instructor": "INSTRUCTOR",
-        "location": "LOCATION",
-        "extras": "EXTRAS",
-        "contract": "CONTRACT",
-        "monthly_cancellable": "Monthly cancellable",
-        "monthly_cancellable_short": "Monthly cancellable",
-        "telegram_materials": "Telegram Group & Materials",
-        "extras_short": "Incl. Material & Telegram"
-      },
-      "a1": {
-        "name": "A1 Beginner",
-        "desc": "The ideal start without prior knowledge."
-      },
-      "b2": {
-        "name": "B2 Advanced",
-        "desc": "Confident performance in work and everyday life."
-      }
+    "a1": {
+      "name": "A1 Beginner",
+      "desc": "The ideal start without prior knowledge."
     },
-    "schedule": {
-      "title": "Your Path to Success – The Weekly Schedule",
-      "subtitle": "Select a day to view the courses",
-      "open_button": "Open Weekly Schedule",
-      "filter_all": "All",
-      "filter_seniors": "Seniors",
-      "instructor": "Instructor",
-      "no_courses": "No courses on this day",
-      "print_button": "Print View / PDF",
-      "view_day": "Day View",
-      "view_grid": "Grid View",
-      "switch_view": "Switch View",
-      "time": "Time",
-      "monday": "Monday",
-      "tuesday": "Tuesday",
-      "wednesday": "Wednesday",
-      "thursday": "Thursday",
-      "friday": "Friday"
-    },
-    "footer": {
-      "rights": "© 2025 SmartGerman Hannover. All rights reserved.",
-      "links": {
-        "imprint": "Imprint",
-        "privacy": "Privacy",
-        "agb": "Terms"
-      }
+    "b2": {
+      "name": "B2 Advanced",
+      "desc": "Confident performance in work and everyday life."
+    }
+  },
+  "schedule": {
+    "title": "Your Path to Success – The Weekly Schedule",
+    "subtitle": "Select a day to view the courses",
+    "open_button": "Open Weekly Schedule",
+    "filter_all": "All",
+    "filter_seniors": "Seniors",
+    "instructor": "Instructor",
+    "no_courses": "No courses on this day",
+    "print_button": "Print View / PDF",
+    "view_day": "Day View",
+    "view_grid": "Grid View",
+    "switch_view": "Switch View",
+    "time": "Time",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday"
+  },
+  "science": {
+    "protocol": "// COGNITIVE_PROTOCOL_v0.4",
+    "title_part1": "Science",
+    "title_part2": "meets Plasticity.",
+    "description_1": "Language acquisition is not just memorization. It is the physical restructuring of your brain. We use scientifically proven methods to specifically stimulate neural plasticity.",
+    "description_2": "Through adaptive learning algorithms and cognitive triggers, we create new synaptic connections that make the decisive difference, especially in adulthood.",
+    "layer_active": "Neural Mapping Layer Active",
+    "data_points": {
+      "data_stream_label": "DATA_STREAM",
+      "data_stream_value": "ACTIVE",
+      "neuron_count_label": "NEURON_COUNT",
+      "neuron_count_value": "86.4 B",
+      "signal_speed_label": "SIGNAL_SPEED",
+      "signal_speed_value": "110 m/s",
+      "synapse_firing_label": "SYNAPSE_FIRING",
+      "synapse_firing_value": "40Hz (GAMMA)",
+      "hemisphere_label": "HEMISPHERE",
+      "hemisphere_value": "COHERENCE 0.88",
+      "plasticity_label": "PLASTICITY",
+      "plasticity_value": "0.94 INDEX"
+    }
+  },
+  "footer": {
+    "rights": "© 2025 SmartGerman Hannover. All rights reserved.",
+    "links": {
+      "imprint": "Imprint",
+      "privacy": "Privacy",
+      "agb": "Terms"
     }
   }
-
+}
