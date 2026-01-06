@@ -49,20 +49,46 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
                 </div>
 
-                {/* Right: Neural Brain Component (60%) */}
-                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative aspect-[4/3] lg:aspect-square w-full">
-                    <div className="absolute inset-0 z-0">
+                {/* Right: Neural Brain Layered Component (60%) */}
+                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative aspect-[4/3] lg:aspect-square w-full select-none pointer-events-none">
+                    {/* 
+                      Layering Strategy:
+                      1. Bottom: Neural Brain (Canvas) - Scale/Position adjusted to fit head
+                      2. Top: Image of Head with transparent brain area OR Multiply blend mode if white background
+                     */}
+
+                    {/* LAYER 1: 3D BRAIN (Bottom) */}
+                    <div className="absolute inset-x-0 bottom-0 top-[10%] z-0">
+                        {/* 
+                           Adjust margins/padding here to align the 3D cluster 
+                           perfectly with the head image's brain cavity 
+                         */}
                         <NeuralBrain />
                     </div>
 
-                    {/* Minimalist Data Points */}
-                    <div className="absolute top-0 right-0 font-mono text-[9px] uppercase tracking-widest opacity-20 text-right space-y-2">
-                        <div>DATA_STREAM: ACTIVE</div>
-                        <div>NEURON_COUNT: 1,200</div>
-                        <div>SIGNAL_SPEED: 120m/s</div>
+                    {/* LAYER 2: MASK IMAGE (Top) */}
+                    <div className="absolute inset-0 z-10 flex items-center justify-center">
+                        <img
+                            src="/Bilder/SG_Brain-Compressed.webp"
+                            alt="Human Head Structure"
+                            className="w-full h-full object-contain mix-blend-multiply opacity-90 dark:mix-blend-normal dark:opacity-80"
+                        />
+                        {/* 
+                           Note: 'mix-blend-multiply' is great if the brain area is white in a JPG.
+                           If it's transparent PNG, normal blending is fine. 
+                           Adjust 'top-[10%]' in Layer 1 to align.
+                         */}
                     </div>
 
-                    <div className="absolute bottom-0 left-0 font-mono text-[9px] uppercase tracking-widest opacity-20 space-y-2">
+                    {/* Minimalist Data Points (Overlaid on top) */}
+                    <div className="absolute top-10 right-0 font-mono text-[9px] uppercase tracking-widest opacity-30 text-right space-y-2 z-20">
+                        <div>DATA_STREAM: ACTIVE</div>
+                        <div>NEURON_COUNT: 1,200</div>
+                        <div>SIGNAL_SPEED: 2.5m/s</div>
+                        <div className="text-[#FF5C00]">SYNAPSE_FIRING...</div>
+                    </div>
+
+                    <div className="absolute bottom-10 left-0 font-mono text-[9px] uppercase tracking-widest opacity-30 space-y-2 z-20">
                         <div>HEMISPHERE: DUAL_SYNC</div>
                         <div>PLASTICITY_INDEX: 0.94</div>
                     </div>
