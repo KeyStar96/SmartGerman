@@ -58,7 +58,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                      */}
 
                     {/* LAYER 1: 3D BRAIN (Bottom) */}
-                    <div className="absolute inset-x-0 bottom-0 top-[10%] z-0">
+                    <div className="absolute inset-x-0 bottom-0 top-[10%] z-0 scale-x-[-1]">
                         {/* 
                            Adjust margins/padding here to align the 3D cluster 
                            perfectly with the head image's brain cavity 
@@ -71,12 +71,11 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         <img
                             src="/Bilder/SG_Brain-Compressed.webp"
                             alt="Human Head Structure"
-                            className="w-full h-full object-contain mix-blend-multiply opacity-90 dark:mix-blend-normal dark:opacity-80"
+                            className="w-[60%] h-auto object-contain scale-x-[-1]"
                         />
                         {/* 
-                           Note: 'mix-blend-multiply' is great if the brain area is white in a JPG.
-                           If it's transparent PNG, normal blending is fine. 
-                           Adjust 'top-[10%]' in Layer 1 to align.
+                           User Request: 60% size, Mirrored, No Transparency options.
+                           Assumes image has alpha channel for brain area if 3D is behind.
                          */}
                     </div>
 
