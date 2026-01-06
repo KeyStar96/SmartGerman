@@ -85,7 +85,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       display: "inline-block",
       opacity: 1,
       duration: 0.1,
-      stagger: 0.12,
+      stagger: 0.08,
       ease: "none",
     }, 0.5) // Sync start with slide up
 
@@ -165,7 +165,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             style={{ fontFamily: 'var(--font-mono)', opacity: 0, visibility: 'hidden' }} // Keep h2 visible for layout but shifted via GSAP
           >
             {claimChars.map((char: string, index: number) => (
-              <span key={index} className="char opacity-0 w-auto">
+              <span key={index} className="char hidden opacity-0 w-auto">
                 {char === " " ? "\u00A0" : char}
               </span>
             ))}
