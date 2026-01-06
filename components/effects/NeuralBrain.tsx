@@ -221,26 +221,87 @@ export default function NeuralBrain() {
         // B. Connections (Lines)
         const linesGeo = new THREE.BufferGeometry();
         const linePositions = new Float32Array(connectionPairs.length * 2 * 3);
-        const lineColors = new Float32Array(connectionPairs.length * 2 * 3); // RGB per vertex
+        const lineProgress = new Float32Array(connectionPairs.length * 2); // 0 for start, 1 for end
+        const signalData = new Float32Array(connectionPairs.length * 2 * 2); // [Progress, Strength] per vertex
 
-        // Pre-fill colors (start with low opacity white/cyan)
-        const baseColor = new THREE.Color(CONFIG.colorNeuron);
-        for (let i = 0; i < lineColors.length; i += 3) {
-            lineColors[i] = baseColor.r;
-            lineColors[i + 1] = baseColor.g;
-            lineColors[i + 2] = baseColor.b;
+        // Pre-fill static attributes
+        for (let i = 0; i < connectionPairs.length; i++) {
+            // Vertex 0
+            lineProgress[i * 2] = 0.0;
+            // Vertex 1
+            lineProgress[i * 2 + 1] = 1.0;
         }
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-        linesGeo.setAttribute('color', new THREE.BufferAttribute(lineColors, 3));
+        linesGeo.setAttribute('aLineProgress', new THREE.BufferAttribute(lineProgress, 1));
+        linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2)); // Dynamic
 
-        const linesMat = new THREE.LineBasicMaterial({
-            vertexColors: true,     // CRITICAL for signal effect
+        const linesMat = new THREE.ShaderMaterial({
+            uniforms: {
+                uColorBase: { value: new THREE.Color(CONFIG.colorNeuron) },
+                uColorSignal: { value: new THREE.Color(CONFIG.colorSignal) },
+                uOpacityBase: { value: 0.06 }, // Subtle base connection
+            },
+            vertexShader: `
+                attribute float aLineProgress;
+                attribute vec2 aSignal; // x = Progress (0..1), y = Strength (0..1)
+                
+                varying float vProgress;
+                varying vec2 vSignal;
+                
+                void main() {
+                    vProgress = aLineProgress;
+                    vSignal = aSignal;
+                    
+                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 uColorBase;
+                uniform vec3 uColorSignal;
+                uniform float uOpacityBase;
+                
+                varying float vProgress;
+                varying vec2 vSignal;
+                
+                void main() {
+                    float signalProgress = vSignal.x;
+                    float rawStrength = vSignal.y;
+                    float signalStrength = abs(rawStrength);
+                    
+                    // Base appearance
+                    vec3 finalColor = uColorBase;
+                    float finalOpacity = uOpacityBase;
+                    
+                    // Signal Trail Logic
+                    if (signalStrength > 0.01) {
+                        bool isReverse = rawStrength < 0.0;
+                        
+                        // Calculate distance from head based on direction
+                        float dist = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
+                        
+                        // Trail Length approx 0.3 (30% of connection)
+                        if (dist >= 0.0 && dist < 0.3) {
+                            // Calculate Glow Factor (1.0 at head, 0.0 at tail)
+                            float glow = 1.0 - (dist / 0.3);
+                            glow = pow(glow, 2.0); // Sharper falloff
+                            
+                            // Mix colors
+                            // Additive glow
+                            finalColor = mix(uColorBase, uColorSignal, glow * signalStrength);
+                            finalOpacity = max(finalOpacity, glow * signalStrength);
+                        }
+                    }
+                    
+                    gl_FragColor = vec4(finalColor, finalOpacity);
+                }
+            `,
             transparent: true,
-            opacity: 0.15,           // Base opacity
             blending: THREE.AdditiveBlending,
             depthWrite: false
         });
+
         const linesMesh = new THREE.LineSegments(linesGeo, linesMat);
         scene.add(linesMesh);
 
@@ -282,8 +343,6 @@ export default function NeuralBrain() {
 
         // Reusable objects to avoid GC
         const tempVec = new THREE.Vector3();
-        const signalColorObj = new THREE.Color(CONFIG.colorSignal);
-        const baseColorObj = new THREE.Color(CONFIG.colorNeuron);
 
         const animate = () => {
             requestAnimationFrame(animate);
@@ -345,68 +404,89 @@ export default function NeuralBrain() {
             linePosAttr.needsUpdate = true;
 
 
-            // C. SIGNAL PROPAGATION & COLORING
-            // Reset colors slightly towards base (decay trail) or fully reset? 
-            // Better: We must reset all colors every frame to base, then apply active pulses.
-            // But for "Trail" decay, we need state. 
-            // Simplified approach: calculated purely on pulses.
+            // C. SIGNAL PROPAGATION & ATTRIBUTE UPDATE
+            // 1. Clear Signal Buffer for this frame (reset to 0)
+            const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
+            // Ideally we'd conceptually "fade" but since our shader draws the trail based on ONE position, 
+            // we just need to update that position. 
+            // Limitation: One pulse per line max for now visually. (Last one wins)
 
-            // First, reset all line colors to base dim state? 
-            // Efficiency warning: Looping 2400 lines * 2 vertices = 4800 updates per frame. acceptable.
-
-            // Optimization: Create an array of "intensity" per line.
-            // Decay intensity array, then update color buffer.
-
-            if (!linesMesh.userData.intensities) {
-                linesMesh.userData.intensities = new Float32Array(connectionPairs.length).fill(0);
-            }
-            const intensities = linesMesh.userData.intensities as Float32Array;
-
-            // Decay intensities
-            for (let i = 0; i < intensities.length; i++) {
-                if (intensities[i] > 0) {
-                    intensities[i] -= CONFIG.trailDecay * dt;
-                    if (intensities[i] < 0) intensities[i] = 0;
-                }
+            // To ensure lines don't "flicker" off if no pulse, we just set them to 0 strength.
+            // Efficient clear:
+            for (let i = 0; i < connectionPairs.length; i++) {
+                // Set Strength (y) to 0
+                signalAttr.setY(i * 2, 0);
+                signalAttr.setY(i * 2 + 1, 0);
             }
 
             // Update Pulses
             pulsePool.forEach(p => {
                 if (!p.active) return;
 
-                // Move progress
-                // dist of this specific connection
+                // Dist
                 const key = `${Math.min(p.fromIdx, p.toIdx)}-${Math.max(p.fromIdx, p.toIdx)}`;
                 const lineIdx = connectionMap.get(key);
 
                 if (lineIdx === undefined) {
-                    p.active = false; // Should not happen
+                    p.active = false;
                     return;
                 }
 
+                // Move Progress
                 const dist = connectionPairs[lineIdx].dist;
                 p.progress += (CONFIG.signalSpeed * dt) / dist;
 
-                // Update intensity of the line it is traversing
-                // We just max out intensity for visual "flash" when passing?
-                // Or drawn a "point" moving? 
-                // Requirement: "Update vertex colors... light trail"
-                // Easiest is to light up the whole segment based on progress or just set it high and let decay handle it.
-                // Let's set high intensity while active.
+                // Update Attribute
+                // Determine direction matching the lineProgress (0->1)
+                // connectionPairs[lineIdx] is stored as {from, to}
+                // lineProgress is 0 at vertex 0 (which corresponds to 'from'?)
+                // Yes, linePosAttr setXYZ(i*2) uses connectionPairs[i].from.
 
-                // Make the line glow based on position? 
-                // LineSegments doesn't support gradient along the line easily without custom shader.
-                // We will light up the WHOLE segment for now as it's a LineSegment (2 verts).
+                // If p.fromIdx == connectionPairs[lineIdx].from, then pulse is moving 0 -> 1.
+                // If p.fromIdx != connectionPairs[lineIdx].from, then pulse is moving 1 -> 0.
 
-                intensities[lineIdx] = Math.max(intensities[lineIdx], p.strength);
+                let shaderProgress = p.progress;
+                const isReverse = p.fromIdx !== connectionPairs[lineIdx].from;
+                if (isReverse) {
+                    shaderProgress = 1.0 - p.progress;
+                }
+
+                // Write to BOTH vertices of the line
+                // But wait, the shader needs ONE progress value relative to the line direction?
+                // Our shader compares vProgress (0..1) with vSignal.x (Signal Position).
+                // If pulse is moving 0->1, Signal Pos increases. Trail is (pos - 0.3) to pos.
+                // If pulse is moving 1->0 (Reverse):
+                // We define shaderProgress as the current location 1.0 -> 0.0.
+                // But calculation: dist = signalProgress - vProgress.
+                // If signal is at 0.8 (moving down), trail should be "behind" it (0.8 to 1.1?).
+                // No, "Behind" logically means where it came from.
+                // If moving 1->0, it came from 1. So trail is [0.8, 1.0].
+                // Math: dist = vProgress - signalProgress?
+                // Visual Symmetry: 
+                // Let's stick to valid range: |vProgress - signalProgress| < 0.3 ?
+                // No, direction matters.
+
+                // UNIVERSAL SHADER LOGIC attempt:
+                // Pass "Direction" to shader? Or handle mathematically.
+                // Let's Keep It Simple:
+                // We ALWAYS pass the signal position as 0..1 relative to the line geometry.
+                // If moving 0->1: Draw trail where vProgress < SignalPos.
+                // If moving 1->0: Draw trail where vProgress > SignalPos.
+                // This requires sending direction or encoding it.
+                // Hack: Pass Signal Strength as NEGATIVE if reverse? 
+
+                let encodedStrength = p.strength;
+                if (isReverse) encodedStrength = -p.strength;
+
+                signalAttr.setXY(lineIdx * 2, shaderProgress, encodedStrength);
+                signalAttr.setXY(lineIdx * 2 + 1, shaderProgress, encodedStrength);
 
                 if (p.progress >= 1.0) {
                     p.active = false;
-                    // Trigger neighbors?
                     if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
                         const targetN = neurons[p.toIdx];
                         targetN.connections.forEach(nextTarget => {
-                            if (nextTarget !== p.fromIdx) { // Don't bounce back immediately
+                            if (nextTarget !== p.fromIdx) {
                                 spawnPulse(p.toIdx, nextTarget, p.strength * CONFIG.signalDecay);
                             }
                         });
@@ -414,24 +494,7 @@ export default function NeuralBrain() {
                 }
             });
 
-            // Update Color Buffer based on Intensities
-            const colorAttr = linesGeo.attributes.color as THREE.BufferAttribute;
-            for (let i = 0; i < connectionPairs.length; i++) {
-                const intensity = intensities[i];
-                // Interp between baseColor and signalColor
-
-                // Color = Base + (Signal - Base) * intensity
-                // Clamped
-                const r = baseColorObj.r + (signalColorObj.r - baseColorObj.r) * Math.min(intensity, 1);
-                const g = baseColorObj.g + (signalColorObj.g - baseColorObj.g) * Math.min(intensity, 1);
-                const b = baseColorObj.b + (signalColorObj.b - baseColorObj.b) * Math.min(intensity, 1);
-
-                // Set both vertices of the segment
-                colorAttr.setXYZ(i * 2, r, g, b);
-                colorAttr.setXYZ(i * 2 + 1, r, g, b);
-            }
-            colorAttr.needsUpdate = true;
-
+            signalAttr.needsUpdate = true;
 
             // D. INTERACTION / AUTO PULSE
             if (CONFIG.autoPulseEnabled) {
