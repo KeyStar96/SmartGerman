@@ -81,61 +81,79 @@ export default function NeuralBrain() {
         controls.minAzimuthAngle = -0.2; // Restrict horizontal movement slightly
         controls.maxAzimuthAngle = 0.2;
 
-        // --- 2. GENERATE BRAIN STRUCTURE ---
-        // Adjusted for Side Profile (Left Facing Head -> Visual Right Cavity)
-        // Since container is mirrored, Visual Right = Negative X in Three.js ?
-        // Let's stick to centering it and moving the camera or using offset.
-        // Actually, we can just shape it to look like a brain profile.
-
-        const brainOffset = new THREE.Vector3(-0.35, 0.15, 0); // Shift to match image cavity
-
-        const brainVolumes = [
-            // Main Cerebrum (Upper mass)
-            { center: new THREE.Vector3(0, 0.15, 0).add(brainOffset), radius: new THREE.Vector3(0.65, 0.55, 0.5) },
-            // Frontal Lobe (Forward/Top)
-            { center: new THREE.Vector3(-0.4, 0.1, 0).add(brainOffset), radius: new THREE.Vector3(0.4, 0.35, 0.45) },
-            // Occipital (Back)
-            { center: new THREE.Vector3(0.4, 0.0, 0).add(brainOffset), radius: new THREE.Vector3(0.4, 0.4, 0.45) },
-            // Temporal (Lower Side)
-            { center: new THREE.Vector3(0.1, -0.25, 0).add(brainOffset), radius: new THREE.Vector3(0.45, 0.3, 0.45) },
-            // Cerebellum (Back Bottom Tucked)
-            { center: new THREE.Vector3(0.3, -0.45, 0).add(brainOffset), radius: new THREE.Vector3(0.3, 0.25, 0.25) },
-            // Brainstem connection
-            { center: new THREE.Vector3(0.1, -0.5, 0).add(brainOffset), radius: new THREE.Vector3(0.15, 0.3, 0.15) },
+        // --- 2. GENERATE BRAIN STRUCTURE (POLYGON MASK) ---
+        // User provided coordinates (Screen pixels -> Normalized Shape)
+        const RAW_POINTS = [
+            { x: 838, y: 268 }, { x: 848, y: 255 }, { x: 856, y: 248 }, { x: 867, y: 237 }, { x: 879, y: 226 },
+            { x: 896, y: 214 }, { x: 910, y: 205 }, { x: 925, y: 199 }, { x: 947, y: 193 }, { x: 964, y: 193 },
+            { x: 977, y: 191 }, { x: 992, y: 191 }, { x: 1007, y: 192 }, { x: 1025, y: 194 }, { x: 1043, y: 197 },
+            { x: 1055, y: 202 }, { x: 1069, y: 208 }, { x: 1082, y: 215 }, { x: 1093, y: 224 }, { x: 1102, y: 232 },
+            { x: 1118, y: 250 }, { x: 1121, y: 256 }, { x: 1127, y: 273 }, { x: 1142, y: 316 }, { x: 1142, y: 338 },
+            { x: 1136, y: 361 }, { x: 1130, y: 371 }, { x: 1126, y: 374 }, { x: 1118, y: 379 }, { x: 1110, y: 387 },
+            { x: 1105, y: 398 }, { x: 1095, y: 411 }, { x: 1085, y: 420 }, { x: 1072, y: 425 }, { x: 1065, y: 431 },
+            { x: 1048, y: 433 }, { x: 1045, y: 434 }, { x: 1048, y: 447 }, { x: 1048, y: 456 }, { x: 1025, y: 467 },
+            { x: 1000, y: 430 }, { x: 991, y: 418 }, { x: 975, y: 403 }, { x: 938, y: 405 }, { x: 908, y: 391 },
+            { x: 892, y: 369 }, { x: 861, y: 359 }, { x: 846, y: 348 }, { x: 837, y: 332 }, { x: 834, y: 313 },
+            { x: 834, y: 293 }, { x: 840, y: 272 }
         ];
 
-        const isInsideEllipsoid = (p: THREE.Vector3, center: THREE.Vector3, radius: THREE.Vector3) => {
-            const dx = (p.x - center.x) / radius.x;
-            const dy = (p.y - center.y) / radius.y;
-            const dz = (p.z - center.z) / radius.z;
-            return (dx * dx + dy * dy + dz * dz) <= 1;
+        // Normalize points to center around (0,0) with range roughly [-1, 1]
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        RAW_POINTS.forEach(p => {
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+        });
+
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        const scaleRef = Math.max(maxX - minX, maxY - minY) * 0.55; // Scaling factor
+
+        const polygonPoints = RAW_POINTS.map(p => ({
+            x: (p.x - centerX) / scaleRef,
+            // Invert Y because screen coords y goes down, 3D y goes up
+            y: -(p.y - centerY) / scaleRef
+        }));
+
+        // Ray-casting algorithm for Point in Polygon
+        const isPointInPolygon = (test: { x: number, y: number }, poly: { x: number, y: number }[]) => {
+            let inside = false;
+            for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+                const xi = poly[i].x, yi = poly[i].y;
+                const xj = poly[j].x, yj = poly[j].y;
+
+                const intersect = ((yi > test.y) !== (yj > test.y))
+                    && (test.x < (xj - xi) * (test.y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+            return inside;
         };
 
-        const particleCount = 1200; // Target count
+        const particleCount = 1200;
         const neurons: Neuron[] = [];
+        const depthRange = 0.6; // Thin depth for 2.5D look
+
+        // Bounding box for generation (slightly larger than polygon)
+        const genBounds = { x: 2.0, y: 2.0 };
 
         let attempts = 0;
-        while (neurons.length < particleCount && attempts < 50000) {
+        while (neurons.length < particleCount && attempts < 100000) {
             attempts++;
-            const p = new THREE.Vector3(
-                (Math.random() - 0.5) * 2.2,
-                (Math.random() - 0.5) * 1.8,
-                (Math.random() - 0.5) * 2.0
-            );
+            // Generate random point
+            const testP = {
+                x: (Math.random() - 0.5) * 2 * genBounds.x,
+                y: (Math.random() - 0.5) * 2 * genBounds.y
+            };
 
-            let inside = false;
-            for (const vol of brainVolumes) {
-                if (isInsideEllipsoid(p, vol.center, vol.radius)) {
-                    inside = true;
-                    break;
-                }
-            }
+            if (isPointInPolygon(testP, polygonPoints)) {
+                // Valid 2D point, add z-depth
+                const z = (Math.random() - 0.5) * depthRange;
 
-            if (inside) {
                 neurons.push({
                     id: neurons.length,
-                    vec: p.clone(),
-                    baseVec: p.clone(),
+                    vec: new THREE.Vector3(testP.x, testP.y, z),
+                    baseVec: new THREE.Vector3(testP.x, testP.y, z),
                     velocity: new THREE.Vector3(0, 0, 0),
                     wanderAngle: {
                         theta: Math.random() * Math.PI * 2,
@@ -429,29 +447,12 @@ export default function NeuralBrain() {
             renderer.setSize(newW, newH);
         };
 
-        // --- DEV TOOL: SHAPE CALIBRATION ---
-        const handleCalibrationClick = (e: MouseEvent) => {
-            if (!containerRef.current) return;
-            const rect = containerRef.current.getBoundingClientRect();
 
-            // Check if click is inside or near container
-            // Since it's full screen or large, just log relative coords
-            const x = (e.clientX - rect.left) / rect.width;
-            const y = (e.clientY - rect.top) / rect.height;
-
-            // NDC format for Three.js (x: -1 to 1, y: 1 to -1)
-            const ndcX = (x * 2) - 1;
-            const ndcY = -(y * 2) + 1;
-
-            console.log(`{ x: ${ndcX.toFixed(3)}, y: ${ndcY.toFixed(3)} }, // Click at ${x.toFixed(2)}, ${y.toFixed(2)}`);
-        };
 
         window.addEventListener("resize", handleResize);
-        window.addEventListener("click", handleCalibrationClick);
 
         return () => {
             window.removeEventListener("resize", handleResize);
-            window.removeEventListener("click", handleCalibrationClick);
             if (controls) controls.dispose();
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);
