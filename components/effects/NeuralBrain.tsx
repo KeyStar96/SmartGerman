@@ -20,8 +20,11 @@ const CONFIG = {
 
     particleSize: 0.035,
 
-    // Palette: Deep Indigo -> Red -> Orange -> White
-    colorIdle: 0x1E3A8A, // Deep Indigo / Cold Blue
+    // Theme Colors
+    colorIdleDark: 0xE0E0E0,   // Light Gray (Dark Mode)
+    colorIdleLight: 0x444444,  // Dark Gray (Light Mode)
+
+    // Heat Palette for Signals (Red -> Orange -> White)
     colorLow: 0xCC3300,
     colorMid: 0xFF9900,
     colorHigh: 0xFFFFDD,
@@ -81,6 +84,36 @@ export default function NeuralBrain() {
 
         // Trigger fade-in after a short delay
         setTimeout(() => setOpacity(1), 100);
+
+        // --- THEME DETECTION ---
+        const updateTheme = () => {
+            const isDark = document.documentElement.classList.contains("dark");
+            const newColor = new THREE.Color(isDark ? CONFIG.colorIdleDark : CONFIG.colorIdleLight);
+            const newBlending = isDark ? THREE.AdditiveBlending : THREE.NormalBlending;
+
+            // Particles
+            particlesMat.uniforms.uColorIdle.value.copy(newColor);
+            particlesMat.blending = newBlending;
+            particlesMat.needsUpdate = true;
+
+            // Lines
+            linesMat.uniforms.uColorIdle.value.copy(newColor);
+            linesMat.blending = newBlending;
+            linesMat.needsUpdate = true;
+        };
+
+        // Initial check
+        updateTheme();
+
+        // Observer
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                    updateTheme();
+                }
+            });
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
         // --- 2. GENERATE BRAIN STRUCTURE (Full Container Fill) ---
         // The container is now masked by CSS (border-radius), so we just fill the space.
@@ -162,7 +195,7 @@ export default function NeuralBrain() {
         const particlesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
-                uColorIdle: { value: new THREE.Color(CONFIG.colorIdle) },
+                uColorIdle: { value: new THREE.Color(CONFIG.colorIdleDark) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
@@ -254,8 +287,6 @@ export default function NeuralBrain() {
                     gl_FragColor = vec4(finalColor, finalAlpha);
                 }
             `,
-            transparent: true,
-            blending: THREE.AdditiveBlending,
             depthWrite: false
         });
 
@@ -283,7 +314,7 @@ export default function NeuralBrain() {
 
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
-                uColorIdle: { value: new THREE.Color(CONFIG.colorIdle) },
+                uColorIdle: { value: new THREE.Color(CONFIG.colorIdleDark) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
@@ -356,8 +387,6 @@ export default function NeuralBrain() {
                     gl_FragColor = vec4(finalColor, finalOpacity);
                 }
             `,
-            transparent: true,
-            blending: THREE.AdditiveBlending,
             depthWrite: false
         });
 
@@ -513,6 +542,54 @@ export default function NeuralBrain() {
         };
         animate();
 
+        // --- 8. INTERACTION (Raycaster) ---
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+
+        // Larger threshold for easier clicking
+        raycaster.params.Points.threshold = 0.2;
+
+        const onPointerDown = (event: PointerEvent) => {
+            if (!containerRef.current) return;
+
+            const rect = containerRef.current.getBoundingClientRect();
+            pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(pointer, camera);
+
+            const intersects = raycaster.intersectObject(particleSystem);
+
+            if (intersects.length > 0) {
+                // Get the closest intersection
+                const hit = intersects[0];
+                const index = hit.index;
+
+                if (index !== undefined) {
+                    const n = neurons[index];
+
+                    // --- SUPER FLASH ---
+                    // Much brighter than auto-pulse
+                    n.flash += 3.0;
+
+                    // Force update to array immediately for responsiveness
+                    const flashAttr = particlesGeo.attributes.aFlash as THREE.BufferAttribute;
+                    flashAttr.setX(index, n.flash);
+                    flashAttr.needsUpdate = true;
+
+                    // Trigger massive signal output
+                    n.connections.forEach(target => {
+                        // Higher strength (2.0) for "Super Pulse"
+                        spawnPulse(index, target, 2.0);
+                    });
+                }
+            }
+        };
+
+        // Attach event
+        renderer.domElement.style.touchAction = 'none'; // Prevent scrolling on touch
+        renderer.domElement.addEventListener('pointerdown', onPointerDown);
+
         // --- 7. RESIZE & CLEANUP ---
         // Adaptation at ResizeObserver (better than window 'resize' event)
         const resizeObserver = new ResizeObserver(() => {
@@ -528,9 +605,11 @@ export default function NeuralBrain() {
         resizeObserver.observe(containerRef.current);
 
         return () => {
+            observer.disconnect();
             resizeObserver.disconnect();
-            // if (controls) controls.dispose();
+
             if (containerRef.current && renderer.domElement) {
+                renderer.domElement.removeEventListener('pointerdown', onPointerDown);
                 containerRef.current.removeChild(renderer.domElement);
             }
             particlesGeo.dispose();
@@ -545,8 +624,9 @@ export default function NeuralBrain() {
     return (
         <div
             ref={containerRef}
-            className="w-full h-full transition-opacity duration-1000 ease-in-out"
+            className="w-full h-full transition-opacity duration-1000 ease-in-out cursor-pointer"
             style={{ opacity: opacity }}
+            title="Click to interact"
         />
     );
 }
