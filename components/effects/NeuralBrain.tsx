@@ -339,7 +339,7 @@ export default function NeuralBrain() {
                         float dist = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
                         if (dist >= 0.0) {
-                            float tailLen = 1.5;
+                            float tailLen = 3.0; // Slower decay (Longer tail)
                             float glow = max(0.0, 1.0 - (dist / tailLen));
                             
                             if (glow > 0.0) {
@@ -426,8 +426,12 @@ export default function NeuralBrain() {
         const triggerNeuron = () => {
             const idx = Math.floor(Math.random() * neurons.length);
             const n = neurons[idx];
-            n.flash += 2.0; // Gold intensity (was 1.0)
-            n.connections.forEach(target => spawnPulse(idx, target, 1.0));
+            n.flash += 2.0; // Gold intensity
+
+            // "Charge up" delay (500ms) before firing
+            setTimeout(() => {
+                n.connections.forEach(target => spawnPulse(idx, target, 1.0));
+            }, 500);
         };
 
         // --- 6. ANIMATION LOOP ---
@@ -530,7 +534,7 @@ export default function NeuralBrain() {
                     p.hasTriggered = true;
                 }
 
-                if (p.progress > 2.5) p.active = false;
+                if (p.progress > 4.5) p.active = false;
             });
             signalAttr.needsUpdate = true;
 
@@ -582,11 +586,13 @@ export default function NeuralBrain() {
                     flashAttr.needsUpdate = true;
 
                     // Trigger massive signal output
-                    n.connections.forEach(target => {
-                        // Higher strength (2.0) for "Super Pulse"
-                        // Start at 0.12 to be immediately visible outside the flash halo!
-                        spawnPulse(index, target, 2.0, 0.12);
-                    });
+                    // Trigger massive signal output with "Charge Up" delay
+                    setTimeout(() => {
+                        n.connections.forEach(target => {
+                            // Higher strength (2.0) for "Super Pulse"
+                            spawnPulse(index, target, 2.0); // Back to 0.0 start for natural launch
+                        });
+                    }, 500);
                 }
             }
         };
