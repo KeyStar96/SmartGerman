@@ -410,13 +410,13 @@ export default function NeuralBrain() {
             pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false });
         }
 
-        const spawnPulse = (from: number, to: number, strength: number) => {
+        const spawnPulse = (from: number, to: number, strength: number, startProgress = 0.0) => {
             const p = pulsePool.find(p => !p.active);
             if (p) {
                 p.active = true;
                 p.fromIdx = from;
                 p.toIdx = to;
-                p.progress = 0;
+                p.progress = startProgress;
                 p.strength = strength;
                 p.trailIntensity = strength;
                 p.hasTriggered = false;
@@ -426,7 +426,7 @@ export default function NeuralBrain() {
         const triggerNeuron = () => {
             const idx = Math.floor(Math.random() * neurons.length);
             const n = neurons[idx];
-            n.flash += 1.0;
+            n.flash += 2.0; // Gold intensity (was 1.0)
             n.connections.forEach(target => spawnPulse(idx, target, 1.0));
         };
 
@@ -584,7 +584,8 @@ export default function NeuralBrain() {
                     // Trigger massive signal output
                     n.connections.forEach(target => {
                         // Higher strength (2.0) for "Super Pulse"
-                        spawnPulse(index, target, 2.0);
+                        // Start at 0.12 to be immediately visible outside the flash halo!
+                        spawnPulse(index, target, 2.0, 0.12);
                     });
                 }
             }
