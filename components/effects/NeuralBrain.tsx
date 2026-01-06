@@ -85,36 +85,6 @@ export default function NeuralBrain() {
         // Trigger fade-in after a short delay
         setTimeout(() => setOpacity(1), 100);
 
-        // --- THEME DETECTION ---
-        const updateTheme = () => {
-            const isDark = document.documentElement.classList.contains("dark");
-            const newColor = new THREE.Color(isDark ? CONFIG.colorIdleDark : CONFIG.colorIdleLight);
-            const newBlending = isDark ? THREE.AdditiveBlending : THREE.NormalBlending;
-
-            // Particles
-            particlesMat.uniforms.uColorIdle.value.copy(newColor);
-            particlesMat.blending = newBlending;
-            particlesMat.needsUpdate = true;
-
-            // Lines
-            linesMat.uniforms.uColorIdle.value.copy(newColor);
-            linesMat.blending = newBlending;
-            linesMat.needsUpdate = true;
-        };
-
-        // Initial check
-        updateTheme();
-
-        // Observer
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === "attributes" && mutation.attributeName === "class") {
-                    updateTheme();
-                }
-            });
-        });
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-
         // --- 2. GENERATE BRAIN STRUCTURE (Full Container Fill) ---
         // The container is now masked by CSS (border-radius), so we just fill the space.
 
@@ -398,6 +368,36 @@ export default function NeuralBrain() {
         connectionPairs.forEach((pair, idx) => {
             connectionMap.set(`${Math.min(pair.from, pair.to)}-${Math.max(pair.from, pair.to)}`, idx);
         });
+
+        // --- THEME DETECTION (Moves here to fix TDZ) ---
+        const updateTheme = () => {
+            const isDark = document.documentElement.classList.contains("dark");
+            const newColor = new THREE.Color(isDark ? CONFIG.colorIdleDark : CONFIG.colorIdleLight);
+            const newBlending = isDark ? THREE.AdditiveBlending : THREE.NormalBlending;
+
+            // Particles
+            particlesMat.uniforms.uColorIdle.value.copy(newColor);
+            particlesMat.blending = newBlending;
+            particlesMat.needsUpdate = true;
+
+            // Lines
+            linesMat.uniforms.uColorIdle.value.copy(newColor);
+            linesMat.blending = newBlending;
+            linesMat.needsUpdate = true;
+        };
+
+        // Initial check
+        updateTheme();
+
+        // Observer
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                    updateTheme();
+                }
+            });
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
         // --- 5. SIGNAL LOGIC ---
         const pulsePool: Pulse[] = [];
