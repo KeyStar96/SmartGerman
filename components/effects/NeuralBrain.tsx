@@ -55,6 +55,7 @@ interface Pulse {
     strength: number;
     trailIntensity: number;
     hasTriggered: boolean; // To trigger target only once
+    lineIdx: number;       // Cached index to avoid Map lookup in loop
 }
 
 export default function NeuralBrain() {
@@ -427,10 +428,17 @@ export default function NeuralBrain() {
         const pulsePool: Pulse[] = [];
         const maxPulses = 200;
         for (let i = 0; i < maxPulses; i++) {
-            pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false });
+            pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1 });
         }
 
+        // Track dirty lines for performant clearing
+        const dirtyLines: number[] = [];
+
         const spawnPulse = (from: number, to: number, strength: number, startProgress = 0.0) => {
+            const key = `${Math.min(from, to)}-${Math.max(from, to)}`;
+            const lineIdx = connectionMap.get(key);
+            if (lineIdx === undefined) return;
+
             const p = pulsePool.find(p => !p.active);
             if (p) {
                 p.active = true;
@@ -440,6 +448,7 @@ export default function NeuralBrain() {
                 p.strength = strength;
                 p.trailIntensity = strength;
                 p.hasTriggered = false;
+                p.lineIdx = lineIdx; // Cache it!
             }
         };
 
@@ -513,16 +522,20 @@ export default function NeuralBrain() {
 
             // Signal Logic
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
-            for (let i = 0; i < connectionPairs.length; i++) {
-                signalAttr.setY(i * 2, 0);
-                signalAttr.setY(i * 2 + 1, 0);
+
+            // Optimization: Only clear dirty lines from previous frame
+            for (let i = 0; i < dirtyLines.length; i++) {
+                const idx = dirtyLines[i];
+                signalAttr.setY(idx * 2, 0);
+                signalAttr.setY(idx * 2 + 1, 0);
             }
+            dirtyLines.length = 0;
 
             pulsePool.forEach(p => {
                 if (!p.active) return;
-                const key = `${Math.min(p.fromIdx, p.toIdx)}-${Math.max(p.fromIdx, p.toIdx)}`;
-                const lineIdx = connectionMap.get(key);
-                if (lineIdx === undefined) { p.active = false; return; }
+
+                // Use cached index - Zero allocation/lookup
+                const lineIdx = p.lineIdx;
 
                 const dist = connectionPairs[lineIdx].dist;
                 p.progress += (CONFIG.signalSpeed * dt) / dist;
@@ -536,6 +549,9 @@ export default function NeuralBrain() {
 
                 signalAttr.setXY(lineIdx * 2, shaderProgress, encodedStrength);
                 signalAttr.setXY(lineIdx * 2 + 1, shaderProgress, encodedStrength);
+
+                // Mark as dirty for cleanup next frame
+                dirtyLines.push(lineIdx);
 
                 // Trigger
                 if (!p.hasTriggered && p.progress >= 1.0) {
