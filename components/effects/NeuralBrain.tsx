@@ -19,13 +19,12 @@ const CONFIG = {
     trailDecay: 2.0,
 
     particleSize: 0.035,
-    colorNeuron: 0xFFFFFF,
 
-    // Gradient Palette: Deep Red -> Smart Orange -> Hot Yellow -> Solar White
+    // Palette: Deep Indigo -> Red -> Orange -> White
+    colorIdle: 0x1E3A8A, // Deep Indigo / Cold Blue
     colorLow: 0xCC3300,
     colorMid: 0xFF9900,
     colorHigh: 0xFFFFDD,
-    colorSignal: 0xFF5C00, // Fallback/Ref
 
     // Auto Pulse
     autoPulseEnabled: true,
@@ -163,7 +162,7 @@ export default function NeuralBrain() {
         const particlesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
-                uColor: { value: new THREE.Color(CONFIG.colorNeuron) },
+                uColorIdle: { value: new THREE.Color(CONFIG.colorIdle) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
@@ -176,6 +175,7 @@ export default function NeuralBrain() {
                 attribute float aFlash;
                 varying float vDepth;
                 varying float vFlash;
+                varying float vPhase;
                 
                 void main() {
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
@@ -183,25 +183,27 @@ export default function NeuralBrain() {
                     
                     vDepth = -mvPosition.z;
                     vFlash = aFlash;
+                    vPhase = aPhase;
 
-                    // Pulsate size
-                    float pulse = 1.0 + 0.3 * sin(uTime * 1.5 + aPhase);
+                    // Pulsate size (Breathing + Flash)
+                    float breath = 0.1 * sin(uTime * 1.5 + aPhase); // Idle breathing
+                    float flashGrow = smoothstep(0.0, 2.0, aFlash) * 1.0; 
                     
-                    // Flash Growth
-                    float flashGrow = smoothstep(0.0, 2.0, aFlash) * 0.8; 
-                    pulse += flashGrow;
+                    float pulse = 1.0 + breath + flashGrow;
                     
                     gl_PointSize = uSize * pulse * (1.0 / vDepth);
                 }
             `,
             fragmentShader: `
-                uniform vec3 uColor;
+                uniform float uTime;
+                uniform vec3 uColorIdle;
                 uniform vec3 uColorLow;
                 uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
                 
                 varying float vDepth;
                 varying float vFlash;
+                varying float vPhase;
                 
                 vec3 getHeatColor(float i) {
                     // Map intensity i (0..2+) to color gradient
@@ -218,7 +220,7 @@ export default function NeuralBrain() {
                     
                     if(dist > 0.5) discard;
                     
-                    // Blur Factors
+                    // Alpha patterns
                     float blurFactor = 1.0 - smoothstep(4.2, 4.9, vDepth);
                     float alphaSharp = 1.0 - smoothstep(0.4, 0.5, dist);
                     float alphaBlur = 1.0 - (dist * 2.0);
@@ -226,22 +228,30 @@ export default function NeuralBrain() {
                     
                     float finalAlpha = mix(alphaSharp, alphaBlur, blurFactor);
                     
-                    // --- HEAT COLOR LOGIC ---
-                    vec3 heat = getHeatColor(vFlash);
+                    // --- COLOR LOGIC ---
                     
-                    // Mix Base -> Heat
-                    float heatMix = smoothstep(0.0, 0.5, vFlash);
-                    vec3 finalColor = mix(uColor, heat, heatMix);
+                    // 1. Idle State (Breathing)
+                    // Slight color shift in idle to make it feel organic
+                    float breath = 0.5 + 0.5 * sin(uTime * 2.0 + vPhase);
+                    vec3 idleState = mix(uColorIdle, uColorIdle * 1.2, breath * 0.3);
                     
-                    // Additive hot core
-                    if (vFlash > 1.0 && dist < 0.2) {
-                        finalColor += vec3(0.3) * (vFlash - 1.0);
+                    // 2. Heat State
+                    vec3 heatState = getHeatColor(vFlash);
+                    
+                    // 3. Mix (Idle -> Heat)
+                    // We want even a small flash to quickly warm up the color
+                    float warmth = smoothstep(0.0, 0.4, vFlash); 
+                    vec3 finalColor = mix(idleState, heatState, warmth);
+                    
+                    // Additive white core saturation
+                    if (vFlash > 1.2 && dist < 0.2) {
+                        finalColor += vec3(0.4) * (vFlash - 1.2);
                     }
                     
-                    // Enhance alpha when flashing
-                    finalAlpha = max(finalAlpha, finalAlpha * (1.0 + min(vFlash, 2.0)));
+                    // Boost Alpha on flash
+                    finalAlpha = max(finalAlpha, finalAlpha * (0.6 + min(vFlash, 2.0)));
 
-                    gl_FragColor = vec4(finalColor, finalAlpha * 0.85);
+                    gl_FragColor = vec4(finalColor, finalAlpha);
                 }
             `,
             transparent: true,
@@ -273,11 +283,11 @@ export default function NeuralBrain() {
 
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
-                uColorBase: { value: new THREE.Color(CONFIG.colorNeuron) },
+                uColorIdle: { value: new THREE.Color(CONFIG.colorIdle) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
-                uOpacityBase: { value: 0.06 },
+                uOpacityBase: { value: 0.08 }, // Slightly higher base opacity
             },
             vertexShader: `
                 attribute float aLineProgress;
@@ -293,7 +303,7 @@ export default function NeuralBrain() {
                 }
             `,
             fragmentShader: `
-                uniform vec3 uColorBase;
+                uniform vec3 uColorIdle;
                 uniform vec3 uColorLow;
                 uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
@@ -314,8 +324,8 @@ export default function NeuralBrain() {
                     float rawStrength = vSignal.y;
                     float signalStrength = abs(rawStrength);
                     
-                    // Base appearance
-                    vec3 finalColor = uColorBase;
+                    // Base appearance = Idle Color
+                    vec3 finalColor = uColorIdle;
                     float finalOpacity = uOpacityBase;
                     
                     if (signalStrength > 0.01) {
@@ -337,7 +347,7 @@ export default function NeuralBrain() {
                                 }
                                 
                                 // Blend
-                                finalColor = mix(uColorBase, trailColor, glow);
+                                finalColor = mix(uColorIdle, trailColor, glow);
                                 finalOpacity = max(finalOpacity, glow * signalStrength);
                             }
                         }
