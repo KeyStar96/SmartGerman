@@ -6,10 +6,10 @@ const nextConfig: NextConfig = {
     // Entferne console.log in Production (spart Bundle-Größe und CPU)
     removeConsole: process.env.NODE_ENV === "production",
   },
-  
+
   // PERFORMANCE: Aktiviere React Strict Mode nur in Development
   reactStrictMode: process.env.NODE_ENV !== "production",
-  
+
   // PERFORMANCE: Optimiere Image-Handling
   images: {
     // Moderne Formate bevorzugen
@@ -20,8 +20,10 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     // Image-Sizes für Thumbnails
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Qualities
+    qualities: [75, 90],
   },
-  
+
   // PERFORMANCE: Experimentelle Optimierungen
   experimental: {
     // Optimized Package Imports - reduziert Bundle-Größe drastisch
@@ -32,11 +34,11 @@ const nextConfig: NextConfig = {
       "@gsap/react",
     ],
   },
-  
+
   // PERFORMANCE: Turbopack-Konfiguration (Next.js 16 Standard)
   // Leere Konfiguration aktiviert Turbopack ohne Webpack-Fehler
   turbopack: {},
-  
+
   // PERFORMANCE: Headers für besseres Caching
   async headers() {
     return [
@@ -62,13 +64,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  
+
   // PERFORMANCE: Kompression aktivieren (falls nicht vom Server bereitgestellt)
   compress: true,
-  
+
   // PERFORMANCE: Powered-By Header entfernen (minimal, aber spart Bytes)
   poweredByHeader: false,
-  
+
   // PERFORMANCE: Strict Mode für bessere Fehlererkennung in Dev
   typescript: {
     // Type-Checking im Build (fängt Fehler früh ab)
