@@ -94,8 +94,9 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       // Human Randomness: 20ms - 80ms per key (Avg 50ms -> Faster)
       // Occasional "micro-pauses" for realism
       const randomDelay = Math.random() * 0.06 + 0.02;
-      const isPause = Math.random() < 0.08; // 8% chance of a thought pause
-      typeTime += randomDelay + (isPause ? 0.15 : 0);
+      const isPause = Math.random() < 0.1; // 10% chance of a thought pause
+      const pauseDuration = isPause ? (Math.random() * 0.3 + 0.3) : 0; // 0.3s - 0.6s pause
+      typeTime += randomDelay + pauseDuration;
     });
 
     // 4. Subline Fade In
