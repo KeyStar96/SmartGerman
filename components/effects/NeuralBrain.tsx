@@ -21,6 +21,7 @@ const CONFIG = {
     particleSize: 0.035,
     colorNeuron: 0xFFFFFF,
     colorSignal: 0xFF5C00,
+    colorHigh: 0xFF9900, // Yellow-Orange boost
 
     // Auto Pulse
     autoPulseEnabled: true,
@@ -35,7 +36,7 @@ interface Neuron {
     velocity: THREE.Vector3;
     wanderAngle: { theta: number; phi: number }; // Spherical coords for wander
     connections: number[];   // Indices of connected neurons
-    flash: number;           // 0..1 activation level
+    flash: number;           // 0..1+ activation level (can exceed 1 for glow)
 }
 
 interface Pulse {
@@ -159,6 +160,7 @@ export default function NeuralBrain() {
                 uTime: { value: 0 },
                 uColor: { value: new THREE.Color(CONFIG.colorNeuron) },
                 uColorSignal: { value: new THREE.Color(CONFIG.colorSignal) },
+                uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
                 uSize: { value: CONFIG.particleSize * 450 } // Slightly increased base scale
             },
             vertexShader: `
@@ -180,7 +182,10 @@ export default function NeuralBrain() {
                     // Pulsate size: organic sine wave
                     // Flash increases size significantly
                     float pulse = 1.0 + 0.3 * sin(uTime * 1.5 + aPhase);
-                    pulse += aFlash * 0.5; // Grow when flashing
+                    
+                    // Flash Growth: Logarithmic or capped to prevent explosion
+                    float flashGrow = smoothstep(0.0, 3.0, aFlash) * 1.0; 
+                    pulse += flashGrow;
                     
                     // Std size attenuation
                     gl_PointSize = uSize * pulse * (1.0 / vDepth);
@@ -189,6 +194,7 @@ export default function NeuralBrain() {
             fragmentShader: `
                 uniform vec3 uColor;
                 uniform vec3 uColorSignal;
+                uniform vec3 uColorHigh;
                 varying float vDepth;
                 varying float vFlash;
                 
@@ -198,35 +204,37 @@ export default function NeuralBrain() {
                     
                     if(dist > 0.5) discard;
                     
-                    // Calculate Blur Factor based on Depth
-                    // Camera at roughly 4.5. Range approx 4.2 (Front) to 4.8 (Back).
-                    // We want Front(4.2) -> Blurry(1.0), Back(4.8) -> Sharp(0.0)
+                    // Blur Factors
                     float blurFactor = 1.0 - smoothstep(4.2, 4.9, vDepth);
-                    
-                    // 1. Sharp Alpha (Hard Edge)
                     float alphaSharp = 1.0 - smoothstep(0.4, 0.5, dist);
-                    
-                    // 2. Blur Alpha (Soft Gradient)
                     float alphaBlur = 1.0 - (dist * 2.0);
-                    alphaBlur = pow(alphaBlur, 1.5); // Soft falloff
+                    alphaBlur = pow(alphaBlur, 1.5);
                     
-                    // Mix: Front uses Blur, Back uses Sharp
                     float finalAlpha = mix(alphaSharp, alphaBlur, blurFactor);
                     
-                    // Extra: Close particles are also more opaque? Or constant?
-                    // Let's keep opacity relatively constant but maybe slight fade for very back?
-                    // User said "Front = Blurry", "Back = Sharp". 
-                    // Usually Blur implies clearer transparency? 
-                    // Let's just output the mixed alpha.
+                    // --- COLOR LOGIC (Additive Glow) ---
+                    // 1. Determine base glowing color (Signal vs High)
+                    vec3 glowColor = uColorSignal;
+                    if (vFlash > 1.0) {
+                        // Mix towards yellow/white if very intense
+                        glowColor = mix(uColorSignal, uColorHigh, smoothstep(1.0, 2.5, vFlash));
+                    }
                     
-                    // Color Mix (Base vs Signal)
-                    // Flash makes it orange
-                    vec3 finalColor = mix(uColor, uColorSignal, vFlash);
+                    // 2. Mix Base Neuron with Glow Color
+                    // Intensity ramps up quickly from 0 to 1
+                    float signalMix = smoothstep(0.0, 1.0, vFlash);
+                    vec3 finalColor = mix(uColor, glowColor, signalMix);
+                    
+                    // 3. Additive Bloom override
+                    // If Really hot (>1.5), we add extra brightness to the center
+                    if (vFlash > 1.5 && dist < 0.2) {
+                        finalColor += vec3(0.2, 0.2, 0.2) * (vFlash - 1.5);
+                    }
                     
                     // Enhance alpha when flashing
-                    finalAlpha = max(finalAlpha, finalAlpha * (1.0 + vFlash));
+                    finalAlpha = max(finalAlpha, finalAlpha * (1.0 + min(vFlash, 2.0)));
 
-                    gl_FragColor = vec4(finalColor, finalAlpha * 0.8);
+                    gl_FragColor = vec4(finalColor, finalAlpha * 0.85);
                 }
             `,
             transparent: true,
@@ -260,6 +268,7 @@ export default function NeuralBrain() {
             uniforms: {
                 uColorBase: { value: new THREE.Color(CONFIG.colorNeuron) },
                 uColorSignal: { value: new THREE.Color(CONFIG.colorSignal) },
+                uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
                 uOpacityBase: { value: 0.06 }, // Subtle base connection
             },
             vertexShader: `
@@ -280,6 +289,7 @@ export default function NeuralBrain() {
             fragmentShader: `
                 uniform vec3 uColorBase;
                 uniform vec3 uColorSignal;
+                uniform vec3 uColorHigh;
                 uniform float uOpacityBase;
                 
                 varying float vProgress;
@@ -307,9 +317,16 @@ export default function NeuralBrain() {
                             float glow = 1.0 - (dist / 0.4);
                             glow = pow(glow, 1.0); // Linear falloff for stronger trail
                             
-                            // Mix colors
-                            // Additive glow
-                            finalColor = mix(uColorBase, uColorSignal, glow * signalStrength);
+                            // Hot Head Effect:
+                            // If close to head (dist < 0.1), mix towards High Color
+                            vec3 trailColor = uColorSignal;
+                            if (dist < 0.1) {
+                                float headHeat = 1.0 - (dist / 0.1);
+                                trailColor = mix(uColorSignal, uColorHigh, headHeat * 0.8);
+                            }
+                            
+                            // Apply additive glow
+                            finalColor = mix(uColorBase, trailColor, glow * signalStrength);
                             finalOpacity = max(finalOpacity, glow * signalStrength);
                         }
                     }
@@ -353,7 +370,7 @@ export default function NeuralBrain() {
         const triggerNeuron = () => {
             const idx = Math.floor(Math.random() * neurons.length);
             const n = neurons[idx];
-            n.flash = 1.0; // Trigger start flash
+            n.flash += 1.0; // Accumulate intensity!
             // Fire to all neighbors
             n.connections.forEach(target => spawnPulse(idx, target, 1.0));
         };
@@ -411,7 +428,9 @@ export default function NeuralBrain() {
 
                 // Flash Decay
                 if (n.flash > 0) {
-                    n.flash = Math.max(0, n.flash - dt * 2.5); // Decay speed
+                    n.flash = Math.max(0, n.flash - dt * 2.0); // Decay speed slightly slower for glow check
+                    // Cap max accumulated flash
+                    n.flash = Math.min(n.flash, 4.0);
                 }
                 flashAttr.setX(i, n.flash);
             }
@@ -512,9 +531,9 @@ export default function NeuralBrain() {
 
                 if (p.progress >= 1.0) {
                     p.active = false;
-                    // Flash the target neuron
+                    // Flash the target neuron (Accumulate!)
                     const targetN = neurons[p.toIdx];
-                    targetN.flash = 1.0;
+                    targetN.flash += 1.0;
 
                     if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
                         targetN.connections.forEach(nextTarget => {
