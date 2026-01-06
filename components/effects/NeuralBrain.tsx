@@ -32,7 +32,7 @@ const CONFIG = {
 
     // Auto Pulse
     autoPulseEnabled: true,
-    autoPulseInterval: 1200,
+    autoPulseInterval: 600,
 };
 
 // --- TYPES ---
