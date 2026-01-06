@@ -11,6 +11,7 @@ const CONFIG = {
     wanderRadius: 0.2,       // Increased for visible movement
     wanderSpeed: 0.4,        // Faster movement
     springStiffness: 0.04,
+    maxConnections: 5,       // Max connections per neuron
 
     // Signals
     signalSpeed: 1.25,
@@ -120,7 +121,6 @@ export default function NeuralBrain() {
 
         // --- 3. CREATE CONNECTIONS ---
         const connectionPairs: { from: number; to: number; dist: number }[] = [];
-        const maxConns = 4;
         const maxDistSq = CONFIG.connectionDistance * CONFIG.connectionDistance;
 
         for (let i = 0; i < neurons.length; i++) {
@@ -128,7 +128,7 @@ export default function NeuralBrain() {
             let connCount = 0;
             // Naive O(N^2) is fine for N=1200 once at startup
             for (let j = i + 1; j < neurons.length; j++) {
-                if (connCount >= maxConns) break;
+                if (connCount >= CONFIG.maxConnections) break;
                 const n2 = neurons[j];
                 const dSq = n1.vec.distanceToSquared(n2.vec);
 
@@ -341,8 +341,8 @@ export default function NeuralBrain() {
                     float finalOpacity = uOpacityBase;
                     
                     if (signalStrength > 0.01) {
-                        // Ambient Wire Glow: Illuminate entire wire slightly when active
-                        float ambientGlow = smoothstep(0.0, 1.0, signalStrength) * 0.15;
+                        // Ambient Wire Glow: Illuminate entire wire stronger when active
+                        float ambientGlow = smoothstep(0.0, 1.0, signalStrength) * 0.3;
                         finalOpacity += ambientGlow;
                         finalColor = mix(finalColor, uColorMid, ambientGlow * 0.5); // Tint wire orange
 
@@ -367,7 +367,8 @@ export default function NeuralBrain() {
                                 
                                 // Blend
                                 finalColor = mix(finalColor, trailColor, glow);
-                                finalOpacity = max(finalOpacity, glow * signalStrength);
+                                // Boost visibility: Multiply signalStrength by 2.5
+                                finalOpacity = max(finalOpacity, glow * signalStrength * 2.5);
                             }
                         }
                     }
