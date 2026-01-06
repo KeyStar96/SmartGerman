@@ -24,10 +24,10 @@ const CONFIG = {
     colorIdleDark: 0xE0E0E0,   // Light Gray (Dark Mode)
     colorIdleLight: 0x444444,  // Dark Gray (Light Mode)
 
-    // Heat Palette for Signals (Red -> Orange -> White)
+    // Heat Palette for Signals (Red -> Orange -> Gold)
     colorLow: 0xCC3300,
     colorMid: 0xFF9900,
-    colorHigh: 0xFFFFDD,
+    colorHigh: 0xFFC000, // Gold / Amber (No White)
 
     // Auto Pulse
     autoPulseEnabled: true,
@@ -246,9 +246,9 @@ export default function NeuralBrain() {
                     float warmth = smoothstep(0.0, 0.4, vFlash); 
                     vec3 finalColor = mix(idleState, heatState, warmth);
                     
-                    // Additive white core saturation
-                    if (vFlash > 1.2 && dist < 0.2) {
-                        finalColor += vec3(0.4) * (vFlash - 1.2);
+                    // Additive white core (Reduced to keep color)
+                    if (vFlash > 1.5 && dist < 0.2) {
+                        finalColor += vec3(0.3) * (vFlash - 1.5);
                     }
                     
                     // Boost Alpha on flash
@@ -330,6 +330,11 @@ export default function NeuralBrain() {
                     float finalOpacity = uOpacityBase;
                     
                     if (signalStrength > 0.01) {
+                        // Ambient Wire Glow: Illuminate entire wire slightly when active
+                        float ambientGlow = smoothstep(0.0, 1.0, signalStrength) * 0.15;
+                        finalOpacity += ambientGlow;
+                        finalColor = mix(finalColor, uColorMid, ambientGlow * 0.5); // Tint wire orange
+
                         bool isReverse = rawStrength < 0.0;
                         float dist = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
@@ -341,14 +346,13 @@ export default function NeuralBrain() {
                                 // Dynamic Color based on Strength
                                 vec3 trailColor = getHeatColor(signalStrength);
                                 
-                                // Make head hotter? Not necessary if Strength is high, but let's add a slight white tip
-                                // if dist is very small
+                                // Make head hotter?
                                 if (dist < 0.1) {
                                      trailColor = mix(trailColor, uColorHigh, 0.5);
                                 }
                                 
                                 // Blend
-                                finalColor = mix(uColorIdle, trailColor, glow);
+                                finalColor = mix(finalColor, trailColor, glow);
                                 finalOpacity = max(finalOpacity, glow * signalStrength);
                             }
                         }
@@ -569,8 +573,8 @@ export default function NeuralBrain() {
                     const n = neurons[index];
 
                     // --- SUPER FLASH ---
-                    // Much brighter than auto-pulse
-                    n.flash += 3.0;
+                    // Brighter than auto-pulse but keeping color (Gold)
+                    n.flash += 2.0;
 
                     // Force update to array immediately for responsiveness
                     const flashAttr = particlesGeo.attributes.aFlash as THREE.BufferAttribute;
