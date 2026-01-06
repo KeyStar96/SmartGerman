@@ -429,10 +429,29 @@ export default function NeuralBrain() {
             renderer.setSize(newW, newH);
         };
 
+        // --- DEV TOOL: SHAPE CALIBRATION ---
+        const handleCalibrationClick = (e: MouseEvent) => {
+            if (!containerRef.current) return;
+            const rect = containerRef.current.getBoundingClientRect();
+
+            // Check if click is inside or near container
+            // Since it's full screen or large, just log relative coords
+            const x = (e.clientX - rect.left) / rect.width;
+            const y = (e.clientY - rect.top) / rect.height;
+
+            // NDC format for Three.js (x: -1 to 1, y: 1 to -1)
+            const ndcX = (x * 2) - 1;
+            const ndcY = -(y * 2) + 1;
+
+            console.log(`{ x: ${ndcX.toFixed(3)}, y: ${ndcY.toFixed(3)} }, // Click at ${x.toFixed(2)}, ${y.toFixed(2)}`);
+        };
+
         window.addEventListener("resize", handleResize);
+        window.addEventListener("click", handleCalibrationClick);
 
         return () => {
             window.removeEventListener("resize", handleResize);
+            window.removeEventListener("click", handleCalibrationClick);
             if (controls) controls.dispose();
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);

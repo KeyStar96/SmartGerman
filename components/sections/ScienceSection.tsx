@@ -50,7 +50,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                 </div>
 
                 {/* Right: Neural Brain Layered Component (60%) */}
-                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative aspect-[4/3] lg:aspect-square w-full select-none pointer-events-none">
+                <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative aspect-[4/3] lg:aspect-square w-full select-none">
                     {/* 
                       Layering Strategy:
                       1. Bottom: Neural Brain (Canvas) - Scale/Position adjusted to fit head
