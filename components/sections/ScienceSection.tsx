@@ -15,7 +15,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
         top: 23,
         left: 45,
         width: 42,
-        height: 38
+        height: 38,
+        borderRadius: 0
     });
 
     return (
@@ -78,9 +79,12 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                 left: `${brainPos.left}%`,
                                 width: `${brainPos.width}%`,
                                 height: `${brainPos.height}%`,
+                                borderRadius: `${brainPos.borderRadius}%`,
                             }}
                         >
-                            <NeuralBrain />
+                            {/* Placeholder for Calibration */}
+                            <div className="w-full h-full bg-[#FF5C00]" />
+                            {/* <NeuralBrain /> */}
                         </div>
                     </div>
 
