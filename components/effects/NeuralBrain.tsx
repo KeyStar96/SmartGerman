@@ -8,8 +8,8 @@ import * as THREE from "three";
 const CONFIG = {
     neuronDensity: 0.0004,
     connectionDistance: 1.2,
-    wanderRadius: 0.05,       // Reduced for "shiver"
-    wanderSpeed: 0.2,        // Slower movement
+    wanderRadius: 0.35,       // Increased for visible movement
+    wanderSpeed: 0.6,        // Faster movement
     springStiffness: 0.04,
 
     // Signals
