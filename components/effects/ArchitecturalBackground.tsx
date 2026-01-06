@@ -7,7 +7,7 @@ export default function ArchitecturalBackground() {
         <div className="fixed inset-0 overflow-hidden pointer-events-none select-none z-0">
             <div className="absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out opacity-100 dark:opacity-0">
                 <Image
-                    src="" //background light removed TODO
+                    src="/Bilder/SmartGerman_LP_BG_Light.png"
                     alt="Architectural Background Light"
                     fill
                     priority
