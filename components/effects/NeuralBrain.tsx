@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 // --- CONFIG ---
 const CONFIG = {
-    neuronDensity: 7,
+    neuronDensity: 10,
     connectionDistance: 0.6, // Reduced for local connections only
     minConnectionDistance: 0.15, // Avoid tiny micro-connections
     wanderRadius: 0.2,       // Increased for visible movement
