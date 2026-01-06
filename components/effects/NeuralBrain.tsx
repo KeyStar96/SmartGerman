@@ -7,7 +7,8 @@ import * as THREE from "three";
 // --- CONFIG ---
 const CONFIG = {
     neuronDensity: 5,
-    connectionDistance: 1.2,
+    connectionDistance: 0.6, // Reduced for local connections only
+    minConnectionDistance: 0.15, // Avoid tiny micro-connections
     wanderRadius: 0.2,       // Increased for visible movement
     wanderSpeed: 0.4,        // Faster movement
     springStiffness: 0.04,
@@ -122,6 +123,7 @@ export default function NeuralBrain() {
         // --- 3. CREATE CONNECTIONS ---
         const connectionPairs: { from: number; to: number; dist: number }[] = [];
         const maxDistSq = CONFIG.connectionDistance * CONFIG.connectionDistance;
+        const minDistSq = CONFIG.minConnectionDistance * CONFIG.minConnectionDistance;
 
         for (let i = 0; i < neurons.length; i++) {
             const n1 = neurons[i];
@@ -132,7 +134,7 @@ export default function NeuralBrain() {
                 const n2 = neurons[j];
                 const dSq = n1.vec.distanceToSquared(n2.vec);
 
-                if (dSq < maxDistSq) {
+                if (dSq < maxDistSq && dSq > minDistSq) {
                     n1.connections.push(j);
                     n2.connections.push(i);
                     connectionPairs.push({ from: i, to: j, dist: Math.sqrt(dSq) });
@@ -342,7 +344,7 @@ export default function NeuralBrain() {
                     
                     if (signalStrength > 0.01) {
                         // Ambient Wire Glow: Illuminate entire wire stronger when active
-                        float ambientGlow = smoothstep(0.0, 1.0, signalStrength) * 0.3;
+                        float ambientGlow = smoothstep(0.0, 1.0, signalStrength) * 0.6;
                         finalOpacity += ambientGlow;
                         finalColor = mix(finalColor, uColorMid, ambientGlow * 0.5); // Tint wire orange
 
@@ -360,6 +362,9 @@ export default function NeuralBrain() {
                                 // Dynamic Color based on Strength
                                 vec3 trailColor = getHeatColor(signalStrength);
                                 
+                                // Super Brightness Boost
+                                trailColor *= 2.0;
+
                                 // Make head hotter?
                                 if (distWorld < 0.1) {
                                      trailColor = mix(trailColor, uColorHigh, 0.5);
@@ -367,8 +372,8 @@ export default function NeuralBrain() {
                                 
                                 // Blend
                                 finalColor = mix(finalColor, trailColor, glow);
-                                // Boost visibility: Multiply signalStrength by 2.5
-                                finalOpacity = max(finalOpacity, glow * signalStrength * 2.5);
+                                // Boost visibility: Multiply signalStrength by 6.0
+                                finalOpacity = max(finalOpacity, glow * signalStrength * 6.0);
                             }
                         }
                     }
