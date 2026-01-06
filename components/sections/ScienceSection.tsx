@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import NeuralBrain from "../effects/NeuralBrain";
 
 interface ScienceSectionProps {
@@ -9,6 +9,14 @@ interface ScienceSectionProps {
 
 export default function ScienceSection({ dictionary }: ScienceSectionProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // TEMPORARY: Calibration State for "Sandwich" positioning
+    const [brainPos, setBrainPos] = useState({
+        top: 23,
+        left: 45,
+        width: 42,
+        height: 38
+    });
 
     return (
         <section
@@ -52,8 +60,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                 {/* Right: The Brain Composition */}
                 <div className="col-span-1 lg:col-span-6 order-1 lg:order-2 relative w-full">
 
-                    {/* Sandwich Wrapper: Constrains aspect ratio based on image */}
-                    <div className="relative w-full max-w-[600px] mx-auto">
+                    {/* Sandwich Wrapper: Reduced to 70% size (approx 420px) */}
+                    <div className="relative w-full max-w-[420px] mx-auto">
 
                         {/* Layer 2 (Top): Head Image with Transparency */}
                         <img
@@ -63,14 +71,13 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         />
 
                         {/* Layer 1 (Bottom): Neural Brain Container */}
-                        {/* TODO: Calibrate these % values to match the specific transparency hole in the image */}
                         <div
                             className="absolute z-10"
                             style={{
-                                top: '23%',
-                                left: '45%',
-                                width: '42%',
-                                height: '38%',
+                                top: `${brainPos.top}%`,
+                                left: `${brainPos.left}%`,
+                                width: `${brainPos.width}%`,
+                                height: `${brainPos.height}%`,
                             }}
                         >
                             <NeuralBrain />
@@ -91,7 +98,32 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
                 </div>
             </div>
+
+            {/* --- CALIBRATION UI (Temporary) --- */}
+            <div className="fixed bottom-4 right-4 z-[9999] bg-black/90 p-4 rounded-lg border border-[#FF5C00] text-xs font-mono text-white w-64 shadow-2xl">
+                <h3 className="text-[#FF5C00] mb-3 font-bold uppercase tracking-wider">Brain Position Tuner</h3>
+                <div className="space-y-3">
+                    {Object.entries(brainPos).map(([key, val]) => (
+                        <div key={key} className="flex flex-col gap-1">
+                            <div className="flex justify-between">
+                                <label className="uppercase opacity-70">{key}</label>
+                                <span className="text-[#FF5C00]">{val}%</span>
+                            </div>
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={val}
+                                onChange={(e) => setBrainPos(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
+                                className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#FF5C00]"
+                            />
+                        </div>
+                    ))}
+                    <div className="pt-2 mt-2 border-t border-white/10 text-[10px] opacity-50">
+                        Copy these values back to code when done.
+                    </div>
+                </div>
+            </div>
         </section>
     );
 }
-
