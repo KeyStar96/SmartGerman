@@ -60,14 +60,6 @@ interface Pulse {
 
 export default function NeuralBrain() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [yOffset, setYOffset] = useState(0); // State for UI
-    const yOffsetRef = useRef(0); // Ref for Animation Loop
-
-    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = parseFloat(e.target.value);
-        setYOffset(val);
-        yOffsetRef.current = val;
-    };
     const [opacity, setOpacity] = useState(0);
 
     useEffect(() => {
@@ -81,7 +73,8 @@ export default function NeuralBrain() {
         // scene.fog = new THREE.FogExp2(0x000000, 0.05); // Optional depth
 
         const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-        camera.position.set(0, 0, 4.5);
+        // User requested Y-Offset: 0.20 (Camera down = Brain up)
+        camera.position.set(0, -0.20, 4.5);
 
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
@@ -488,10 +481,6 @@ export default function NeuralBrain() {
             const dt = Math.min(clock.getDelta(), 0.1);
             const time = clock.getElapsedTime();
 
-            // Apply Y-Offset from Slider
-            // Moving camera down (-y) makes object appear to move up (+y)
-            camera.position.y = -yOffsetRef.current;
-
             particlesMat.uniforms.uTime.value = time;
 
             // Direct Array Access - Huge CPU saver
@@ -715,27 +704,11 @@ export default function NeuralBrain() {
     }, []);
 
     return (
-        <div className="relative w-full h-full">
-            <div
-                ref={containerRef}
-                className="w-full h-full transition-opacity duration-1000 ease-in-out cursor-pointer"
-                style={{ opacity: opacity }}
-                title="Click to interact"
-            />
-
-            {/* Temporary Tuning Slider */}
-            <div className="absolute top-24 right-4 z-50 bg-black/80 p-4 rounded text-white border border-white/20 pointer-events-auto">
-                <label className="block text-xs mb-2 font-mono">Y Offset: {yOffset.toFixed(2)}</label>
-                <input
-                    type="range"
-                    min="-2.0"
-                    max="2.0"
-                    step="0.05"
-                    value={yOffset}
-                    onChange={handleSliderChange}
-                    className="w-32 accent-amber-500 cursor-pointer"
-                />
-            </div>
-        </div>
+        <div
+            ref={containerRef}
+            className="w-full h-full transition-opacity duration-1000 ease-in-out cursor-pointer"
+            style={{ opacity: opacity }}
+            title="Click to interact"
+        />
     );
 }
