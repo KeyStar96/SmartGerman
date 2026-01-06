@@ -136,22 +136,84 @@ export default function NeuralBrain() {
         // A. Particles (Points)
         const particlesGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(neurons.length * 3);
-        // Fill initial positions
+        const phases = new Float32Array(neurons.length); // For individual pulsating
+
+        // Fill initial positions and phases
         neurons.forEach((n, i) => {
             positions[i * 3] = n.vec.x;
             positions[i * 3 + 1] = n.vec.y;
             positions[i * 3 + 2] = n.vec.z;
+            phases[i] = Math.random() * Math.PI * 2;
         });
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        particlesGeo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
 
-        const particlesMat = new THREE.PointsMaterial({
-            color: CONFIG.colorNeuron,
-            size: CONFIG.particleSize,
+        // Custom Shader for Pulsating Particles with DoF
+        const particlesMat = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uColor: { value: new THREE.Color(CONFIG.colorNeuron) },
+                uSize: { value: CONFIG.particleSize * 450 } // Slightly increased base scale
+            },
+            vertexShader: `
+                uniform float uTime;
+                uniform float uSize;
+                attribute float aPhase;
+                varying float vDepth;
+                
+                void main() {
+                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                    gl_Position = projectionMatrix * mvPosition;
+                    
+                    // Pass depth to fragment (positive view Z distance)
+                    vDepth = -mvPosition.z;
+
+                    // Pulsate size: organic sine wave
+                    float pulse = 1.0 + 0.3 * sin(uTime * 1.5 + aPhase);
+                    
+                    // Std size attenuation
+                    gl_PointSize = uSize * pulse * (1.0 / vDepth);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 uColor;
+                varying float vDepth;
+                
+                void main() {
+                    vec2 coord = gl_PointCoord - vec2(0.5);
+                    float dist = length(coord);
+                    
+                    if(dist > 0.5) discard;
+                    
+                    // Calculate Blur Factor based on Depth
+                    // Camera at roughly 4.5. Range approx 4.2 (Front) to 4.8 (Back).
+                    // We want Front(4.2) -> Blurry(1.0), Back(4.8) -> Sharp(0.0)
+                    float blurFactor = 1.0 - smoothstep(4.2, 4.9, vDepth);
+                    
+                    // 1. Sharp Alpha (Hard Edge)
+                    float alphaSharp = 1.0 - smoothstep(0.4, 0.5, dist);
+                    
+                    // 2. Blur Alpha (Soft Gradient)
+                    float alphaBlur = 1.0 - (dist * 2.0);
+                    alphaBlur = pow(alphaBlur, 1.5); // Soft falloff
+                    
+                    // Mix: Front uses Blur, Back uses Sharp
+                    float finalAlpha = mix(alphaSharp, alphaBlur, blurFactor);
+                    
+                    // Extra: Close particles are also more opaque? Or constant?
+                    // Let's keep opacity relatively constant but maybe slight fade for very back?
+                    // User said "Front = Blurry", "Back = Sharp". 
+                    // Usually Blur implies clearer transparency? 
+                    // Let's just output the mixed alpha.
+                    
+                    gl_FragColor = vec4(uColor, finalAlpha * 0.8);
+                }
+            `,
             transparent: true,
-            opacity: 0.6,
             blending: THREE.AdditiveBlending,
             depthWrite: false
         });
+
         const particleSystem = new THREE.Points(particlesGeo, particlesMat);
         scene.add(particleSystem);
 
@@ -227,6 +289,9 @@ export default function NeuralBrain() {
             requestAnimationFrame(animate);
             const dt = Math.min(clock.getDelta(), 0.1); // Cap dt
             const time = clock.getElapsedTime();
+
+            // Shader Pulsation Update
+            particlesMat.uniforms.uTime.value = time;
 
             // controls.update(); // Removed controls
 
