@@ -81,19 +81,28 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       , 0.5);
 
     // Actual Typewriter Effect on Chars
-    tl.to(claimCharElements, {
-      display: "inline-block",
-      opacity: 1,
-      duration: 0.1,
-      stagger: 0.08,
-      ease: "none",
-    }, 0.5) // Sync start with slide up
+    // Actual Typewriter Effect on Chars (Humanized)
+    let typeTime = 0.5;
+    claimCharElements.forEach((char) => {
+      tl.to(char, {
+        display: "inline-block",
+        opacity: 1,
+        duration: 0.05,
+        ease: "none",
+      }, typeTime);
 
-      // 4. Subline Fade In
-      .fromTo(sublineRef.current,
-        { autoAlpha: 0, y: 10 },
-        { autoAlpha: 0.8, y: 0, duration: 1.5, ease: "power2.out" }
-        , "+=0.2")
+      // Human Randomness: 20ms - 80ms per key (Avg 50ms -> Faster)
+      // Occasional "micro-pauses" for realism
+      const randomDelay = Math.random() * 0.06 + 0.02;
+      const isPause = Math.random() < 0.08; // 8% chance of a thought pause
+      typeTime += randomDelay + (isPause ? 0.15 : 0);
+    });
+
+    // 4. Subline Fade In
+    tl.fromTo(sublineRef.current,
+      { autoAlpha: 0, y: 10 },
+      { autoAlpha: 0.8, y: 0, duration: 1.5, ease: "power2.out" }
+      , typeTime + 0.2)
 
       // 5. CTA Fade In
       .fromTo(ctaRef.current,
