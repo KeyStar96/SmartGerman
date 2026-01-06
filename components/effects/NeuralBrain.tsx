@@ -265,6 +265,7 @@ export default function NeuralBrain() {
         });
 
         const particleSystem = new THREE.Points(particlesGeo, particlesMat);
+        particleSystem.matrixAutoUpdate = false; // Optimization: Static container
         scene.add(particleSystem);
 
 
@@ -386,6 +387,7 @@ export default function NeuralBrain() {
         });
 
         const linesMesh = new THREE.LineSegments(linesGeo, linesMat);
+        linesMesh.matrixAutoUpdate = false; // Optimization: Static container
         scene.add(linesMesh);
 
         // Helper Map to find line segment index in buffer by connection key
@@ -490,17 +492,14 @@ export default function NeuralBrain() {
                 const n = neurons[i];
 
                 // Wander (using LUT)
+                // Cartesian optimization: No sin/cos, just random XYZ vector
                 // Use bitwise AND for fast wrap-around
                 const r1 = randLUT[randIdx++ & 8191];
                 const r2 = randLUT[randIdx++ & 8191];
+                const r3 = randLUT[randIdx++ & 8191];
 
-                n.wanderAngle.theta += r1 * CONFIG.wanderSpeed * dt;
-                n.wanderAngle.phi += r2 * CONFIG.wanderSpeed * dt;
-
-                const wx = Math.sin(n.wanderAngle.phi) * Math.cos(n.wanderAngle.theta);
-                const wy = Math.sin(n.wanderAngle.phi) * Math.sin(n.wanderAngle.theta);
-                const wz = Math.cos(n.wanderAngle.phi);
-                tempVec.set(wx, wy, wz).multiplyScalar(CONFIG.wanderRadius * 0.1);
+                // Cartesian wander (Cheaper than Spherical)
+                tempVec.set(r1, r2, r3).multiplyScalar(CONFIG.wanderRadius * 0.1);
                 n.velocity.add(tempVec);
 
                 // Spring & Damping
@@ -528,18 +527,21 @@ export default function NeuralBrain() {
             // Update Connection Geometry
             for (let i = 0; i < connectionPairs.length; i++) {
                 const pair = connectionPairs[i];
-                const n1 = neurons[pair.from];
-                const n2 = neurons[pair.to];
+                // Optimization: Read from cached posArray instead of neuron objects
+                const i1 = pair.from * 3;
+                const i2 = pair.to * 3;
 
                 const idx = i * 6; // 2 vertices * 3 coords
-                // Vertex 1
-                linePosArray[idx] = n1.vec.x;
-                linePosArray[idx + 1] = n1.vec.y;
-                linePosArray[idx + 2] = n1.vec.z;
-                // Vertex 2
-                linePosArray[idx + 3] = n2.vec.x;
-                linePosArray[idx + 4] = n2.vec.y;
-                linePosArray[idx + 5] = n2.vec.z;
+
+                // Vertex 1 (From n1)
+                linePosArray[idx] = posArray[i1];
+                linePosArray[idx + 1] = posArray[i1 + 1];
+                linePosArray[idx + 2] = posArray[i1 + 2];
+
+                // Vertex 2 (From n2)
+                linePosArray[idx + 3] = posArray[i2];
+                linePosArray[idx + 4] = posArray[i2 + 1];
+                linePosArray[idx + 5] = posArray[i2 + 2];
             }
             (linesGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
 
