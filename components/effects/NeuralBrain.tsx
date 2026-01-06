@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 // --- CONFIG ---
 const CONFIG = {
-    neuronDensity: 0.4,
+    neuronDensity: 1,
     connectionDistance: 1.2,
     wanderRadius: 0.2,       // Increased for visible movement
     wanderSpeed: 0.4,        // Faster movement
