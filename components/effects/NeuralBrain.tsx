@@ -7,7 +7,7 @@ import * as THREE from "three";
 // --- CONFIG ---
 const CONFIG = {
     neuronDensity: 10,
-    connectionDistance: 0.6, // Reduced for local connections only
+    connectionDistance: 0.4, // Stricter local connections
     minConnectionDistance: 0.15, // Avoid tiny micro-connections
     wanderRadius: 0.2,       // Increased for visible movement
     wanderSpeed: 0.4,        // Faster movement
@@ -16,7 +16,7 @@ const CONFIG = {
 
     // Signals
     signalSpeed: 1.25,
-    signalDecay: 0.85, // Slower decay for longer life
+    signalDecay: 0.95, // Minimal decay for long-distance flow
     minSignalStrength: 0.05,
     trailDecay: 2.0,
 
