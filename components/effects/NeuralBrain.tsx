@@ -6,26 +6,30 @@ import * as THREE from "three";
 
 // --- CONFIG ---
 const CONFIG = {
-    neuronDensity: 0.004,
+    neuronDensity: 0.04,
     connectionDistance: 1.2,
     wanderRadius: 0.3,       // Increased for visible movement
     wanderSpeed: 0.5,        // Faster movement
     springStiffness: 0.04,
 
     // Signals
-    signalSpeed: 1.25, // Slower (Half of 2.5)
-    signalDecay: 0.7,
+    signalSpeed: 1.25,
+    signalDecay: 0.85, // Slower decay for longer life
     minSignalStrength: 0.1,
     trailDecay: 2.0,
 
     particleSize: 0.035,
     colorNeuron: 0xFFFFFF,
-    colorSignal: 0xFF5C00,
-    colorHigh: 0xFF9900, // Yellow-Orange boost
+
+    // Gradient Palette: Deep Red -> Smart Orange -> Hot Yellow -> Solar White
+    colorLow: 0xCC3300,
+    colorMid: 0xFF9900,
+    colorHigh: 0xFFFFDD,
+    colorSignal: 0xFF5C00, // Fallback/Ref
 
     // Auto Pulse
     autoPulseEnabled: true,
-    autoPulseInterval: 2000,
+    autoPulseInterval: 1200,
 };
 
 // --- TYPES ---
@@ -155,14 +159,15 @@ export default function NeuralBrain() {
         particlesGeo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
         particlesGeo.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 1));
 
-        // Custom Shader for Pulsating Particles with DoF and Flash
+        // Custom Shader for Pulsating Particles with Heat Gradient
         const particlesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
                 uColor: { value: new THREE.Color(CONFIG.colorNeuron) },
-                uColorSignal: { value: new THREE.Color(CONFIG.colorSignal) },
+                uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
+                uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
-                uSize: { value: CONFIG.particleSize * 450 } // Slightly increased base scale
+                uSize: { value: CONFIG.particleSize * 450 }
             },
             vertexShader: `
                 uniform float uTime;
@@ -176,29 +181,37 @@ export default function NeuralBrain() {
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                     
-                    // Pass depth to fragment (positive view Z distance)
                     vDepth = -mvPosition.z;
                     vFlash = aFlash;
 
-                    // Pulsate size: organic sine wave
-                    // Flash increases size significantly
+                    // Pulsate size
                     float pulse = 1.0 + 0.3 * sin(uTime * 1.5 + aPhase);
                     
-                    // Flash Growth: Logarithmic or capped to prevent explosion
-                    float flashGrow = smoothstep(0.0, 3.0, aFlash) * 1.0; 
+                    // Flash Growth
+                    float flashGrow = smoothstep(0.0, 2.0, aFlash) * 0.8; 
                     pulse += flashGrow;
                     
-                    // Std size attenuation
                     gl_PointSize = uSize * pulse * (1.0 / vDepth);
                 }
             `,
             fragmentShader: `
                 uniform vec3 uColor;
-                uniform vec3 uColorSignal;
+                uniform vec3 uColorLow;
+                uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
+                
                 varying float vDepth;
                 varying float vFlash;
                 
+                vec3 getHeatColor(float i) {
+                    // Map intensity i (0..2+) to color gradient
+                    // 0.0 - 0.5: Low -> Mid
+                    // 0.5 - 1.5: Mid -> High
+                    vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.6, i));
+                    c = mix(c, uColorHigh, smoothstep(0.6, 2.0, i));
+                    return c;
+                }
+
                 void main() {
                     vec2 coord = gl_PointCoord - vec2(0.5);
                     float dist = length(coord);
@@ -213,23 +226,16 @@ export default function NeuralBrain() {
                     
                     float finalAlpha = mix(alphaSharp, alphaBlur, blurFactor);
                     
-                    // --- COLOR LOGIC (Additive Glow) ---
-                    // 1. Determine base glowing color (Signal vs High)
-                    vec3 glowColor = uColorSignal;
-                    if (vFlash > 1.0) {
-                        // Mix towards yellow/white if very intense
-                        glowColor = mix(uColorSignal, uColorHigh, smoothstep(1.0, 2.5, vFlash));
-                    }
+                    // --- HEAT COLOR LOGIC ---
+                    vec3 heat = getHeatColor(vFlash);
                     
-                    // 2. Mix Base Neuron with Glow Color
-                    // Intensity ramps up quickly from 0 to 1
-                    float signalMix = smoothstep(0.0, 1.0, vFlash);
-                    vec3 finalColor = mix(uColor, glowColor, signalMix);
+                    // Mix Base -> Heat
+                    float heatMix = smoothstep(0.0, 0.5, vFlash);
+                    vec3 finalColor = mix(uColor, heat, heatMix);
                     
-                    // 3. Additive Bloom override
-                    // If Really hot (>1.5), we add extra brightness to the center
-                    if (vFlash > 1.5 && dist < 0.2) {
-                        finalColor += vec3(0.2, 0.2, 0.2) * (vFlash - 1.5);
+                    // Additive hot core
+                    if (vFlash > 1.0 && dist < 0.2) {
+                        finalColor += vec3(0.3) * (vFlash - 1.0);
                     }
                     
                     // Enhance alpha when flashing
@@ -268,34 +274,41 @@ export default function NeuralBrain() {
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uColorBase: { value: new THREE.Color(CONFIG.colorNeuron) },
-                uColorSignal: { value: new THREE.Color(CONFIG.colorSignal) },
+                uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
+                uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
-                uOpacityBase: { value: 0.06 }, // Subtle base connection
+                uOpacityBase: { value: 0.06 },
             },
             vertexShader: `
                 attribute float aLineProgress;
-                attribute vec2 aSignal; // x = Progress (0..1), y = Strength (0..1)
-                
+                attribute vec2 aSignal; 
                 varying float vProgress;
                 varying vec2 vSignal;
                 
                 void main() {
                     vProgress = aLineProgress;
                     vSignal = aSignal;
-                    
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                 }
             `,
             fragmentShader: `
                 uniform vec3 uColorBase;
-                uniform vec3 uColorSignal;
+                uniform vec3 uColorLow;
+                uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
                 uniform float uOpacityBase;
                 
                 varying float vProgress;
                 varying vec2 vSignal;
                 
+                vec3 getHeatColor(float i) {
+                     // Gradient mapping for Signal Strength
+                    vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.6, i));
+                    c = mix(c, uColorHigh, smoothstep(0.6, 2.0, i));
+                    return c;
+                }
+
                 void main() {
                     float signalProgress = vSignal.x;
                     float rawStrength = vSignal.y;
@@ -305,33 +318,26 @@ export default function NeuralBrain() {
                     vec3 finalColor = uColorBase;
                     float finalOpacity = uOpacityBase;
                     
-                    // Signal Trail Logic
                     if (signalStrength > 0.01) {
                         bool isReverse = rawStrength < 0.0;
-                        
-                        // Calculate distance from head based on direction
                         float dist = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
-                        // EXTENDED TRAIL: dist >= 0.0 check ensures we don't draw ahead of signal
                         if (dist >= 0.0) {
-                            // Long tail fade
-                            // Brightness = 1.0 at head (dist=0)
-                            // Fades to 0 at dist=1.5 (very long tail)
                             float tailLen = 1.5;
                             float glow = max(0.0, 1.0 - (dist / tailLen));
                             
                             if (glow > 0.0) {
-                                // Hot Head Effect:
-                                // If close to head (dist < 0.15), mix towards High Color
-                                vec3 trailColor = uColorSignal;
-                                if (dist < 0.15) {
-                                    float headHeat = 1.0 - (dist / 0.15);
-                                    trailColor = mix(uColorSignal, uColorHigh, headHeat);
+                                // Dynamic Color based on Strength
+                                vec3 trailColor = getHeatColor(signalStrength);
+                                
+                                // Make head hotter? Not necessary if Strength is high, but let's add a slight white tip
+                                // if dist is very small
+                                if (dist < 0.1) {
+                                     trailColor = mix(trailColor, uColorHigh, 0.5);
                                 }
                                 
-                                // Apply additive glow
-                                // Use max to prevent base line opacity from overriding bright tails
-                                finalColor = mix(uColorBase, trailColor, glow * signalStrength);
+                                // Blend
+                                finalColor = mix(uColorBase, trailColor, glow);
                                 finalOpacity = max(finalOpacity, glow * signalStrength);
                             }
                         }
@@ -349,7 +355,7 @@ export default function NeuralBrain() {
         scene.add(linesMesh);
 
         // Helper Map to find line segment index in buffer by connection key
-        const connectionMap = new Map<string, number>(); // "min-max" -> index in connectionPairs
+        const connectionMap = new Map<string, number>();
         connectionPairs.forEach((pair, idx) => {
             connectionMap.set(`${Math.min(pair.from, pair.to)}-${Math.max(pair.from, pair.to)}`, idx);
         });
@@ -369,7 +375,7 @@ export default function NeuralBrain() {
                 p.toIdx = to;
                 p.progress = 0;
                 p.strength = strength;
-                p.trailIntensity = strength; // Start full strength
+                p.trailIntensity = strength;
                 p.hasTriggered = false;
             }
         };
@@ -377,66 +383,50 @@ export default function NeuralBrain() {
         const triggerNeuron = () => {
             const idx = Math.floor(Math.random() * neurons.length);
             const n = neurons[idx];
-            n.flash += 1.0; // Accumulate intensity!
-            // Fire to all neighbors
+            n.flash += 1.0;
             n.connections.forEach(target => spawnPulse(idx, target, 1.0));
         };
 
         // --- 6. ANIMATION LOOP ---
         const clock = new THREE.Clock();
         let autoPulseTimer = 0;
-
-        // Reusable objects to avoid GC
         const tempVec = new THREE.Vector3();
 
         const animate = () => {
             requestAnimationFrame(animate);
-            const dt = Math.min(clock.getDelta(), 0.1); // Cap dt
+            const dt = Math.min(clock.getDelta(), 0.1);
             const time = clock.getElapsedTime();
 
-            // Shader Pulsation Update
             particlesMat.uniforms.uTime.value = time;
 
-            // controls.update(); // Removed controls
-
-            // A. PHYSICS UPDATE (Wander & Spring)
             const posAttr = particlesGeo.attributes.position as THREE.BufferAttribute;
             const flashAttr = particlesGeo.attributes.aFlash as THREE.BufferAttribute;
             const linePosAttr = linesGeo.attributes.position as THREE.BufferAttribute;
 
+            // Update Neurons
             for (let i = 0; i < neurons.length; i++) {
                 const n = neurons[i];
 
-                // 1. Wander force
+                // Wander
                 n.wanderAngle.theta += (Math.random() - 0.5) * CONFIG.wanderSpeed * dt;
                 n.wanderAngle.phi += (Math.random() - 0.5) * CONFIG.wanderSpeed * dt;
-
-                // Sphere to Cartesian
                 const wx = Math.sin(n.wanderAngle.phi) * Math.cos(n.wanderAngle.theta);
                 const wy = Math.sin(n.wanderAngle.phi) * Math.sin(n.wanderAngle.theta);
                 const wz = Math.cos(n.wanderAngle.phi);
-
-                tempVec.set(wx, wy, wz).multiplyScalar(CONFIG.wanderRadius * 0.1); // Force magnitude
-
+                tempVec.set(wx, wy, wz).multiplyScalar(CONFIG.wanderRadius * 0.1);
                 n.velocity.add(tempVec);
 
-                // 2. Spring force (return to base)
+                // Spring & Damping
                 tempVec.copy(n.baseVec).sub(n.vec).multiplyScalar(CONFIG.springStiffness);
                 n.velocity.add(tempVec);
-
-                // 3. Damping
                 n.velocity.multiplyScalar(0.95);
+                n.vec.addScaledVector(n.velocity, dt * 20);
 
-                // 4. Apply
-                n.vec.addScaledVector(n.velocity, dt * 20); // Scale time for effect
-
-                // Update Buffer
                 posAttr.setXYZ(i, n.vec.x, n.vec.y, n.vec.z);
 
                 // Flash Decay
                 if (n.flash > 0) {
-                    n.flash = Math.max(0, n.flash - dt * 2.0); // Decay speed slightly slower for glow check
-                    // Cap max accumulated flash
+                    n.flash = Math.max(0, n.flash - dt * 2.0);
                     n.flash = Math.min(n.flash, 4.0);
                 }
                 flashAttr.setX(i, n.flash);
@@ -444,91 +434,35 @@ export default function NeuralBrain() {
             posAttr.needsUpdate = true;
             flashAttr.needsUpdate = true;
 
-            // B. UPDATE CONNECTIONS GEOMETRY
-            // Needs to move with neurons
+            // Update Connection Geometry
             for (let i = 0; i < connectionPairs.length; i++) {
                 const pair = connectionPairs[i];
                 const n1 = neurons[pair.from];
                 const n2 = neurons[pair.to];
-
-                // Line start
                 linePosAttr.setXYZ(i * 2, n1.vec.x, n1.vec.y, n1.vec.z);
-                // Line end
                 linePosAttr.setXYZ(i * 2 + 1, n2.vec.x, n2.vec.y, n2.vec.z);
             }
             linePosAttr.needsUpdate = true;
 
-
-            // C. SIGNAL PROPAGATION & ATTRIBUTE UPDATE
-            // 1. Clear Signal Buffer for this frame (reset to 0)
+            // Signal Logic
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
-            // Ideally we'd conceptually "fade" but since our shader draws the trail based on ONE position, 
-            // we just need to update that position. 
-            // Limitation: One pulse per line max for now visually. (Last one wins)
-
-            // To ensure lines don't "flicker" off if no pulse, we just set them to 0 strength.
-            // Efficient clear:
             for (let i = 0; i < connectionPairs.length; i++) {
-                // Set Strength (y) to 0
                 signalAttr.setY(i * 2, 0);
                 signalAttr.setY(i * 2 + 1, 0);
             }
 
-            // Update Pulses
             pulsePool.forEach(p => {
                 if (!p.active) return;
-
-                // Dist
                 const key = `${Math.min(p.fromIdx, p.toIdx)}-${Math.max(p.fromIdx, p.toIdx)}`;
                 const lineIdx = connectionMap.get(key);
+                if (lineIdx === undefined) { p.active = false; return; }
 
-                if (lineIdx === undefined) {
-                    p.active = false;
-                    return;
-                }
-
-                // Move Progress
                 const dist = connectionPairs[lineIdx].dist;
                 p.progress += (CONFIG.signalSpeed * dt) / dist;
 
-                // Update Attribute
-                // Determine direction matching the lineProgress (0->1)
-                // connectionPairs[lineIdx] is stored as {from, to}
-                // lineProgress is 0 at vertex 0 (which corresponds to 'from'?)
-                // Yes, linePosAttr setXYZ(i*2) uses connectionPairs[i].from.
-
-                // If p.fromIdx == connectionPairs[lineIdx].from, then pulse is moving 0 -> 1.
-                // If p.fromIdx != connectionPairs[lineIdx].from, then pulse is moving 1 -> 0.
-
                 let shaderProgress = p.progress;
                 const isReverse = p.fromIdx !== connectionPairs[lineIdx].from;
-                if (isReverse) {
-                    shaderProgress = 1.0 - p.progress;
-                }
-
-                // Write to BOTH vertices of the line
-                // But wait, the shader needs ONE progress value relative to the line direction?
-                // Our shader compares vProgress (0..1) with vSignal.x (Signal Position).
-                // If pulse is moving 0->1, Signal Pos increases. Trail is (pos - 0.3) to pos.
-                // If pulse is moving 1->0 (Reverse):
-                // We define shaderProgress as the current location 1.0 -> 0.0.
-                // But calculation: dist = signalProgress - vProgress.
-                // If signal is at 0.8 (moving down), trail should be "behind" it (0.8 to 1.1?).
-                // No, "Behind" logically means where it came from.
-                // If moving 1->0, it came from 1. So trail is [0.8, 1.0].
-                // Math: dist = vProgress - signalProgress?
-                // Visual Symmetry: 
-                // Let's stick to valid range: |vProgress - signalProgress| < 0.3 ?
-                // No, direction matters.
-
-                // UNIVERSAL SHADER LOGIC attempt:
-                // Pass "Direction" to shader? Or handle mathematically.
-                // Let's Keep It Simple:
-                // We ALWAYS pass the signal position as 0..1 relative to the line geometry.
-                // If moving 0->1: Draw trail where vProgress < SignalPos.
-                // If moving 1->0: Draw trail where vProgress > SignalPos.
-                // This requires sending direction or encoding it.
-                // Hack: Pass Signal Strength as NEGATIVE if reverse? 
+                if (isReverse) shaderProgress = 1.0 - p.progress;
 
                 let encodedStrength = p.strength;
                 if (isReverse) encodedStrength = -p.strength;
@@ -536,11 +470,12 @@ export default function NeuralBrain() {
                 signalAttr.setXY(lineIdx * 2, shaderProgress, encodedStrength);
                 signalAttr.setXY(lineIdx * 2 + 1, shaderProgress, encodedStrength);
 
-                // CHECK TRIGGER (Target Reached)
+                // Trigger
                 if (!p.hasTriggered && p.progress >= 1.0) {
-                    // Flash the target neuron (Accumulate!)
                     const targetN = neurons[p.toIdx];
-                    targetN.flash += 1.0;
+
+                    // ACCUMULATE EXACT STRENGTH (Physics Fix!)
+                    targetN.flash += p.strength;
 
                     if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
                         targetN.connections.forEach(nextTarget => {
@@ -552,16 +487,11 @@ export default function NeuralBrain() {
                     p.hasTriggered = true;
                 }
 
-                // CHECK DEATH (Trail fully faded)
-                // If trailLen = 1.5, we kill it when progress > 1.0 + 1.5 = 2.5
-                if (p.progress > 2.5) {
-                    p.active = false;
-                }
+                if (p.progress > 2.5) p.active = false;
             });
-
             signalAttr.needsUpdate = true;
 
-            // D. INTERACTION / AUTO PULSE
+            // Auto Pulse
             if (CONFIG.autoPulseEnabled) {
                 autoPulseTimer += dt * 1000;
                 if (autoPulseTimer > CONFIG.autoPulseInterval) {
@@ -569,7 +499,6 @@ export default function NeuralBrain() {
                     autoPulseTimer = 0;
                 }
             }
-
             renderer.render(scene, camera);
         };
         animate();
