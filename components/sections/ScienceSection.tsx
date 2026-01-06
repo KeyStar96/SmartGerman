@@ -74,7 +74,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
 
                         {/* Layer 1 (Bottom): Neural Brain Container */}
                         <div
-                            className="absolute z-10"
+                            className="absolute z-10 overflow-hidden"
                             style={{
                                 top: `${brainPos.top}%`,
                                 left: `${brainPos.left}%`,
