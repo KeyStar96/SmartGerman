@@ -18,7 +18,7 @@ export default function ArchitecturalBackground() {
 
             <div className="absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out opacity-0 dark:opacity-100">
                 <Image
-                    src="/Bilder/SmartGerman_BG_Dark.jpg"
+                    src="/Bilder/SG_Brain_BG_Dark.JPG"
                     alt="Architectural Background Dark"
                     fill
                     priority
