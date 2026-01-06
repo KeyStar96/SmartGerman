@@ -9,8 +9,8 @@ const CONFIG = {
     neuronDensity: 20,       // Increased density
     connectionDistance: 0.35, // Shorter connections
     minConnectionDistance: 0.15,
-    wanderRadius: 0.05,      // Very subtle movement
-    wanderSpeed: 0.05,       // Very slow movement
+    wanderRadius: 0.025,     // Halved again (Subtle breathing)
+    wanderSpeed: 0.025,      // Halved again (Subtle breathing)
     springStiffness: 0.04,
     maxConnections: 5,       // Max connections per neuron
 
