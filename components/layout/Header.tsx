@@ -67,14 +67,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     return "text-foreground"; // Standard (weiß im Dark, Anthracite im Light bei gescrollt)
   }, [isTransparentLight, isScrolled, isDarkMode]);
 
-  const logoClasses = useMemo(() => {
-    // Darkmode: Immer PURE WHITE Logo (unabhängig vom Scroll-Status)
-    if (isDarkMode) {
-      return "invert brightness-0 contrast-200"; // Pure White im Darkmode
-    }
-    // Lightmode: Immer Originales Logo (unverändert, egal ob gescrollt oder nicht)
-    return ""; // Originales Logo im Lightmode
-  }, [isDarkMode]);
+
 
   const toggleTheme = () => {
     const newTheme = !isDarkMode;
@@ -106,11 +99,11 @@ export default function Header({ lang, dictionary }: HeaderProps) {
           {/* Logo Section - Logo-Farbe gekoppelt an Header-Hintergrund */}
           <Link href={`/${lang}`} className="group block">
             <Image
-              src="/Bilder/SG_Logo_Lightmode.png"
+              src={isDarkMode ? "/Bilder/SG_Logo_Darkmode.png" : "/Bilder/SG_Logo_Lightmode.png"}
               alt="SmartGerman Logo"
               width={192}
               height={40}
-              className={`h-auto object-contain transition-all duration-500 group-hover:scale-105 ${logoClasses}`}
+              className={`h-auto object-contain transition-all duration-500 group-hover:scale-105`}
               priority={true}
             />
           </Link>
