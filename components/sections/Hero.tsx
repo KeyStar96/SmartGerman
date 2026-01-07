@@ -155,7 +155,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Block A: Brand Split (Solid Colors) */}
           <h1
             ref={brandRef}
-            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline whitespace-nowrap"
+            className="text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline whitespace-nowrap"
             style={{ opacity: 0, visibility: 'hidden' }}
           >
             <span className="font-bold text-[#2D3436] dark:text-[#E2D7CE]">Smart</span>
