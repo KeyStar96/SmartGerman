@@ -148,7 +148,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
               className="font-mono text-[10px] text-[#2D3436] dark:text-[#E2D7CE] tracking-[0.2em] uppercase whitespace-nowrap"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
-              Next Session: 03. Feb 2026.
+              {dictionary.hero.next_session}
             </span>
           </div>
 
