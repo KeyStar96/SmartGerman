@@ -25,7 +25,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
   // Text Content
   const claimText = "Spracherwerb durch Wissenschaft.";
-  const claimChars = claimText.split("");
+  const claimWords = claimText.split(" ");
 
   useEffect(() => {
     if (document.readyState === "complete") {
@@ -155,7 +155,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Block A: Brand Split (Solid Colors) */}
           <h1
             ref={brandRef}
-            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline"
+            className="text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 flex items-baseline whitespace-nowrap"
             style={{ opacity: 0, visibility: 'hidden' }}
           >
             <span className="font-bold text-[#2D3436] dark:text-[#E2D7CE]">Smart</span>
@@ -174,9 +174,13 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             className="text-2xl md:text-3xl font-normal leading-tight text-[#2D3436] dark:text-[#E2D7CE] font-mono opacity-90 mb-12 min-h-[2em]"
             style={{ fontFamily: 'var(--font-mono)', opacity: 0, visibility: 'hidden' }} // Keep h2 visible for layout but shifted via GSAP
           >
-            {claimChars.map((char: string, index: number) => (
-              <span key={index} className="char hidden opacity-0 w-auto">
-                {char === " " ? "\u00A0" : char}
+            {claimWords.map((word, wordIndex) => (
+              <span key={wordIndex} className="inline-block whitespace-nowrap mr-[0.5em] last:mr-0">
+                {word.split("").map((char, charIndex) => (
+                  <span key={`${wordIndex}-${charIndex}`} className="char hidden opacity-0 w-auto">
+                    {char}
+                  </span>
+                ))}
               </span>
             ))}
             <span ref={cursorRef} className="cursor-blink inline-block text-[#FF5C00] font-bold ml-1">_</span>
@@ -185,7 +189,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* Subline: Clean Sans-Serif */}
           <p
             ref={sublineRef}
-            className="text-lg md:text-xl font-light tracking-wide leading-relaxed mb-12 max-w-xl text-[#2D3436] dark:text-[#E2D7CE]"
+            className="text-lg md:text-xl font-light tracking-wide leading-relaxed mb-12 max-w-xl text-[#2D3436] dark:text-[#E2D7CE] hyphens-none"
             style={{ opacity: 0, visibility: 'hidden' }}
           >
             {dictionary.hero.subline}

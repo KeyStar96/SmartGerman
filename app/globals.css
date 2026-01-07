@@ -60,6 +60,13 @@ html {
   background-color: var(--background) !important;
 }
 
+/* Helper for disabling hyphenation explicity */
+.hyphens-none {
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
 /* ============================================
    TYPEWRITER & SCIENTIFIC EFFECTS
    ============================================ */
