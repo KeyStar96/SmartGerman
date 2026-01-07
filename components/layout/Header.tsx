@@ -99,7 +99,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
           {/* Logo Section - Logo-Farbe gekoppelt an Header-Hintergrund */}
           <Link href={`/${lang}`} className="group block">
             <Image
-              src={isDarkMode ? "/Bilder/SG_Logo_Darkmode.png" : "/Bilder/SG_Logo_Lightmode.png"}
+              src={isDarkMode ? "/Bilder/SG_Logo_Darkmode2.png" : "/Bilder/SG_Logo_Lightmode.png"}
               alt="SmartGerman Logo"
               width={192}
               height={40}
