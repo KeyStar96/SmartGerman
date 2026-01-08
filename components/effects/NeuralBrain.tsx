@@ -17,7 +17,7 @@ const CONFIG = {
     // Signals
     signalSpeed: 1.25,
     signalDecay: 0.95,
-    minSignalStrength: 0.05,
+    minSignalStrength: 0.1,
     trailDecay: 2.0,
 
     particleSize: 0.035, // Base size
@@ -33,7 +33,7 @@ const CONFIG = {
 
     // Auto Pulse
     autoPulseEnabled: true,
-    autoPulseInterval: 600,
+    autoPulseInterval: 300,
 };
 
 // --- TYPES ---
