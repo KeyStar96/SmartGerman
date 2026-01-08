@@ -12,11 +12,10 @@ const CONFIG = {
     wanderRadius: 0.025,
     wanderSpeed: 0.01,
     springStiffness: 0.04,
-    maxConnections: 5,
+    maxConnections: 6,
 
     // Signals
     signalSpeed: 1.25,
-    signalDecay: 0.99,
     minSignalStrength: 0.05,
     trailDecay: 2.0,
 
@@ -420,7 +419,7 @@ export default function NeuralBrain() {
 
         // --- 5. SIGNAL LOGIC ---
         const pulsePool: Pulse[] = [];
-        const maxPulses = 200;
+        const maxPulses = 2000;
         for (let i = 0; i < maxPulses; i++) {
             pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1 });
         }
@@ -553,7 +552,7 @@ export default function NeuralBrain() {
 
                 // --- VISUAL DECAY DURING TRAVEL ---
                 // "Light signal decreases luminosity with the path"
-                const travelDecay = Math.exp(-dist * p.progress * 1.0);
+                const travelDecay = Math.exp(-dist * p.progress * 4.0);
                 const currentStrength = p.strength * travelDecay;
 
                 if (isReverse) encodedStrength = -currentStrength;
