@@ -62,6 +62,12 @@ export default function NeuralBrain() {
     const containerRef = useRef<HTMLDivElement>(null);
     const [opacity, setOpacity] = useState(0);
 
+    // Animation Refs
+    const expansionRef = useRef(0);
+    const requestRef = useRef<number | undefined>(undefined);
+    const isVisibleRef = useRef(false);
+    const lastTimeRef = useRef(0);
+
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -504,11 +510,6 @@ export default function NeuralBrain() {
 
         // --- 6. ANIMATION LOOP ---
         const clock = new THREE.Clock();
-        // --- 6. VISIBILITY & ANIMATION LOOP ---
-        const expansionRef = useRef(0);
-        const requestRef = useRef<number>();
-        const isVisibleRef = useRef(false);
-        const lastTimeRef = useRef(0);
 
         const animate = (time: number) => {
             // Keep reference for loop
