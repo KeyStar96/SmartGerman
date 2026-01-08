@@ -507,9 +507,8 @@ export default function NeuralBrain() {
             const n = neurons[idx];
             n.flash += 2.0;
 
-            setTimeout(() => {
-                n.connections.forEach(target => spawnPulse(idx, target, 3.0)); // Start very bright
-            }, 500);
+            // Immediate Trigger (No artificial delay)
+            n.connections.forEach(target => spawnPulse(idx, target, 3.0));
         };
 
         // --- 6. ANIMATION LOOP ---
@@ -586,7 +585,7 @@ export default function NeuralBrain() {
                 const n = neurons[i];
 
                 if (n.flash > 0) {
-                    n.flash = Math.max(0, n.flash - dt * 0.5);
+                    n.flash = Math.max(0, n.flash - dt * 2.0); // Faster decay to reduce "busy" look
                     n.flash = Math.min(n.flash, 4.0);
                 }
                 flashArray[i] = n.flash;
@@ -597,47 +596,22 @@ export default function NeuralBrain() {
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
             const signalArray = signalAttr.array as Float32Array;
 
-            // Reset "Active" lines first (Optimization)
-            // Ideally we track which lines are dirty, but iterating all lines for clear is safest for now 
-            // OR use dirtyLines again (let's use dirtyLines for cleanup)
-
             // Auto Pulse (Random / Organic)
-            // No rhythm, just pure chaos
+            // Low probability to avoid "Heartbeat" / "Clumping"
             if (CONFIG.autoPulseEnabled) {
-                // Try to fire multiple times per frame with low probability to create "bursts" or "noise"
-                // rather than a metronome.
-                const attempts = 4;
-                for (let k = 0; k < attempts; k++) {
-                    if (Math.random() < 0.15) {
-                        triggerNeuron();
-                    }
+                // 2% chance per frame (~1.2 pulses per second @ 60fps)
+                // This ensures individual cascades are distinct and beautiful
+                if (Math.random() < 0.02) {
+                    triggerNeuron();
                 }
             }
 
-            // Clean previous dirty signals (Reset to 0 if not updated this frame? No, we need persistence)
-            // Actually, we need to clear updated signals from previous frame if they finished?
-            // We just need to update active pulses.
-
-            // We need to zero out signals that are NOT active anymore?
-            // Since we share the buffer, it's tricky.
-            // Strategy: Zero out ALL lines every frame? Or just active ones?
-            // Zeroing all 2000 lines * 4 floats is cheap.
-            // Let's optimize: Only clear lines that were active last frame.
-
-            // For simplicity and correctness: 
-            // We'll iterate pulsePool and update. 
-            // BUT we must clear the specific line slot before writing if multiple pulses (not supported yet)
-            // Current shader supports 1 pulse per line direction effectively (mix).
-            // Let's just Loop over active pulses.
-
-            // Problem: If a pulse finishes, we need to clear the line on the GPU.
-            // We can track "dirtyLines" to clear them.
-
+            // Clean previous dirty signals
             dirtyLines.forEach(lineIdx => {
                 const v1 = lineIdx * 4;
                 signalArray[v1] = 0;
                 signalArray[v1 + 1] = 0;
-                const v2 = v1 + 2; // fix lint later
+                const v2 = v1 + 2;
                 signalArray[v2] = 0;
                 signalArray[v1 + 3] = 0;
             });
