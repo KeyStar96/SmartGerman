@@ -103,9 +103,13 @@ export default function NeuralBrain() {
         const genBounds = { x: 4.0, y: 3.0 };
 
         for (let i = 0; i < particleCount; i++) {
+            // Elliptical Generation for organic shape
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.sqrt(Math.random()); // Sqrt for uniform distribution
+
             const testP = {
-                x: (Math.random() - 0.5) * 2 * genBounds.x,
-                y: (Math.random() - 0.5) * 2 * genBounds.y
+                x: Math.cos(angle) * radius * genBounds.x,
+                y: Math.sin(angle) * radius * genBounds.y
             };
 
             // Z is strictly 0 for physics
