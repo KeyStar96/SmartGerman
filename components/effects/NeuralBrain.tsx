@@ -339,9 +339,9 @@ export default function NeuralBrain() {
                 
                 vec3 getHeatColor(float i) {
                     // 0.0 - 0.4: Low (Red) -> Mid (Orange)
-                    // 0.4 - 1.2: Mid (Orange) -> High (Gold/Bright)
+                    // 0.4 - 0.8: Mid (Orange) -> High (Gold/Bright)
                     vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.4, i));
-                    c = mix(c, uColorHigh, smoothstep(0.4, 1.2, i));
+                    c = mix(c, uColorHigh, smoothstep(0.4, 0.8, i));
                     return c;
                 }
 
@@ -552,7 +552,7 @@ export default function NeuralBrain() {
 
                 // --- VISUAL DECAY DURING TRAVEL ---
                 // "Light signal decreases luminosity with the path"
-                const travelDecay = Math.exp(-dist * p.progress * 4.0);
+                const travelDecay = Math.exp(-dist * p.progress * 2.5);
                 const currentStrength = p.strength * travelDecay;
 
                 if (isReverse) encodedStrength = -currentStrength;
