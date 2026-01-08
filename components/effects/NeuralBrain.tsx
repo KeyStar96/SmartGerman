@@ -33,7 +33,7 @@ const CONFIG = {
 
     // Auto Pulse
     autoPulseEnabled: true,
-    autoPulseInterval: 300,
+    autoPulseInterval: 100,
 };
 
 // --- TYPES ---
@@ -592,7 +592,8 @@ export default function NeuralBrain() {
         // --- 8. INTERACTION (Raycaster) ---
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
-        raycaster.params.Points.threshold = 0.2;
+        // Larger threshold for easier clicking (Increased from 0.2 to 1.0)
+        raycaster.params.Points.threshold = 1.0;
 
         const onPointerDown = (event: PointerEvent) => {
             if (!containerRef.current) return;
