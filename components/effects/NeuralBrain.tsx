@@ -687,7 +687,7 @@ export default function NeuralBrain() {
                     startLoop();
                 }
             });
-        }, { threshold: 0.1 }); // 10% visible to start
+        }, { threshold: 0.1, rootMargin: '-20% 0px' }); // Trigger earlier to show collapse
 
         intersectionObserver.observe(containerRef.current);
 
