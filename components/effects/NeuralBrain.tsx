@@ -353,25 +353,21 @@ export default function NeuralBrain() {
                     float finalOpacity = uOpacityBase;
                     
                     if (signalStrength > 0.01) {
-                        float ambientGlow = smoothstep(0.0, 1.0, signalStrength) * 0.6;
-                        finalOpacity += ambientGlow;
-                        finalColor = mix(finalColor, uColorMid, ambientGlow * 0.5);
-
                         bool isReverse = rawStrength < 0.0;
                         float distUV = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
                         float distWorld = distUV * vDist;
 
                         if (distWorld >= 0.0) {
-                            float tailLen = 1.8;
+                            float tailLen = 0.6; // Reduced tail length for clearer pulse
                             float glow = max(0.0, 1.0 - (distWorld / tailLen));
                             
                             if (glow > 0.0) {
                                 vec3 trailColor = getHeatColor(signalStrength);
                                 trailColor *= 2.0;
 
-                                if (distWorld < 0.1) {
-                                     trailColor = mix(trailColor, uColorHigh, 0.5);
+                                if (distWorld < 0.05) {
+                                     trailColor = mix(trailColor, uColorHigh, 0.6);
                                 }
                                 
                                 finalColor = mix(finalColor, trailColor, glow);
