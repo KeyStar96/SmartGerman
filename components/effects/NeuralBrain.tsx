@@ -547,8 +547,15 @@ export default function NeuralBrain() {
                 const isReverse = p.fromIdx !== connectionPairs[lineIdx].from;
                 if (isReverse) shaderProgress = 1.0 - p.progress;
 
-                let encodedStrength = p.strength;
-                if (isReverse) encodedStrength = -p.strength;
+                let encodedStrength = p.strength;   // Default to start strength
+
+                // --- VISUAL DECAY DURING TRAVEL ---
+                // "Light signal decreases luminosity with the path"
+                const travelDecay = Math.exp(-dist * p.progress * 1.0);
+                const currentStrength = p.strength * travelDecay;
+
+                if (isReverse) encodedStrength = -currentStrength;
+                else encodedStrength = currentStrength;
 
                 const v1 = lineIdx * 4;
                 signalArray[v1] = shaderProgress;
@@ -562,12 +569,16 @@ export default function NeuralBrain() {
 
                 if (!p.hasTriggered && p.progress >= 1.0) {
                     const targetN = neurons[p.toIdx];
-                    targetN.flash += p.strength;
 
-                    if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
+                    // "Neuron lights up in same intensity as signal reached it"
+                    targetN.flash += currentStrength;
+
+                    // "Sends new signal with reduced intensity" (Immediate, no delay)
+                    // We treat "reduced" as the value it arrived with.
+                    if (currentStrength > CONFIG.minSignalStrength) {
                         targetN.connections.forEach(nextTarget => {
                             if (nextTarget !== p.fromIdx) {
-                                spawnPulse(p.toIdx, nextTarget, p.strength * CONFIG.signalDecay);
+                                spawnPulse(p.toIdx, nextTarget, currentStrength);
                             }
                         });
                     }
