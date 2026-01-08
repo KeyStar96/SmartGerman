@@ -601,18 +601,21 @@ export default function NeuralBrain() {
             // Ideally we track which lines are dirty, but iterating all lines for clear is safest for now 
             // OR use dirtyLines again (let's use dirtyLines for cleanup)
 
-            // Auto Pulse
+            // Auto Pulse (Random / Organic)
+            // No rhythm, just pure chaos
             if (CONFIG.autoPulseEnabled) {
-                const interval = CONFIG.autoPulseInterval / 1000;
-                if (time * 0.001 % interval < dt) {
-                    // Trigger multiple per frame
-                    for (let k = 0; k < 3; k++) triggerNeuron();
+                // Try to fire multiple times per frame with low probability to create "bursts" or "noise"
+                // rather than a metronome.
+                const attempts = 4;
+                for (let k = 0; k < attempts; k++) {
+                    if (Math.random() < 0.15) {
+                        triggerNeuron();
+                    }
                 }
             }
 
             // Clean previous dirty signals (Reset to 0 if not updated this frame? No, we need persistence)
             // Actually, we need to clear updated signals from previous frame if they finished?
-            // The logic: Signal array contains current signal states.
             // We just need to update active pulses.
 
             // We need to zero out signals that are NOT active anymore?
