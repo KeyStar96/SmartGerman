@@ -10,13 +10,13 @@ const CONFIG = {
     connectionDistance: 0.35,
     minConnectionDistance: 0.15,
     wanderRadius: 0.025,
-    wanderSpeed: 0.025,
+    wanderSpeed: 0.01,
     springStiffness: 0.04,
     maxConnections: 5,
 
     // Signals
     signalSpeed: 1.25,
-    signalDecay: 0.95,
+    signalDecay: 0.99,
     minSignalStrength: 0.05,
     trailDecay: 2.0,
 
