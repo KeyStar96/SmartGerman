@@ -17,7 +17,7 @@ const CONFIG = {
     // Signals
     signalSpeed: 1.25,
     signalDecay: 0.95,
-    minSignalStrength: 0.1,
+    minSignalStrength: 0.05,
     trailDecay: 2.0,
 
     particleSize: 0.035, // Base size
@@ -339,8 +339,10 @@ export default function NeuralBrain() {
                 varying float vDist;
                 
                 vec3 getHeatColor(float i) {
-                    vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.6, i));
-                    c = mix(c, uColorHigh, smoothstep(0.6, 2.0, i));
+                    // 0.0 - 0.4: Low (Red) -> Mid (Orange)
+                    // 0.4 - 1.2: Mid (Orange) -> High (Gold/Bright)
+                    vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.4, i));
+                    c = mix(c, uColorHigh, smoothstep(0.4, 1.2, i));
                     return c;
                 }
 
@@ -449,7 +451,7 @@ export default function NeuralBrain() {
             n.flash += 2.0;
 
             setTimeout(() => {
-                n.connections.forEach(target => spawnPulse(idx, target, 1.0));
+                n.connections.forEach(target => spawnPulse(idx, target, 3.0)); // Start very bright
             }, 500);
         };
 
