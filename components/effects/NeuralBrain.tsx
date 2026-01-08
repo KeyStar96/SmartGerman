@@ -171,6 +171,7 @@ export default function NeuralBrain() {
         const particlesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
+                uExpansion: { value: 0 }, // 0 = Collapsed, 1 = Full
                 uColorIdle: { value: new THREE.Color(CONFIG.colorIdleDark) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
@@ -180,6 +181,7 @@ export default function NeuralBrain() {
             vertexShader: `
                 uniform float uTime;
                 uniform float uSize;
+                uniform float uExpansion;
                 attribute float aPhase;
                 attribute float aFlash;
                 attribute float aVisualDepth; // 0..1
@@ -197,7 +199,7 @@ export default function NeuralBrain() {
                         0.0
                     ) * 0.04; // 0.04 matches prev wander radius approx
 
-                    vec3 finalPos = position + offset;
+                    vec3 finalPos = (position + offset) * uExpansion;
 
                     vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
@@ -335,6 +337,7 @@ export default function NeuralBrain() {
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
+                uExpansion: { value: 0 }, // 0 = Collapsed, 1 = Full
                 uColorIdle: { value: new THREE.Color(CONFIG.colorIdleDark) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
@@ -344,6 +347,7 @@ export default function NeuralBrain() {
             transparent: true,
             vertexShader: `
                 uniform float uTime;
+                uniform float uExpansion;
                 attribute float aLineProgress;
                 attribute vec2 aSignal; 
                 attribute float aDist;
@@ -365,7 +369,7 @@ export default function NeuralBrain() {
                         0.0
                     ) * 0.04;
 
-                    vec3 finalPos = position + offset;
+                    vec3 finalPos = (position + offset) * uExpansion;
                     vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                 }
@@ -500,26 +504,52 @@ export default function NeuralBrain() {
 
         // --- 6. ANIMATION LOOP ---
         const clock = new THREE.Clock();
-        let autoPulseTimer = 0;
-        const tempVec = new THREE.Vector3();
+        // --- 6. VISIBILITY & ANIMATION LOOP ---
+        const expansionRef = useRef(0);
+        const requestRef = useRef<number>();
+        const isVisibleRef = useRef(false);
+        const lastTimeRef = useRef(0);
 
-        const randLUT = new Float32Array(8192);
-        for (let i = 0; i < 8192; i++) randLUT[i] = Math.random() - 0.5;
-        let randIdx = 0;
+        const animate = (time: number) => {
+            // Keep reference for loop
+            requestRef.current = requestAnimationFrame(animate);
 
-        const animate = () => {
-            requestAnimationFrame(animate);
-            const dt = Math.min(clock.getDelta(), 0.1);
-            const time = clock.getElapsedTime();
+            // Time Delta
+            const dt = Math.min((time - lastTimeRef.current) / 1000, 0.1);
+            lastTimeRef.current = time;
 
-            particlesMat.uniforms.uTime.value = time;
-            linesMat.uniforms.uTime.value = time;
+            // --- EXPANSION/COLLAPSE ANIMATION ---
+            const targetExpansion = isVisibleRef.current ? 1.0 : 0.0;
+            const currentExp = expansionRef.current;
 
-            const posArray = particlesGeo.attributes.position.array as Float32Array;
+            // Smooth Lerp
+            const newExp = currentExp + (targetExpansion - currentExp) * 0.05; // Adjust speed here
+            expansionRef.current = newExp;
+
+            // Apply Uniforms
+            particlesMat.uniforms.uExpansion.value = newExp;
+            linesMat.uniforms.uExpansion.value = newExp;
+
+            // --- STOP OPTIMIZATION ---
+            // If we are aiming for 0 (hidden) and practically there, STOP the loop
+            if (targetExpansion === 0 && newExp < 0.001) {
+                if (requestRef.current) {
+                    cancelAnimationFrame(requestRef.current);
+                    requestRef.current = undefined;
+                    // Ensure it is strictly 0
+                    particlesMat.uniforms.uExpansion.value = 0;
+                    linesMat.uniforms.uExpansion.value = 0;
+                }
+                return; // Stop execution
+            }
+
+            // Normal Animation Update
+            particlesMat.uniforms.uTime.value = time * 0.001;
+            linesMat.uniforms.uTime.value = time * 0.001;
+
             const flashArray = particlesGeo.attributes.aFlash.array as Float32Array;
-            const linePosArray = linesGeo.attributes.position.array as Float32Array;
 
-            // Update Neurons (only Flash state, positions are handled in Shader now)
+            // Update Neurons (only Flash state)
             for (let i = 0; i < neurons.length; i++) {
                 const n = neurons[i];
 
@@ -531,17 +561,51 @@ export default function NeuralBrain() {
             }
             (particlesGeo.attributes.aFlash as THREE.BufferAttribute).needsUpdate = true;
 
-            // Connection Geometry is STATIC (handled in shader), so no loop here!
-
             // Signal Logic
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
             const signalArray = signalAttr.array as Float32Array;
 
-            for (let i = 0; i < dirtyLines.length; i++) {
-                const idx = dirtyLines[i];
-                signalArray[idx * 4 + 1] = 0;
-                signalArray[idx * 4 + 3] = 0;
+            // Reset "Active" lines first (Optimization)
+            // Ideally we track which lines are dirty, but iterating all lines for clear is safest for now 
+            // OR use dirtyLines again (let's use dirtyLines for cleanup)
+
+            // Auto Pulse
+            if (CONFIG.autoPulseEnabled) {
+                const interval = CONFIG.autoPulseInterval / 1000;
+                if (time * 0.001 % interval < dt) {
+                    // Trigger multiple per frame
+                    for (let k = 0; k < 3; k++) triggerNeuron();
+                }
             }
+
+            // Clean previous dirty signals (Reset to 0 if not updated this frame? No, we need persistence)
+            // Actually, we need to clear updated signals from previous frame if they finished?
+            // The logic: Signal array contains current signal states.
+            // We just need to update active pulses.
+
+            // We need to zero out signals that are NOT active anymore?
+            // Since we share the buffer, it's tricky.
+            // Strategy: Zero out ALL lines every frame? Or just active ones?
+            // Zeroing all 2000 lines * 4 floats is cheap.
+            // Let's optimize: Only clear lines that were active last frame.
+
+            // For simplicity and correctness: 
+            // We'll iterate pulsePool and update. 
+            // BUT we must clear the specific line slot before writing if multiple pulses (not supported yet)
+            // Current shader supports 1 pulse per line direction effectively (mix).
+            // Let's just Loop over active pulses.
+
+            // Problem: If a pulse finishes, we need to clear the line on the GPU.
+            // We can track "dirtyLines" to clear them.
+
+            dirtyLines.forEach(lineIdx => {
+                const v1 = lineIdx * 4;
+                signalArray[v1] = 0;
+                signalArray[v1 + 1] = 0;
+                const v2 = v1 + 2; // fix lint later
+                signalArray[v2] = 0;
+                signalArray[v1 + 3] = 0;
+            });
             dirtyLines.length = 0;
 
             pulsePool.forEach(p => {
@@ -583,29 +647,44 @@ export default function NeuralBrain() {
                     // "Sends new signal with reduced intensity" (Immediate, no delay)
                     // We treat "reduced" as the value it arrived with.
                     if (currentStrength > CONFIG.minSignalStrength) {
-                        targetN.connections.forEach(nextTarget => {
-                            if (nextTarget !== p.fromIdx) {
-                                spawnPulse(p.toIdx, nextTarget, currentStrength);
+                        // Spread to others
+                        targetN.connections.forEach(mateIdx => {
+                            // Don't send back to sender immediately (optional simple block)
+                            if (mateIdx !== p.fromIdx) {
+                                spawnPulse(p.toIdx, mateIdx, currentStrength, 0.0);
                             }
                         });
                     }
                     p.hasTriggered = true;
                 }
 
-                if (p.progress > 4.5) p.active = false;
+                if (p.progress >= 1.0 + (CONFIG.trailDecay / dist)) { // Wait for trail to finish
+                    p.active = false;
+                }
             });
+
             signalAttr.needsUpdate = true;
 
-            if (CONFIG.autoPulseEnabled) {
-                autoPulseTimer += dt * 1000;
-                if (autoPulseTimer > CONFIG.autoPulseInterval) {
-                    triggerNeuron();
-                    autoPulseTimer = 0;
-                }
-            }
             renderer.render(scene, camera);
         };
-        animate();
+
+        const startLoop = () => {
+            if (!requestRef.current) {
+                lastTimeRef.current = performance.now();
+                animate(performance.now());
+            }
+        };
+
+        const intersectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                isVisibleRef.current = entry.isIntersecting;
+                if (entry.isIntersecting) {
+                    startLoop();
+                }
+            });
+        }, { threshold: 0.1 }); // 10% visible to start
+
+        intersectionObserver.observe(containerRef.current);
 
         // --- 7. RESIZE & CLEANUP ---
         const resizeObserver = new ResizeObserver(() => {
