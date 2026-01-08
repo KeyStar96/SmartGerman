@@ -88,11 +88,13 @@ export default function NeuralBrain() {
         setTimeout(() => setOpacity(1), 100);
 
         // --- 2. GENERATE BRAIN STRUCTURE (2D Plane) ---
-        const particleCount = Math.floor(400 * CONFIG.neuronDensity);
+        // Expanded area to prevent "flat sides" when container is non-square or large
+        const areaMultiplier = 2.5;
+        const particleCount = Math.floor(400 * CONFIG.neuronDensity * 1.5); // Increased count
         const neurons: Neuron[] = [];
 
-        // Bounding box for generation (2D)
-        const genBounds = { x: 2.2, y: 1.8 };
+        // Bounding box for generation (2D) - Significantly larger
+        const genBounds = { x: 4.0, y: 3.0 };
 
         for (let i = 0; i < particleCount; i++) {
             const testP = {
