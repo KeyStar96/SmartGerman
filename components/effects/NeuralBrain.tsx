@@ -33,7 +33,7 @@ const CONFIG = {
 
     // Auto Pulse
     autoPulseEnabled: true,
-    autoPulseInterval: 100,
+    autoPulseInterval: 40,
 };
 
 // --- TYPES ---
@@ -589,45 +589,6 @@ export default function NeuralBrain() {
         };
         animate();
 
-        // --- 8. INTERACTION (Raycaster) ---
-        const raycaster = new THREE.Raycaster();
-        const pointer = new THREE.Vector2();
-        // Larger threshold for easier clicking (Increased from 0.2 to 1.0)
-        raycaster.params.Points.threshold = 1.0;
-
-        const onPointerDown = (event: PointerEvent) => {
-            if (!containerRef.current) return;
-
-            const rect = containerRef.current.getBoundingClientRect();
-            pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            raycaster.setFromCamera(pointer, camera);
-            const intersects = raycaster.intersectObject(particleSystem);
-
-            if (intersects.length > 0) {
-                const hit = intersects[0];
-                const index = hit.index;
-                if (index !== undefined) {
-                    const n = neurons[index];
-                    n.flash += 2.0;
-
-                    const flashAttr = particlesGeo.attributes.aFlash as THREE.BufferAttribute;
-                    flashAttr.setX(index, n.flash);
-                    flashAttr.needsUpdate = true;
-
-                    setTimeout(() => {
-                        n.connections.forEach(target => {
-                            spawnPulse(index, target, 2.0);
-                        });
-                    }, 500);
-                }
-            }
-        };
-
-        renderer.domElement.style.touchAction = 'none';
-        renderer.domElement.addEventListener('pointerdown', onPointerDown);
-
         // --- 7. RESIZE & CLEANUP ---
         const resizeObserver = new ResizeObserver(() => {
             if (!containerRef.current) return;
@@ -646,7 +607,6 @@ export default function NeuralBrain() {
             resizeObserver.disconnect();
 
             if (containerRef.current && renderer.domElement) {
-                renderer.domElement.removeEventListener('pointerdown', onPointerDown);
                 containerRef.current.removeChild(renderer.domElement);
             }
             particlesGeo.dispose();
