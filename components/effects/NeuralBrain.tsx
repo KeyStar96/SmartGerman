@@ -6,30 +6,30 @@ import * as THREE from "three";
 
 // --- CONFIG ---
 const CONFIG = {
-    neuronDensity: 20,       // Increased density
-    connectionDistance: 0.35, // Shorter connections
+    neuronDensity: 20,
+    connectionDistance: 0.35,
     minConnectionDistance: 0.15,
-    wanderRadius: 0.025,     // Halved again (Subtle breathing)
-    wanderSpeed: 0.025,      // Halved again (Subtle breathing)
+    wanderRadius: 0.025,
+    wanderSpeed: 0.025,
     springStiffness: 0.04,
-    maxConnections: 5,       // Max connections per neuron
+    maxConnections: 5,
 
     // Signals
     signalSpeed: 1.25,
-    signalDecay: 0.95, // Minimal decay for long-distance flow
+    signalDecay: 0.95,
     minSignalStrength: 0.05,
     trailDecay: 2.0,
 
-    particleSize: 0.035,
+    particleSize: 0.035, // Base size
 
     // Theme Colors
-    colorIdleDark: 0xE0E0E0,   // Light Gray (Dark Mode)
-    colorIdleLight: 0x444444,  // Dark Gray (Light Mode)
+    colorIdleDark: 0xE0E0E0,
+    colorIdleLight: 0x444444,
 
     // Heat Palette for Signals (Red -> Orange -> Gold)
     colorLow: 0xCC3300,
     colorMid: 0xFF9900,
-    colorHigh: 0xFFC000, // Gold / Amber (No White)
+    colorHigh: 0xFFC000,
 
     // Auto Pulse
     autoPulseEnabled: true,
@@ -39,23 +39,23 @@ const CONFIG = {
 // --- TYPES ---
 interface Neuron {
     id: number;
-    vec: THREE.Vector3;      // Current Position (ref to Geometry attribute ideally, but object for physics easier)
+    vec: THREE.Vector3;      // Position (Z will be 0)
     baseVec: THREE.Vector3;  // Base Position
     velocity: THREE.Vector3;
-    wanderAngle: { theta: number; phi: number }; // Spherical coords for wander
-    connections: number[];   // Indices of connected neurons
-    flash: number;           // 0..1+ activation level (can exceed 1 for glow)
+    connections: number[];
+    flash: number;
+    visualDepth: number;     // 0 (Back) to 1 (Front)
 }
 
 interface Pulse {
     active: boolean;
     fromIdx: number;
     toIdx: number;
-    progress: number; // 0 to >1 (overshoot for trail)
+    progress: number;
     strength: number;
     trailIntensity: number;
-    hasTriggered: boolean; // To trigger target only once
-    lineIdx: number;       // Cached index to avoid Map lookup in loop
+    hasTriggered: boolean;
+    lineIdx: number;
 }
 
 export default function NeuralBrain() {
@@ -70,11 +70,10 @@ export default function NeuralBrain() {
         const height = containerRef.current.clientHeight;
 
         const scene = new THREE.Scene();
-        // scene.fog = new THREE.FogExp2(0x000000, 0.05); // Optional depth
 
         const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-        // User requested Y-Offset: 0.20 (Camera down = Brain up)
-        camera.position.set(0, -0.20, 4.5);
+        // Z=0 Plane View
+        camera.position.set(0, 0, 4.5);
 
         const renderer = new THREE.WebGLRenderer({
             antialias: true,
@@ -83,21 +82,17 @@ export default function NeuralBrain() {
         });
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setClearColor(0x000000, 0); // Explicitly clear to transparent
+        renderer.setClearColor(0x000000, 0);
         containerRef.current.appendChild(renderer.domElement);
 
-        // Trigger fade-in after a short delay
         setTimeout(() => setOpacity(1), 100);
 
-        // --- 2. GENERATE BRAIN STRUCTURE (Full Container Fill) ---
-        // The container is now masked by CSS (border-radius), so we just fill the space.
-
+        // --- 2. GENERATE BRAIN STRUCTURE (2D Plane) ---
         const particleCount = Math.floor(400 * CONFIG.neuronDensity);
         const neurons: Neuron[] = [];
-        const depthRange = 0.6; // Thin depth for 2.5D look
 
-        // Bounding box for generation - covers the view
-        const genBounds = { x: 2.2, y: 1.8 }; // Adjusted to cover standard aspect ratio
+        // Bounding box for generation (2D)
+        const genBounds = { x: 2.2, y: 1.8 };
 
         for (let i = 0; i < particleCount; i++) {
             const testP = {
@@ -105,20 +100,20 @@ export default function NeuralBrain() {
                 y: (Math.random() - 0.5) * 2 * genBounds.y
             };
 
-            // Valid 2D point, add z-depth
-            const z = (Math.random() - 0.5) * depthRange;
+            // Z is strictly 0 for physics
+            const z = 0;
+
+            // Visual Depth: 0 (Far/Sharp/Small) -> 1 (Near/Blurry/Large)
+            const visualDepth = Math.random();
 
             neurons.push({
                 id: neurons.length,
                 vec: new THREE.Vector3(testP.x, testP.y, z),
                 baseVec: new THREE.Vector3(testP.x, testP.y, z),
                 velocity: new THREE.Vector3(0, 0, 0),
-                wanderAngle: {
-                    theta: Math.random() * Math.PI * 2,
-                    phi: Math.acos(2 * Math.random() - 1)
-                },
                 connections: [],
-                flash: 0
+                flash: 0,
+                visualDepth: visualDepth
             });
         }
 
@@ -130,10 +125,11 @@ export default function NeuralBrain() {
         for (let i = 0; i < neurons.length; i++) {
             const n1 = neurons[i];
             let connCount = 0;
-            // Naive O(N^2) is fine for N=1200 once at startup
             for (let j = i + 1; j < neurons.length; j++) {
                 if (connCount >= CONFIG.maxConnections) break;
                 const n2 = neurons[j];
+
+                // 2D Distance Check (Z is ignored as it is 0)
                 const dSq = n1.vec.distanceToSquared(n2.vec);
 
                 if (dSq < maxDistSq && dSq > minDistSq) {
@@ -150,22 +146,25 @@ export default function NeuralBrain() {
         // A. Particles (Points)
         const particlesGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(neurons.length * 3);
-        const phases = new Float32Array(neurons.length); // For individual pulsating
-        const flashes = new Float32Array(neurons.length); // For visual activation
+        const phases = new Float32Array(neurons.length);
+        const flashes = new Float32Array(neurons.length);
+        const visualDepths = new Float32Array(neurons.length);
 
-        // Fill initial positions and phases
         neurons.forEach((n, i) => {
             positions[i * 3] = n.vec.x;
             positions[i * 3 + 1] = n.vec.y;
             positions[i * 3 + 2] = n.vec.z;
             phases[i] = Math.random() * Math.PI * 2;
             flashes[i] = 0.0;
+            visualDepths[i] = n.visualDepth;
         });
+
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
         particlesGeo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
         particlesGeo.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 1).setUsage(THREE.DynamicDrawUsage));
+        particlesGeo.setAttribute('aVisualDepth', new THREE.BufferAttribute(visualDepths, 1));
 
-        // Custom Shader for Pulsating Particles with Heat Gradient
+        // Custom Shader for Depth Effect
         const particlesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
@@ -180,25 +179,33 @@ export default function NeuralBrain() {
                 uniform float uSize;
                 attribute float aPhase;
                 attribute float aFlash;
-                varying float vDepth;
+                attribute float aVisualDepth; // 0..1
+                
                 varying float vFlash;
                 varying float vPhase;
+                varying float vVisualDepth;
                 
                 void main() {
                     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                     
-                    vDepth = -mvPosition.z;
                     vFlash = aFlash;
                     vPhase = aPhase;
+                    vVisualDepth = aVisualDepth;
 
-                    // Pulsate size (Breathing + Flash)
-                    float breath = 0.1 * sin(uTime * 1.5 + aPhase); // Idle breathing
+                    // Pulsate
+                    float breath = 0.1 * sin(uTime * 1.5 + aPhase); 
                     float flashGrow = smoothstep(0.0, 2.0, aFlash) * 1.0; 
-                    
                     float pulse = 1.0 + breath + flashGrow;
                     
-                    gl_PointSize = uSize * pulse * (1.0 / vDepth);
+                    // --- OPTICAL ILLUSION: SIZE ---
+                    // Front (Depth 1) -> Large
+                    // Back (Depth 0) -> Small
+                    // Range: 0.5x to 1.5x base size
+                    float depthScale = 0.5 + aVisualDepth * 1.0;
+
+                    // Perspective divide (standard) + Depth Scale
+                    gl_PointSize = uSize * pulse * depthScale * (1.0 / -mvPosition.z);
                 }
             `,
             fragmentShader: `
@@ -208,14 +215,11 @@ export default function NeuralBrain() {
                 uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
                 
-                varying float vDepth;
                 varying float vFlash;
                 varying float vPhase;
+                varying float vVisualDepth;
                 
                 vec3 getHeatColor(float i) {
-                    // Map intensity i (0..2+) to color gradient
-                    // 0.0 - 0.5: Low -> Mid
-                    // 0.5 - 1.5: Mid -> High
                     vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.6, i));
                     c = mix(c, uColorHigh, smoothstep(0.6, 2.0, i));
                     return c;
@@ -227,70 +231,73 @@ export default function NeuralBrain() {
                     
                     if(dist > 0.5) discard;
                     
-                    // Alpha patterns
-                    float blurFactor = 1.0 - smoothstep(4.2, 4.9, vDepth);
-                    float alphaSharp = 1.0 - smoothstep(0.4, 0.5, dist);
-                    float alphaBlur = 1.0 - (dist * 2.0);
-                    alphaBlur = pow(alphaBlur, 1.5);
+                    // --- OPTICAL ILLUSION: BLUR ---
+                    // Back (Depth 0) -> Sharp Edge
+                    // Front (Depth 1) -> Soft/Blurry Edge
                     
-                    float finalAlpha = mix(alphaSharp, alphaBlur, blurFactor);
+                    // Sharp: smoothstep(0.40, 0.50)
+                    // Blur:  smoothstep(0.00, 0.50)
                     
+                    // Interpolate edge hardness based on depth
+                    float edgeInner = mix(0.40, 0.0, vVisualDepth);
+                    float alpha = 1.0 - smoothstep(edgeInner, 0.5, dist);
+                    
+                    // Tone down alpha heavily for "blocked" fuzzy front particles
+                    // to imitate "out of focus" transparency
+                    float maxAlpha = mix(1.0, 0.6, vVisualDepth);
+                    alpha *= maxAlpha;
+
                     // --- COLOR LOGIC ---
                     
-                    // 1. Idle State (Breathing)
-                    // Slight color shift in idle to make it feel organic
+                    // Idle
                     float breath = 0.5 + 0.5 * sin(uTime * 2.0 + vPhase);
                     vec3 idleState = mix(uColorIdle, uColorIdle * 1.2, breath * 0.3);
                     
-                    // 2. Heat State
+                    // Heat
                     vec3 heatState = getHeatColor(vFlash);
                     
-                    // 3. Mix (Idle -> Heat)
-                    // We want even a small flash to quickly warm up the color
-                    // Expanded range to keep color visible longer during cooling
+                    // Mix
                     float warmth = smoothstep(0.0, 1.0, vFlash);   
                     vec3 finalColor = mix(idleState, heatState, warmth);
                     
-                    // Additive white core (Reduced to keep color)
+                    // White Core (Only for sharp back particles? Or all?)
+                    // Let's keep it for all but maybe less distinct on blurry ones
                     if (vFlash > 1.5 && dist < 0.2) {
                         finalColor += vec3(0.3) * (vFlash - 1.5);
                     }
                     
                     // Boost Alpha on flash
-                    finalAlpha = max(finalAlpha, finalAlpha * (0.6 + min(vFlash, 2.0)));
+                    alpha = max(alpha, alpha * (0.6 + min(vFlash, 2.0)));
 
-                    gl_FragColor = vec4(finalColor, finalAlpha);
+                    gl_FragColor = vec4(finalColor, alpha);
                 }
             `,
             depthWrite: false
         });
 
         const particleSystem = new THREE.Points(particlesGeo, particlesMat);
-        particleSystem.matrixAutoUpdate = false; // Optimization: Static container
+        particleSystem.matrixAutoUpdate = false;
         scene.add(particleSystem);
 
 
         // B. Connections (Lines)
         const linesGeo = new THREE.BufferGeometry();
         const linePositions = new Float32Array(connectionPairs.length * 2 * 3);
-        const lineProgress = new Float32Array(connectionPairs.length * 2); // 0 for start, 1 for end
-        const signalData = new Float32Array(connectionPairs.length * 2 * 2); // [Progress, Strength] per vertex
-        const distData = new Float32Array(connectionPairs.length * 2); // Distance per vertex
+        const lineProgress = new Float32Array(connectionPairs.length * 2);
+        const signalData = new Float32Array(connectionPairs.length * 2 * 2);
+        const distData = new Float32Array(connectionPairs.length * 2);
 
-        // Pre-fill static attributes
         for (let i = 0; i < connectionPairs.length; i++) {
-            // Vertex 0
             lineProgress[i * 2] = 0.0;
             distData[i * 2] = connectionPairs[i].dist;
-            // Vertex 1
             lineProgress[i * 2 + 1] = 1.0;
             distData[i * 2 + 1] = connectionPairs[i].dist;
         }
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
         linesGeo.setAttribute('aLineProgress', new THREE.BufferAttribute(lineProgress, 1));
-        linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2).setUsage(THREE.DynamicDrawUsage)); // Dynamic
-        linesGeo.setAttribute('aDist', new THREE.BufferAttribute(distData, 1)); // Physical Length
+        linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2).setUsage(THREE.DynamicDrawUsage));
+        linesGeo.setAttribute('aDist', new THREE.BufferAttribute(distData, 1));
 
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
@@ -298,13 +305,13 @@ export default function NeuralBrain() {
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
-                uOpacityBase: { value: 0.08 }, // Slightly higher base opacity
+                uOpacityBase: { value: 0.08 },
             },
-            transparent: true, // Required for alpha to work with NormalBlending
+            transparent: true,
             vertexShader: `
                 attribute float aLineProgress;
                 attribute vec2 aSignal; 
-                attribute float aDist; // World length
+                attribute float aDist;
                 
                 varying float vProgress;
                 varying vec2 vSignal;
@@ -330,7 +337,6 @@ export default function NeuralBrain() {
                 varying float vDist;
                 
                 vec3 getHeatColor(float i) {
-                     // Gradient mapping for Signal Strength
                     vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.6, i));
                     c = mix(c, uColorHigh, smoothstep(0.6, 2.0, i));
                     return c;
@@ -341,46 +347,36 @@ export default function NeuralBrain() {
                     float rawStrength = vSignal.y;
                     float signalStrength = abs(rawStrength);
                     
-                    // Base appearance = Idle Color
                     vec3 finalColor = uColorIdle;
                     float finalOpacity = uOpacityBase;
                     
                     if (signalStrength > 0.01) {
-                        // Ambient Wire Glow: Illuminate entire wire stronger when active
                         float ambientGlow = smoothstep(0.0, 1.0, signalStrength) * 0.6;
                         finalOpacity += ambientGlow;
-                        finalColor = mix(finalColor, uColorMid, ambientGlow * 0.5); // Tint wire orange
+                        finalColor = mix(finalColor, uColorMid, ambientGlow * 0.5);
 
                         bool isReverse = rawStrength < 0.0;
                         float distUV = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
                         
-                        // Convert to World Distance
                         float distWorld = distUV * vDist;
 
                         if (distWorld >= 0.0) {
-                            float tailLen = 1.8; // World Units length (constant physical size)
+                            float tailLen = 1.8;
                             float glow = max(0.0, 1.0 - (distWorld / tailLen));
                             
                             if (glow > 0.0) {
-                                // Dynamic Color based on Strength
                                 vec3 trailColor = getHeatColor(signalStrength);
-                                
-                                // Super Brightness Boost
                                 trailColor *= 2.0;
 
-                                // Make head hotter?
                                 if (distWorld < 0.1) {
                                      trailColor = mix(trailColor, uColorHigh, 0.5);
                                 }
                                 
-                                // Blend
                                 finalColor = mix(finalColor, trailColor, glow);
-                                // Boost visibility: Multiply signalStrength by 6.0
                                 finalOpacity = max(finalOpacity, glow * signalStrength * 6.0);
                             }
                         }
                     }
-                    
                     gl_FragColor = vec4(finalColor, finalOpacity);
                 }
             `,
@@ -388,36 +384,31 @@ export default function NeuralBrain() {
         });
 
         const linesMesh = new THREE.LineSegments(linesGeo, linesMat);
-        linesMesh.matrixAutoUpdate = false; // Optimization: Static container
+        linesMesh.matrixAutoUpdate = false;
         scene.add(linesMesh);
 
-        // Helper Map to find line segment index in buffer by connection key
         const connectionMap = new Map<string, number>();
         connectionPairs.forEach((pair, idx) => {
             connectionMap.set(`${Math.min(pair.from, pair.to)}-${Math.max(pair.from, pair.to)}`, idx);
         });
 
-        // --- THEME DETECTION (Moves here to fix TDZ) ---
+        // --- THEME DETECTION ---
         const updateTheme = () => {
             const isDark = document.documentElement.classList.contains("dark");
             const newColor = new THREE.Color(isDark ? CONFIG.colorIdleDark : CONFIG.colorIdleLight);
             const newBlending = isDark ? THREE.AdditiveBlending : THREE.NormalBlending;
 
-            // Particles
             particlesMat.uniforms.uColorIdle.value.copy(newColor);
             particlesMat.blending = newBlending;
             particlesMat.needsUpdate = true;
 
-            // Lines
             linesMat.uniforms.uColorIdle.value.copy(newColor);
             linesMat.blending = newBlending;
             linesMat.needsUpdate = true;
         };
 
-        // Initial check
         updateTheme();
 
-        // Observer
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === "attributes" && mutation.attributeName === "class") {
@@ -434,7 +425,6 @@ export default function NeuralBrain() {
             pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1 });
         }
 
-        // Track dirty lines for performant clearing
         const dirtyLines: number[] = [];
 
         const spawnPulse = (from: number, to: number, strength: number, startProgress = 0.0) => {
@@ -451,16 +441,15 @@ export default function NeuralBrain() {
                 p.strength = strength;
                 p.trailIntensity = strength;
                 p.hasTriggered = false;
-                p.lineIdx = lineIdx; // Cache it!
+                p.lineIdx = lineIdx;
             }
         };
 
         const triggerNeuron = () => {
             const idx = Math.floor(Math.random() * neurons.length);
             const n = neurons[idx];
-            n.flash += 2.0; // Gold intensity
+            n.flash += 2.0;
 
-            // "Charge up" delay (500ms) before firing
             setTimeout(() => {
                 n.connections.forEach(target => spawnPulse(idx, target, 1.0));
             }, 500);
@@ -471,8 +460,7 @@ export default function NeuralBrain() {
         let autoPulseTimer = 0;
         const tempVec = new THREE.Vector3();
 
-        // Optimized Random LUT (Key for performance "under the hood")
-        const randLUT = new Float32Array(8192); // Power of 2
+        const randLUT = new Float32Array(8192);
         for (let i = 0; i < 8192; i++) randLUT[i] = Math.random() - 0.5;
         let randIdx = 0;
 
@@ -483,7 +471,6 @@ export default function NeuralBrain() {
 
             particlesMat.uniforms.uTime.value = time;
 
-            // Direct Array Access - Huge CPU saver
             const posArray = particlesGeo.attributes.position.array as Float32Array;
             const flashArray = particlesGeo.attributes.aFlash.array as Float32Array;
             const linePosArray = linesGeo.attributes.position.array as Float32Array;
@@ -492,32 +479,28 @@ export default function NeuralBrain() {
             for (let i = 0; i < neurons.length; i++) {
                 const n = neurons[i];
 
-                // Wander (using LUT)
-                // Cartesian optimization: No sin/cos, just random XYZ vector
-                // Use bitwise AND for fast wrap-around
                 const r1 = randLUT[randIdx++ & 8191];
                 const r2 = randLUT[randIdx++ & 8191];
-                const r3 = randLUT[randIdx++ & 8191];
 
-                // Cartesian wander (Cheaper than Spherical)
-                tempVec.set(r1, r2, r3).multiplyScalar(CONFIG.wanderRadius * 0.1);
+                // 2D Wander
+                tempVec.set(r1, r2, 0).multiplyScalar(CONFIG.wanderRadius * 0.1);
                 n.velocity.add(tempVec);
 
-                // Spring & Damping
                 tempVec.copy(n.baseVec).sub(n.vec).multiplyScalar(CONFIG.springStiffness);
                 n.velocity.add(tempVec);
                 n.velocity.multiplyScalar(0.95);
                 n.vec.addScaledVector(n.velocity, dt * 20);
 
-                // Direct assignment (No function call overhead)
+                // Z force-lock to 0 just in case
+                n.vec.z = 0;
+
                 const i3 = i * 3;
                 posArray[i3] = n.vec.x;
                 posArray[i3 + 1] = n.vec.y;
                 posArray[i3 + 2] = n.vec.z;
 
-                // Flash Decay (Thermal Cooling)
                 if (n.flash > 0) {
-                    n.flash = Math.max(0, n.flash - dt * 0.5); // Slower cooling
+                    n.flash = Math.max(0, n.flash - dt * 0.5);
                     n.flash = Math.min(n.flash, 4.0);
                 }
                 flashArray[i] = n.flash;
@@ -528,18 +511,17 @@ export default function NeuralBrain() {
             // Update Connection Geometry
             for (let i = 0; i < connectionPairs.length; i++) {
                 const pair = connectionPairs[i];
-                // Optimization: Read from cached posArray instead of neuron objects
                 const i1 = pair.from * 3;
                 const i2 = pair.to * 3;
 
-                const idx = i * 6; // 2 vertices * 3 coords
+                const idx = i * 6;
 
-                // Vertex 1 (From n1)
+                // Vertex 1
                 linePosArray[idx] = posArray[i1];
                 linePosArray[idx + 1] = posArray[i1 + 1];
                 linePosArray[idx + 2] = posArray[i1 + 2];
 
-                // Vertex 2 (From n2)
+                // Vertex 2
                 linePosArray[idx + 3] = posArray[i2];
                 linePosArray[idx + 4] = posArray[i2 + 1];
                 linePosArray[idx + 5] = posArray[i2 + 2];
@@ -550,11 +532,8 @@ export default function NeuralBrain() {
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
             const signalArray = signalAttr.array as Float32Array;
 
-            // Optimization: Only clear dirty lines from previous frame
             for (let i = 0; i < dirtyLines.length; i++) {
                 const idx = dirtyLines[i];
-                // 2 vertices * 2 floats (vec2) = stride 4
-                // We want to clear Y (strength) which is at offset +1 and +3
                 signalArray[idx * 4 + 1] = 0;
                 signalArray[idx * 4 + 3] = 0;
             }
@@ -562,10 +541,7 @@ export default function NeuralBrain() {
 
             pulsePool.forEach(p => {
                 if (!p.active) return;
-
-                // Use cached index - Zero allocation/lookup
                 const lineIdx = p.lineIdx;
-
                 const dist = connectionPairs[lineIdx].dist;
                 p.progress += (CONFIG.signalSpeed * dt) / dist;
 
@@ -576,7 +552,6 @@ export default function NeuralBrain() {
                 let encodedStrength = p.strength;
                 if (isReverse) encodedStrength = -p.strength;
 
-                // Direct array assignment
                 const v1 = lineIdx * 4;
                 signalArray[v1] = shaderProgress;
                 signalArray[v1 + 1] = encodedStrength;
@@ -585,14 +560,10 @@ export default function NeuralBrain() {
                 signalArray[v2] = shaderProgress;
                 signalArray[v2 + 1] = encodedStrength;
 
-                // Mark as dirty for cleanup next frame
                 dirtyLines.push(lineIdx);
 
-                // Trigger
                 if (!p.hasTriggered && p.progress >= 1.0) {
                     const targetN = neurons[p.toIdx];
-
-                    // ACCUMULATE EXACT STRENGTH (Physics Fix!)
                     targetN.flash += p.strength;
 
                     if (p.strength * CONFIG.signalDecay > CONFIG.minSignalStrength) {
@@ -609,7 +580,6 @@ export default function NeuralBrain() {
             });
             signalAttr.needsUpdate = true;
 
-            // Auto Pulse
             if (CONFIG.autoPulseEnabled) {
                 autoPulseTimer += dt * 1000;
                 if (autoPulseTimer > CONFIG.autoPulseInterval) {
@@ -624,8 +594,6 @@ export default function NeuralBrain() {
         // --- 8. INTERACTION (Raycaster) ---
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
-
-        // Larger threshold for easier clicking
         raycaster.params.Points.threshold = 0.2;
 
         const onPointerDown = (event: PointerEvent) => {
@@ -636,44 +604,32 @@ export default function NeuralBrain() {
             pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
             raycaster.setFromCamera(pointer, camera);
-
             const intersects = raycaster.intersectObject(particleSystem);
 
             if (intersects.length > 0) {
-                // Get the closest intersection
                 const hit = intersects[0];
                 const index = hit.index;
-
                 if (index !== undefined) {
                     const n = neurons[index];
-
-                    // --- SUPER FLASH ---
-                    // Brighter than auto-pulse but keeping color (Gold)
                     n.flash += 2.0;
 
-                    // Force update to array immediately for responsiveness
                     const flashAttr = particlesGeo.attributes.aFlash as THREE.BufferAttribute;
                     flashAttr.setX(index, n.flash);
                     flashAttr.needsUpdate = true;
 
-                    // Trigger massive signal output
-                    // Trigger massive signal output with "Charge Up" delay
                     setTimeout(() => {
                         n.connections.forEach(target => {
-                            // Higher strength (2.0) for "Super Pulse"
-                            spawnPulse(index, target, 2.0); // Back to 0.0 start for natural launch
+                            spawnPulse(index, target, 2.0);
                         });
                     }, 500);
                 }
             }
         };
 
-        // Attach event
-        renderer.domElement.style.touchAction = 'none'; // Prevent scrolling on touch
+        renderer.domElement.style.touchAction = 'none';
         renderer.domElement.addEventListener('pointerdown', onPointerDown);
 
         // --- 7. RESIZE & CLEANUP ---
-        // Adaptation at ResizeObserver (better than window 'resize' event)
         const resizeObserver = new ResizeObserver(() => {
             if (!containerRef.current) return;
             const newW = containerRef.current.clientWidth;
