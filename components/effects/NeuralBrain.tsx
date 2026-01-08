@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 // --- CONFIG ---
 const CONFIG = {
-    neuronDensity: 20,
+    neuronDensity: 30,
     connectionDistance: 0.35,
     minConnectionDistance: 0.15,
     wanderRadius: 0.025,
@@ -33,7 +33,7 @@ const CONFIG = {
 
     // Auto Pulse
     autoPulseEnabled: true,
-    autoPulseInterval: 40,
+    autoPulseInterval: 10,
 };
 
 // --- TYPES ---
