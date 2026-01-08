@@ -523,12 +523,38 @@ export default function NeuralBrain() {
             const dt = Math.min((time - lastTimeRef.current) / 1000, 0.1);
             lastTimeRef.current = time;
 
-            // --- EXPANSION/COLLAPSE ANIMATION ---
-            const targetExpansion = isVisibleRef.current ? 1.0 : 0.0;
+            // --- SCROLL-DRIVEN EXPANSION ---
+            let targetExpansion = 0.0;
+
+            if (containerRef.current) {
+                // Calculate position relative to viewport
+                const rect = containerRef.current.getBoundingClientRect();
+                const viewH = window.innerHeight;
+                const viewCenter = viewH / 2;
+                const elementCenter = rect.top + rect.height / 2;
+
+                // Distance from center
+                const dist = Math.abs(elementCenter - viewCenter);
+
+                // Define range:
+                // 0 dist -> 1.0 expansion
+                // viewH * 0.6 dist -> 0.0 expansion (faded out before leaving screen entirely)
+                const maxDist = viewH * 0.6;
+
+                // Smoothstep for organic falloff
+                // We use inverted smoothstep logic: 1 at 0, 0 at maxDist
+                const normDist = Math.max(0, Math.min(1, dist / maxDist));
+                // cubic ease out/in manual or smoothstep
+                targetExpansion = 1.0 - (normDist * normDist * (3 - 2 * normDist));
+            }
+
+            // If observer says Hidden, force 0 (Optimization safety)
+            if (!isVisibleRef.current) targetExpansion = 0.0;
+
             const currentExp = expansionRef.current;
 
-            // Smooth Lerp
-            const newExp = currentExp + (targetExpansion - currentExp) * 0.05; // Adjust speed here
+            // Smooth Lerp (Responsive but smooth)
+            const newExp = currentExp + (targetExpansion - currentExp) * 0.1;
             expansionRef.current = newExp;
 
             // Apply Uniforms
@@ -536,8 +562,9 @@ export default function NeuralBrain() {
             linesMat.uniforms.uExpansion.value = newExp;
 
             // --- STOP OPTIMIZATION ---
-            // If we are aiming for 0 (hidden) and practically there, STOP the loop
-            if (targetExpansion === 0 && newExp < 0.001) {
+            // If target is 0 and we are practically 0, and Observer says hidden, STOP.
+            // (We keep running if visible even if expansion is low, to catch the scroll back in)
+            if (!isVisibleRef.current && newExp < 0.001) {
                 if (requestRef.current) {
                     cancelAnimationFrame(requestRef.current);
                     requestRef.current = undefined;
