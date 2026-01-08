@@ -44,6 +44,7 @@ interface Neuron {
     connections: number[];
     flash: number;
     visualDepth: number;     // 0 (Back) to 1 (Front)
+    phase: number;
 }
 
 interface Pulse {
@@ -114,7 +115,8 @@ export default function NeuralBrain() {
                 velocity: new THREE.Vector3(0, 0, 0),
                 connections: [],
                 flash: 0,
-                visualDepth: visualDepth
+                visualDepth: visualDepth,
+                phase: Math.random() * Math.PI * 2
             });
         }
 
@@ -187,7 +189,17 @@ export default function NeuralBrain() {
                 varying float vVisualDepth;
                 
                 void main() {
-                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                    // Wander Logic (GPU)
+                    // Matches "organic" movement
+                    vec3 offset = vec3(
+                        sin(uTime * 0.5 + aPhase), 
+                        cos(uTime * 0.4 + aPhase * 0.9), 
+                        0.0
+                    ) * 0.04; // 0.04 matches prev wander radius approx
+
+                    vec3 finalPos = position + offset;
+
+                    vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                     
                     vFlash = aFlash;
@@ -287,21 +299,27 @@ export default function NeuralBrain() {
         const lineProgress = new Float32Array(connectionPairs.length * 2);
         const signalData = new Float32Array(connectionPairs.length * 2 * 2);
         const distData = new Float32Array(connectionPairs.length * 2);
+        const linePhases = new Float32Array(connectionPairs.length * 2);
 
         for (let i = 0; i < connectionPairs.length; i++) {
             lineProgress[i * 2] = 0.0;
             distData[i * 2] = connectionPairs[i].dist;
+            linePhases[i * 2] = neurons[connectionPairs[i].from].phase;
+
             lineProgress[i * 2 + 1] = 1.0;
             distData[i * 2 + 1] = connectionPairs[i].dist;
+            linePhases[i * 2 + 1] = neurons[connectionPairs[i].to].phase;
         }
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
         linesGeo.setAttribute('aLineProgress', new THREE.BufferAttribute(lineProgress, 1));
         linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2).setUsage(THREE.DynamicDrawUsage));
         linesGeo.setAttribute('aDist', new THREE.BufferAttribute(distData, 1));
+        linesGeo.setAttribute('aPhase', new THREE.BufferAttribute(linePhases, 1));
 
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
+                uTime: { value: 0 },
                 uColorIdle: { value: new THREE.Color(CONFIG.colorIdleDark) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
@@ -310,9 +328,11 @@ export default function NeuralBrain() {
             },
             transparent: true,
             vertexShader: `
+                uniform float uTime;
                 attribute float aLineProgress;
                 attribute vec2 aSignal; 
                 attribute float aDist;
+                attribute float aPhase; // Phase of the attached neuron
                 
                 varying float vProgress;
                 varying vec2 vSignal;
@@ -322,7 +342,16 @@ export default function NeuralBrain() {
                     vProgress = aLineProgress;
                     vSignal = aSignal;
                     vDist = aDist;
-                    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+                    // Wander Logic (Match Particles)
+                    vec3 offset = vec3(
+                        sin(uTime * 0.5 + aPhase), 
+                        cos(uTime * 0.4 + aPhase * 0.9), 
+                        0.0
+                    ) * 0.04;
+
+                    vec3 finalPos = position + offset;
+                    vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                 }
             `,
@@ -469,34 +498,15 @@ export default function NeuralBrain() {
             const time = clock.getElapsedTime();
 
             particlesMat.uniforms.uTime.value = time;
+            linesMat.uniforms.uTime.value = time;
 
             const posArray = particlesGeo.attributes.position.array as Float32Array;
             const flashArray = particlesGeo.attributes.aFlash.array as Float32Array;
             const linePosArray = linesGeo.attributes.position.array as Float32Array;
 
-            // Update Neurons
+            // Update Neurons (only Flash state, positions are handled in Shader now)
             for (let i = 0; i < neurons.length; i++) {
                 const n = neurons[i];
-
-                const r1 = randLUT[randIdx++ & 8191];
-                const r2 = randLUT[randIdx++ & 8191];
-
-                // 2D Wander
-                tempVec.set(r1, r2, 0).multiplyScalar(CONFIG.wanderRadius * 0.1);
-                n.velocity.add(tempVec);
-
-                tempVec.copy(n.baseVec).sub(n.vec).multiplyScalar(CONFIG.springStiffness);
-                n.velocity.add(tempVec);
-                n.velocity.multiplyScalar(0.95);
-                n.vec.addScaledVector(n.velocity, dt * 20);
-
-                // Z force-lock to 0 just in case
-                n.vec.z = 0;
-
-                const i3 = i * 3;
-                posArray[i3] = n.vec.x;
-                posArray[i3 + 1] = n.vec.y;
-                posArray[i3 + 2] = n.vec.z;
 
                 if (n.flash > 0) {
                     n.flash = Math.max(0, n.flash - dt * 0.5);
@@ -504,28 +514,9 @@ export default function NeuralBrain() {
                 }
                 flashArray[i] = n.flash;
             }
-            (particlesGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
             (particlesGeo.attributes.aFlash as THREE.BufferAttribute).needsUpdate = true;
 
-            // Update Connection Geometry
-            for (let i = 0; i < connectionPairs.length; i++) {
-                const pair = connectionPairs[i];
-                const i1 = pair.from * 3;
-                const i2 = pair.to * 3;
-
-                const idx = i * 6;
-
-                // Vertex 1
-                linePosArray[idx] = posArray[i1];
-                linePosArray[idx + 1] = posArray[i1 + 1];
-                linePosArray[idx + 2] = posArray[i1 + 2];
-
-                // Vertex 2
-                linePosArray[idx + 3] = posArray[i2];
-                linePosArray[idx + 4] = posArray[i2 + 1];
-                linePosArray[idx + 5] = posArray[i2 + 2];
-            }
-            (linesGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+            // Connection Geometry is STATIC (handled in shader), so no loop here!
 
             // Signal Logic
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
