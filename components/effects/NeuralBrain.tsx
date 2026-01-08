@@ -302,13 +302,28 @@ export default function NeuralBrain() {
         const linePhases = new Float32Array(connectionPairs.length * 2);
 
         for (let i = 0; i < connectionPairs.length; i++) {
+            const pair = connectionPairs[i];
+            const n1 = neurons[pair.from];
+            const n2 = neurons[pair.to];
+
+            // Fill Positions (Static Base)
+            const idx = i * 6;
+            linePositions[idx] = n1.vec.x;
+            linePositions[idx + 1] = n1.vec.y;
+            linePositions[idx + 2] = n1.vec.z;
+
+            linePositions[idx + 3] = n2.vec.x;
+            linePositions[idx + 4] = n2.vec.y;
+            linePositions[idx + 5] = n2.vec.z;
+
+            // Fill Attributes
             lineProgress[i * 2] = 0.0;
-            distData[i * 2] = connectionPairs[i].dist;
-            linePhases[i * 2] = neurons[connectionPairs[i].from].phase;
+            distData[i * 2] = pair.dist;
+            linePhases[i * 2] = n1.phase;
 
             lineProgress[i * 2 + 1] = 1.0;
-            distData[i * 2 + 1] = connectionPairs[i].dist;
-            linePhases[i * 2 + 1] = neurons[connectionPairs[i].to].phase;
+            distData[i * 2 + 1] = pair.dist;
+            linePhases[i * 2 + 1] = n2.phase;
         }
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
