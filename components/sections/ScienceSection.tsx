@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import NeuralBrain from "../effects/NeuralBrain";
 
 interface ScienceSectionProps {
@@ -10,11 +10,41 @@ interface ScienceSectionProps {
 export default function ScienceSection({ dictionary }: ScienceSectionProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
+    // DEBUG: Positioning State
+    const [config, setConfig] = useState({
+        top: 6,
+        left: 18,
+        width: 71,
+        height: 62
+    });
+
     return (
         <section
             ref={containerRef}
             className="relative min-h-screen py-32 overflow-hidden bg-transparent"
         >
+            {/* DEBUG CONTROLS */}
+            <div className="fixed bottom-4 right-4 z-50 bg-black/80 text-white p-4 rounded-lg text-xs space-y-2 opacity-80 hover:opacity-100 transition-opacity font-mono">
+                <div className="font-bold mb-2 text-[#FF5C00]">BRAIN POS (DEBUG)</div>
+                {Object.entries(config).map(([key, val]) => (
+                    <div key={key} className="flex flex-col">
+                        <div className="flex justify-between">
+                            <span>{key.toUpperCase()}</span>
+                            <span>{val}%</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="0.5"
+                            value={val}
+                            onChange={(e) => setConfig(prev => ({ ...prev, [key]: parseFloat(e.target.value) }))}
+                            className="w-32 accent-[#FF5C00]"
+                        />
+                    </div>
+                ))}
+            </div>
+
             <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-10 gap-12 items-center relative z-10">
 
                 {/* Left: Scientific Text (40%) */}
@@ -64,10 +94,10 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         <div
                             className="absolute z-10 overflow-hidden"
                             style={{
-                                top: '6%',
-                                left: '18%',
-                                width: '71%',
-                                height: '62%',
+                                top: `${config.top}%`,
+                                left: `${config.left}%`,
+                                width: `${config.width}%`,
+                                height: `${config.height}%`,
                                 borderRadius: '50%',
                                 transform: 'rotate(0deg)',
                             }}
