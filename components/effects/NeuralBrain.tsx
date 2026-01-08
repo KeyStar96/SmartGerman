@@ -132,12 +132,14 @@ export default function NeuralBrain() {
 
         // --- 3. CREATE CONNECTIONS ---
         const connectionPairs: { from: number; to: number; dist: number }[] = [];
-        const maxDistSq = CONFIG.connectionDistance * CONFIG.connectionDistance;
         const minDistSq = CONFIG.minConnectionDistance * CONFIG.minConnectionDistance;
 
         for (let i = 0; i < neurons.length; i++) {
             const n1 = neurons[i];
             let connCount = 0;
+            // Iterate through potential partners. 
+            // Since neurons are generated in random positions, array order is random relative to space.
+            // Connecting to the next available neurons in the list effectively creates random long-range connections.
             for (let j = i + 1; j < neurons.length; j++) {
                 if (connCount >= CONFIG.maxConnections) break;
                 const n2 = neurons[j];
@@ -145,7 +147,8 @@ export default function NeuralBrain() {
                 // 2D Distance Check (Z is ignored as it is 0)
                 const dSq = n1.vec.distanceToSquared(n2.vec);
 
-                if (dSq < maxDistSq && dSq > minDistSq) {
+                // Allow connection to ANY neuron (removed max distance check), just avoid huge overlaps
+                if (dSq > minDistSq) {
                     n1.connections.push(j);
                     n2.connections.push(i);
                     connectionPairs.push({ from: i, to: j, dist: Math.sqrt(dSq) });
