@@ -608,7 +608,7 @@ export default function NeuralBrain() {
             if (CONFIG.autoPulseEnabled) {
                 // 2% chance per frame (~1.2 pulses per second @ 60fps)
                 // This ensures individual cascades are distinct and beautiful
-                if (Math.random() < 0.50) {
+                if (Math.random() < 1.00) {
                     triggerNeuron();
                 }
             }
