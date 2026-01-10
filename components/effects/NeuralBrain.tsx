@@ -527,8 +527,21 @@ export default function NeuralBrain() {
             const n = neurons[idx];
             n.flash += 2.0;
 
-            // Immediate Trigger (No artificial delay)
-            n.connections.forEach(target => spawnPulse(idx, target, 3.0));
+            // Randomize outputs: Don't fire all connections. 
+            // Fire 1 to N connections (random subset) to avoid "starburst" uniformity.
+            // This makes some signals weak (single line) and others strong (burst).
+            const targetCount = 1 + Math.floor(Math.random() * n.connections.length);
+            // Simple shuffle or pick random
+            // Since maxConnections is small (6), just iterating and skipping random is fine.
+            let fired = 0;
+            for (let i = 0; i < n.connections.length; i++) {
+                if (fired >= targetCount) break;
+                // Randomized chance to pick this connection, or force if we run out of time
+                if (Math.random() < 0.5 || (n.connections.length - i) <= (targetCount - fired)) {
+                    spawnPulse(idx, n.connections[i], 3.0);
+                    fired++;
+                }
+            }
         };
 
         // --- 6. ANIMATION LOOP ---
@@ -619,10 +632,17 @@ export default function NeuralBrain() {
             // Auto Pulse (Random / Organic)
             // Low probability to avoid "Heartbeat" / "Clumping"
             if (CONFIG.autoPulseEnabled) {
-                // 2% chance per frame (~1.2 pulses per second @ 60fps)
-                // This ensures individual cascades are distinct and beautiful
-                if (Math.random() < 0.30) {
-                    triggerNeuron();
+                // "Arbitrary and chaotic":
+                // Instead of 1 check per frame, we use a loop to allow 0, 1, 2... N triggers per frame.
+                // Target: ~40 triggers/sec (very active)
+                // At 60fps = ~0.66 triggers/frame. 
+                // We run 3 checks at 0.22 chance each to allow potential "double/triple strikes" in one frame (clustering)
+                // blocking the rythm.
+
+                for (let k = 0; k < 3; k++) {
+                    if (Math.random() < 0.25) { // ~45 triggers/sec total
+                        triggerNeuron();
+                    }
                 }
             }
 
