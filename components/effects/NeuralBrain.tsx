@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 // --- CONFIG ---
 const CONFIG = {
-    neuronDensity: 8,
+    neuronDensity: 4,
     connectionDistance: 0.35,
     minConnectionDistance: 0.15,
     wanderRadius: 0.025,
@@ -609,6 +609,9 @@ export default function NeuralBrain() {
                 // 2% chance per frame (~1.2 pulses per second @ 60fps)
                 // This ensures individual cascades are distinct and beautiful
                 if (Math.random() < 1.00) {
+                    triggerNeuron();
+                    triggerNeuron();
+                    triggerNeuron();
                     triggerNeuron();
                     triggerNeuron();
                     triggerNeuron();
