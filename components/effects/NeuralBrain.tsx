@@ -403,10 +403,9 @@ export default function NeuralBrain() {
                 varying float vDist;
                 
                 vec3 getHeatColor(float i) {
-                    // 0.0 - 0.4: Low (Red) -> Mid (Orange)
-                    // 0.4 - 0.8: Mid (Orange) -> High (Gold/Bright)
-                    vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.4, i));
-                    c = mix(c, uColorHigh, smoothstep(0.4, 0.8, i));
+                    // Force start from Orange (Mid) even at low intensity to be visible against black
+                    // Blend directly from Mid (Orange) to High (Gold) to keep it bright
+                    vec3 c = mix(uColorMid, uColorHigh, smoothstep(0.0, 1.0, i));
                     return c;
                 }
 
@@ -425,7 +424,7 @@ export default function NeuralBrain() {
                         float distWorld = distUV * vDist;
 
                         if (distWorld >= 0.0) {
-                            float tailLen = 0.6; // Reduced tail length for clearer pulse
+                            float tailLen = 0.8; // Reduced tail length for clearer pulse
                             float glow = max(0.0, 1.0 - (distWorld / tailLen));
                             
                             if (glow > 0.0) {
@@ -437,7 +436,8 @@ export default function NeuralBrain() {
                                 }
                                 
                                 finalColor = mix(finalColor, trailColor, glow);
-                                finalOpacity = max(finalOpacity, glow * signalStrength * 6.0);
+                                // Double the opacity multiplier (6.0 -> 12.0) to make trails visible even at low strength
+                                finalOpacity = max(finalOpacity, glow * signalStrength * 12.0);
                             }
                         }
                     }
@@ -484,7 +484,7 @@ export default function NeuralBrain() {
 
         // --- 5. SIGNAL LOGIC ---
         const pulsePool: Pulse[] = [];
-        const maxPulses = 2000;
+        const maxPulses = 8000;
         for (let i = 0; i < maxPulses; i++) {
             pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1 });
         }
@@ -608,12 +608,7 @@ export default function NeuralBrain() {
             if (CONFIG.autoPulseEnabled) {
                 // 2% chance per frame (~1.2 pulses per second @ 60fps)
                 // This ensures individual cascades are distinct and beautiful
-                if (Math.random() < 1.00) {
-                    triggerNeuron();
-                    triggerNeuron();
-                    triggerNeuron();
-                    triggerNeuron();
-                    triggerNeuron();
+                if (Math.random() < 0.30) {
                     triggerNeuron();
                 }
             }
@@ -643,7 +638,7 @@ export default function NeuralBrain() {
 
                 // --- VISUAL DECAY DURING TRAVEL ---
                 // "Light signal decreases luminosity with the path"
-                const travelDecay = Math.exp(-dist * p.progress * 2.5);
+                const travelDecay = Math.exp(-dist * p.progress * 2.0);
                 const currentStrength = p.strength * travelDecay;
 
                 if (isReverse) encodedStrength = -currentStrength;
