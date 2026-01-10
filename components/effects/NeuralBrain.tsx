@@ -105,7 +105,11 @@ export default function NeuralBrain() {
         for (let i = 0; i < particleCount; i++) {
             // Elliptical Generation for organic shape
             const angle = Math.random() * Math.PI * 2;
-            const radius = Math.sqrt(Math.random()); // Sqrt for uniform distribution
+            let radius = Math.sqrt(Math.random()); // Sqrt for uniform distribution
+            // Coastline/Erosion effect: Randomly pull back particles to break the hard edge
+            // Logic: 1.0 - (random^2 * strength) ensures usually small indent, occasionally deep
+            // This prevents the "clean cut" look at the border.
+            radius *= (1.0 - Math.random() * Math.random() * 0.35);
 
             const testP = {
                 x: Math.cos(angle) * radius * genBounds.x,
@@ -485,8 +489,13 @@ export default function NeuralBrain() {
         // --- 5. SIGNAL LOGIC ---
         const pulsePool: Pulse[] = [];
         const maxPulses = 8000;
+        // Optimization: Free Stack (O(1) allocation) & Active List (O(N_active) iteration)
+        const freePulseIndices: number[] = [];
+        const activePulseIndices: number[] = [];
+
         for (let i = 0; i < maxPulses; i++) {
             pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1 });
+            freePulseIndices.push(i);
         }
 
         const dirtyLines: number[] = [];
@@ -496,8 +505,10 @@ export default function NeuralBrain() {
             const lineIdx = connectionMap.get(key);
             if (lineIdx === undefined) return;
 
-            const p = pulsePool.find(p => !p.active);
-            if (p) {
+            if (freePulseIndices.length > 0) {
+                const pIdx = freePulseIndices.pop()!;
+                const p = pulsePool[pIdx];
+
                 p.active = true;
                 p.fromIdx = from;
                 p.toIdx = to;
@@ -506,6 +517,8 @@ export default function NeuralBrain() {
                 p.trailIntensity = strength;
                 p.hasTriggered = false;
                 p.lineIdx = lineIdx;
+
+                activePulseIndices.push(pIdx);
             }
         };
 
@@ -624,8 +637,12 @@ export default function NeuralBrain() {
             });
             dirtyLines.length = 0;
 
-            pulsePool.forEach(p => {
-                if (!p.active) return;
+            // Optimization: Iterate ONLY active pulses
+            // Use reverse loop for easy removal (Swap & Pop)
+            for (let i = activePulseIndices.length - 1; i >= 0; i--) {
+                const pIdx = activePulseIndices[i];
+                const p = pulsePool[pIdx];
+
                 const lineIdx = p.lineIdx;
                 const dist = connectionPairs[lineIdx].dist;
                 p.progress += (CONFIG.signalSpeed * dt) / dist;
@@ -676,8 +693,16 @@ export default function NeuralBrain() {
 
                 if (p.progress >= 1.0 + (CONFIG.trailDecay / dist)) { // Wait for trail to finish
                     p.active = false;
+
+                    // Return to free pool
+                    freePulseIndices.push(pIdx);
+
+                    // Fast removal from active list (Swap with last & pop)
+                    const lastActive = activePulseIndices[activePulseIndices.length - 1];
+                    activePulseIndices[i] = lastActive;
+                    activePulseIndices.pop();
                 }
-            });
+            }
 
             signalAttr.needsUpdate = true;
 
