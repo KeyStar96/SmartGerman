@@ -610,6 +610,8 @@ export default function NeuralBrain() {
                 // This ensures individual cascades are distinct and beautiful
                 if (Math.random() < 1.00) {
                     triggerNeuron();
+                    triggerNeuron();
+                    triggerNeuron();
                 }
             }
 
