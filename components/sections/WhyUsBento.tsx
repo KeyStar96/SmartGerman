@@ -193,7 +193,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 3: Praxiserfahrung (6 Spalten, 2 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-2">
+                    <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-3">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">
@@ -211,7 +211,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 4: Sprachen & Empathie (6 Spalten, 2 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-2">
+                    <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-3">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">
