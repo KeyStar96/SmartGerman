@@ -33,11 +33,11 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         <span className="text-[#FF5C00]">{dictionary.science.title_part2}</span>
                     </h2>
 
-                    <div className="space-y-8 text-xl font-light leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
-                        <p className="opacity-90">
+                    <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
+                        <p>
                             {dictionary.science.description_1}
                         </p>
-                        <p className="opacity-70 text-lg">
+                        <p className="text-lg">
                             {dictionary.science.description_2}
                         </p>
                     </div>
@@ -97,7 +97,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                 {/* Inner Texture */}
                                 <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
 
-                                <div className="relative font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-right space-y-1">
+                                <div className="relative font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-right space-y-1">
                                     <div>{dictionary.science.data_points.data_stream_label}: {dictionary.science.data_points.data_stream_value}</div>
                                     <div>{dictionary.science.data_points.neuron_count_label}: {dictionary.science.data_points.neuron_count_value}</div>
                                     <div>{dictionary.science.data_points.signal_speed_label}: {dictionary.science.data_points.signal_speed_value}</div>
@@ -118,7 +118,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                 {/* Inner Texture */}
                                 <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
 
-                                <div className="relative font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-left space-y-1">
+                                <div className="relative font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-left space-y-1">
                                     <div>{dictionary.science.data_points.hemisphere_label}: {dictionary.science.data_points.hemisphere_value}</div>
                                     <div>{dictionary.science.data_points.plasticity_label}: {dictionary.science.data_points.plasticity_value}</div>
                                 </div>
