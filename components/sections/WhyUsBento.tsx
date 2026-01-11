@@ -8,7 +8,7 @@ export default function WhyUsBento() {
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
-    const cardStyles = "relative overflow-hidden border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 bg-white/40 dark:bg-[#1A1C1E]/40 backdrop-blur-md transition-all duration-500 hover:border-[#FF5C00]/40 group p-10 flex flex-col justify-between";
+    const cardStyles = "relative overflow-hidden border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 bg-white/40 dark:bg-[#1A1C1E]/40 backdrop-blur-md transition-all duration-700 hover:border-[#FF5C00]/40 group p-12 lg:p-16 flex flex-col justify-between hover:shadow-2xl hover:shadow-[#FF5C00]/5 bg-noise";
 
     return (
         <section ref={containerRef} className="relative py-32 px-6 md:px-12 bg-transparent overflow-hidden">
@@ -37,7 +37,7 @@ export default function WhyUsBento() {
                     >
                         <div>
                             <div className="flex items-center gap-3 mb-8 text-[#FF5C00]">
-                                <Brain size={20} />
+                                <Brain size={20} strokeWidth={1.5} />
                                 <span className="font-mono text-[10px] uppercase tracking-widest">Universitäre Forschung</span>
                             </div>
                             <h3 className="text-3xl md:text-4xl font-bold uppercase tracking-tighter mb-8 leading-tight">
@@ -64,11 +64,11 @@ export default function WhyUsBento() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ delay: 0.1 }}
-                        className={`md:col-span-4 md:row-span-2 ${cardStyles} !bg-[#FF5C00] text-white !border-none`}
+                        className={`md:col-span-4 md:row-span-2 ${cardStyles} !bg-[#FF5C00] text-white !border-none shadow-[0_0_40px_-10px_rgba(255,92,0,0.4)]`}
                     >
                         <div>
                             <div className="flex items-center gap-3 mb-10 opacity-80">
-                                <GraduationCap size={22} />
+                                <GraduationCap size={22} strokeWidth={1.5} />
                                 <span className="font-mono text-[10px] uppercase tracking-widest">Bildungsweg</span>
                             </div>
                             <h3 className="text-3xl font-bold uppercase tracking-tighter mb-10 leading-none">
@@ -76,24 +76,24 @@ export default function WhyUsBento() {
                             </h3>
                             <ul className="space-y-8 text-[13px] uppercase tracking-wider font-medium">
                                 <li className="flex items-start gap-4">
-                                    <div className="mt-1"><CheckCircle2 size={16} /></div>
+                                    <div className="mt-1"><CheckCircle2 size={16} strokeWidth={1.5} /></div>
                                     <div>
                                         <p>TU Braunschweig</p>
-                                        <p className="text-[10px] opacity-70 font-mono">Studium DaF/DaZ (Deutsch als Fremdsprache)</p>
+                                        <p className="text-[11px] text-white/90 font-mono tracking-wide">Studium DaF/DaZ (Deutsch als Fremdsprache)</p>
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-4 border-t border-white/20 pt-8">
-                                    <div className="mt-1"><CheckCircle2 size={16} /></div>
+                                    <div className="mt-1"><CheckCircle2 size={16} strokeWidth={1.5} /></div>
                                     <div>
                                         <p>Universität Hannover</p>
-                                        <p className="text-[10px] opacity-70 font-mono">Master of Education / Bachelor of Science</p>
+                                        <p className="text-[11px] text-white/90 font-mono tracking-wide">Master of Education / Bachelor of Science</p>
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-4 border-t border-white/20 pt-8">
-                                    <div className="mt-1"><CheckCircle2 size={16} /></div>
+                                    <div className="mt-1"><CheckCircle2 size={16} strokeWidth={1.5} /></div>
                                     <div>
                                         <p>Zertifizierte Kompetenz</p>
-                                        <p className="text-[10px] opacity-70 font-mono">Mehrsprachigkeit & Interkulturelle Bildung</p>
+                                        <p className="text-[11px] text-white/90 font-mono tracking-wide">Mehrsprachigkeit & Interkulturelle Bildung</p>
                                     </div>
                                 </li>
                             </ul>
@@ -110,7 +110,7 @@ export default function WhyUsBento() {
                         <div className="flex justify-between">
                             <div className="max-w-xs">
                                 <div className="flex items-center gap-3 mb-6 text-[#FF5C00]">
-                                    <Users size={18} />
+                                    <Users size={18} strokeWidth={1.5} />
                                     <span className="font-mono text-[10px] uppercase tracking-widest">Praxiserfahrung</span>
                                 </div>
                                 <h3 className="text-2xl font-bold uppercase tracking-tighter mb-4">Erprobt im Feld.</h3>
@@ -131,7 +131,7 @@ export default function WhyUsBento() {
                         <div className="flex justify-between">
                             <div className="max-w-xs">
                                 <div className="flex items-center gap-3 mb-6 text-[#FF5C00]">
-                                    <Globe2 size={18} />
+                                    <Globe2 size={18} strokeWidth={1.5} />
                                     <span className="font-mono text-[10px] uppercase tracking-widest">Bilingualität</span>
                                 </div>
                                 <h3 className="text-2xl font-bold uppercase tracking-tighter mb-4">Zwei Muttersprachen.</h3>
