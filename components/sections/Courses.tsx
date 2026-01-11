@@ -48,21 +48,21 @@ export default function Courses({ dictionary }: CoursesSectionProps) {
       <div className="relative z-10 max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="text-center mb-16 space-y-6">
+        <div className="text-center mb-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className={`${instrumentSerif.className} text-5xl md:text-7xl lg:text-8xl leading-[0.9] text-[#1A1A1A] dark:text-[#E2D7CE]`}
+            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none"
           >
-            {t.title_part1} <span className="text-[#FF5C00] italic">{t.title_part2}</span>
+            {t.title_part1} <span className="text-[#FF5C00]">{t.title_part2}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="max-w-xl mx-auto text-lg md:text-xl text-[#1A1A1A]/60 dark:text-[#E2D7CE]/60 leading-relaxed font-sans"
+            className="max-w-xl mx-auto mt-6 text-lg md:text-xl text-[#1A1A1A]/60 dark:text-[#E2D7CE]/60 leading-relaxed font-sans"
           >
             {t.intro}
           </motion.p>
