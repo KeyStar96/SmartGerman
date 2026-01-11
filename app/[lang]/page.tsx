@@ -18,7 +18,7 @@ export default async function HomePage({
     <div className="flex flex-col items-center w-full overflow-visible relative bg-transparent">
       <Hero dictionary={dictionary} lang={lang} />
       <ScienceSection dictionary={dictionary} />
-      <WhyUsBento dictionary={dictionary} />
+      <WhyUsBento />
       <Features dictionary={dictionary} />
       <Courses dictionary={dictionary} lang={lang} />
       <Schedule dictionary={dictionary} lang={lang} />
