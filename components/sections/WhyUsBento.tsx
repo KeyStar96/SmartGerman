@@ -17,7 +17,7 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
         <div
             className={cn(
                 "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card",
-                isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9]",
+                isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9] dark:bg-[#1E2024]",
                 "border-[0.5px] border-black/10 dark:border-white/5",
                 "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]", // Slight tilt on hover
                 className
@@ -30,7 +30,7 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
                     "bg-noise-paper",
                     isOrange
                         ? "opacity-40 mix-blend-overlay brightness-110" // High opacity for visible texture on orange
-                        : "opacity-[0.12] mix-blend-multiply" // Subtle shadow simulation for light paper
+                        : "opacity-[0.12] mix-blend-multiply dark:mix-blend-overlay dark:opacity-5" // Subtle shadow simulation for light paper (Onyx Paper logic)
                 )}
             />
 
@@ -64,12 +64,14 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block border-b border-white/20 pb-2";
 
     // Heading: Dry Ink (Charcoal #333) -> Wet Ink (Black #000) on Hover
+    // Dark: Sand (#E2D7CE) -> White on Hover
     // Tracking tightened for "Swiss Style"
-    const headingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-[#333333] transition-colors duration-500 ease-out group-hover/card:text-black leading-[1.1]";
+    const headingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-[#333333] dark:text-[#E2D7CE] transition-colors duration-500 ease-out group-hover/card:text-black dark:group-hover/card:text-white leading-[1.1]";
     const whiteHeadingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-white/90 transition-colors duration-500 ease-out group-hover/card:text-white leading-[1.1]";
 
     // Body: Dry Ink (#333) -> Wet Ink (#000)
-    const bodyStyle = "text-xl text-[#333333] leading-relaxed font-bold tracking-tight transition-colors duration-500 ease-out group-hover/card:text-black";
+    // Dark: Sand (#E2D7CE) -> White on Hover
+    const bodyStyle = "text-xl text-[#333333] dark:text-[#E2D7CE] leading-relaxed font-bold tracking-tight transition-colors duration-500 ease-out group-hover/card:text-black dark:group-hover/card:text-white";
 
     const t = dictionary?.WhyUs;
 

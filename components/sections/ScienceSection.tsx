@@ -15,6 +15,9 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
             ref={containerRef}
             className="relative min-h-screen py-32 overflow-hidden bg-transparent"
         >
+            {/* Background Texture: Global Paper Noise (opacity 0.03) */}
+            <div className="absolute inset-0 z-0 pointer-events-none mix-blend-multiply dark:mix-blend-overlay opacity-[0.03] bg-noise-paper"></div>
+
             <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-10 gap-12 items-center relative z-10">
 
                 {/* Left: Scientific Text (40%) */}
@@ -71,22 +74,28 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         </div>
                     </div>
 
-                    {/* Data Points overlay */}
-                    {/* Top Right Data Block - Pushed further to the right edge and up */}
-                    <div className="relative w-full lg:absolute lg:top-0 lg:right-[-20px] font-mono text-[9px] uppercase tracking-widest opacity-60 text-center lg:text-right space-y-2 z-30 mt-8 lg:mt-0 pointer-events-none">
-                        <div className="grid grid-cols-1 gap-1">
-                            <div>{dictionary.science.data_points.data_stream_label}: {dictionary.science.data_points.data_stream_value}</div>
-                            <div>{dictionary.science.data_points.neuron_count_label}: {dictionary.science.data_points.neuron_count_value}</div>
-                            <div>{dictionary.science.data_points.signal_speed_label}: {dictionary.science.data_points.signal_speed_value}</div>
-                            <div className="text-[#FF5C00]">{dictionary.science.data_points.synapse_firing_label}: {dictionary.science.data_points.synapse_firing_value}</div>
+                    {/* Data Points - Transformed into "Lab Labels" */}
+                    {/* Top Right Data Block */}
+                    <div className="relative w-full lg:absolute lg:top-0 lg:right-[-20px] z-30 mt-8 lg:mt-0 pointer-events-none flex flex-col items-center lg:items-end gap-2">
+                        {/* Lab Label Container */}
+                        <div className="backdrop-blur-md bg-[#F0EFE9]/10 dark:bg-[#1A1C1E]/30 border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 rounded-sm">
+                            <div className="font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]/80 text-center lg:text-right space-y-1">
+                                <div>{dictionary.science.data_points.data_stream_label}: {dictionary.science.data_points.data_stream_value}</div>
+                                <div>{dictionary.science.data_points.neuron_count_label}: {dictionary.science.data_points.neuron_count_value}</div>
+                                <div>{dictionary.science.data_points.signal_speed_label}: {dictionary.science.data_points.signal_speed_value}</div>
+                                <div className="text-[#FF5C00] font-bold">{dictionary.science.data_points.synapse_firing_label}: {dictionary.science.data_points.synapse_firing_value}</div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Bottom Left Data Block - Pushed further to the left edge and down */}
-                    <div className="relative w-full lg:absolute lg:bottom-0 lg:left-[-20px] font-mono text-[9px] uppercase tracking-widest opacity-60 text-center lg:text-left space-y-2 z-30 mt-4 lg:mt-0 pointer-events-none">
-                        <div className="grid grid-cols-1 gap-1">
-                            <div>{dictionary.science.data_points.hemisphere_label}: {dictionary.science.data_points.hemisphere_value}</div>
-                            <div>{dictionary.science.data_points.plasticity_label}: {dictionary.science.data_points.plasticity_value}</div>
+                    {/* Bottom Left Data Block */}
+                    <div className="relative w-full lg:absolute lg:bottom-0 lg:left-[-20px] z-30 mt-4 lg:mt-0 pointer-events-none flex flex-col items-center lg:items-start gap-2">
+                        {/* Lab Label Container */}
+                        <div className="backdrop-blur-md bg-[#F0EFE9]/10 dark:bg-[#1A1C1E]/30 border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 rounded-sm">
+                            <div className="font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]/80 text-center lg:text-left space-y-1">
+                                <div>{dictionary.science.data_points.hemisphere_label}: {dictionary.science.data_points.hemisphere_value}</div>
+                                <div>{dictionary.science.data_points.plasticity_label}: {dictionary.science.data_points.plasticity_value}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
