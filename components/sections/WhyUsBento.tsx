@@ -2,134 +2,161 @@
 
 import React, { useRef } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { Play, Pause, Shield, Flame, Users, Check } from "lucide-react";
+import {
+    GraduationCap,
+    Brain,
+    Languages,
+    Search,
+    Target,
+    ArrowUpRight,
+    Check
+} from "lucide-react";
 
-// Animation Settings matching your GSAP flow
 const SPRING_CONFIG = { type: "spring", stiffness: 100, damping: 20 };
 
 export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
-    const shouldReduceMotion = useReducedMotion();
 
-    // Mapping for consistent colors and borders from your globals.css
-    const cardStyles = "relative overflow-hidden border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 bg-white/50 dark:bg-[#1A1C1E]/50 backdrop-blur-sm transition-all duration-500 hover:border-[#FF5C00]/40 group";
+    const cardStyles = "relative overflow-hidden border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 bg-white/40 dark:bg-[#1A1C1E]/40 backdrop-blur-md transition-all duration-500 hover:border-[#FF5C00]/40 group p-10 flex flex-col justify-between";
 
     return (
         <section ref={containerRef} className="relative py-32 px-6 md:px-12 bg-transparent overflow-hidden">
             <div className="container mx-auto">
 
-                {/* Section Header: Matching Hero/Science Style */}
+                {/* Section Header */}
                 <div className="mb-20">
                     <div className="inline-block mb-6">
                         <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
-                            {dictionary.science.protocol} // 03: TRUST_VALIDATION
+                            Protocol_03 // Methodological_Validation
                         </span>
                     </div>
                     <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none">
-                        Warum <br />
-                        <span className="text-[#FF5C00]">Smart German?</span>
+                        Wissenschaft <br />
+                        <span className="text-[#FF5C00]">Statt Bürokratie.</span>
                     </h2>
                 </div>
 
                 {/* Bento Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-10 gap-4 auto-rows-[240px]">
+                <div className="grid grid-cols-1 md:grid-cols-10 gap-4 auto-rows-[300px]">
 
-                    {/* TILE 1: AUDIO PROOF (Large) */}
+                    {/* TILE 1: THE RESEARCH (Master Thesis & BAMF Critique) - Large 6x2 */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
-                        className={`md:col-span-6 md:row-span-2 ${cardStyles} p-10 flex flex-col justify-between`}
+                        className={`md:col-span-6 md:row-span-2 ${cardStyles}`}
                     >
                         <div>
-                            <span className="font-mono text-[9px] tracking-widest uppercase opacity-50 mb-8 block">User_Voice_Analysis</span>
-                            <blockquote className="text-2xl md:text-4xl font-light leading-tight text-[#2D3436] dark:text-[#E2D7CE] max-w-lg">
-                                &ldquo;Endlich verstehe ich meine Nachbarn. Es fühlt sich an wie ein neues Leben.&rdquo;
-                            </blockquote>
+                            <div className="flex items-center gap-3 mb-8">
+                                <Search size={14} className="text-[#FF5C00]" />
+                                <span className="font-mono text-[9px] tracking-widest uppercase opacity-50">Scientific_Audit_2025</span>
+                            </div>
+                            <h3 className="text-2xl md:text-4xl font-bold uppercase tracking-tighter mb-6 leading-tight">
+                                Warum staatliche Kurse <br />
+                                <span className="text-[#FF5C00]">Scheitern müssen.</span>
+                            </h3>
+                            <div className="space-y-6 text-lg font-light text-[#2D3436] dark:text-[#E2D7CE] opacity-90 max-w-xl">
+                                <p>
+                                    Unsere aktuelle Masterarbeit belegt: Herkömmliche BAMF-Methoden sind wissenschaftlich nicht mehr zeitgemäß. Sie ignorieren die
+                                    <span className="font-bold"> neuronale Plastizität ab 50</span>.
+                                </p>
+                                <p className="opacity-70 text-base leading-relaxed">
+                                    Während staatliche Institutionen auf starre, bürokratische Frontal-Modelle setzen, nutzen wir kognitive Protokolle,
+                                    die speziell auf die physische Umstrukturierung des reiferen Gehirns optimiert sind.
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="flex items-center gap-6 mt-8">
-                            <div className="w-16 h-16 rounded-full border border-[#FF5C00] flex items-center justify-center group-hover:bg-[#FF5C00] transition-colors duration-500">
-                                <Play size={20} className="text-[#FF5C00] group-hover:text-white translate-x-0.5" />
-                            </div>
-                            <div className="flex-1 space-y-2">
-                                <div className="h-[1px] w-full bg-[#2D3436]/10 dark:bg-[#E2D7CE]/10 relative">
-                                    <motion.div
-                                        className="absolute inset-0 bg-[#FF5C00] origin-left"
-                                        initial={{ scaleX: 0 }}
-                                        animate={isInView ? { scaleX: 0.4 } : {}}
-                                        transition={{ delay: 1, duration: 2 }}
-                                    />
-                                </div>
-                                <div className="flex justify-between font-mono text-[9px] opacity-40 uppercase tracking-tighter">
-                                    <span>Signal_Detected</span>
-                                    <span>0:14 / 16:42</span>
-                                </div>
+                        <div className="mt-8 flex items-center gap-4">
+                            <div className="px-4 py-2 border-[0.5px] border-[#FF5C00]/30 bg-[#FF5C00]/5 font-mono text-[10px] uppercase tracking-widest">
+                                Status: Research_Finalized
                             </div>
                         </div>
                     </motion.div>
 
-                    {/* TILE 2: FLEXIBILITY (Tall) */}
+                    {/* TILE 2: INSTRUCTOR PROFILE - Tall 4x2 */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ delay: 0.1 }}
-                        className={`md:col-span-4 md:row-span-2 ${cardStyles} p-10 flex flex-col`}
+                        className={`md:col-span-4 md:row-span-2 ${cardStyles} !bg-[#FF5C00] dark:!bg-[#FF5C00] !border-none text-white`}
                     >
-                        <span className="font-mono text-[9px] tracking-widest uppercase opacity-50 mb-12">Protocol_Flex</span>
-                        <div className="flex-1 flex flex-col justify-center items-center">
-                            {/* Industrial Switch UI */}
-                            <div className="w-20 h-40 rounded-full border border-[#2D3436]/20 dark:border-[#E2D7CE]/20 p-2 flex flex-col justify-between bg-[#FCF4E6] dark:bg-[#1A1C1E]">
-                                <div className="w-full aspect-square rounded-full border border-[#2D3436]/10 dark:border-[#E2D7CE]/10 flex items-center justify-center text-[8px] font-mono opacity-30">OFF</div>
-                                <motion.div
-                                    className="w-full aspect-square rounded-full bg-[#FF5C00] shadow-lg shadow-[#FF5C00]/20 flex items-center justify-center"
-                                    layoutId="switch"
-                                >
-                                    <Check size={16} className="text-white" />
-                                </motion.div>
+                        <div>
+                            <div className="flex items-center gap-3 mb-12 opacity-80">
+                                <GraduationCap size={16} />
+                                <span className="font-mono text-[9px] tracking-widest uppercase">Verified_Academic_Profile</span>
                             </div>
-                            <div className="text-center mt-10">
-                                <h3 className="text-xl font-bold uppercase tracking-tighter">Monatlich</h3>
-                                <p className="text-sm opacity-60 font-light mt-2">Jederzeit kündbar. <br />Volle Kontrolle.</p>
-                            </div>
+                            <h3 className="text-3xl font-bold uppercase tracking-tighter mb-8 leading-none">
+                                Akademische <br />Exzellenz.
+                            </h3>
+                            <ul className="space-y-6 font-mono text-[11px] uppercase tracking-widest">
+                                <li className="flex gap-4">
+                                    <span className="opacity-50">01</span>
+                                    <span>Uni-Abschluss Deutsch & DaZ/DaF</span>
+                                </li>
+                                <li className="flex gap-4 border-t border-white/20 pt-4">
+                                    <span className="opacity-50">02</span>
+                                    <span>Bilingual aufgewachsen (DE/RU)</span>
+                                </li>
+                                <li className="flex gap-4 border-t border-white/20 pt-4">
+                                    <span>Mehrjährige Spezialisierung 50+</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="mt-12 p-6 border border-white/20 bg-white/10 backdrop-blur-md">
+                            <p className="text-xs font-light leading-relaxed">
+                                "Lernen ist keine Frage des Alters, sondern der Methodik. Ich lehre nicht nur Deutsch – ich schalte Potentiale frei."
+                            </p>
                         </div>
                     </motion.div>
 
-                    {/* TILE 3: NATIVE (Wide) */}
+                    {/* TILE 3: NATIVE LANGUAGE - Wide 5x1 */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ delay: 0.2 }}
-                        className={`md:col-span-5 md:row-span-1 ${cardStyles} p-8 flex items-center gap-8`}
+                        className={`md:col-span-5 md:row-span-1 ${cardStyles}`}
                     >
-                        <div className="w-24 h-24 shrink-0 border-[0.5px] border-[#FF5C00]/30 rounded-none overflow-hidden bg-[#FF5C00]/5 p-4">
-                            <Users className="w-full h-full text-[#FF5C00] opacity-80" />
-                        </div>
-                        <div>
-                            <span className="font-mono text-[9px] tracking-widest uppercase opacity-50 block mb-2">Authority_Check</span>
-                            <h3 className="text-xl font-bold uppercase tracking-tighter">100% Muttersprachler</h3>
-                            <p className="text-sm opacity-60 font-light mt-1">Keine KI-Stimmen. Echte menschliche Resonanz.</p>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <span className="font-mono text-[9px] tracking-widest uppercase opacity-50 block mb-4">Linguistic_Bridge</span>
+                                <h3 className="text-xl font-bold uppercase tracking-tighter">Muttersprache als Anker.</h3>
+                                <p className="text-sm opacity-60 font-light mt-2 max-w-xs">
+                                    Unterricht primär auf Russisch. Wir eliminieren die "Angst vor der Lücke", indem wir komplexe Konzepte in Ihrer Muttersprache validieren.
+                                </p>
+                            </div>
+                            <Languages size={32} className="text-[#FF5C00] opacity-20" />
                         </div>
                     </motion.div>
 
-                    {/* TILE 4: MICRO-LEARNING (Small) */}
+                    {/* TILE 4: FUTURE & EXPANSION - Wide 5x1 */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ delay: 0.3 }}
-                        className={`md:col-span-5 md:row-span-1 ${cardStyles} p-8 flex items-center justify-between`}
+                        className={`md:col-span-5 md:row-span-1 ${cardStyles}`}
                     >
-                        <div className="flex flex-col">
-                            <span className="font-mono text-[9px] tracking-widest uppercase opacity-50 mb-2">Time_Efficiency</span>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-5xl font-bold text-[#FF5C00]">15</span>
-                                <span className="text-sm font-mono opacity-60">MIN / TAG</span>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <span className="font-mono text-[9px] tracking-widest uppercase opacity-50 block mb-4">Evolution_Track</span>
+                                <h3 className="text-xl font-bold uppercase tracking-tighter">Horizont Erweiterung.</h3>
+                                <p className="text-sm opacity-60 font-light mt-2 max-w-xs">
+                                    Aktuelle Erweiterung des Protokolls auf Türkisch. Wir wachsen mit den Bedürfnissen unserer Gesellschaft.
+                                </p>
+                            </div>
+                            <div className="w-12 h-12 rounded-full border border-[#FF5C00]/20 flex items-center justify-center">
+                                <ArrowUpRight size={20} className="text-[#FF5C00]" />
                             </div>
                         </div>
-                        <div className="relative">
-                            <Flame size={48} className="text-[#FF5C00] opacity-20 animate-pulse" />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-[#FF5C00] animate-status-pulse" />
+                        <div className="mt-4 flex gap-4">
+                            <div className="flex items-center gap-2 font-mono text-[8px] opacity-40 uppercase">
+                                <div className="w-1 h-1 bg-[#FF5C00] rounded-full" />
+                                15 Min / Tag
+                            </div>
+                            <div className="flex items-center gap-2 font-mono text-[8px] opacity-40 uppercase">
+                                <div className="w-1 h-1 bg-[#FF5C00] rounded-full" />
+                                No AI Voices
                             </div>
                         </div>
                     </motion.div>
