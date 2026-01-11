@@ -20,7 +20,7 @@ export default async function HomePage({
       <ScienceSection dictionary={dictionary} />
       <WhyUsBento dictionary={dictionary} />
       <Features dictionary={dictionary} />
-      <Courses dictionary={dictionary} lang={lang} />
+      <Courses dictionary={dictionary} />
       <Schedule dictionary={dictionary} lang={lang} />
       {/* Spacer am Ende hilft beim Testen des Scroll-Endes */}
       <div className="h-[20vh] w-full" />
