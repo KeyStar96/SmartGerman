@@ -43,7 +43,7 @@ function TiltCard({ children, className, glowColor = "#FF5C00" }: { children: Re
 
 
             {/* Card Content */}
-            <div className="relative h-full w-full overflow-hidden bg-white dark:bg-[#0D0F12] rounded-none border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 shadow-sm transition-all duration-500 group-hover/tilt:shadow-2xl group-hover/tilt:shadow-[#FF5C00]/20">
+            <div className="relative h-full w-full overflow-hidden bg-white dark:bg-[#0D0F12] rounded-none border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 shadow-sm transition-all duration-500">
 
                 {/* 1px Reflection Top */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 dark:via-white/20 to-transparent opacity-0 group-hover/tilt:opacity-100 transition-opacity duration-700" />
@@ -118,7 +118,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                 >
 
                     {/* KARTE 1: Forschung & Biologie (7 Spalten, 3 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-7 relative z-40 transition-all duration-200">
+                    <motion.div variants={itemVariants} className="md:col-span-7 relative z-40">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-between relative z-10">
                                 <div>
@@ -145,7 +145,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 2: Akademischer Werdegang (5 Spalten, 3 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-5 z-30 transition-all duration-200">
+                    <motion.div variants={itemVariants} className="md:col-span-5 z-30">
                         <TiltCard className="h-full">
                             <div className="h-full bg-[#FF5C00] text-white p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden">
                                 {/* Scan-Lines Pattern */}
@@ -178,7 +178,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 3: Praxiserfahrung (6 Spalten, 2 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-6 z-20 transition-all duration-200">
+                    <motion.div variants={itemVariants} className="md:col-span-6 z-20">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">
@@ -196,7 +196,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 4: Sprachen & Empathie (6 Spalten, 2 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-6 z-10 transition-all duration-200">
+                    <motion.div variants={itemVariants} className="md:col-span-6 z-10">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">

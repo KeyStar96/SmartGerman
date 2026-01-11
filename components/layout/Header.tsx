@@ -76,11 +76,16 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     localStorage.setItem("theme", newTheme ? "dark" : "light");
   };
 
+  const [isPending, startTransition] = React.useTransition();
+
   const switchLanguage = (newLang: string) => {
     setIsLanguageDropdownOpen(false);
     // Ersetze die Sprache im aktuellen Pfad
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
-    router.push(newPath);
+
+    startTransition(() => {
+      router.push(newPath, { scroll: false });
+    });
   };
 
   const currentLanguage = languages.find((l) => l.code === lang) || languages[0];
