@@ -40,7 +40,7 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   /* Sanfter Übergang für das gesamte Layout beim Theme-Wechsel */
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   min-height: 100vh;
   overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
@@ -245,7 +245,7 @@ html {
 
   /* Basis Glass-Panel: 1px präzise Linien, keine Schatten */
   .glass-panel {
-    @apply backdrop-blur-xl rounded-2xl transition-all duration-500;
+    @apply backdrop-blur-xl rounded-2xl transition-all duration-200;
     /* Lightmode: Subtile Linien */
     border: 1px solid rgba(0, 0, 0, 0.08);
     background: rgba(255, 255, 255, 0.4);
@@ -283,7 +283,7 @@ html {
   /* CHROME FIX: backdrop-filter wurde auf .glass-panel-backdrop verschoben */
   /* Dieses Element hat nur noch Styling, KEIN backdrop-filter mehr */
   .glass-panel-enhanced {
-    @apply rounded-2xl transition-all duration-500;
+    @apply rounded-2xl transition-all duration-200;
     /* Position relative für stabile Positionierung */
     position: relative;
     /* Verhindert 3D-Vererbung auf das Element selbst */
@@ -376,7 +376,7 @@ html {
   /* Texturierte Oberfläche: Paper-Feel mit weichem Theme-Übergang */
   .textured-surface {
     background-color: var(--background);
-    transition: background-color 0.5s ease;
+    transition: background-color 0.2s ease;
   }
 
   /* Optionaler Hard-Fix für Safari: Deaktiviere Filter-Effekte während des Scrollens */
@@ -427,7 +427,7 @@ html {
       inset 0 1px 0 rgba(255, 255, 255, 0.03);
 
     /* Smooth transition */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   /* Desktop Enhancement: Backdrop-Blur nur wenn hover unterstützt wird */
