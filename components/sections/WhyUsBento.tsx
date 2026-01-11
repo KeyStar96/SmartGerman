@@ -40,11 +40,7 @@ function TiltCard({ children, className, glowColor = "#FF5C00" }: { children: Re
             style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
             className={cn("relative group/tilt will-change-transform perspective-1000", className)}
         >
-            {/* Backlight Glow (Dark Mode) */}
-            <div
-                className="absolute -inset-4 rounded-3xl opacity-0 dark:group-hover/tilt:opacity-40 transition-opacity duration-500 -z-10 blur-2xl"
-                style={{ backgroundColor: glowColor }}
-            />
+
 
             {/* Card Content */}
             <div className="relative h-full w-full overflow-hidden bg-white dark:bg-[#0D0F12] rounded-none border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 shadow-sm transition-all duration-500 group-hover/tilt:shadow-2xl group-hover/tilt:shadow-[#FF5C00]/20">
