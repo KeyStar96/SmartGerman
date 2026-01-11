@@ -26,13 +26,13 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
                 {/* Layer A (Fine Grain) */}
                 <div className={cn(
                     "absolute inset-0 bg-noise-fine pointer-events-none z-30 transition-opacity duration-300",
-                    "mix-blend-multiply opacity-[0.12]"
+                    "mix-blend-multiply opacity-[0.20]"
                 )} />
 
                 {/* Layer B (Organic Fibers) */}
                 <div className={cn(
                     "absolute inset-0 bg-noise-fibers pointer-events-none z-30 transition-opacity duration-300",
-                    "mix-blend-multiply opacity-[0.12]"
+                    "mix-blend-multiply opacity-[0.30]"
                 )} />
 
                 {/* Content Container */}
