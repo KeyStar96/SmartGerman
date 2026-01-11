@@ -70,26 +70,29 @@ export default function Courses({ dictionary }: CoursesSectionProps) {
 
         {/* Toggle Switch */}
         <div className="flex justify-center mb-20">
-          <div className="bg-white/50 dark:bg-black/20 backdrop-blur-sm border border-[#1A1A1A]/10 dark:border-white/10 rounded-full p-1.5 flex gap-1 relative shadow-sm">
+          <div className="bg-[#E2D7CE]/30 dark:bg-white/5 backdrop-blur-md border border-[#1A1A1A]/10 dark:border-white/10 rounded-full p-1.5 flex gap-1 relative shadow-inner">
             {["presence", "online"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as "presence" | "online")}
                 className={`
-                    relative px-8 py-3 rounded-full text-sm font-medium transition-colors z-10
-                    ${activeTab === tab ? "text-[#1A1A1A]" : "text-[#1A1A1A]/60 dark:text-[#E2D7CE]/60 hover:text-[#1A1A1A] dark:hover:text-[#E2D7CE]"}
+                    relative px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 z-10
+                    ${activeTab === tab
+                    ? "text-[#1A1A1A]"
+                    : "text-[#1A1A1A]/70 dark:text-[#E2D7CE]/70 hover:text-[#1A1A1A] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
+                  }
                     ${jetbrainsMono.className} uppercase tracking-wider
                   `}
               >
                 {activeTab === tab && (
                   <motion.div
                     layoutId="activeTabBackground"
-                    className="absolute inset-0 bg-white dark:bg-[#E2D7CE] rounded-full shadow-sm border border-[#1A1A1A]/5"
+                    className="absolute inset-0 bg-[#E2D7CE] dark:bg-[#E2D7CE] rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.1)] border border-white/20"
                     initial={false}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-                <span className="relative z-20 mix-blend-exclusion dark:mix-blend-normal dark:text-[#1A1A1A]">
+                <span className="relative z-20">
                   {t.switch[tab]}
                 </span>
               </button>
@@ -128,14 +131,20 @@ export default function Courses({ dictionary }: CoursesSectionProps) {
           {/* Sticky USP Note (Desktop) */}
           <div className="hidden lg:block lg:col-span-4 relative pl-8">
             <div className="sticky top-32">
-              <div className="relative bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)] border border-black/10 overflow-hidden p-8 rotate-1 transform transition-transform hover:rotate-0 duration-500">
+              <div className="relative bg-[#FF5C00] shadow-[2px_10px_40px_rgba(0,0,0,0.15)] border border-black/10 overflow-hidden p-8 rotate-1 transform transition-transform hover:rotate-0 duration-500 origin-top">
 
                 {/* Paper Texture for Orange Card */}
                 <div className="absolute inset-0 pointer-events-none z-0 bg-noise-paper opacity-50 mix-blend-overlay brightness-110" />
 
-                {/* Pin effect */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-black/20 rounded-full border border-black/10 shadow-sm flex items-center justify-center z-20">
-                  <div className="w-1.5 h-1.5 bg-black rounded-full opacity-50"></div>
+                {/* REALISTIC PIN EFFECT */}
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-20 w-12 h-12 flex items-center justify-center pointer-events-none">
+                  {/* Shadow on paper */}
+                  <div className="absolute top-7 left-1/2 -translate-x-1/2 w-4 h-4 bg-black/40 blur-[2px] rounded-full transform scale-x-125"></div>
+                  {/* Metal Pin Head */}
+                  <div className="relative w-6 h-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-400 shadow-[inset_1px_1px_4px_rgba(255,255,255,0.8),inset_-1px_-1px_4px_rgba(0,0,0,0.3),2px_4px_8px_rgba(0,0,0,0.3)] border border-black/10">
+                    {/* Highlight */}
+                    <div className="absolute top-1.5 left-1.5 w-2 h-2 rounded-full bg-white/90 blur-[0.5px]"></div>
+                  </div>
                 </div>
 
                 <div className="relative z-10 text-[#F0EFE9]">
