@@ -129,16 +129,16 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                             }
                         }
                     }}
-                    className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-auto md:auto-rows-[160px]"
+                    className="grid grid-cols-1 md:grid-cols-12 gap-6"
                 >
 
                     {/* KARTE 1: Forschung & Biologie (7 Spalten, 3 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-7 md:row-span-3 relative">
+                    <motion.div variants={itemVariants} className="md:col-span-7 relative">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-between relative z-10">
                                 <div>
                                     <div className="flex items-center gap-4 mb-2">
-                                        <Brain size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
+                                        <Brain size={28} strokeWidth={1.5} className="text-[#FF5C00]" />
                                         <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card1.category}</span>
                                     </div>
                                     <div className="h-px w-full bg-[#2D3436]/10 dark:bg-[#E2D7CE]/10 my-6" />
@@ -160,7 +160,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 2: Akademischer Werdegang (5 Spalten, 3 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-5 md:row-span-3">
+                    <motion.div variants={itemVariants} className="md:col-span-5">
                         <TiltCard className="h-full">
                             <div className="h-full bg-[#FF5C00] text-white p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden">
                                 {/* Scan-Lines Pattern */}
@@ -193,11 +193,11 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 3: Praxiserfahrung (6 Spalten, 2 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-3">
+                    <motion.div variants={itemVariants} className="md:col-span-6">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Users size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
+                                    <Users size={28} strokeWidth={1.5} className="text-[#FF5C00]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card3.category}</span>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
@@ -211,11 +211,11 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     </motion.div>
 
                     {/* KARTE 4: Sprachen & Empathie (6 Spalten, 2 Zeilen) */}
-                    <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-3">
+                    <motion.div variants={itemVariants} className="md:col-span-6">
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Globe2 size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
+                                    <Globe2 size={28} strokeWidth={1.5} className="text-[#FF5C00]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card4.category}</span>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
