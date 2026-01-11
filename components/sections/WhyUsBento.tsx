@@ -47,7 +47,7 @@ function TiltCard({ children, className, glowColor = "#FF5C00" }: { children: Re
             />
 
             {/* Card Content */}
-            <div className="relative h-full w-full overflow-hidden bg-white dark:bg-[#0D0F12] rounded-none border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 shadow-sm transition-all duration-500 group-hover/tilt:shadow-2xl">
+            <div className="relative h-full w-full overflow-hidden bg-white dark:bg-[#0D0F12] rounded-none border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 shadow-sm transition-all duration-500 group-hover/tilt:shadow-2xl group-hover/tilt:shadow-[#FF5C00]/20">
 
                 {/* 1px Reflection Top */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 dark:via-white/20 to-transparent opacity-0 group-hover/tilt:opacity-100 transition-opacity duration-700" />
@@ -86,8 +86,8 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     // Typography & Style Constants
     const labelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#FF5C00] mb-6 block";
     const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block";
-    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#2D3436] dark:text-[#E2D7CE] uppercase mb-6 group-hover/tilt:font-black transition-all duration-500";
-    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 group-hover/tilt:font-black transition-all duration-500";
+    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#2D3436] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500";
+    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500";
     const bodyStyle = "text-xl text-[#2D3436]/80 dark:text-[#E2D7CE]/80 leading-relaxed font-medium";
 
     const t = dictionary?.WhyUs;
@@ -129,7 +129,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                             }
                         }
                     }}
-                    className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[160px]"
+                    className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-auto md:auto-rows-[160px]"
                 >
 
                     {/* KARTE 1: Forschung & Biologie (7 Spalten, 3 Zeilen) */}
@@ -161,7 +161,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
 
                     {/* KARTE 2: Akademischer Werdegang (5 Spalten, 3 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-5 md:row-span-3">
-                        <TiltCard className="h-full" glowColor="#FFFFFF">
+                        <TiltCard className="h-full">
                             <div className="h-full bg-[#FF5C00] text-white p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden">
                                 {/* Scan-Lines Pattern */}
                                 <div className="absolute inset-0 bg-scanlines opacity-20 pointer-events-none" />
@@ -195,15 +195,17 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     {/* KARTE 3: Praxiserfahrung (6 Spalten, 2 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-2">
                         <TiltCard className="h-full">
-                            <div className="p-10 lg:p-12 h-full flex flex-col justify-center">
+                            <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Users size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card3.category}</span>
                                 </div>
-                                <h3 className={headingStyle}>{t.card3.title}</h3>
-                                <p className={bodyStyle}>
-                                    {t.card3.text}
-                                </p>
+                                <div className="flex-1 flex flex-col justify-center">
+                                    <h3 className={headingStyle}>{t.card3.title}</h3>
+                                    <p className={bodyStyle}>
+                                        {t.card3.text}
+                                    </p>
+                                </div>
                             </div>
                         </TiltCard>
                     </motion.div>
@@ -211,15 +213,17 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     {/* KARTE 4: Sprachen & Empathie (6 Spalten, 2 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-6 md:row-span-2">
                         <TiltCard className="h-full">
-                            <div className="p-10 lg:p-12 h-full flex flex-col justify-center">
+                            <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Globe2 size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card4.category}</span>
                                 </div>
-                                <h3 className={headingStyle}>{t.card4.title}</h3>
-                                <p className={bodyStyle}>
-                                    {t.card4.text}
-                                </p>
+                                <div className="flex-1 flex flex-col justify-center">
+                                    <h3 className={headingStyle}>{t.card4.title}</h3>
+                                    <p className={bodyStyle}>
+                                        {t.card4.text}
+                                    </p>
+                                </div>
                             </div>
                         </TiltCard>
                     </motion.div>
