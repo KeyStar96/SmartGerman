@@ -570,8 +570,8 @@ export default function NeuralBrain() {
 
                 // Define range:
                 // 0 dist -> 1.0 expansion
-                // viewH * 0.6 dist -> 0.0 expansion (faded out before leaving screen entirely)
-                const maxDist = viewH * 0.6;
+                // viewH * 0.35 dist -> 0.0 expansion (faded out before leaving screen entirely)
+                const maxDist = viewH * 0.35;
 
                 // Smoothstep for organic falloff
                 // We use inverted smoothstep logic: 1 at 0, 0 at maxDist
