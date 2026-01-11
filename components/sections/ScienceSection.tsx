@@ -95,7 +95,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             {/* Lab Label Container */}
                             <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30 w-full lg:w-auto">
                                 {/* Inner Texture */}
-                                <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
+                                <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none"></div>
 
                                 <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
                                     <span className="opacity-70">{dictionary.science.data_points.data_stream_label}:</span>
@@ -123,7 +123,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             {/* Lab Label Container */}
                             <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30 w-full lg:w-auto">
                                 {/* Inner Texture */}
-                                <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
+                                <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none"></div>
 
                                 <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
                                     <span className="opacity-70">{dictionary.science.data_points.hemisphere_label}:</span>

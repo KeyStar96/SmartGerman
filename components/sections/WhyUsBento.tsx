@@ -29,8 +29,8 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
                     "absolute inset-0 pointer-events-none z-0",
                     "bg-noise-paper",
                     isOrange
-                        ? "opacity-40 mix-blend-overlay brightness-110" // High opacity for visible texture on orange
-                        : "opacity-[0.12] mix-blend-multiply dark:mix-blend-overlay dark:opacity-5" // Subtle shadow simulation for light paper (Onyx Paper logic)
+                        ? "opacity-50 mix-blend-overlay brightness-110" // High opacity for visible texture on orange
+                        : "opacity-20 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5" // Subtle shadow simulation for light paper (Onyx Paper logic)
                 )}
             />
 

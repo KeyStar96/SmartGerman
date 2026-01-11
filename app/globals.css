@@ -204,8 +204,10 @@ html {
 
 /* Balanced Paper Texture (Aquarell/Karton) - baseFrequency 0.7 & Sharp Contrast */
 .bg-noise-paper {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='2' intercept='-0.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.6'/%3E%3C/svg%3E");
-  background-size: 100px 100px;
+  /* baseFrequency 0.5 = Größere Struktur (sichtbar ohne Zoom) */
+  /* slope 1.5 = Weichere Schatten (keine harten Punkte) */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noisePaperVisible'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='1.5' intercept='-0.2'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noisePaperVisible)' opacity='0.7'/%3E%3C/svg%3E");
+  background-size: 250px 250px;
 }
 
 /* 2. Tactile Cardboard Noise - Layer System */
