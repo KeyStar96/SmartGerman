@@ -27,10 +27,10 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
             <div
                 className={cn(
                     "absolute inset-0 pointer-events-none z-0",
-                    "bg-noise-rough",
+                    "bg-noise-paper",
                     isOrange
-                        ? "opacity-25 mix-blend-soft-light brightness-110 contrast-125" // Soft Light for natural orange texture
-                        : "opacity-20 mix-blend-multiply contrast-125" // Increased opacity for light cards
+                        ? "opacity-40 mix-blend-overlay brightness-110" // High opacity for visible texture on orange
+                        : "opacity-[0.12] mix-blend-multiply" // Subtle shadow simulation for light paper
                 )}
             />
 
