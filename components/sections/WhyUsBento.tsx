@@ -61,17 +61,17 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     // Typography & Style Constants
     // Typography & Style Constants
     const labelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#FF5C00] mb-6 block";
-    const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block border-b border-white/20 pb-2";
+    const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#F0EFE9]/90 mb-6 block border-b border-white/20 pb-2";
 
     // Heading: Dry Ink (Charcoal #333) -> Wet Ink (Black #000) on Hover
     // Dark: Sand (#E2D7CE) -> White on Hover
     // Tracking tightened for "Swiss Style"
-    const headingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-[#333333] dark:text-[#E2D7CE] transition-colors duration-500 ease-out group-hover/card:text-black dark:group-hover/card:text-white leading-[1.1]";
-    const whiteHeadingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-white/90 transition-colors duration-500 ease-out group-hover/card:text-white leading-[1.1]";
+    const headingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-[#2D3436] dark:text-[#E2D7CE] transition-colors duration-500 ease-out group-hover/card:text-[#111111] dark:group-hover/card:text-[#F0EFE9] leading-[1.1]";
+    const whiteHeadingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-[#F0EFE9]/90 transition-colors duration-500 ease-out group-hover/card:text-[#F0EFE9] leading-[1.1]";
 
     // Body: Dry Ink (#333) -> Wet Ink (#000)
     // Dark: Sand (#E2D7CE) -> White on Hover
-    const bodyStyle = "text-xl text-[#333333] dark:text-[#E2D7CE] leading-relaxed font-bold tracking-tight transition-colors duration-500 ease-out group-hover/card:text-black dark:group-hover/card:text-white";
+    const bodyStyle = "text-xl text-[#2D3436] dark:text-[#E2D7CE] leading-relaxed font-bold tracking-tight transition-colors duration-500 ease-out group-hover/card:text-[#111111] dark:group-hover/card:text-[#F0EFE9]";
 
     const t = dictionary?.WhyUs;
 
@@ -145,12 +145,12 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                     {/* KARTE 2: Akademischer Werdegang (5 Spalten, 3 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-5 z-30">
                         <PaperCard className="h-full" isOrange={true}>
-                            <div className="h-full text-white p-10 lg:p-12 flex flex-col justify-between relative">
+                            <div className="h-full text-[#F0EFE9] p-10 lg:p-12 flex flex-col justify-between relative">
                                 {/* No extra Scan-Lines, just noise from PaperCard component */}
 
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-8">
-                                        <GraduationCap size={28} strokeWidth={2} className="text-white transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
+                                        <GraduationCap size={28} strokeWidth={2} className="text-[#F0EFE9] transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
                                         <span className={whiteLabelStyle.replace("mb-6", "mb-0")}>{t.card2.category}</span>
                                     </div>
 
@@ -162,10 +162,10 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                                         {t.card2.items.map((item: any, idx: number) => (
                                             <li key={idx} className="group/item">
                                                 <div className="flex items-start gap-3 mb-1">
-                                                    <CheckCircle2 size={18} strokeWidth={2.5} className="mt-0.5 flex-shrink-0 text-white" />
-                                                    <span className="text-base font-bold uppercase tracking-wide text-white group-hover/card:text-white transition-colors duration-500">{item.name}</span>
+                                                    <CheckCircle2 size={18} strokeWidth={2.5} className="mt-0.5 flex-shrink-0 text-[#F0EFE9]" />
+                                                    <span className="text-base font-bold uppercase tracking-wide text-[#F0EFE9] group-hover/card:text-[#F0EFE9] transition-colors duration-500">{item.name}</span>
                                                 </div>
-                                                <p className="pl-8 text-white/90 font-bold text-xs leading-relaxed group-hover/card:text-white transition-colors duration-500">{item.desc}</p>
+                                                <p className="pl-8 text-[#F0EFE9]/90 font-bold text-xs leading-relaxed group-hover/card:text-[#F0EFE9] transition-colors duration-500">{item.desc}</p>
                                             </li>
                                         ))}
                                     </ul>
