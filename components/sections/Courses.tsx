@@ -2,17 +2,16 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Instrument_Serif, JetBrains_Mono } from "next/font/google"; // Assuming fonts are available here or imported
-import { ArrowUpRight, Check, ChevronDown, Clock, Users, BookOpen } from "lucide-react";
+import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 const instrumentSerif = Instrument_Serif({ weight: "400", subsets: ["latin"] });
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
-// Types based on the new dictionary structure
 interface CourseItem {
   id: string;
-  group?: string; // Optional grouping
+  group?: string;
   title: string;
   level: string;
   instructor: string;
@@ -24,6 +23,11 @@ interface CourseItem {
   description: string;
   max_participants: string;
   badge: string;
+  // Fallback for new properties if dictionary structure varies
+  details?: {
+    label: string;
+    value: string;
+  }[];
 }
 
 interface CoursesSectionProps {
@@ -43,76 +47,93 @@ export default function Courses({ dictionary }: CoursesSectionProps) {
   };
 
   return (
-    <section id="courses" className="relative py-24 px-6 md:px-12 bg-transparent text-[#1A1A1A] overflow-hidden min-h-screen">
+    <section id="courses" className="relative py-32 px-6 md:px-12 bg-transparent text-[#1A1A1A] dark:text-[#E2D7CE] overflow-hidden min-h-screen">
 
       <div className="relative z-10 max-w-7xl mx-auto">
 
-        {/* Header */}
-        <div className="text-center mb-20">
+        {/* HEADER: Massive & Brutalist */}
+        <div className="mb-32 relative">
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none"
+            className={`${instrumentSerif.className} text-7xl md:text-9xl leading-[0.8] tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE]`}
           >
-            {t.title_part1} <span className="text-[#FF5C00]">{t.title_part2}</span>
+            {t.title_part1} <br />
+            <span className="text-[#FF5C00] italic">{t.title_part2}</span>
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="max-w-xl mx-auto mt-6 text-lg md:text-xl text-[#1A1A1A]/60 dark:text-[#E2D7CE]/60 leading-relaxed font-sans"
-          >
-            {t.intro}
-          </motion.p>
-        </div>
 
-        {/* Toggle Switch */}
-        <div className="flex justify-center mb-20">
-          <div className="bg-[#E2D7CE]/30 dark:bg-white/5 backdrop-blur-md border border-[#1A1A1A]/10 dark:border-white/10 rounded-full p-1.5 flex gap-1 relative shadow-inner">
-            {["presence", "online"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab as "presence" | "online")}
-                className={`
-                    relative px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 z-10
+          {/* Toggle Switch - Minimalist & Technical */}
+          <div className="absolute top-0 right-0 md:top-1/2 md:-translate-y-1/2 flex flex-col items-end gap-2 z-20">
+            <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em] opacity-50`}>
+              Location Mode
+            </span>
+            <div className="flex bg-[#1A1A1A]/5 dark:bg-white/5 p-1">
+              {["presence", "online"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab as "presence" | "online")}
+                  className={`
+                    px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300
                     ${activeTab === tab
-                    ? "text-[#1A1A1A]"
-                    : "text-[#1A1A1A]/70 dark:text-[#E2D7CE]/70 hover:text-[#1A1A1A] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
-                  }
-                    ${jetbrainsMono.className} uppercase tracking-wider
+                      ? "bg-[#1A1A1A] text-white dark:bg-[#E2D7CE] dark:text-[#1A1A1A]"
+                      : "text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"}
+                    ${jetbrainsMono.className}
                   `}
-              >
-                {activeTab === tab && (
-                  <motion.div
-                    layoutId="activeTabBackground"
-                    className="absolute inset-0 bg-[#E2D7CE] dark:bg-[#E2D7CE] rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.1)] border border-white/20"
-                    initial={false}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-20">
+                >
                   {t.switch[tab]}
-                </span>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Course List & USP Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-24">
+        {/* LIST LAYOUT */}
+        <div className="relative">
 
-          {/* Main List */}
-          <div className="lg:col-span-8 space-y-0 relative z-10">
+          {/* THE STICKY NOTE: Breaking the Grid */}
+          {/* Position absolute on desktop right edge, distinct from grid */}
+          <div className="hidden lg:block absolute right-0 top-24 z-30 w-80 pointer-events-none">
+            <div className={`
+                relative bg-[#FF5C00] p-8 -rotate-3 shadow-[0_20px_50px_-10px_rgba(0,0,0,0.3)]
+                transition-transform duration-500 hover:rotate-0 hover:scale-105 pointer-events-auto
+            `}>
+              {/* Realistic Pin */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-gradient-to-br from-gray-200 to-gray-600 shadow-md border border-white/20 z-10"></div>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-black/20 blur-[2px] transform translate-y-2 translate-x-1 -z-10"></div>
+
+              <div className="text-[#F0EFE9]">
+                <h3 className={`${instrumentSerif.className} text-4xl mb-4 leading-[0.9]`}>
+                  {t.usp.telegram_title}
+                </h3>
+                <p className="font-medium text-sm leading-relaxed opacity-90 mb-6">
+                  {t.usp.telegram_desc}
+                </p>
+                <div className="h-[1px] w-full bg-white/30 mb-6" />
+                <h3 className={`${instrumentSerif.className} text-3xl mb-2 leading-[0.9]`}>
+                  {t.usp.flexibility_title}
+                </h3>
+                <p className="font-medium text-xs leading-relaxed opacity-90">
+                  {t.usp.flexibility_desc}
+                </p>
+              </div>
+
+              {/* Decorative Scribble */}
+              <svg className="absolute bottom-4 right-4 w-12 h-12 text-black/20 transform rotate-12" viewBox="0 0 100 100">
+                <path d="M10,50 Q50,10 90,50 T10,90" fill="none" stroke="currentColor" strokeWidth="8" />
+              </svg>
+            </div>
+          </div>
+
+          {/* BRUTALIST COURSE LIST */}
+          <div className="w-full lg:w-[75%] border-t border-[#1A1A1A] dark:border-[#E2D7CE] border-opacity-20">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
               >
                 {currentCourses.map((course, index) => (
                   <CourseRow
@@ -128,60 +149,12 @@ export default function Courses({ dictionary }: CoursesSectionProps) {
             </AnimatePresence>
           </div>
 
-          {/* Sticky USP Note "The Disruptor" */}
-          <div className="lg:col-span-4 relative lg:pl-0 mt-12 lg:mt-0 pointer-events-none lg:pointer-events-auto">
-            <div className="lg:sticky lg:top-40 z-20">
-              <div className="relative bg-[#FF5C00] shadow-[4px_20px_60px_rgba(0,0,0,0.25)] border border-black/10 overflow-hidden p-8 rotate-0 lg:-rotate-3 transform transition-transform hover:rotate-0 duration-500 origin-center lg:-ml-12 w-full lg:w-[115%]">
-
-                {/* Paper Texture for Orange Card */}
-                <div className="absolute inset-0 pointer-events-none z-0 bg-noise-paper opacity-50 mix-blend-overlay brightness-110" />
-
-                {/* REALISTIC PIN EFFECT (Re-centered and enhanced) */}
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20 w-16 h-16 flex items-center justify-center pointer-events-none">
-                  {/* Shadow on paper */}
-                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-5 h-5 bg-black/40 blur-[3px] rounded-full transform scale-x-125"></div>
-                  {/* Metal Pin Head */}
-                  <div className="relative w-7 h-7 rounded-full bg-gradient-to-br from-gray-100 to-gray-500 shadow-[inset_1px_1px_4px_rgba(255,255,255,0.9),2px_4px_10px_rgba(0,0,0,0.4)] border border-black/20">
-                    {/* Highlight */}
-                    <div className="absolute top-2 left-2 w-2.5 h-2.5 rounded-full bg-white/95 blur-[0.5px]"></div>
-                  </div>
-                </div>
-
-                <div className="relative z-10 text-[#F0EFE9] pointer-events-auto">
-                  <h3 className={`${instrumentSerif.className} text-4xl mb-6 text-white leading-[0.9]`}>
-                    {t.usp.telegram_title}
-                  </h3>
-                  <p className="text-white/90 mb-10 leading-relaxed font-medium text-lg">
-                    {t.usp.telegram_desc}
-                  </p>
-
-                  <div className="w-full h-[1px] bg-white/30 mb-10" />
-
-                  <h3 className={`${instrumentSerif.className} text-3xl mb-4 text-white leading-[0.9]`}>
-                    {t.usp.flexibility_title}
-                  </h3>
-                  <p className="text-white/90 leading-relaxed font-medium text-lg">
-                    {t.usp.flexibility_desc}
-                  </p>
-                </div>
-
-                {/* Decorative scribble */}
-                <div className="absolute -bottom-12 -right-6 opacity-20 pointer-events-none z-0">
-                  <svg width="140" height="80" viewBox="0 0 100 60" fill="none" stroke="currentColor" className="text-black transform rotate-12">
-                    <path d="M10 30 Q 30 10, 50 30 T 90 30" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </section>
   );
 }
 
-// Sub-component for individual course row
 function CourseRow({
   course,
   isExpanded,
@@ -197,113 +170,120 @@ function CourseRow({
   isLast: boolean
 }) {
   return (
-    <div className={`
-      relative border-b border-[#1A1A1A]/20 dark:border-white/20 transition-all duration-500 
-      ${isExpanded ? 'bg-white/40 dark:bg-white/5 pb-8' : 'hover:bg-[#1A1A1A]/[0.02]'}
-    `}>
+    <div className={`relative group border-b border-[#1A1A1A] dark:border-[#E2D7CE] border-opacity-20 overflow-hidden`}>
+
+      {/* GHOST LEVEL INDICATOR - BACKGROUND LAYER */}
+      <div className={`
+        absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-0
+        text-[8rem] md:text-[10rem] font-sans font-black italic
+        text-transparent [-webkit-text-stroke:1px_rgba(26,26,26,0.1)] dark:[-webkit-text-stroke:1px_rgba(226,215,206,0.1)]
+        group-hover:[-webkit-text-stroke:1px_rgba(26,26,26,0.2)] dark:group-hover:[-webkit-text-stroke:1px_rgba(226,215,206,0.2)]
+        transition-all duration-500 opacity-50 group-hover:opacity-100 group-hover:scale-105
+        select-none whitespace-nowrap
+      `}>
+        {course.level}
+      </div>
+
       <button
         onClick={onToggle}
-        className="w-full py-12 flex items-stretch md:items-center justify-between group text-left px-0 relative overflow-hidden"
+        className="relative z-10 w-full py-16 md:py-20 flex items-center justify-between text-left focus:outline-none"
       >
-        <div className="flex flex-col md:flex-row items-baseline md:items-center gap-6 md:gap-12 flex-1 relative z-10">
+        <div className="flex items-center w-full">
 
-          {/* Level: Giant Outline Text (Watermark style) */}
-          <div className="flex-shrink-0 w-28 md:w-32 relative h-full flex items-center">
-            <span className={`
-               text-6xl md:text-7xl font-bold tracking-tighter leading-none block select-none
-               text-transparent [-webkit-text-stroke:1px_rgba(26,26,26,0.15)] dark:[-webkit-text-stroke:1px_rgba(255,255,255,0.15)]
-               group-hover:[-webkit-text-stroke:1px_#FF5C00] transition-colors duration-500
-               ${jetbrainsMono.className}
-             `}>
-              {course.level.replace('.', '')}
-            </span>
-
-            {/* Dynamic Reveal Icon (Orange Dot/Arrow) */}
-            <motion.div
-              className="absolute -right-4 top-1/2 -translate-y-1/2 text-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden md:block"
-            >
-              <ArrowUpRight className="w-8 h-8" />
-            </motion.div>
+          {/* HOVER ARROW - SLIDE IN */}
+          <div className="w-0 overflow-hidden group-hover:w-16 transition-all duration-300 ease-out flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0">
+            <ArrowRight className="w-12 h-12 text-[#FF5C00]" strokeWidth={2.5} />
           </div>
 
-          {/* Title - MASSIVE & Animated */}
-          <div className="flex-1 transform transition-transform duration-500 ease-out group-hover:translate-x-4">
-            <h3 className={`${instrumentSerif.className} text-4xl md:text-5xl lg:text-6xl text-[#1A1A1A] dark:text-[#E2D7CE] group-hover:text-[#FF5C00] transition-colors leading-[0.9] tracking-tight`}>
+          {/* TITLE - SLIDE EFFECT */}
+          <div className="transform transition-transform duration-500 ease-out group-hover:translate-x-6">
+            <h3 className={`
+                    ${instrumentSerif.className}
+                    text-5xl md:text-7xl leading-[0.85] tracking-tight
+                    text-[#2D3436] dark:text-[#E2D7CE]
+                    group-hover:text-[#FF5C00]
+                `}>
               {course.title}
             </h3>
-            {/* Mobile Reveal Icon */}
-            <div className="md:hidden mt-2 text-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <ArrowUpRight className="w-6 h-6" />
-            </div>
           </div>
         </div>
 
-        {/* Right Info (Desktop Only for Layout, Mobile stacks in expanded) */}
-        <div className="hidden md:flex flex-col items-end gap-1 text-right min-w-[120px] transform transition-transform duration-500 ease-out group-hover:-translate-x-4">
-          {/* Time/Freq */}
-          <div className={`text-[10px] uppercase tracking-[0.2em] font-bold text-[#1A1A1A] dark:text-[#E2D7CE] ${jetbrainsMono.className}`}>
-            {course.time.split('&')[0]}
-          </div>
-          {/* Price */}
-          <div className={`text-[10px] uppercase tracking-[0.2em] font-bold text-[#1A1A1A]/60 dark:text-[#E2D7CE]/60 ${jetbrainsMono.className}`}>
+        {/* METADATA - ORGANIC PLACEMENT */}
+        <div className="hidden md:flex flex-col items-end gap-2 absolute right-0 top-8 opacity-60 group-hover:opacity-100 transition-opacity">
+          <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em]`}>
+            {course.time}
+          </span>
+          <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em]`}>
             {course.price}
-          </div>
+          </span>
+          <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em] bg-[#1A1A1A] text-white dark:bg-white dark:text-black px-1`}>
+            {course.level}
+          </span>
         </div>
+
+        {/* Mobile Indicator */}
+        <div className="md:hidden">
+          <ArrowUpRight className="w-6 h-6 text-[#1A1A1A] dark:text-[#E2D7CE] opacity-50" />
+        </div>
+
       </button>
 
-      {/* Expanded Content */}
+      {/* EXPANDED CONTENT - BRUTALIST & STRUCTURED */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.04, 0.62, 0.23, 0.98] }}
+            initial={{ height: 0 }}
+            animate={{ height: "auto" }}
+            exit={{ height: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <div className="pt-4 px-0 md:pl-[9rem] grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="pb-16 pt-4 grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-dashed border-[#1A1A1A]/20 dark:border-white/20 mt-4">
 
-              {/* Content Left */}
+              {/* LEFT: DETAILS */}
               <div className="space-y-8">
-                <p className="text-xl md:text-2xl leading-relaxed text-[#1A1A1A]/80 dark:text-[#E2D7CE]/80 font-sans">
+                <p className="text-xl md:text-2xl leading-relaxed font-serif text-[#1A1A1A] dark:text-[#E2D7CE]">
                   {course.description}
                 </p>
 
-                <div className="grid grid-cols-2 gap-6 pt-4 border-t border-[#1A1A1A]/10 dark:border-white/10">
+                <div className="grid grid-cols-2 gap-y-8 gap-x-4">
                   <div>
-                    <span className={`block text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40 dark:text-[#E2D7CE]/40 mb-2 ${jetbrainsMono.className}`}>Zeit</span>
-                    <p className="font-bold text-[#1A1A1A] dark:text-[#E2D7CE]">{course.time}</p>
+                    <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em] block mb-2 opacity-50`}>Instructor</span>
+                    <span className={`${instrumentSerif.className} text-2xl`}>{course.instructor}</span>
                   </div>
                   <div>
-                    <span className={`block text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40 dark:text-[#E2D7CE]/40 mb-2 ${jetbrainsMono.className}`}>Frequenz</span>
-                    <p className="font-bold text-[#1A1A1A] dark:text-[#E2D7CE]">{course.freq}</p>
+                    <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em] block mb-2 opacity-50`}>Frequenz</span>
+                    <span className="font-bold">{course.freq}</span>
+                  </div>
+                  <div>
+                    <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em] block mb-2 opacity-50`}>Max. Participants</span>
+                    <span className="font-bold">{course.max_participants}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Content Right (CTA) */}
-              <div className="flex flex-col justify-between items-start gap-8 bg-[#F5F5F0] dark:bg-[#1E2024] p-8 rounded-none border-l-2 border-[#FF5C00]">
-                <div>
-                  <span className={`block text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40 dark:text-[#E2D7CE]/40 mb-2 ${jetbrainsMono.className}`}>{labels.instructor}</span>
-                  <p className={`${instrumentSerif.className} text-3xl text-[#1A1A1A] dark:text-[#E2D7CE]`}>{course.instructor}</p>
-                </div>
+              {/* RIGHT: ACTION */}
+              <div className="flex flex-col justify-end items-start bg-[#F5F5F0] dark:bg-[#252529] p-8 relative">
+                <div className="absolute top-0 left-0 w-2 h-full bg-[#FF5C00]"></div>
 
-                <div className="w-full">
-                  <div className="flex items-baseline gap-2 mb-6">
-                    <span className={`${instrumentSerif.className} text-5xl text-[#FF5C00]`}>{course.price}</span>
-                    <span className="text-sm font-bold text-[#1A1A1A]/60 dark:text-[#E2D7CE]/60 lowercase">{course.price_unit}</span>
+                <div className="mb-8">
+                  <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-[0.2em] block mb-1 opacity-50`}>Total Price</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`${instrumentSerif.className} text-6xl text-[#FF5C00]`}>{course.price}</span>
+                    <span className="text-xs font-bold opacity-50">{course.price_unit}</span>
                   </div>
-
-                  <Link
-                    href="#contact"
-                    className="group flex items-center justify-between w-full bg-[#1A1A1A] dark:bg-white text-white dark:text-[#1A1A1A] py-5 px-6 hover:bg-[#FF5C00] dark:hover:bg-[#FF5C00] hover:text-white dark:hover:text-white transition-all duration-300"
-                  >
-                    <span className={`font-bold uppercase tracking-widest text-xs ${jetbrainsMono.className}`}>
-                      {labels.book_now}
-                    </span>
-                    <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-                  </Link>
+                  <p className="text-xs opacity-50 mt-1">{course.price_note}</p>
                 </div>
+
+                <Link
+                  href="#contact"
+                  className="w-full bg-[#1A1A1A] dark:bg-[#E2D7CE] text-white dark:text-[#1A1A1A] py-4 px-6 flex items-center justify-between hover:bg-[#FF5C00] dark:hover:bg-[#FF5C00] hover:text-white transition-all duration-300 group/btn"
+                >
+                  <span className={`${jetbrainsMono.className} text-xs uppercase tracking-[0.2em] font-bold`}>
+                    {labels.book_now}
+                  </span>
+                  <ArrowUpRight className="w-5 h-5 transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
+                </Link>
               </div>
 
             </div>
