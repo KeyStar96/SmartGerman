@@ -80,11 +80,11 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     if (!t) return null;
 
     return (
-        <section ref={containerRef} className="relative py-32 px-10 md:px-20 bg-transparent">
+        <section ref={containerRef} className="relative py-32 bg-transparent">
             {/* Global Grain Texture Overlay */}
             <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-10 mix-blend-overlay"></div>
 
-            <div className="container mx-auto relative z-10">
+            <div className="container mx-auto px-6 md:px-12 relative z-10">
 
                 {/* Header: Klar und seriös */}
                 <div className="mb-20">
