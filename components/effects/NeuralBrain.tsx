@@ -17,7 +17,7 @@ const CONFIG = {
     // Signals
     signalSpeed: 1.25,
     minSignalStrength: 0.05,
-    trailDecay: 2.0,
+    trailDecay: 2.0, // Seconds until trail is gone
 
     particleSize: 0.035, // Base size
 
@@ -32,7 +32,6 @@ const CONFIG = {
 
     // Auto Pulse
     autoPulseEnabled: true,
-    autoPulseInterval: 10,
 };
 
 // --- TYPES ---
@@ -40,22 +39,21 @@ interface Neuron {
     id: number;
     vec: THREE.Vector3;      // Position (Z will be 0)
     baseVec: THREE.Vector3;  // Base Position
-    velocity: THREE.Vector3;
     connections: number[];
-    flash: number;
     visualDepth: number;     // 0 (Back) to 1 (Front)
     phase: number;
+    lastFlash: number;       // Timestamp of last flash
 }
 
 interface Pulse {
     active: boolean;
     fromIdx: number;
     toIdx: number;
-    progress: number;
+    startTime: number;
+    arrivalTime: number; // calculated startTime + dist/speed
     strength: number;
-    trailIntensity: number;
-    hasTriggered: boolean;
     lineIdx: number;
+    dist: number;
 }
 
 export default function NeuralBrain() {
@@ -107,8 +105,6 @@ export default function NeuralBrain() {
             const angle = Math.random() * Math.PI * 2;
             let radius = Math.sqrt(Math.random()); // Sqrt for uniform distribution
             // Coastline/Erosion effect: Randomly pull back particles to break the hard edge
-            // Logic: 1.0 - (random^2 * strength) ensures usually small indent, occasionally deep
-            // This prevents the "clean cut" look at the border.
             radius *= (1.0 - Math.random() * Math.random() * 0.35);
 
             const testP = {
@@ -126,11 +122,10 @@ export default function NeuralBrain() {
                 id: neurons.length,
                 vec: new THREE.Vector3(testP.x, testP.y, z),
                 baseVec: new THREE.Vector3(testP.x, testP.y, z),
-                velocity: new THREE.Vector3(0, 0, 0),
                 connections: [],
-                flash: 0,
                 visualDepth: visualDepth,
-                phase: Math.random() * Math.PI * 2
+                phase: Math.random() * Math.PI * 2,
+                lastFlash: -100.0 // Never flashed
             });
         }
 
@@ -171,7 +166,7 @@ export default function NeuralBrain() {
         const particlesGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(neurons.length * 3);
         const phases = new Float32Array(neurons.length);
-        const flashes = new Float32Array(neurons.length);
+        const flashTimes = new Float32Array(neurons.length);
         const visualDepths = new Float32Array(neurons.length);
 
         neurons.forEach((n, i) => {
@@ -179,13 +174,13 @@ export default function NeuralBrain() {
             positions[i * 3 + 1] = n.vec.y;
             positions[i * 3 + 2] = n.vec.z;
             phases[i] = Math.random() * Math.PI * 2;
-            flashes[i] = 0.0;
+            flashTimes[i] = -100.0; // Init as 'long ago'
             visualDepths[i] = n.visualDepth;
         });
 
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
         particlesGeo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
-        particlesGeo.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 1).setUsage(THREE.DynamicDrawUsage));
+        particlesGeo.setAttribute('aFlashTime', new THREE.BufferAttribute(flashTimes, 1).setUsage(THREE.DynamicDrawUsage));
         particlesGeo.setAttribute('aVisualDepth', new THREE.BufferAttribute(visualDepths, 1));
 
         // Custom Shader for Depth Effect
@@ -204,7 +199,7 @@ export default function NeuralBrain() {
                 uniform float uSize;
                 uniform float uExpansion;
                 attribute float aPhase;
-                attribute float aFlash;
+                attribute float aFlashTime;
                 attribute float aVisualDepth; // 0..1
                 
                 varying float vFlash;
@@ -213,34 +208,35 @@ export default function NeuralBrain() {
                 
                 void main() {
                     // Wander Logic (GPU)
-                    // Matches "organic" movement
                     vec3 offset = vec3(
                         sin(uTime * 0.5 + aPhase), 
                         cos(uTime * 0.4 + aPhase * 0.9), 
                         0.0
-                    ) * 0.04; // 0.04 matches prev wander radius approx
+                    ) * 0.04;
 
                     vec3 finalPos = (position + offset) * uExpansion;
-
                     vec4 mvPosition = modelViewMatrix * vec4(finalPos, 1.0);
                     gl_Position = projectionMatrix * mvPosition;
                     
-                    vFlash = aFlash;
+                    // Calc flash intensity based on time elapsed since trigger
+                    float timeSinceFlash = uTime - aFlashTime;
+                    
+                    // Decay logic: Starts at 4.0, decays to 0.0 quickly
+                    // Using similar decay to JS version: 2.0 speed
+                    float decay = max(0.0, 4.0 - timeSinceFlash * 2.5);
+                    vFlash = decay;
+
                     vPhase = aPhase;
                     vVisualDepth = aVisualDepth;
 
                     // Pulsate
                     float breath = 0.1 * sin(uTime * 1.5 + aPhase); 
-                    float flashGrow = smoothstep(0.0, 2.0, aFlash) * 1.0; 
+                    float flashGrow = smoothstep(0.0, 2.0, vFlash) * 1.0; 
                     float pulse = 1.0 + breath + flashGrow;
                     
-                    // --- OPTICAL ILLUSION: SIZE ---
-                    // Front (Depth 1) -> Large
-                    // Back (Depth 0) -> Small
-                    // Range: 0.5x to 1.5x base size
+                    // Depth Scale
                     float depthScale = 0.5 + aVisualDepth * 1.0;
 
-                    // Perspective divide (standard) + Depth Scale
                     gl_PointSize = uSize * pulse * depthScale * (1.0 / -mvPosition.z);
                 }
             `,
@@ -267,19 +263,9 @@ export default function NeuralBrain() {
                     
                     if(dist > 0.5) discard;
                     
-                    // --- OPTICAL ILLUSION: BLUR ---
-                    // Back (Depth 0) -> Sharp Edge
-                    // Front (Depth 1) -> Soft/Blurry Edge
-                    
-                    // Sharp: smoothstep(0.40, 0.50)
-                    // Blur:  smoothstep(0.00, 0.50)
-                    
-                    // Interpolate edge hardness based on depth
                     float edgeInner = mix(0.40, 0.0, vVisualDepth);
                     float alpha = 1.0 - smoothstep(edgeInner, 0.5, dist);
                     
-                    // Tone down alpha heavily for "blocked" fuzzy front particles
-                    // to imitate "out of focus" transparency
                     float maxAlpha = mix(1.0, 0.6, vVisualDepth);
                     alpha *= maxAlpha;
 
@@ -296,8 +282,6 @@ export default function NeuralBrain() {
                     float warmth = smoothstep(0.0, 1.0, vFlash);   
                     vec3 finalColor = mix(idleState, heatState, warmth);
                     
-                    // White Core (Only for sharp back particles? Or all?)
-                    // Let's keep it for all but maybe less distinct on blurry ones
                     if (vFlash > 1.5 && dist < 0.2) {
                         finalColor += vec3(0.3) * (vFlash - 1.5);
                     }
@@ -320,7 +304,10 @@ export default function NeuralBrain() {
         const linesGeo = new THREE.BufferGeometry();
         const linePositions = new Float32Array(connectionPairs.length * 2 * 3);
         const lineProgress = new Float32Array(connectionPairs.length * 2);
+
+        // Signal Data now holds: [TargetTime (Time when signal started), Strength]
         const signalData = new Float32Array(connectionPairs.length * 2 * 2);
+
         const distData = new Float32Array(connectionPairs.length * 2);
         const linePhases = new Float32Array(connectionPairs.length * 2);
 
@@ -340,13 +327,20 @@ export default function NeuralBrain() {
             linePositions[idx + 5] = n2.vec.z;
 
             // Fill Attributes
+            // Direction 1 -> 0.0 (Source)
             lineProgress[i * 2] = 0.0;
             distData[i * 2] = pair.dist;
             linePhases[i * 2] = n1.phase;
+            // Init signal: Start time very negative (expired)
+            signalData[i * 4] = -999.0;
+            signalData[i * 4 + 1] = 0.0;
 
+            // Direction 2 -> 1.0 (Target)
             lineProgress[i * 2 + 1] = 1.0;
             distData[i * 2 + 1] = pair.dist;
             linePhases[i * 2 + 1] = n2.phase;
+            signalData[i * 4 + 2] = -999.0;
+            signalData[i * 4 + 3] = 0.0;
         }
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
@@ -358,32 +352,33 @@ export default function NeuralBrain() {
         const linesMat = new THREE.ShaderMaterial({
             uniforms: {
                 uTime: { value: 0 },
-                uExpansion: { value: 0 }, // 0 = Collapsed, 1 = Full
+                uExpansion: { value: 0 },
                 uColorIdle: { value: new THREE.Color(CONFIG.colorIdleDark) },
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
-                uOpacityBase: { value: 0.08 },
+                uOpacityBase: { value: 0.15 }, // slightly increased base
+                uSignalSpeed: { value: CONFIG.signalSpeed },
             },
             transparent: true,
             vertexShader: `
                 uniform float uTime;
                 uniform float uExpansion;
                 attribute float aLineProgress;
-                attribute vec2 aSignal; 
+                attribute vec2 aSignal; // x = StartTime, y = Strength
                 attribute float aDist;
-                attribute float aPhase; // Phase of the attached neuron
+                attribute float aPhase;
                 
-                varying float vProgress;
-                varying vec2 vSignal;
+                varying float vLineProgress;
+                varying vec2 vSignal; // x = StartTime, y = Strength
                 varying float vDist;
                 
                 void main() {
-                    vProgress = aLineProgress;
+                    vLineProgress = aLineProgress;
                     vSignal = aSignal;
                     vDist = aDist;
 
-                    // Wander Logic (Match Particles)
+                    // Wander (Match Particles)
                     vec3 offset = vec3(
                         sin(uTime * 0.5 + aPhase), 
                         cos(uTime * 0.4 + aPhase * 0.9), 
@@ -397,54 +392,79 @@ export default function NeuralBrain() {
             `,
             fragmentShader: `
                 uniform vec3 uColorIdle;
-                uniform vec3 uColorLow;
                 uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
                 uniform float uOpacityBase;
+                uniform float uSignalSpeed;
+                uniform float uTime;
                 
-                varying float vProgress;
+                varying float vLineProgress;
                 varying vec2 vSignal;
                 varying float vDist;
                 
                 vec3 getHeatColor(float i) {
-                    // Force start from Orange (Mid) even at low intensity to be visible against black
-                    // Blend directly from Mid (Orange) to High (Gold) to keep it bright
                     vec3 c = mix(uColorMid, uColorHigh, smoothstep(0.0, 1.0, i));
                     return c;
                 }
 
                 void main() {
-                    float signalProgress = vSignal.x;
+                    float startTime = vSignal.x;
                     float rawStrength = vSignal.y;
-                    float signalStrength = abs(rawStrength);
                     
+                    float elapsedTime = uTime - startTime;
+                    float signalStrength = abs(rawStrength);
+
                     vec3 finalColor = uColorIdle;
                     float finalOpacity = uOpacityBase;
-                    
-                    if (signalStrength > 0.01) {
-                        bool isReverse = rawStrength < 0.0;
-                        float distUV = isReverse ? (vProgress - signalProgress) : (signalProgress - vProgress);
+
+                    // If signal is active (elapsedTime >= 0)
+                    if (signalStrength > 0.01 && elapsedTime >= 0.0) {
+                        float distTravelled = elapsedTime * uSignalSpeed;
+                        float currentProgress = distTravelled / vDist;
                         
-                        float distWorld = distUV * vDist;
+                        // Check if we are within valid range (including trail)
+                        // Trail Length in UV space = trailLen / vDist
+                        float trailLen = 0.8; 
+                        
+                        // Direction Handling
+                        bool isReverse = rawStrength < 0.0;
+                        
+                        // Map currentProgress to UV space [0..1]
+                        float signalUV = isReverse ? (1.0 - currentProgress) : currentProgress;
+                        
+                        // Calculate distance from this fragment to the signal head in World Space
+                        // Frag is at vLineProgress
+                        // Signal Head is at signalUV
+                        
+                        // signed distance along line (positive = signal passed us)
+                        float distFromHead = isReverse 
+                            ? (vLineProgress - signalUV) * vDist 
+                            : (signalUV - vLineProgress) * vDist;
 
-                        if (distWorld >= 0.0) {
-                            float tailLen = 0.8; // Reduced tail length for clearer pulse
-                            float glow = max(0.0, 1.0 - (distWorld / tailLen));
-                            
-                            if (glow > 0.0) {
-                                vec3 trailColor = getHeatColor(signalStrength);
-                                trailColor *= 2.0;
+                        // Trail logic: Signal is at Head. Tail is behind.
+                        // distFromHead should be >= 0 (signal passed) and <= tailLen
+                        if (distFromHead >= 0.0 && distFromHead <= trailLen) {
+                             float glow = 1.0 - (distFromHead / trailLen);
+                             // Cubic falloff for smoother trail
+                             glow = glow * glow; 
 
-                                if (distWorld < 0.05) {
-                                     trailColor = mix(trailColor, uColorHigh, 0.6);
-                                }
-                                
-                                finalColor = mix(finalColor, trailColor, glow);
-                                // Double the opacity multiplier (6.0 -> 12.0) to make trails visible even at low strength
-                                finalOpacity = max(finalOpacity, glow * signalStrength * 12.0);
-                            }
+                             // Decay intensity over distance travelled
+                             float travelDecay = exp(-distTravelled * 1.5);
+                             float currentIntensity = signalStrength * travelDecay;
+                             
+                             vec3 trailColor = getHeatColor(currentIntensity);
+                             trailColor *= 2.0; // Boost brightness
+
+                             // White hot tip
+                             if (distFromHead < 0.05) {
+                                  trailColor = mix(trailColor, uColorHigh, 0.6);
+                             }
+                             
+                             finalColor = mix(finalColor, trailColor, glow);
+                             finalOpacity = max(finalOpacity, glow * currentIntensity * 12.0);
                         }
                     }
+
                     gl_FragColor = vec4(finalColor, finalOpacity);
                 }
             `,
@@ -460,7 +480,7 @@ export default function NeuralBrain() {
             connectionMap.set(`${Math.min(pair.from, pair.to)}-${Math.max(pair.from, pair.to)}`, idx);
         });
 
-        // --- THEME DETECTION ---
+        // --- THEME ---
         const updateTheme = () => {
             const isDark = document.documentElement.classList.contains("dark");
             const newColor = new THREE.Color(isDark ? CONFIG.colorIdleDark : CONFIG.colorIdleLight);
@@ -486,284 +506,232 @@ export default function NeuralBrain() {
         });
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
-        // --- 5. SIGNAL LOGIC ---
-        const pulsePool: Pulse[] = [];
-        const maxPulses = 8000;
-        // Optimization: Free Stack (O(1) allocation) & Active List (O(N_active) iteration)
-        const freePulseIndices: number[] = [];
-        const activePulseIndices: number[] = [];
+        // --- 5. LOGIC ENGINE (EVENTS) ---
+        // Instead of per-frame updates, we calculate events.
 
-        for (let i = 0; i < maxPulses; i++) {
-            pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1 });
-            freePulseIndices.push(i);
-        }
+        const activePulses: Pulse[] = [];
+        // Buffers for updating GPU attributes sparsely
+        const signalUpdateQueue = new Set<number>(); // line indices that need updates
+        const neuronUpdateQueue = new Set<number>(); // neuron indices that need updates
 
-        const dirtyLines: number[] = [];
-
-        const spawnPulse = (from: number, to: number, strength: number, startProgress = 0.0) => {
+        const spawnPulse = (from: number, to: number, strength: number, time: number) => {
             const key = `${Math.min(from, to)}-${Math.max(from, to)}`;
             const lineIdx = connectionMap.get(key);
             if (lineIdx === undefined) return;
 
-            if (freePulseIndices.length > 0) {
-                const pIdx = freePulseIndices.pop()!;
-                const p = pulsePool[pIdx];
+            const pair = connectionPairs[lineIdx];
+            const dist = pair.dist;
+            const duration = dist / CONFIG.signalSpeed;
 
-                p.active = true;
-                p.fromIdx = from;
-                p.toIdx = to;
-                p.progress = startProgress;
-                p.strength = strength;
-                p.trailIntensity = strength;
-                p.hasTriggered = false;
-                p.lineIdx = lineIdx;
+            // Logic Object
+            const p: Pulse = {
+                active: true,
+                fromIdx: from,
+                toIdx: to,
+                startTime: time,
+                arrivalTime: time + duration,
+                strength: strength,
+                lineIdx: lineIdx,
+                dist: dist
+            };
+            activePulses.push(p);
 
-                activePulseIndices.push(pIdx);
-            }
+            // GPU Update
+            // 1. Calculate encoded strength (Negative if Reverse direction)
+            const isReverse = from !== pair.from;
+            const encodedStrength = isReverse ? -strength : strength;
+
+            // 2. Update Attribute for this line
+            const vIndex = lineIdx * 4;
+            // Write to local array (Reference)
+            // Note: We use the existing buffers.
+            signalData[vIndex] = time;
+            signalData[vIndex + 1] = encodedStrength;
+            signalData[vIndex + 2] = time;
+            signalData[vIndex + 3] = encodedStrength;
+
+            // 3. Mark for upload
+            signalUpdateQueue.add(lineIdx);
         };
 
-        const triggerNeuron = () => {
-            const idx = Math.floor(Math.random() * neurons.length);
-            const n = neurons[idx];
-            n.flash += 2.0;
+        const triggerNeuron = (neuronIdx: number, time: number, incomingStrength: number) => {
+            const n = neurons[neuronIdx];
 
-            // Randomize outputs: Don't fire all connections. 
-            // Fire 1 to N connections (random subset) to avoid "starburst" uniformity.
-            // This makes some signals weak (single line) and others strong (burst).
+            // update logic
+            n.lastFlash = time;
+
+            // GPU Update
+            flashTimes[neuronIdx] = time;
+            neuronUpdateQueue.add(neuronIdx);
+
+            // Trigger Connections
+            // Logic: Random subset to properly disperse
             const targetCount = 1 + Math.floor(Math.random() * n.connections.length);
-            // Simple shuffle or pick random
-            // Since maxConnections is small (6), just iterating and skipping random is fine.
+
             let fired = 0;
+            // Shuffle/Random pick optimization:
+            // Start at random offset
+            const startOff = Math.floor(Math.random() * n.connections.length);
+
             for (let i = 0; i < n.connections.length; i++) {
                 if (fired >= targetCount) break;
-                // Randomized chance to pick this connection, or force if we run out of time
-                if (Math.random() < 0.5 || (n.connections.length - i) <= (targetCount - fired)) {
-                    spawnPulse(idx, n.connections[i], 3.0);
-                    fired++;
-                }
+                const idx = (startOff + i) % n.connections.length;
+
+                // Allow back-prop mostly, but maybe not immediately to sender? 
+                // Simplified: Just trigger.
+
+                // Strength Decay
+                // Ensure we don't have infinite loops of max strength
+                // Slightly decay the strength passed on.
+                const outStrength = Math.max(CONFIG.minSignalStrength, incomingStrength * 0.9);
+
+                spawnPulse(neuronIdx, n.connections[idx], outStrength, time);
+                fired++;
             }
         };
 
-        // --- 6. ANIMATION LOOP ---
-        const clock = new THREE.Clock();
 
-        const animate = (time: number) => {
-            // Keep reference for loop
+        // --- 6. ANIMATION LOOP ---
+        const animate = (timeMS: number) => {
             requestRef.current = requestAnimationFrame(animate);
 
-            // Time Delta
-            const dt = Math.min((time - lastTimeRef.current) / 1000, 0.1);
-            lastTimeRef.current = time;
+            // Convert to seconds
+            const time = timeMS * 0.001;
+            const dt = (time - lastTimeRef.current); // Seconds
 
-            // --- SCROLL-DRIVEN EXPANSION ---
+            // --- SCROLL / EXPANSION LOGIC ---
+            // (Same as before)
             let targetExpansion = 0.0;
-
             if (containerRef.current) {
-                // Calculate position relative to viewport
                 const rect = containerRef.current.getBoundingClientRect();
                 const viewH = window.innerHeight;
-                const viewCenter = viewH / 2;
-                const elementCenter = rect.top + rect.height / 2;
-
-                // Distance from center
-                const dist = Math.abs(elementCenter - viewCenter);
-
-                // Define range:
-                // 0 dist -> 1.0 expansion
-                // viewH * 0.6 dist -> 0.0 expansion (faded out before leaving screen entirely)
+                const dist = Math.abs((rect.top + rect.height / 2) - (viewH / 2));
                 const maxDist = viewH * 0.6;
-
-                // Smoothstep for organic falloff
-                // We use inverted smoothstep logic: 1 at 0, 0 at maxDist
                 const normDist = Math.max(0, Math.min(1, dist / maxDist));
-                // cubic ease out/in manual or smoothstep
                 targetExpansion = 1.0 - (normDist * normDist * (3 - 2 * normDist));
             }
-
-            // If observer says Hidden, force 0 (Optimization safety)
             if (!isVisibleRef.current) targetExpansion = 0.0;
 
             const currentExp = expansionRef.current;
-
-            // Smooth Lerp (Responsive but smooth)
             const newExp = currentExp + (targetExpansion - currentExp) * 0.1;
             expansionRef.current = newExp;
 
-            // Apply Uniforms
             particlesMat.uniforms.uExpansion.value = newExp;
             linesMat.uniforms.uExpansion.value = newExp;
 
-            // --- STOP OPTIMIZATION ---
-            // If target is 0 and we are practically 0, and Observer says hidden, STOP.
-            // (We keep running if visible even if expansion is low, to catch the scroll back in)
+            // Stop rendering content if hidden/collapsed (Optimization)
             if (!isVisibleRef.current && newExp < 0.001) {
-                if (requestRef.current) {
-                    cancelAnimationFrame(requestRef.current);
-                    requestRef.current = undefined;
-                    // Ensure it is strictly 0
-                    particlesMat.uniforms.uExpansion.value = 0;
-                    linesMat.uniforms.uExpansion.value = 0;
-                }
-                return; // Stop execution
+                lastTimeRef.current = time; // Keep time sync
+                return;
             }
 
-            // Normal Animation Update
-            particlesMat.uniforms.uTime.value = time * 0.001;
-            linesMat.uniforms.uTime.value = time * 0.001;
+            // Update Uniforms
+            particlesMat.uniforms.uTime.value = time;
+            linesMat.uniforms.uTime.value = time;
 
-            const flashArray = particlesGeo.attributes.aFlash.array as Float32Array;
+            // --- GAME LOOP LOGIC ---
 
-            // Update Neurons (only Flash state)
-            for (let i = 0; i < neurons.length; i++) {
-                const n = neurons[i];
+            // 1. Process Active Pulses
+            // Check for arrivals
+            for (let i = activePulses.length - 1; i >= 0; i--) {
+                const p = activePulses[i];
+                if (time >= p.arrivalTime) {
+                    // Arrived!
+                    triggerNeuron(p.toIdx, time, p.strength);
 
-                if (n.flash > 0) {
-                    n.flash = Math.max(0, n.flash - dt * 2.0); // Faster decay to reduce "busy" look
-                    n.flash = Math.min(n.flash, 4.0);
+                    // Remove from active list
+                    // Swap-Pop
+                    activePulses[i] = activePulses[activePulses.length - 1];
+                    activePulses.pop();
                 }
-                flashArray[i] = n.flash;
             }
-            (particlesGeo.attributes.aFlash as THREE.BufferAttribute).needsUpdate = true;
 
-            // Signal Logic
-            const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
-            const signalArray = signalAttr.array as Float32Array;
-
-            // Auto Pulse (Random / Organic)
-            // Low probability to avoid "Heartbeat" / "Clumping"
+            // 2. Auto Pulse (Random Triggers)4
             if (CONFIG.autoPulseEnabled) {
-                // "Arbitrary and chaotic":
-                // Instead of 1 check per frame, we use a loop to allow 0, 1, 2... N triggers per frame.
-                // Target: ~40 triggers/sec (very active)
-                // At 60fps = ~0.66 triggers/frame. 
-                // We run 3 checks at 0.22 chance each to allow potential "double/triple strikes" in one frame (clustering)
-                // blocking the rythm.
+                // Determine how many to fire. 
+                // Adjusted for 120Hz/60Hz invariance: Probability per second.
+                // Target: ~45 pulses/sec
+                const pulsesToSpawn = 45 * dt;
+                // Integer part
+                let count = Math.floor(pulsesToSpawn);
+                // Float remainder chance
+                if (Math.random() < (pulsesToSpawn - count)) count++;
 
-                for (let k = 0; k < 3; k++) {
-                    if (Math.random() < 0.25) { // ~45 triggers/sec total
-                        triggerNeuron();
-                    }
+                // Cap to avoid explosion on lag spike
+                count = Math.min(count, 10);
+
+                for (let k = 0; k < count; k++) {
+                    const idx = Math.floor(Math.random() * neurons.length);
+                    // Start new chain with high strength
+                    triggerNeuron(idx, time, 4.0);
                 }
             }
 
-            // Clean previous dirty signals
-            dirtyLines.forEach(lineIdx => {
-                const v1 = lineIdx * 4;
-                signalArray[v1] = 0;
-                signalArray[v1 + 1] = 0;
-                const v2 = v1 + 2;
-                signalArray[v2] = 0;
-                signalArray[v1 + 3] = 0;
-            });
-            dirtyLines.length = 0;
+            // --- BATCH UPDATES TO GPU ---
 
-            // Optimization: Iterate ONLY active pulses
-            // Use reverse loop for easy removal (Swap & Pop)
-            for (let i = activePulseIndices.length - 1; i >= 0; i--) {
-                const pIdx = activePulseIndices[i];
-                const p = pulsePool[pIdx];
+            // Update Lines
+            if (signalUpdateQueue.size > 0) {
+                const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
 
-                const lineIdx = p.lineIdx;
-                const dist = connectionPairs[lineIdx].dist;
-                p.progress += (CONFIG.signalSpeed * dt) / dist;
+                // Optimization: If too many, update all. If few, update ranges.
+                // "Too many" heuristic: > 20% of buffer?
+                // Actually, three.js `updateRange` is a single contiguous block. 
+                // If we have sparse updates (idx 0 and idx 1000), single range covers 0..1000.
+                // So effectively, full update might be cheaper/same if scattered.
+                // BUT: We usually only have 1-5 new pulses per frame.
+                // The `signalData` array is already up to date (we wrote to it in spawnPulse).
+                // We just need to tell GL to re-upload.
 
-                let shaderProgress = p.progress;
-                const isReverse = p.fromIdx !== connectionPairs[lineIdx].from;
-                if (isReverse) shaderProgress = 1.0 - p.progress;
-
-                let encodedStrength = p.strength;   // Default to start strength
-
-                // --- VISUAL DECAY DURING TRAVEL ---
-                // "Light signal decreases luminosity with the path"
-                const travelDecay = Math.exp(-dist * p.progress * 2.0);
-                const currentStrength = p.strength * travelDecay;
-
-                if (isReverse) encodedStrength = -currentStrength;
-                else encodedStrength = currentStrength;
-
-                const v1 = lineIdx * 4;
-                signalArray[v1] = shaderProgress;
-                signalArray[v1 + 1] = encodedStrength;
-
-                const v2 = v1 + 2;
-                signalArray[v2] = shaderProgress;
-                signalArray[v2 + 1] = encodedStrength;
-
-                dirtyLines.push(lineIdx);
-
-                if (!p.hasTriggered && p.progress >= 1.0) {
-                    const targetN = neurons[p.toIdx];
-
-                    // "Neuron lights up in same intensity as signal reached it"
-                    targetN.flash += currentStrength;
-
-                    // "Sends new signal with reduced intensity" (Immediate, no delay)
-                    // We treat "reduced" as the value it arrived with.
-                    if (currentStrength > CONFIG.minSignalStrength) {
-                        // Spread to others
-                        targetN.connections.forEach(mateIdx => {
-                            // Don't send back to sender immediately (optional simple block)
-                            if (mateIdx !== p.fromIdx) {
-                                spawnPulse(p.toIdx, mateIdx, currentStrength, 0.0);
-                            }
-                        });
-                    }
-                    p.hasTriggered = true;
-                }
-
-                if (p.progress >= 1.0 + (CONFIG.trailDecay / dist)) { // Wait for trail to finish
-                    p.active = false;
-
-                    // Return to free pool
-                    freePulseIndices.push(pIdx);
-
-                    // Fast removal from active list (Swap with last & pop)
-                    const lastActive = activePulseIndices[activePulseIndices.length - 1];
-                    activePulseIndices[i] = lastActive;
-                    activePulseIndices.pop();
-                }
+                // In simple 120Hz opt: Just set needsUpdate=true.
+                // Uploading float32array of ~8000 (32KB) is INSTANT.
+                // The slowdown before was JS loop calculating 8000 items.
+                signalAttr.needsUpdate = true;
+                signalUpdateQueue.clear();
             }
 
-            signalAttr.needsUpdate = true;
+            // Update Neurons
+            if (neuronUpdateQueue.size > 0) {
+                const flashAttr = particlesGeo.attributes.aFlashTime as THREE.BufferAttribute;
+                flashAttr.needsUpdate = true;
+                neuronUpdateQueue.clear();
+            }
 
+            lastTimeRef.current = time;
             renderer.render(scene, camera);
         };
 
+        // Start Loop
         const startLoop = () => {
             if (!requestRef.current) {
-                lastTimeRef.current = performance.now();
+                lastTimeRef.current = performance.now() * 0.001;
                 animate(performance.now());
             }
         };
 
+        // Observers
         const intersectionObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 isVisibleRef.current = entry.isIntersecting;
-                if (entry.isIntersecting) {
-                    startLoop();
-                }
+                if (entry.isIntersecting) startLoop();
             });
-        }, { threshold: 0.1, rootMargin: '-20% 0px' }); // Trigger earlier to show collapse
-
+        }, { threshold: 0.1 });
         intersectionObserver.observe(containerRef.current);
 
-        // --- 7. RESIZE & CLEANUP ---
         const resizeObserver = new ResizeObserver(() => {
             if (!containerRef.current) return;
             const newW = containerRef.current.clientWidth;
             const newH = containerRef.current.clientHeight;
-
             camera.aspect = newW / newH;
             camera.updateProjectionMatrix();
             renderer.setSize(newW, newH);
         });
-
         resizeObserver.observe(containerRef.current);
 
         return () => {
+            if (requestRef.current) cancelAnimationFrame(requestRef.current);
             observer.disconnect();
             resizeObserver.disconnect();
-
+            intersectionObserver.disconnect();
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);
             }
