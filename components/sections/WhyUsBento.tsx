@@ -1,66 +1,46 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { GraduationCap, Brain, Users, Globe2, CheckCircle2, Stamp } from "lucide-react";
+import React, { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { GraduationCap, Brain, Users, Globe2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// --- 3D TILT COMPONENT ---
-function TiltCard({ children, className, glowColor = "#FF5C00" }: { children: React.ReactNode; className?: string; glowColor?: string }) {
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
-    const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
-
-    const rotateX = useTransform(mouseY, [-0.5, 0.5], ["2deg", "-2deg"]);
-    const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-2deg", "2deg"]);
-
-    function onMouseMove(event: React.MouseEvent<HTMLDivElement>) {
-        const rect = event.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseXVal = event.clientX - rect.left;
-        const mouseYVal = event.clientY - rect.top;
-        const xPct = mouseXVal / width - 0.5;
-        const yPct = mouseYVal / height - 0.5;
-        x.set(xPct);
-        y.set(yPct);
-    }
-
-    function onMouseLeave() {
-        x.set(0);
-        y.set(0);
-    }
-
+// --- TACTILE PAPER CARD COMPONENT ---
+// Removed "Tilt" 3D logic for a flatter, more solid print aesthetic
+function PaperCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
     return (
-        <motion.div
-            onMouseMove={onMouseMove}
-            onMouseLeave={onMouseLeave}
-            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-            className={cn("relative group/tilt will-change-transform perspective-1000", className)}
-        >
+        <div className={cn("relative h-full w-full group/paper", className)}>
+            {/* Main Card Surface - Solid & Heavy */}
+            <div className={cn(
+                "relative h-full w-full overflow-hidden transition-transform duration-500",
+                // Base Material Colors
+                isOrange ? "bg-[#FF5C00]" : "bg-[#FCF4E6] dark:bg-[#1A1C1E]",
+                // Border: Hairline precision (0.5px)
+                "border-[0.5px] border-black/10 dark:border-white/10",
+                // No soft shadows requested
+                "shadow-none"
+            )}>
+                {/* Noise Texture Integration (8-12% opacity) */}
+                <div className="absolute inset-0 bg-noise opacity-[0.12] mix-blend-overlay pointer-events-none z-10" />
 
-
-            {/* Card Content */}
-            <div className="relative h-full w-full overflow-hidden bg-white dark:bg-[#0D0F12] rounded-none border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 shadow-sm transition-all duration-500">
-
-                {/* 1px Reflection Top */}
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 dark:via-white/20 to-transparent opacity-0 group-hover/tilt:opacity-100 transition-opacity duration-700" />
-
-                {children}
+                {/* Content Container */}
+                <div className="relative z-20 h-full">
+                    {children}
+                </div>
             </div>
-        </motion.div>
+        </div>
     );
 }
 
 const itemVariants = {
-    hidden: { opacity: 0, y: 40, scale: 0.95 },
+    hidden: { opacity: 0, scale: 1.02 },
     visible: {
         opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: { type: "spring" as const, stiffness: 50, damping: 20 }
+        scale: 1.0,
+        transition: {
+            duration: 0.6,
+            ease: "easeOut" as const
+        }
     }
 };
 
@@ -69,11 +49,13 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
     // Typography & Style Constants
-    const labelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#FF5C00] mb-6 block";
-    const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block";
-    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#2D3436] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500";
-    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500";
-    const bodyStyle = "text-xl text-[#2D3436]/80 dark:text-[#E2D7CE]/80 leading-relaxed font-medium";
+    // Typography & Style Constants
+    const labelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#FF5C00] mb-6 block drop-shadow-[0_1px_0_rgba(255,255,255,0.5)] dark:drop-shadow-none";
+    const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block border-b border-white/20 pb-2";
+    // Letterpress effect: Inside shadow mimic via text intent or subtle drop shadow for depth
+    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#2D3436] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500 drop-shadow-[0_1px_0_rgba(255,255,255,0.8)] dark:drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]";
+    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500 text-shadow-sm";
+    const bodyStyle = "text-xl text-[#2D3436] dark:text-[#E2D7CE]/90 leading-relaxed font-bold tracking-tight"; // "Fett, scharf"
 
     const t = dictionary?.WhyUs;
 
@@ -81,8 +63,8 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
 
     return (
         <section ref={containerRef} className="relative py-32 bg-transparent">
-            {/* Global Grain Texture Overlay */}
-            <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-[0.03] mix-blend-overlay"></div>
+            {/* Global Grain Texture Overlay - Static Grain over the entire section */}
+            <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-[0.08] mix-blend-overlay"></div>
 
             <div className="container mx-auto px-6 md:px-12 relative z-10">
 
@@ -119,41 +101,40 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
 
                     {/* KARTE 1: Forschung & Biologie (7 Spalten, 3 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-7 relative z-40">
-                        <TiltCard className="h-full">
+                        <PaperCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-between relative z-10">
                                 <div>
                                     <div className="flex items-center gap-4 mb-2">
-                                        <Brain size={28} strokeWidth={1.5} className="text-[#FF5C00]" />
+                                        <Brain size={28} strokeWidth={2} className="text-[#FF5C00]" />
                                         <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card1.category}</span>
                                     </div>
-                                    <div className="h-px w-full bg-[#2D3436]/10 dark:bg-[#E2D7CE]/10 my-6" />
+                                    <div className="h-[0.5px] w-full bg-black/10 dark:bg-white/10 my-6" />
 
                                     <h3 className={headingStyle}>
                                         {t.card1.title}
                                     </h3>
                                     <div className={bodyStyle}>
-                                        <p className="opacity-90 leading-relaxed text-lg">
+                                        <p className="opacity-100 leading-relaxed text-lg font-bold">
                                             {t.card1.text}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3 mt-6 text-xs font-mono text-[#FF5C00] font-bold uppercase tracking-widest pl-4 border-l border-[#FF5C00]/30">
+                                <div className="flex items-center gap-3 mt-6 text-xs font-mono text-[#FF5C00] font-bold uppercase tracking-widest pl-4 border-l-2 border-[#FF5C00]">
                                     {t.card1.specialization}
                                 </div>
                             </div>
-                        </TiltCard>
+                        </PaperCard>
                     </motion.div>
 
                     {/* KARTE 2: Akademischer Werdegang (5 Spalten, 3 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-5 z-30">
-                        <TiltCard className="h-full">
-                            <div className="h-full bg-[#FF5C00] text-white p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden">
-                                {/* Scan-Lines Pattern */}
-                                <div className="absolute inset-0 bg-scanlines opacity-20 pointer-events-none" />
+                        <PaperCard className="h-full" isOrange={true}>
+                            <div className="h-full text-white p-10 lg:p-12 flex flex-col justify-between relative">
+                                {/* No extra Scan-Lines, just noise from PaperCard component */}
 
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-8">
-                                        <GraduationCap size={28} strokeWidth={1.5} className="text-white" />
+                                        <GraduationCap size={28} strokeWidth={2} className="text-white" />
                                         <span className={whiteLabelStyle.replace("mb-6", "mb-0")}>{t.card2.category}</span>
                                     </div>
 
@@ -165,24 +146,24 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                                         {t.card2.items.map((item: any, idx: number) => (
                                             <li key={idx} className="group/item">
                                                 <div className="flex items-start gap-3 mb-1">
-                                                    <CheckCircle2 size={18} strokeWidth={2} className="mt-0.5 flex-shrink-0" />
-                                                    <span className="text-base font-bold uppercase tracking-wide group-hover/item:text-[#2D3436] transition-colors">{item.name}</span>
+                                                    <CheckCircle2 size={18} strokeWidth={2.5} className="mt-0.5 flex-shrink-0 text-white" />
+                                                    <span className="text-base font-bold uppercase tracking-wide text-white">{item.name}</span>
                                                 </div>
-                                                <p className="pl-8 text-white/90 font-medium text-xs leading-relaxed">{item.desc}</p>
+                                                <p className="pl-8 text-white/90 font-bold text-xs leading-relaxed">{item.desc}</p>
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
                             </div>
-                        </TiltCard>
+                        </PaperCard>
                     </motion.div>
 
                     {/* KARTE 3: Praxiserfahrung (6 Spalten, 2 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-6 z-20">
-                        <TiltCard className="h-full">
-                            <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
+                        <PaperCard className="h-full">
+                            <div className="p-10 lg:p-12 h-full flex flex-col relative z-20">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Users size={28} strokeWidth={1.5} className="text-[#FF5C00]" />
+                                    <Users size={28} strokeWidth={2} className="text-[#FF5C00]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card3.category}</span>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
@@ -192,15 +173,15 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                                     </p>
                                 </div>
                             </div>
-                        </TiltCard>
+                        </PaperCard>
                     </motion.div>
 
                     {/* KARTE 4: Sprachen & Empathie (6 Spalten, 2 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-6 z-10">
-                        <TiltCard className="h-full">
-                            <div className="p-10 lg:p-12 h-full flex flex-col relative z-10">
+                        <PaperCard className="h-full">
+                            <div className="p-10 lg:p-12 h-full flex flex-col relative z-20">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Globe2 size={28} strokeWidth={1.5} className="text-[#FF5C00]" />
+                                    <Globe2 size={28} strokeWidth={2} className="text-[#FF5C00]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card4.category}</span>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
@@ -210,7 +191,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                                     </p>
                                 </div>
                             </div>
-                        </TiltCard>
+                        </PaperCard>
                     </motion.div>
 
                 </motion.div>
