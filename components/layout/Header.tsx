@@ -45,6 +45,10 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // Check initial scroll position
+    handleScroll();
+
     return () => {
       if (scrollRafId !== null) {
         cancelAnimationFrame(scrollRafId);
