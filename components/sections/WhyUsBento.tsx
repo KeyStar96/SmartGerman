@@ -13,7 +13,7 @@ const SPRING_PHYSICS = {
     mass: 1,
     stiffness: 120,
     damping: 20,
-};
+} as const;
 
 const STAGGER_DELAY = 0.15;
 
