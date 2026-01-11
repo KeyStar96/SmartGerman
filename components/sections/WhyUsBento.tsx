@@ -52,17 +52,6 @@ function TiltCard({ children, className, glowColor = "#FF5C00" }: { children: Re
                 {/* 1px Reflection Top */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 dark:via-white/20 to-transparent opacity-0 group-hover/tilt:opacity-100 transition-opacity duration-700" />
 
-                {/* Status Dot */}
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 z-20">
-                    <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
-                    </span>
-                    <span className="text-[9px] font-mono text-[#FF5C00]/60 uppercase tracking-wider hidden group-hover/tilt:block transition-all duration-300">
-                        Active
-                    </span>
-                </div>
-
                 {children}
             </div>
         </motion.div>
@@ -95,7 +84,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     if (!t) return null;
 
     return (
-        <section ref={containerRef} className="relative py-32 px-6 md:px-12 bg-transparent overflow-hidden">
+        <section ref={containerRef} className="relative py-32 px-10 md:px-20 bg-transparent overflow-hidden">
             {/* Global Grain Texture Overlay */}
             <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-10 mix-blend-overlay"></div>
 
