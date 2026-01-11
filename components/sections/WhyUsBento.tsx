@@ -10,35 +10,33 @@ import { cn } from "@/lib/utils";
 // --- TACTILE CARDBOARD COMPONENT ---
 // Replaces previous PaperCard with a physically accurate, heavy cardboard feel
 function PaperCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
+    // Paper Texture: Uses the rougher noise texture for more haptics
+    // Light Cards: #F0EFE9 (slightly darker/warmer than #F2EFE9) with reduced noise opacity
+    // Orange Card: #FF5C00 with aggressive noise blend mode (multiply/hard-light) and shadow
     return (
-        <div className={cn("relative h-full w-full group/card", className)}>
-            {/* Main Card Surface - Heavy Cardboard */}
-            <div className={cn(
-                "relative h-full w-full overflow-hidden transition-all duration-300 ease-out",
-                // Base Material Colors: "Natural White / Bone" or "Inked Orange"
-                isOrange ? "bg-[#FF5C00]" : "bg-[#F2EFE9] dark:bg-[#1A1C1E]",
-                // Borders: Physical Cut Edges (Light Bevel)
-                "border-t-[0.5px] border-t-white/40",
-                "border-l-[0.5px] border-l-white/20",
-                // Shadows: Hard, minimal offset (No Glow)
-                "shadow-[2px_2px_0px_rgba(0,0,0,0.08)]"
-            )}>
-                {/* Layer A (Fine Grain) */}
-                <div className={cn(
-                    "absolute inset-0 bg-noise-fine pointer-events-none transition-opacity duration-300",
-                    "mix-blend-overlay opacity-[0.05]"
-                )} />
+        <div
+            className={cn(
+                "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card",
+                isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9]",
+                "border-[0.5px] border-black/10 dark:border-white/5",
+                "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]", // Slight tilt on hover
+                className
+            )}
+        >
+            {/* Paper Texture Overlay */}
+            <div
+                className={cn(
+                    "absolute inset-0 pointer-events-none z-0",
+                    "bg-noise-rough",
+                    isOrange
+                        ? "opacity-20 mix-blend-multiply brightness-110 contrast-125" // Aggressive texture for orange
+                        : "opacity-15 mix-blend-multiply contrast-125" // Subtle but visible for light
+                )}
+            />
 
-                {/* Layer B (Organic Fibers) */}
-                <div className={cn(
-                    "absolute inset-0 bg-noise-fibers pointer-events-none transition-opacity duration-300",
-                    "mix-blend-luminosity opacity-[0.03]"
-                )} />
-
-                {/* Content Container */}
-                <div className="relative z-20 h-full">
-                    {children}
-                </div>
+            {/* Content Container */}
+            <div className="relative z-10 h-full">
+                {children}
             </div>
         </div>
     );
@@ -65,15 +63,13 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     const labelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#FF5C00] mb-6 block";
     const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block border-b border-white/20 pb-2";
 
-    // Letterpress effect: "Stamped" look
-    // Lightmode: #242424 (Graphite) with white bottom-right shadow
-    // Added specific letterpress shadow class
-    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#242424] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500 text-shadow-letterpress dark:text-shadow-letterpress-dark";
+    // Heading: Dry Ink (Charcoal #333) -> Wet Ink (Black #000) on Hover
+    // Tracking tightened for "Swiss Style"
+    const headingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-[#333333] transition-colors duration-500 ease-out group-hover/card:text-black leading-[1.1]";
+    const whiteHeadingStyle = "text-3xl lg:text-4xl font-bold tracking-tighter mb-4 text-white/90 transition-colors duration-500 ease-out group-hover/card:text-white leading-[1.1]";
 
-    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500 text-shadow-letterpress-orange";
-
-    // Body: Graphite #242424
-    const bodyStyle = "text-xl text-[#242424] dark:text-[#E2D7CE]/90 leading-relaxed font-bold tracking-tight";
+    // Body: Dry Ink (#333) -> Wet Ink (#000)
+    const bodyStyle = "text-xl text-[#333333] leading-relaxed font-bold tracking-tight transition-colors duration-500 ease-out group-hover/card:text-black";
 
     const t = dictionary?.WhyUs;
 
@@ -123,7 +119,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-between relative z-10">
                                 <div>
                                     <div className="flex items-center gap-4 mb-2">
-                                        <Brain size={28} strokeWidth={2} className="text-[#FF5C00]" />
+                                        <Brain size={28} strokeWidth={2} className="text-[#FF5C00] transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
                                         <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card1.category}</span>
                                     </div>
                                     <div className="h-[0.5px] w-full bg-black/10 dark:bg-white/10 my-6" />
@@ -152,7 +148,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
 
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-8">
-                                        <GraduationCap size={28} strokeWidth={2} className="text-white" />
+                                        <GraduationCap size={28} strokeWidth={2} className="text-white transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
                                         <span className={whiteLabelStyle.replace("mb-6", "mb-0")}>{t.card2.category}</span>
                                     </div>
 
@@ -165,9 +161,9 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                                             <li key={idx} className="group/item">
                                                 <div className="flex items-start gap-3 mb-1">
                                                     <CheckCircle2 size={18} strokeWidth={2.5} className="mt-0.5 flex-shrink-0 text-white" />
-                                                    <span className="text-base font-bold uppercase tracking-wide text-white">{item.name}</span>
+                                                    <span className="text-base font-bold uppercase tracking-wide text-white group-hover/card:text-white transition-colors duration-500">{item.name}</span>
                                                 </div>
-                                                <p className="pl-8 text-white/90 font-bold text-xs leading-relaxed">{item.desc}</p>
+                                                <p className="pl-8 text-white/90 font-bold text-xs leading-relaxed group-hover/card:text-white transition-colors duration-500">{item.desc}</p>
                                             </li>
                                         ))}
                                     </ul>
@@ -181,7 +177,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                         <PaperCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-20">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Users size={28} strokeWidth={2} className="text-[#FF5C00]" />
+                                    <Users size={28} strokeWidth={2} className="text-[#FF5C00] transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card3.category}</span>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
@@ -199,7 +195,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
                         <PaperCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-20">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <Globe2 size={28} strokeWidth={2} className="text-[#FF5C00]" />
+                                    <Globe2 size={28} strokeWidth={2} className="text-[#FF5C00] transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
                                     <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card4.category}</span>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
