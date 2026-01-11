@@ -76,10 +76,20 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
 
                     {/* Data Points - Transformed into "Lab Labels" */}
                     {/* Top Right Data Block */}
-                    <div className="relative w-full lg:absolute lg:top-0 lg:right-[-20px] z-30 mt-8 lg:mt-0 pointer-events-none flex flex-col items-center lg:items-end gap-2">
+                    <div className="relative w-full lg:absolute lg:top-0 lg:right-[-20px] z-30 mt-8 lg:mt-0 pointer-events-none flex flex-row items-center justify-center lg:justify-end gap-0">
+
+                        {/* Connector Line (Points Left to Brain) - Only visible on Desktop for correct orientation, or adjust logic if needed. 
+                            The user requested: "Füge jedem Label-Block eine feine Linie hinzu... die in Richtung des Gehirns zeigt." 
+                            For the Right Block, the brain is to the LEFT. So Line is LEFT of Label.
+                        */}
+                        <div className="hidden lg:block h-[1px] w-8 bg-[#FF5C00] mr-[-1px] z-20"></div>
+
                         {/* Lab Label Container */}
-                        <div className="backdrop-blur-md bg-[#F0EFE9]/10 dark:bg-[#1A1C1E]/30 border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 rounded-sm">
-                            <div className="font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]/80 text-center lg:text-right space-y-1">
+                        <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
+                            {/* Inner Texture */}
+                            <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
+
+                            <div className="relative font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-right space-y-1">
                                 <div>{dictionary.science.data_points.data_stream_label}: {dictionary.science.data_points.data_stream_value}</div>
                                 <div>{dictionary.science.data_points.neuron_count_label}: {dictionary.science.data_points.neuron_count_value}</div>
                                 <div>{dictionary.science.data_points.signal_speed_label}: {dictionary.science.data_points.signal_speed_value}</div>
@@ -89,14 +99,20 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
 
                     {/* Bottom Left Data Block */}
-                    <div className="relative w-full lg:absolute lg:bottom-0 lg:left-[-20px] z-30 mt-4 lg:mt-0 pointer-events-none flex flex-col items-center lg:items-start gap-2">
+                    <div className="relative w-full lg:absolute lg:bottom-0 lg:left-[-20px] z-30 mt-4 lg:mt-0 pointer-events-none flex flex-row items-center justify-center lg:justify-start gap-0">
                         {/* Lab Label Container */}
-                        <div className="backdrop-blur-md bg-[#F0EFE9]/10 dark:bg-[#1A1C1E]/30 border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 rounded-sm">
-                            <div className="font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]/80 text-center lg:text-left space-y-1">
+                        <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
+                            {/* Inner Texture */}
+                            <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
+
+                            <div className="relative font-mono text-[9px] uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-left space-y-1">
                                 <div>{dictionary.science.data_points.hemisphere_label}: {dictionary.science.data_points.hemisphere_value}</div>
                                 <div>{dictionary.science.data_points.plasticity_label}: {dictionary.science.data_points.plasticity_value}</div>
                             </div>
                         </div>
+
+                        {/* Connector Line (Points Right to Brain) - Brain is to the RIGHT. So Line is RIGHT of Label. */}
+                        <div className="hidden lg:block h-[1px] w-8 bg-[#FF5C00] ml-[-1px] z-20"></div>
                     </div>
                 </div>
             </div>
