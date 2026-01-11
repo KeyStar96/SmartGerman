@@ -97,11 +97,18 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                 {/* Inner Texture */}
                                 <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
 
-                                <div className="relative font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-right space-y-1">
-                                    <div>{dictionary.science.data_points.data_stream_label}: {dictionary.science.data_points.data_stream_value}</div>
-                                    <div>{dictionary.science.data_points.neuron_count_label}: {dictionary.science.data_points.neuron_count_value}</div>
-                                    <div>{dictionary.science.data_points.signal_speed_label}: {dictionary.science.data_points.signal_speed_value}</div>
-                                    <div className="text-[#FF5C00] font-bold">{dictionary.science.data_points.synapse_firing_label}: {dictionary.science.data_points.synapse_firing_value}</div>
+                                <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
+                                    <span className="opacity-70">{dictionary.science.data_points.data_stream_label}:</span>
+                                    <span>{dictionary.science.data_points.data_stream_value}</span>
+
+                                    <span className="opacity-70">{dictionary.science.data_points.neuron_count_label}:</span>
+                                    <span>{dictionary.science.data_points.neuron_count_value}</span>
+
+                                    <span className="opacity-70">{dictionary.science.data_points.signal_speed_label}:</span>
+                                    <span>{dictionary.science.data_points.signal_speed_value}</span>
+
+                                    <span className="opacity-70 text-[#FF5C00]">{dictionary.science.data_points.synapse_firing_label}:</span>
+                                    <span className="text-[#FF5C00] font-bold">{dictionary.science.data_points.synapse_firing_value}</span>
                                 </div>
                             </div>
                         </div>
@@ -118,9 +125,12 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                 {/* Inner Texture */}
                                 <div className="absolute inset-0 bg-noise-paper opacity-10 pointer-events-none"></div>
 
-                                <div className="relative font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE] text-center lg:text-left space-y-1">
-                                    <div>{dictionary.science.data_points.hemisphere_label}: {dictionary.science.data_points.hemisphere_value}</div>
-                                    <div>{dictionary.science.data_points.plasticity_label}: {dictionary.science.data_points.plasticity_value}</div>
+                                <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
+                                    <span className="opacity-70">{dictionary.science.data_points.hemisphere_label}:</span>
+                                    <span>{dictionary.science.data_points.hemisphere_value}</span>
+
+                                    <span className="opacity-70">{dictionary.science.data_points.plasticity_label}:</span>
+                                    <span>{dictionary.science.data_points.plasticity_value}</span>
                                 </div>
                             </div>
 
