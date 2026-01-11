@@ -7,21 +7,29 @@ import { cn } from "@/lib/utils";
 
 // --- TACTILE PAPER CARD COMPONENT ---
 // Removed "Tilt" 3D logic for a flatter, more solid print aesthetic
+// --- TACTILE CARDBOARD COMPONENT ---
+// Replaces previous PaperCard with a physically accurate, heavy cardboard feel
 function PaperCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
     return (
-        <div className={cn("relative h-full w-full group/paper", className)}>
-            {/* Main Card Surface - Solid & Heavy */}
+        <div className={cn("relative h-full w-full group/card", className)}>
+            {/* Main Card Surface - Heavy Cardboard */}
             <div className={cn(
-                "relative h-full w-full overflow-hidden transition-transform duration-500",
-                // Base Material Colors
-                isOrange ? "bg-[#FF5C00]" : "bg-[#FCF4E6] dark:bg-[#1A1C1E]",
-                // Border: Hairline precision (0.5px)
-                "border-[0.5px] border-black/10 dark:border-white/10",
-                // No soft shadows requested
-                "shadow-none"
+                "relative h-full w-full overflow-hidden transition-all duration-300 ease-out",
+                // Base Material Colors: "Natural White / Bone" or "Inked Orange"
+                isOrange ? "bg-[#FF5C00]" : "bg-[#F2EFE9] dark:bg-[#1A1C1E]",
+                // Borders: Hairline definition + Top-edge light bevel
+                "border-[1px] border-black/10 dark:border-white/10",
+                "border-t-[0.5px] border-t-white/40 dark:border-t-white/20",
+                // Shadows: Hard, minimal offset (No Glow)
+                "shadow-[2px_2px_0px_rgba(0,0,0,0.05)] dark:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
             )}>
-                {/* Noise Texture Integration (8-12% opacity) */}
-                <div className="absolute inset-0 bg-noise opacity-[0.12] mix-blend-overlay pointer-events-none z-10" />
+                {/* Fiber-Noise Layer - Interacts via Blend Mode */}
+                <div className={cn(
+                    "absolute inset-0 bg-noise-tactile pointer-events-none z-10 transition-opacity duration-300",
+                    isOrange ? "opacity-20 mix-blend-soft-light" : "opacity-10 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5",
+                    // Hover: Texture gets slightly more visible (coming closer)
+                    "group-hover/card:opacity-20 dark:group-hover/card:opacity-10"
+                )} />
 
                 {/* Content Container */}
                 <div className="relative z-20 h-full">
@@ -50,12 +58,17 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
 
     // Typography & Style Constants
     // Typography & Style Constants
-    const labelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#FF5C00] mb-6 block drop-shadow-[0_1px_0_rgba(255,255,255,0.5)] dark:drop-shadow-none";
+    const labelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-[#FF5C00] mb-6 block";
     const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block border-b border-white/20 pb-2";
-    // Letterpress effect: Inside shadow mimic via text intent or subtle drop shadow for depth
-    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#2D3436] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500 drop-shadow-[0_1px_0_rgba(255,255,255,0.8)] dark:drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]";
-    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500 text-shadow-sm";
-    const bodyStyle = "text-xl text-[#2D3436] dark:text-[#E2D7CE]/90 leading-relaxed font-bold tracking-tight"; // "Fett, scharf"
+
+    // Letterpress effect: "Stamped" look
+    // Lightmode: #242424 (Graphite) with white bottom-right shadow
+    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#242424] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500 text-shadow-letterpress-light dark:text-shadow-letterpress-dark";
+
+    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500 text-shadow-letterpress-light";
+
+    // Body: Graphite #242424
+    const bodyStyle = "text-xl text-[#242424] dark:text-[#E2D7CE]/90 leading-relaxed font-bold tracking-tight";
 
     const t = dictionary?.WhyUs;
 

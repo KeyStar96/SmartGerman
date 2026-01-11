@@ -202,6 +202,22 @@ html {
   mix-blend-mode: overlay;
 }
 
+/* 2. Tactile Cardboard Noise - High frequency for paper feel */
+.bg-noise-tactile {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 100px 100px;
+}
+
+/* Letterpress text shadow utility */
+.text-shadow-letterpress-light {
+  text-shadow: 0.5px 0.5px 0px rgba(255, 255, 255, 0.5);
+}
+
+.dark .text-shadow-letterpress-dark {
+  text-shadow: 0.5px 0.5px 0px rgba(0, 0, 0, 0.5);
+}
+
 .bg-scanlines {
   background: repeating-linear-gradient(0deg,
       transparent,
