@@ -8,7 +8,7 @@ export default function WhyUsBento() {
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
-    const cardStyles = "relative overflow-hidden border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 bg-white/40 dark:bg-[#1A1C1E]/40 backdrop-blur-md transition-all duration-700 hover:border-[#FF5C00]/40 group p-12 lg:p-16 flex flex-col justify-between hover:shadow-2xl hover:shadow-[#FF5C00]/5 bg-noise";
+    const cardStyles = "relative overflow-hidden border-[0.5px] border-[#2D3436]/10 dark:border-[#E2D7CE]/10 bg-white/80 dark:bg-[#1A1C1E]/80 backdrop-blur-xl transition-all duration-700 hover:border-[#FF5C00]/40 group p-12 lg:p-16 flex flex-col justify-between hover:shadow-2xl hover:shadow-[#FF5C00]/5 bg-noise text-[#2D3436] dark:text-[#E2D7CE]";
 
     return (
         <section ref={containerRef} className="relative py-32 px-6 md:px-12 bg-transparent overflow-hidden">
@@ -44,11 +44,11 @@ export default function WhyUsBento() {
                                 Gehirngerechtes Lernen <br />
                                 <span className="text-[#FF5C00]">statt Standard-Kurs.</span>
                             </h3>
-                            <div className="space-y-6 text-xl font-light leading-relaxed opacity-90">
+                            <div className="space-y-6 text-xl font-normal leading-relaxed text-[#2D3436]/90 dark:text-[#E2D7CE]/90">
                                 <p>
                                     Auf Basis unseres Studiums an der <b>TU Braunschweig</b> und der <b>Universität Hannover</b> untersuchen wir, wie Lehrmethoden biologisch angepasst werden müssen, damit sie dem reiferen Gehirn gerecht werden.
                                 </p>
-                                <p className="text-lg opacity-70">
+                                <p className="text-lg text-[#2D3436]/80 dark:text-[#E2D7CE]/80">
                                     Herkömmliche Standard-Methoden überfordern Lernende ab 50 oft. Wir nutzen Erkenntnisse aus der Biologie und Neuroplastizität, um den Spracherwerb effizient und stressfrei zu gestalten.
                                 </p>
                             </div>
