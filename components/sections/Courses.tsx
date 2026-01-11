@@ -128,10 +128,10 @@ export default function Courses({ dictionary }: CoursesSectionProps) {
             </AnimatePresence>
           </div>
 
-          {/* Sticky USP Note (Desktop) */}
-          <div className="hidden lg:block lg:col-span-4 relative pl-8">
-            <div className="sticky top-32">
-              <div className="relative bg-[#FF5C00] shadow-[2px_10px_40px_rgba(0,0,0,0.15)] border border-black/10 overflow-hidden p-8 rotate-1 transform transition-transform hover:rotate-0 duration-500 origin-top">
+          {/* Sticky USP Note */}
+          <div className="lg:col-span-4 relative lg:pl-8 mt-12 lg:mt-0">
+            <div className="lg:sticky lg:top-32">
+              <div className="relative bg-[#FF5C00] shadow-[4px_12px_40px_rgba(0,0,0,0.15)] border border-black/10 overflow-hidden p-8 rotate-0 lg:rotate-1 transform transition-transform hover:rotate-0 duration-500 origin-top">
 
                 {/* Paper Texture for Orange Card */}
                 <div className="absolute inset-0 pointer-events-none z-0 bg-noise-paper opacity-50 mix-blend-overlay brightness-110" />
@@ -205,28 +205,28 @@ function CourseRow({
         <div className="flex items-center gap-6 md:gap-12 flex-1">
           {/* Badge / Level */}
           <div className="flex-shrink-0 w-16">
-            <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase ${jetbrainsMono.className} bg-[#FF5C00]/5 text-[#FF5C00] border border-[#FF5C00]/10`}>
+            <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase ${jetbrainsMono.className} bg-[#FF5C00]/5 text-[#FF5C00] border-[0.5px] border-[#FF5C00]/20`}>
               {course.level}
             </span>
           </div>
 
-          {/* Title */}
-          <h3 className={`${instrumentSerif.className} text-2xl md:text-3xl text-[#1A1A1A] dark:text-[#E2D7CE] group-hover:text-[#FF5C00] dark:group-hover:text-[#FF5C00] transition-colors`}>
+          {/* Title - Larger & Dominant */}
+          <h3 className={`${instrumentSerif.className} text-3xl lg:text-4xl text-[#1A1A1A] dark:text-[#E2D7CE] group-hover:text-[#FF5C00] dark:group-hover:text-[#FF5C00] transition-colors`}>
             {course.title}
           </h3>
         </div>
 
         {/* Right Info (Time & Arrow) */}
         <div className="flex items-center gap-4 md:gap-8">
-          <div className={`hidden md:flex items-center gap-2 text-sm text-[#1A1A1A]/50 dark:text-[#E2D7CE]/50 ${jetbrainsMono.className} tracking-tight`}>
-            <Clock className="w-4 h-4" />
+          <div className={`hidden md:flex items-center gap-2 text-xs uppercase tracking-widest text-[#1A1A1A]/50 dark:text-[#E2D7CE]/50 ${jetbrainsMono.className}`}>
+            <Clock className="w-3 h-3" />
             <span>{course.time.split('&')[0]}...</span> {/* Truncate for closed view */}
           </div>
 
           <motion.div
             animate={{ rotate: isExpanded ? 180 : 0 }}
             transition={{ duration: 0.3 }}
-            className="text-[#1A1A1A]/40 dark:text-[#E2D7CE]/40 group-hover:text-[#FF5C00] dark:group-hover:text-[#FF5C00] transition-colors"
+            className="text-[#1A1A1A]/40 dark:text-[#E2D7CE]/40 group-hover:text-[#FF5C00] dark:group-hover:text-[#FF5C00] transition-colors group-hover:translate-y-1"
           >
             <ChevronDown className="w-6 h-6" />
           </motion.div>
