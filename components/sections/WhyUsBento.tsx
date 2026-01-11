@@ -17,18 +17,22 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
                 "relative h-full w-full overflow-hidden transition-all duration-300 ease-out",
                 // Base Material Colors: "Natural White / Bone" or "Inked Orange"
                 isOrange ? "bg-[#FF5C00]" : "bg-[#F2EFE9] dark:bg-[#1A1C1E]",
-                // Borders: Hairline definition + Top-edge light bevel
-                "border-[1px] border-black/10 dark:border-white/10",
-                "border-t-[0.5px] border-t-white/40 dark:border-t-white/20",
+                // Borders: Physical Cut Edges (Light Bevel)
+                "border-t-[0.5px] border-t-white/40",
+                "border-l-[0.5px] border-l-white/20",
                 // Shadows: Hard, minimal offset (No Glow)
-                "shadow-[2px_2px_0px_rgba(0,0,0,0.05)] dark:shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                "shadow-[2px_2px_0px_rgba(0,0,0,0.08)]"
             )}>
-                {/* Fiber-Noise Layer - Interacts via Blend Mode */}
+                {/* Layer A (Fine Grain) */}
                 <div className={cn(
-                    "absolute inset-0 bg-noise-tactile pointer-events-none z-10 transition-opacity duration-300",
-                    isOrange ? "opacity-20 mix-blend-soft-light" : "opacity-10 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5",
-                    // Hover: Texture gets slightly more visible (coming closer)
-                    "group-hover/card:opacity-20 dark:group-hover/card:opacity-10"
+                    "absolute inset-0 bg-noise-fine pointer-events-none z-30 transition-opacity duration-300",
+                    "mix-blend-multiply opacity-[0.12]"
+                )} />
+
+                {/* Layer B (Organic Fibers) */}
+                <div className={cn(
+                    "absolute inset-0 bg-noise-fibers pointer-events-none z-30 transition-opacity duration-300",
+                    "mix-blend-multiply opacity-[0.12]"
                 )} />
 
                 {/* Content Container */}
@@ -63,9 +67,10 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
 
     // Letterpress effect: "Stamped" look
     // Lightmode: #242424 (Graphite) with white bottom-right shadow
-    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#242424] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500 text-shadow-letterpress-light dark:text-shadow-letterpress-dark";
+    // Added specific letterpress shadow class
+    const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#242424] dark:text-[#E2D7CE] uppercase mb-6 transition-all duration-500 text-shadow-letterpress dark:text-shadow-letterpress-dark";
 
-    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500 text-shadow-letterpress-light";
+    const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 transition-all duration-500 text-shadow-letterpress-orange";
 
     // Body: Graphite #242424
     const bodyStyle = "text-xl text-[#242424] dark:text-[#E2D7CE]/90 leading-relaxed font-bold tracking-tight";
@@ -76,8 +81,8 @@ export default function WhyUsBento({ dictionary }: { dictionary: any }) {
 
     return (
         <section ref={containerRef} className="relative py-32 bg-transparent">
-            {/* Global Grain Texture Overlay - Static Grain over the entire section */}
-            <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-[0.08] mix-blend-overlay"></div>
+            {/* Global Grain Texture Overlay - Removed to avoid conflict with card textures */}
+            {/* <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-[0.08] mix-blend-overlay"></div> */}
 
             <div className="container mx-auto px-6 md:px-12 relative z-10">
 

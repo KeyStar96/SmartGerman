@@ -202,16 +202,28 @@ html {
   mix-blend-mode: overlay;
 }
 
-/* 2. Tactile Cardboard Noise - High frequency for paper feel */
-.bg-noise-tactile {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+/* 2. Tactile Cardboard Noise - Layer System */
+/* Layer A: Fine Grain (Base) */
+.bg-noise-fine {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 100px 100px;
 }
 
+/* Layer B: Organic Fibers (Structure) */
+.bg-noise-fibers {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.02' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
 /* Letterpress text shadow utility */
-.text-shadow-letterpress-light {
-  text-shadow: 0.5px 0.5px 0px rgba(255, 255, 255, 0.5);
+.text-shadow-letterpress {
+  text-shadow: 0.5px 0.5px 0px rgba(255, 255, 255, 0.4);
+}
+
+.text-shadow-letterpress-orange {
+  text-shadow: 0.5px 0.5px 0px rgba(255, 255, 255, 0.4);
 }
 
 .dark .text-shadow-letterpress-dark {
