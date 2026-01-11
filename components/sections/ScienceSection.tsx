@@ -39,12 +39,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         </p>
                     </div>
 
-                    <div className="mt-16 flex items-center gap-6">
-                        <div className="h-[1px] w-12 bg-[#FF5C00]" />
-                        <span className="font-mono text-[9px] tracking-[0.4em] uppercase opacity-40">
-                            {dictionary.science.layer_active}
-                        </span>
-                    </div>
+
                 </div>
 
                 {/* Right: The Brain Composition */}

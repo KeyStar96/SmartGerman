@@ -262,12 +262,12 @@
     "friday": "Friday"
   },
   "science": {
-    "protocol": "// COGNITIVE_PROTOCOL_v0.4",
+    "protocol": "Scientific Foundation",
     "title_part1": "Science",
     "title_part2": "meets Plasticity.",
     "description_1": "Language acquisition is not just memorization. It is the physical restructuring of your brain. We use scientifically proven methods to specifically stimulate neural plasticity.",
     "description_2": "Through adaptive learning algorithms and cognitive triggers, we create new synaptic connections that make the decisive difference, especially in adulthood.",
-    "layer_active": "Neural Mapping Layer Active",
+    "layer_active": "Neural Plasticity",
     "data_points": {
       "data_stream_label": "DATA_STREAM",
       "data_stream_value": "ACTIVE",

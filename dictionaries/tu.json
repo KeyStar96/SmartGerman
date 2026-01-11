@@ -262,12 +262,12 @@
     "friday": "Cuma"
   },
   "science": {
-    "protocol": "// COGNITIVE_PROTOCOL_v0.4",
+    "protocol": "Bilimsel Temel",
     "title_part1": "Bilim",
     "title_part2": "Plastisite ile Buluşuyor.",
     "description_1": "Dil öğrenimi sadece ezberlemek değildir. Beyninizin fiziksel olarak yeniden yapılandırılmasıdır. Nöronal plastisiteyi özel olarak uyarmak için bilimsel olarak kanıtlanmış yöntemler kullanıyoruz.",
     "description_2": "Uyarlanabilir öğrenme algoritmaları ve bilişsel tetikleyiciler sayesinde, özellikle yetişkinlikte belirleyici farkı yaratan yeni sinaptik bağlantılar oluşturuyoruz.",
-    "layer_active": "Nöronal Haritalama Katmanı Aktif",
+    "layer_active": "Nöronal Plastisite",
     "data_points": {
       "data_stream_label": "VERİ_AKIŞI",
       "data_stream_value": "AKTİF",

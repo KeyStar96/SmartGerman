@@ -262,12 +262,12 @@
     "friday": "Freitag"
   },
   "science": {
-    "protocol": "// COGNITIVE_PROTOCOL_v0.4",
+    "protocol": "Wissenschaftliches Fundament",
     "title_part1": "Wissenschaft",
     "title_part2": "trifft Plastizität.",
     "description_1": "Spracherwerb ist kein bloßes Auswendiglernen. Es ist die physische Umstrukturierung Ihres Gehirns. Wir nutzen wissenschaftlich fundierte Methoden, um die neuronale Plastizität gezielt zu stimulieren.",
     "description_2": "Durch adaptive Lernalgorithmen und kognitive Trigger schaffen wir neue synaptische Verbindungen, die besonders im Erwachsenenalter den entscheidenden Unterschied machen.",
-    "layer_active": "Neural Mapping Layer Active",
+    "layer_active": "Neuronale Plastizität",
     "data_points": {
       "data_stream_label": "DATENSTROM",
       "data_stream_value": "AKTIV",
