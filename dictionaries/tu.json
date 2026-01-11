@@ -290,5 +290,46 @@
       "privacy": "Gizlilik",
       "agb": "Şartlar"
     }
+  },
+  "WhyUs": {
+    "header": {
+      "label": "Nitelikler ve Arka Plan",
+      "title_Line1": "Bilimsel",
+      "title_Line2": "Temel."
+    },
+    "card1": {
+      "category": "Üniversite Araştırması",
+      "title": "Standart devlet kursları neden sıklıkla başarısız olur?",
+      "text": "Geleneksel yöntemler (BAMF gibi) genellikle 50 yaşından sonra beyindeki biyolojik değişiklikleri dikkate almaz. TU Braunschweig ve Hannover Üniversitesi'ndeki güncel araştırmalarımızda şunu gösteriyoruz: İleri yaşta başarılı öğrenme, doğal nöroplastisiteyi aşırı yüklemek yerine onu kullanan uyarlanmış yöntemler gerektirir.",
+      "specialization": "Uzmanlık: DaF / DaZ & Biyoloji"
+    },
+    "card2": {
+      "category": "Akademik Uzmanlık",
+      "title": "Üniversiteden sağlam bilgi.",
+      "items": [
+        {
+          "name": "TU Braunschweig",
+          "desc": "DaF/DaZ Eğitimi (Yabancı/İkinci Dil Olarak Almanca)"
+        },
+        {
+          "name": "Leibniz Üniversitesi Hannover",
+          "desc": "Eğitim Yüksek Lisans & Bilim Lisans (Biyoloji & Almanca)"
+        },
+        {
+          "name": "Uzmanlık",
+          "desc": "Çok dilli ve kültürlerarası eğitimde sertifikalı yetkinlik"
+        }
+      ]
+    },
+    "card3": {
+      "category": "Deneyim",
+      "title": "Pratikte kanıtlanmış.",
+      "text": "2023'ten bu yana Aşağı Saksonya Ukrayna Derneği e.V. için Almanca kursları yönetiyoruz. Karşılama sınıflarındaki çalışmalarımız ve Hannover Üniversitesi'nde İkinci Dil Olarak Almanca alanındaki öğrenci asistanlığımız sayesinde, karşılaştığınız gerçek engelleri biliyoruz."
+    },
+    "card4": {
+      "category": "İki Dillilik",
+      "title": "İki ana dil: Almanca & Rusça.",
+      "text": "Tamamen iki dilli olarak büyüdük. Bu, karmaşık kuralları doğrudan ana dilinizde açıklamamıza olanak tanır. Öğrenci olarak bakış açınızı daha iyi anlamak için şu anda kendimiz Türkçe öğreniyoruz - bu yüzden her şeye yeniden başlamanın nasıl bir his olduğunu tam olarak biliyoruz."
+    }
   }
 }

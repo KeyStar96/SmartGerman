@@ -79,7 +79,7 @@ const itemVariants = {
     }
 };
 
-export default function WhyUsBento() {
+export default function WhyUsBento({ dictionary }: { dictionary: any }) {
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
@@ -88,7 +88,11 @@ export default function WhyUsBento() {
     const whiteLabelStyle = "font-mono text-xs font-bold uppercase tracking-widest text-white/90 mb-6 block";
     const headingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-[#2D3436] dark:text-[#E2D7CE] uppercase mb-6 group-hover/tilt:font-black transition-all duration-500";
     const whiteHeadingStyle = "text-3xl lg:text-4xl font-sans font-bold tracking-tighter leading-[1.1] text-white uppercase mb-8 group-hover/tilt:font-black transition-all duration-500";
-    const bodyStyle = "text-xl leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]/90 font-normal";
+    const bodyStyle = "text-xl text-[#2D3436]/80 dark:text-[#E2D7CE]/80 leading-relaxed font-medium";
+
+    const t = dictionary?.WhyUs;
+
+    if (!t) return null;
 
     return (
         <section ref={containerRef} className="relative py-32 px-6 md:px-12 bg-transparent overflow-hidden">
@@ -98,20 +102,20 @@ export default function WhyUsBento() {
             <div className="container mx-auto relative z-10">
 
                 {/* Header: Klar und seriös */}
-                <div className="mb-24">
+                <div className="mb-20">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={isInView ? { opacity: 1, x: 0 } : {}}
                         transition={{ delay: 0.2 }}
-                        className="inline-block mb-6 pl-4 border-l-2 border-[#FF5C00]"
+                        className="inline-block mb-4"
                     >
-                        <span className="font-mono text-xs font-bold tracking-[0.3em] text-[#FF5C00] uppercase">
-                            [ Qualification &amp; Background ]
+                        <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
+                            {t.header.label}
                         </span>
                     </motion.div>
-                    <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none">
-                        Wissenschaftliche <br />
-                        <span className="text-[#FF5C00]">Fundierung.</span>
+                    <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none">
+                        {t.header.title_Line1} <br />
+                        <span className="text-[#FF5C00]">{t.header.title_Line2}</span>
                     </h2>
                 </div>
 
@@ -130,39 +134,26 @@ export default function WhyUsBento() {
 
                     {/* KARTE 1: Forschung & Biologie (7 Spalten, 3 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-7 md:row-span-3 relative">
-                        {/* Grid Break Element - Stamp */}
-                        <div className="absolute -top-6 -right-6 z-30 rotate-12 opacity-0 lg:opacity-100 transition-opacity duration-700 delay-1000">
-                            <div className="w-24 h-24 border-4 border-[#FF5C00]/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                                <span className="font-mono text-[10px] text-[#FF5C00] font-bold uppercase tracking-widest text-center leading-tight rotate-[-12deg]">
-                                    Scientific<br />Verified
-                                </span>
-                            </div>
-                        </div>
-
                         <TiltCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-between relative z-10">
                                 <div>
                                     <div className="flex items-center gap-4 mb-2">
                                         <Brain size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
-                                        <span className={labelStyle.replace("mb-6", "mb-0")}>Universitäre Forschung</span>
+                                        <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card1.category}</span>
                                     </div>
                                     <div className="h-px w-full bg-[#2D3436]/10 dark:bg-[#E2D7CE]/10 my-6" />
 
                                     <h3 className={headingStyle}>
-                                        Gehirngerechtes Lernen <br />
-                                        <span className="text-[#FF5C00]">statt Standard-Kurs.</span>
+                                        {t.card1.title}
                                     </h3>
                                     <div className={bodyStyle}>
-                                        <p className="mb-4">
-                                            Auf Basis unseres Studiums an der <b>TU Braunschweig</b> und der <b>Universität Hannover</b> untersuchen wir, wie Lehrmethoden biologisch angepasst werden müssen.
-                                        </p>
                                         <p className="opacity-90 leading-relaxed text-lg">
-                                            Wir nutzen Erkenntnisse aus der Biologie, um den Spracherwerb stressfrei zu gestalten.
+                                            {t.card1.text}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 mt-6 text-xs font-mono text-[#FF5C00] font-bold uppercase tracking-widest pl-4 border-l border-[#FF5C00]/30">
-                                    Spezialisierung: DaF / DaZ & Biologie
+                                    {t.card1.specialization}
                                 </div>
                             </div>
                         </TiltCard>
@@ -178,19 +169,15 @@ export default function WhyUsBento() {
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-4 mb-8">
                                         <GraduationCap size={28} strokeWidth={1.5} className="text-white" />
-                                        <span className={whiteLabelStyle.replace("mb-6", "mb-0")}>Bildungsweg</span>
+                                        <span className={whiteLabelStyle.replace("mb-6", "mb-0")}>{t.card2.category}</span>
                                     </div>
 
                                     <h3 className={whiteHeadingStyle}>
-                                        Expertise von <br />der Universität.
+                                        {t.card2.title}
                                     </h3>
 
                                     <ul className="space-y-6 mt-6">
-                                        {[
-                                            { name: "TU Braunschweig", desc: "Studium DaF/DaZ" },
-                                            { name: "Universität Hannover", desc: "M.Ed. / B.Sc." },
-                                            { name: "Zertifiziert", desc: "Mehrsprachigkeit & Interk. Bildung" }
-                                        ].map((item, idx) => (
+                                        {t.card2.items.map((item: any, idx: number) => (
                                             <li key={idx} className="group/item">
                                                 <div className="flex items-start gap-3 mb-1">
                                                     <CheckCircle2 size={18} strokeWidth={2} className="mt-0.5 flex-shrink-0" />
@@ -211,11 +198,11 @@ export default function WhyUsBento() {
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-center">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Users size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
-                                    <span className={labelStyle.replace("mb-6", "mb-0")}>Praxiserfahrung</span>
+                                    <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card3.category}</span>
                                 </div>
-                                <h3 className={headingStyle}>Erprobt im Feld.</h3>
+                                <h3 className={headingStyle}>{t.card3.title}</h3>
                                 <p className={bodyStyle}>
-                                    Langjährige Arbeit mit dem <b>Ukrainischen Verein in Niedersachsen e.V.</b>. Wir kennen die realen Hürden.
+                                    {t.card3.text}
                                 </p>
                             </div>
                         </TiltCard>
@@ -227,11 +214,11 @@ export default function WhyUsBento() {
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-center">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Globe2 size={24} strokeWidth={1.5} className="text-[#FF5C00]" />
-                                    <span className={labelStyle.replace("mb-6", "mb-0")}>Bilingualität</span>
+                                    <span className={labelStyle.replace("mb-6", "mb-0")}>{t.card4.category}</span>
                                 </div>
-                                <h3 className={headingStyle}>Zwei Muttersprachen.</h3>
+                                <h3 className={headingStyle}>{t.card4.title}</h3>
                                 <p className={bodyStyle}>
-                                    Vollständig zweisprachig aufgewachsen (DE/RU). Zusätzlich lernen wir aktuell <b>Türkisch</b>.
+                                    {t.card4.text}
                                 </p>
                             </div>
                         </TiltCard>

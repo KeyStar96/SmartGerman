@@ -290,5 +290,46 @@
       "privacy": "Datenschutz",
       "agb": "AGB"
     }
+  },
+  "WhyUs": {
+    "header": {
+      "label": "Qualifikation & Hintergrund",
+      "title_Line1": "Wissenschaftliche",
+      "title_Line2": "Fundierung."
+    },
+    "card1": {
+      "category": "Universitäre Forschung",
+      "title": "Warum staatliche Standard-Kurse oft scheitern.",
+      "text": "Herkömmliche Methoden (wie die des BAMF) nehmen oft keine Rücksicht auf die biologischen Veränderungen des Gehirns ab 50. In unserer aktuellen Forschung an der TU Braunschweig und der Universität Hannover zeigen wir: Erfolgreiches Lernen im Alter erfordert angepasste Methoden, die die natürliche Neuroplastizität nutzen, statt sie zu überfordern.",
+      "specialization": "Spezialisierung: DaF / DaZ & Biologie"
+    },
+    "card2": {
+      "category": "Akademische Expertise",
+      "title": "Fundiertes Wissen von der Universität.",
+      "items": [
+        {
+          "name": "TU Braunschweig",
+          "desc": "Studium DaF/DaZ (Deutsch als Fremdsprache/Zweitsprache)"
+        },
+        {
+          "name": "Leibniz Universität Hannover",
+          "desc": "Master of Education & Bachelor of Science (Biologie & Deutsch)"
+        },
+        {
+          "name": "Spezialisierung",
+          "desc": "Zertifizierte Kompetenz in Mehrsprachigkeit und interkultureller Bildung"
+        }
+      ]
+    },
+    "card3": {
+      "category": "Erfahrung",
+      "title": "Erprobt in der Praxis.",
+      "text": "Seit 2023 leiten wir Deutschkurse für den Ukrainischen Verein in Niedersachsen e.V. Durch unsere Arbeit in Willkommensklassen und als studentische Hilfskraft im Bereich Deutsch als Zweitsprache an der Universität Hannover kennen wir die realen Hürden, vor denen Sie stehen."
+    },
+    "card4": {
+      "category": "Bilingualität",
+      "title": "Zwei Muttersprachen: Deutsch & Russisch.",
+      "text": "Wir sind vollständig zweisprachig aufgewachsen. Das erlaubt es uns, komplexe Regeln direkt in Ihrer Muttersprache zu erklären. Um Ihre Perspektive als Lernende noch besser zu verstehen, lernen wir aktuell selbst Türkisch – wir wissen also genau, wie es sich anfühlt, noch einmal neu anzufangen."
+    }
   }
 }

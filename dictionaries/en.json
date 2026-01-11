@@ -290,5 +290,46 @@
       "privacy": "Privacy",
       "agb": "Terms"
     }
+  },
+  "WhyUs": {
+    "header": {
+      "label": "Qualifications & Background",
+      "title_Line1": "Scientific",
+      "title_Line2": "Foundation."
+    },
+    "card1": {
+      "category": "University Research",
+      "title": "Why standard government courses often fail.",
+      "text": "Traditional methods (like those of the BAMF) often take no account of the biological changes in the brain after 50. In our current research at TU Braunschweig and the University of Hannover, we show: Successful learning in old age requires adapted methods that use natural neuroplasticity instead of overwhelming it.",
+      "specialization": "Specialization: GFL / GSL & Biology"
+    },
+    "card2": {
+      "category": "Academic Expertise",
+      "title": "Solid knowledge from the university.",
+      "items": [
+        {
+          "name": "TU Braunschweig",
+          "desc": "Studies GFL/GSL (German as a Foreign/Second Language)"
+        },
+        {
+          "name": "Leibniz University Hannover",
+          "desc": "Master of Education & Bachelor of Science (Biology & German)"
+        },
+        {
+          "name": "Specialization",
+          "desc": "Certified competence in multilingualism and intercultural education"
+        }
+      ]
+    },
+    "card3": {
+      "category": "Experience",
+      "title": "Proven in practice.",
+      "text": "Since 2023, we have been leading German courses for the Ukrainian Association in Lower Saxony e.V. Through our work in welcome classes and as a student assistant in the field of German as a Second Language at the University of Hannover, we know the real hurdles you face."
+    },
+    "card4": {
+      "category": "Bilingualism",
+      "title": "Two mother tongues: German & Russian.",
+      "text": "We grew up completely bilingual. This allows us to explain complex rules directly in your native language. To understand your perspective as a learner even better, we are currently learning Turkish ourselves – so we know exactly how it feels to start all over again."
+    }
   }
 }
