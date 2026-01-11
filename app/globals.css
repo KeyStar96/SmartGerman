@@ -202,6 +202,22 @@ html {
   mix-blend-mode: overlay;
 }
 
+.bg-scanlines {
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.1) 3px);
+  background-size: 100% 3px;
+  pointer-events: none;
+}
+
+.dark .bg-scanlines {
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.05) 3px);
+}
+
 /* 2. Der eigentliche Glass-Style - Chrome optimiert */
 .glass-panel {
   /* Basis-Transparenz */
