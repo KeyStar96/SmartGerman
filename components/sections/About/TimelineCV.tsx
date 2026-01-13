@@ -103,8 +103,7 @@ export default function TimelineCV({ title, items }: TimelineCVProps) {
                 </div>
             </div>
 
-            {/* Bottom Decoration fading out */}
-            <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#FAFAFA] dark:from-[#1A1A1A] to-transparent pointer-events-none" />
+
         </div>
     );
 }
