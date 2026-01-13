@@ -489,5 +489,61 @@
       "title": "Zwei Muttersprachen: Deutsch & Russisch.",
       "text": "Wir sind vollständig zweisprachig aufgewachsen. Das erlaubt es uns, komplexe Regeln direkt in Ihrer Muttersprache zu erklären. Um Ihre Perspektive als Lernende noch besser zu verstehen, lernen wir aktuell selbst Türkisch – wir wissen also genau, wie es sich anfühlt, noch einmal neu anzufangen."
     }
+  },
+  "about_v2": {
+    "headline": "Anastasia Sitov - Gründerin & Lehrkraft",
+    "subline": "Wissenschaftlich fundiert. Zweisprachig. Empathisch.",
+    "body": "Zweisprachig aufgewachsen, verstehe ich die Herausforderungen des Sprachenlernens aus eigener Erfahrung. Mein Ansatz kombiniert neurobiologische Erkenntnisse mit individuellen Lernstrategien – für ein Lernen im eigenen Tempo, das wirklich funktioniert.",
+    "timeline": {
+      "title": "Akademischer Werdegang",
+      "items": [
+        {
+          "year": "2024",
+          "title": "DaF/DaZ Zertifizierung",
+          "institution": "TU Braunschweig"
+        },
+        {
+          "year": "2022",
+          "title": "Master of Education",
+          "institution": "Leibniz Uni Hannover",
+          "desc": "Fokus: Neuroplastizität"
+        },
+        {
+          "year": "2018",
+          "title": "B.Sc. Biologie",
+          "institution": "Leibniz Uni Hannover"
+        },
+        {
+          "year": "2010-2018",
+          "title": "Abitur",
+          "institution": "Gymnasium Stolzenau"
+        }
+      ]
+    },
+    "languages": {
+      "title": "Sprachkompetenz",
+      "items": [
+        {
+          "code": "DE",
+          "name": "Deutsch",
+          "level": "Muttersprache"
+        },
+        {
+          "code": "RU",
+          "name": "Russisch",
+          "level": "Muttersprache"
+        },
+        {
+          "code": "EN",
+          "name": "Englisch",
+          "level": "C1 Fließend"
+        },
+        {
+          "code": "FR/TR",
+          "name": "Französisch / Türkisch",
+          "level": "A2 Grundkenntnisse"
+        }
+      ]
+    }
   }
 }

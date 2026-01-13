@@ -349,5 +349,61 @@
       "title": "Two mother tongues: German & Russian.",
       "text": "We grew up completely bilingual. This allows us to explain complex rules directly in your native language. To understand your perspective as a learner even better, we are currently learning Turkish ourselves – so we know exactly how it feels to start all over again."
     }
+  },
+  "about_v2": {
+    "headline": "Anastasia Sitov - Founder & Instructor",
+    "subline": "Scientifically based. Bilingual. Empathetic.",
+    "body": "Growing up bilingual, I understand the challenges of language learning from my own experience. My approach combines neurobiological insights with individual learning strategies – for learning at your own pace that actually works.",
+    "timeline": {
+      "title": "Academic Background",
+      "items": [
+        {
+          "year": "2024",
+          "title": "GFL/GSL Certification",
+          "institution": "TU Braunschweig"
+        },
+        {
+          "year": "2022",
+          "title": "Master of Education",
+          "institution": "Leibniz Uni Hannover",
+          "desc": "Focus: Neuroplasticity"
+        },
+        {
+          "year": "2018",
+          "title": "B.Sc. Biology",
+          "institution": "Leibniz Uni Hannover"
+        },
+        {
+          "year": "2010-2018",
+          "title": "A-Levels (Abitur)",
+          "institution": "Gymnasium Stolzenau"
+        }
+      ]
+    },
+    "languages": {
+      "title": "Language Proficiency",
+      "items": [
+        {
+          "code": "DE",
+          "name": "German",
+          "level": "Native Speaker"
+        },
+        {
+          "code": "RU",
+          "name": "Russian",
+          "level": "Native Speaker"
+        },
+        {
+          "code": "EN",
+          "name": "English",
+          "level": "C1 Fluent"
+        },
+        {
+          "code": "FR/TR",
+          "name": "French / Turkish",
+          "level": "A2 Basic Knowledge"
+        }
+      ]
+    }
   }
 }

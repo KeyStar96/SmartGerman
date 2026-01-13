@@ -349,5 +349,61 @@
       "title": "İki ana dil: Almanca & Rusça.",
       "text": "Tamamen iki dilli olarak büyüdük. Bu, karmaşık kuralları doğrudan ana dilinizde açıklamamıza olanak tanır. Öğrenci olarak bakış açınızı daha iyi anlamak için şu anda kendimiz Türkçe öğreniyoruz - bu yüzden her şeye yeniden başlamanın nasıl bir his olduğunu tam olarak biliyoruz."
     }
+  },
+  "about_v2": {
+    "headline": "Anastasia Sitov - Kurucu ve Eğitmen",
+    "subline": "Bilimsel temelli. İki dilli. Empatik.",
+    "body": "İki dilli büyüdüğüm için dil öğrenmenin zorluklarını kendi deneyimlerimden biliyorum. Yaklaşımım, nörobiyolojik bulguları bireysel öğrenme stratejileriyle birleştiriyor – gerçekten işe yarayan, kendi hızınızda bir öğrenme için.",
+    "timeline": {
+      "title": "Akademik Geçmiş",
+      "items": [
+        {
+          "year": "2024",
+          "title": "DaF/DaZ Sertifikası",
+          "institution": "TU Braunschweig"
+        },
+        {
+          "year": "2022",
+          "title": "Eğitim Yüksek Lisansı",
+          "institution": "Leibniz Üniversitesi Hannover",
+          "desc": "Odak: Nöroplastisite"
+        },
+        {
+          "year": "2018",
+          "title": "B.Sc. Biyoloji",
+          "institution": "Leibniz Üniversitesi Hannover"
+        },
+        {
+          "year": "2010-2018",
+          "title": "Lise (Abitur)",
+          "institution": "Gymnasium Stolzenau"
+        }
+      ]
+    },
+    "languages": {
+      "title": "Dil Yetkinliği",
+      "items": [
+        {
+          "code": "DE",
+          "name": "Almanca",
+          "level": "Ana Dil"
+        },
+        {
+          "code": "RU",
+          "name": "Rusça",
+          "level": "Ana Dil"
+        },
+        {
+          "code": "EN",
+          "name": "İngilizce",
+          "level": "C1 Akıcı"
+        },
+        {
+          "code": "FR/TR",
+          "name": "Fransızca / Türkçe",
+          "level": "A2 Temel Bilgi"
+        }
+      ]
+    }
   }
 }
