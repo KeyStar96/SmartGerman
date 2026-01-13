@@ -72,7 +72,7 @@ export default function BioReveal({ headline, subline, body, className, imageUrl
                     whileInView={{ opacity: 1, filter: "grayscale(0%)", y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
-                    className="absolute bottom-[-10%] right-[-10%] w-[80%] md:w-[60%] lg:w-[50%] h-[80%] z-10 pointer-events-none"
+                    className="absolute bottom-0 right-[-5%] md:right-[-20px] w-[90%] md:w-[60%] h-[50%] md:h-[85%] z-10 pointer-events-none opacity-40 md:opacity-100"
                 >
                     {/* 
                         Using Next.js Image for optimization. 
