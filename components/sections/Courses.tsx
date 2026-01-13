@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 
 // --- Fonts ---
 const instrumentSerif = Instrument_Serif({ weight: "400", subsets: ["latin"] });
-// Using JetBrains Mono as requested for the typewriter/scientific look
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
 // --- Types ---
@@ -133,6 +132,34 @@ interface CoursesProps {
   dictionary?: any;
 }
 
+// --- Animation Variants ---
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.2 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+};
+
 export default function Courses({ dictionary }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
 
@@ -146,12 +173,12 @@ export default function Courses({ dictionary }: CoursesProps) {
         {/* --- Header / Toggle Section --- */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-20 md:mb-32">
 
-          {/* Headline - "Swiss Style" */}
+          {/* Headline - High Contrast & Authority */}
           <div className="text-center md:text-left">
             <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4">
               ZEITPLAN & FORMATE
             </span>
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#111111] dark:text-[#E2D7CE] leading-none">
               UNSER AKADEMISCHES <br />
               <span className="text-[#FF5C00]">LEHRANGEBOT.</span>
             </h2>
@@ -191,17 +218,25 @@ export default function Courses({ dictionary }: CoursesProps) {
           </div>
         </div>
 
-        {/* --- Syllabus Grid --- */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-[#2D3436]/10 dark:border-white/10"
-        >
-          <AnimatePresence mode="popLayout">
-            {COURSES_DATA[filter].map((course, index) => (
-              <CourseCard key={course.id} course={course} index={index} />
-            ))}
+        {/* --- Syllabus Grid (Butter Smooth Performance) --- */}
+        {/* Removed 'layout' prop to prevent reflow jank. Used 'mode="wait"' for controlled transitions. */}
+        <div className="relative w-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={filter} // Key triggers complete remount for animation
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pl-px pt-px"
+            >
+              {COURSES_DATA[filter].map((course, index) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </motion.div>
           </AnimatePresence>
-        </motion.div>
+        </div>
+
 
         {/* --- Footer Rule --- */}
         <div className="mt-20 border-t border-[#2D3436]/10 dark:border-white/10 pt-8 flex justify-center">
@@ -218,34 +253,33 @@ export default function Courses({ dictionary }: CoursesProps) {
   );
 }
 
-// --- Component: Academic Index Card (Material Design v2) ---
-function CourseCard({ course, index }: { course: CourseData; index: number }) {
+// --- Component: Academic Index Card (Final Accessible Version) ---
+function CourseCard({ course }: { course: CourseData }) {
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{
-        duration: 0.4,
-        delay: index * 0.05,
-        ease: "easeOut"
-      }}
+      variants={cardVariants} // Child variant controlled by parent stagger
       className={`
         group relative w-full h-full min-h-[380px] 
         bg-[#F9F8F6] dark:bg-[#1E2024]
-        border-[0.5px] border-black/10 dark:border-white/10
+        
+        /* Border Collapsing Trick: Negative Margins */
+        -ml-px -mt-px
+        border-[0.5px] border-black/10 dark:border-white/5
+
         flex flex-col justify-between overflow-hidden
         transition-all duration-300 ease-out
-        hover:border-[#FF5C00] dark:hover:border-[#FF5C00] hover:z-20 
+        
+        /* Interaction States */
+        hover:z-20 
+        hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
         hover:shadow-2xl hover:-translate-y-2
         
-        /* Thickness Simulation via Box-Shadow (Inset Glow top/left, Shadow bottom/right) */
+        /* Thickness Simulation */
         shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.1)]
         hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_25px_50px_-12px_rgba(0,0,0,0.25)]
       `}
     >
-      {/* Paper Texture Overlay (Refined: 3% Opacity, Multiply) */}
+      {/* Paper Texture Overlay (3% Opacity) */}
       <div
         className={cn(
           "absolute inset-0 pointer-events-none z-0 bg-noise-paper",
@@ -256,10 +290,10 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
       {/* Content Container */}
       <div className="relative z-10 flex flex-col h-full justify-between">
 
-        {/* Top Section: "Tab" Header Area */}
+        {/* Header Area */}
         <div className="bg-black/[0.02] dark:bg-white/[0.02] p-7 pb-6 border-b border-black/5 dark:border-white/5">
           <div className="flex justify-between items-start mb-6">
-            {/* Dynamic Level Badge */}
+            {/* Level Badge */}
             {course.tags?.[0] ? (
               <span className={`
                    ${jetbrainsMono.className} 
@@ -274,7 +308,7 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
               </span>
             ) : <div />}
 
-            {/* Optional 'Online Start' Badge */}
+            {/* Start Badge */}
             {course.start_badge && (
               <span className={`
                    ${jetbrainsMono.className}
@@ -295,59 +329,62 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
           </h3>
         </div>
 
-        {/* Body Section */}
+        {/* Body Area */}
         <div className="p-7 pt-6 flex-1 flex flex-col justify-between">
+          {/* Description - De-emphasize on hover */}
           <p className="text-[#2D3436]/70 dark:text-[#E2D7CE]/70 leading-relaxed text-sm font-medium pr-4 group-hover:opacity-50 transition-opacity duration-300">
             {course.desc}
           </p>
 
-          {/* Meta-Data Block */}
+          {/* Accessible Meta-Data Block */}
           <div className="mt-8">
-            <div className="grid grid-cols-1 gap-y-3 mb-8 pt-6 border-t border-[#2D3436]/10 dark:border-white/10">
+            <div className="grid grid-cols-1 gap-y-4 mb-8 pt-6 border-t border-[#2D3436]/10 dark:border-white/10">
 
-              {/* Educator */}
-              <div className="flex items-center gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
-                <User strokeWidth={1.5} size={14} className="text-black/30 dark:text-white/30" />
-                <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest`}>
+              {/* Educator (Larger Text, Size 16 Icon) */}
+              <div className="flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
+                <User strokeWidth={1.5} size={16} className="text-black/30 dark:text-white/30" />
+                <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider`}>
                   {course.educator}
                 </span>
               </div>
 
-              {/* Schedule with Marker */}
-              <div className="relative flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold">
-                {/* Orange Marker Bar */}
-                <div className="absolute -left-3 top-0.5 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
+              {/* Schedule (Larger Text, Size 16 Icon) */}
+              <div className="relative flex items-start gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold">
+                {/* Marker */}
+                <div className="absolute -left-3 top-1 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
 
-                <Clock strokeWidth={1.5} size={14} className="mt-0.5 shrink-0 text-black/30 dark:text-white/30" />
-                <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
+                <Clock strokeWidth={1.5} size={16} className="mt-0.5 shrink-0 text-black/30 dark:text-white/30" />
+                <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider leading-tight`}>
                   {course.schedule}
-                </span>
-              </div>
-
-              {/* Unit */}
-              <div className="flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300">
-                <CheckCircle2 strokeWidth={1.5} size={14} className="mt-0.5 shrink-0 text-black/30 dark:text-white/30" />
-                <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
-                  {course.unit}
                 </span>
               </div>
             </div>
 
-            {/* Price Anchor with Progressive Arrow */}
-            <div className="flex items-center justify-end gap-2 text-[#2D3436] dark:text-[#E2D7CE]">
-              <span className={`
-                        ${instrumentSerif.className} 
-                        text-5xl 
-                        group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300
-                    `}>
-                {course.price}
-              </span>
+            {/* Price & Unit Block (Unified) */}
+            <div className="flex items-end justify-between text-[#2D3436] dark:text-[#E2D7CE]">
 
-              {/* Progressive Arrow */}
-              <ArrowRight
-                className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#FF5C00]"
-                size={24}
-              />
+              {/* Unit Context - Linked to Price */}
+              <div className="flex items-center gap-2 mb-2 group-hover:opacity-100 opacity-60 transition-opacity">
+                <CheckCircle2 strokeWidth={1.5} size={16} className="text-black/30 dark:text-white/30" />
+                <span className={`${jetbrainsMono.className} text-xs uppercase tracking-widest`}>
+                  {course.unit}
+                </span>
+              </div>
+
+              {/* Price with Arrow */}
+              <div className="flex items-center gap-2">
+                <span className={`
+                            ${instrumentSerif.className} 
+                            text-5xl 
+                            group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300
+                        `}>
+                  {course.price}
+                </span>
+                <ArrowRight
+                  className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#FF5C00]"
+                  size={24}
+                />
+              </div>
             </div>
           </div>
         </div>
