@@ -139,9 +139,9 @@ export default function Courses({ dictionary }: CoursesProps) {
   return (
     <section
       id="courses"
-      className="relative py-24 md:py-32 px-6 md:px-12 bg-transparent text-[#2D3436] dark:text-[#E2D7CE] overflow-hidden"
+      className="relative py-24 md:py-32 bg-transparent text-[#2D3436] dark:text-[#E2D7CE] overflow-hidden"
     >
-      <div className="max-w-[1400px] mx-auto relative z-10">
+      <div className="container mx-auto px-6 md:px-12 relative z-10">
 
         {/* --- Header / Toggle Section --- */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-20 md:mb-32">
@@ -232,10 +232,10 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
         ease: "easeOut"
       }}
       className={`
-        group relative w-full h-full min-h-[420px] 
+        group relative w-full h-full min-h-[380px] 
         bg-[#F0EFE9] dark:bg-[#1E2024]
         border-r border-b border-[#2D3436]/10 dark:border-white/10
-        p-8 flex flex-col justify-between overflow-hidden
+        p-7 flex flex-col justify-between overflow-hidden
         transition-all duration-300
         hover:border-[#FF5C00] dark:hover:border-[#FF5C00] hover:z-20 hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] hover:-translate-y-1
       `}
