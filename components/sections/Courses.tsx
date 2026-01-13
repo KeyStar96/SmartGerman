@@ -218,7 +218,7 @@ export default function Courses({ dictionary }: CoursesProps) {
   );
 }
 
-// --- Component: Academic Index Card ---
+// --- Component: Academic Index Card (Material Design v2) ---
 function CourseCard({ course, index }: { course: CourseData; index: number }) {
   return (
     <motion.div
@@ -233,30 +233,32 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
       }}
       className={`
         group relative w-full h-full min-h-[380px] 
-        bg-[#F0EFE9] dark:bg-[#1E2024]
-        border-r border-b border-[#2D3436]/10 dark:border-white/10
-        p-7 flex flex-col justify-between overflow-hidden
+        bg-[#F9F8F6] dark:bg-[#1E2024]
+        border-[0.5px] border-black/10 dark:border-white/10
+        flex flex-col justify-between overflow-hidden
         transition-all duration-300 ease-out
         hover:border-[#FF5C00] dark:hover:border-[#FF5C00] hover:z-20 
-        hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.15)] 
-        hover:-translate-y-2
-        hover:bg-[#F5F1EB] dark:hover:bg-[#25282D]
+        hover:shadow-2xl hover:-translate-y-2
+        
+        /* Thickness Simulation via Box-Shadow (Inset Glow top/left, Shadow bottom/right) */
+        shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.1)]
+        hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_25px_50px_-12px_rgba(0,0,0,0.25)]
       `}
     >
-      {/* Paper Texture Overlay */}
+      {/* Paper Texture Overlay (Refined: 3% Opacity, Multiply) */}
       <div
         className={cn(
           "absolute inset-0 pointer-events-none z-0 bg-noise-paper",
-          "opacity-50 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5"
+          "opacity-[0.03] mix-blend-multiply dark:mix-blend-overlay dark:opacity-[0.05]"
         )}
       />
 
       {/* Content Container */}
       <div className="relative z-10 flex flex-col h-full justify-between">
 
-        {/* Top Section: Badge & Title */}
-        <div>
-          <div className="flex justify-between items-start mb-8">
+        {/* Top Section: "Tab" Header Area */}
+        <div className="bg-black/[0.02] dark:bg-white/[0.02] p-7 pb-6 border-b border-black/5 dark:border-white/5">
+          <div className="flex justify-between items-start mb-6">
             {/* Dynamic Level Badge */}
             {course.tags?.[0] ? (
               <span className={`
@@ -286,64 +288,67 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
 
           <h3 className={`
               ${instrumentSerif.className} 
-              text-4xl md:text-5xl leading-[0.9] mb-6
-              text-[#2D3436] dark:text-[#E2D7CE]
+              text-4xl md:text-5xl leading-[0.9]
+              text-[#111111] dark:text-[#E2D7CE] font-medium
             `}>
             {course.title}
           </h3>
+        </div>
 
+        {/* Body Section */}
+        <div className="p-7 pt-6 flex-1 flex flex-col justify-between">
           <p className="text-[#2D3436]/70 dark:text-[#E2D7CE]/70 leading-relaxed text-sm font-medium pr-4 group-hover:opacity-50 transition-opacity duration-300">
             {course.desc}
           </p>
-        </div>
 
-        {/* Meta-Data Block */}
-        <div className="mt-12">
-          <div className="grid grid-cols-1 gap-y-3 mb-8 border-t border-[#2D3436]/10 dark:border-white/10 pt-6">
+          {/* Meta-Data Block */}
+          <div className="mt-8">
+            <div className="grid grid-cols-1 gap-y-3 mb-8 pt-6 border-t border-[#2D3436]/10 dark:border-white/10">
 
-            {/* Educator */}
-            <div className="flex items-center gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
-              <User strokeWidth={1.5} size={14} />
-              <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest`}>
-                {course.educator}
-              </span>
+              {/* Educator */}
+              <div className="flex items-center gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
+                <User strokeWidth={1.5} size={14} className="text-black/30 dark:text-white/30" />
+                <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest`}>
+                  {course.educator}
+                </span>
+              </div>
+
+              {/* Schedule with Marker */}
+              <div className="relative flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold">
+                {/* Orange Marker Bar */}
+                <div className="absolute -left-3 top-0.5 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
+
+                <Clock strokeWidth={1.5} size={14} className="mt-0.5 shrink-0 text-black/30 dark:text-white/30" />
+                <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
+                  {course.schedule}
+                </span>
+              </div>
+
+              {/* Unit */}
+              <div className="flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300">
+                <CheckCircle2 strokeWidth={1.5} size={14} className="mt-0.5 shrink-0 text-black/30 dark:text-white/30" />
+                <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
+                  {course.unit}
+                </span>
+              </div>
             </div>
 
-            {/* Schedule with Marker */}
-            <div className="relative flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold">
-              {/* Orange Marker Bar */}
-              <div className="absolute -left-3 top-0.5 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
-
-              <Clock strokeWidth={1.5} size={14} className="mt-0.5 shrink-0" />
-              <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
-                {course.schedule}
+            {/* Price Anchor with Progressive Arrow */}
+            <div className="flex items-center justify-end gap-2 text-[#2D3436] dark:text-[#E2D7CE]">
+              <span className={`
+                        ${instrumentSerif.className} 
+                        text-5xl 
+                        group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300
+                    `}>
+                {course.price}
               </span>
+
+              {/* Progressive Arrow */}
+              <ArrowRight
+                className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#FF5C00]"
+                size={24}
+              />
             </div>
-
-            {/* Unit */}
-            <div className="flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300">
-              <CheckCircle2 strokeWidth={1.5} size={14} className="mt-0.5 shrink-0" />
-              <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
-                {course.unit}
-              </span>
-            </div>
-          </div>
-
-          {/* Price Anchor with Progressive Arrow */}
-          <div className="flex items-center justify-end gap-2 text-[#2D3436] dark:text-[#E2D7CE]">
-            <span className={`
-                      ${instrumentSerif.className} 
-                      text-5xl 
-                      group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300
-                  `}>
-              {course.price}
-            </span>
-
-            {/* Progressive Arrow */}
-            <ArrowRight
-              className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#FF5C00]"
-              size={24}
-            />
           </div>
         </div>
       </div>
