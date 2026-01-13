@@ -2,7 +2,7 @@
 
 import React, { useRef, useMemo, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { PerformanceMonitor } from "@react-three/drei";
+// import { PerformanceMonitor } from "@react-three/drei";
 import * as THREE from "three";
 
 // --- Shader Definition ---
@@ -115,55 +115,55 @@ const fragmentShader = `
 `;
 
 const NeuralScene = () => {
-    const meshRef = useRef<THREE.Mesh>(null);
-    const uniforms = useMemo(
-        () => ({
-            uTime: { value: 0 },
-            uResolution: { value: new THREE.Vector2(1, 1) },
-            uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-            uQuality: { value: 1.0 },
-        }),
-        []
-    );
+  const meshRef = useRef<THREE.Mesh>(null);
+  const uniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uResolution: { value: new THREE.Vector2(1, 1) },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+      uQuality: { value: 1.0 },
+    }),
+    []
+  );
 
-    useFrame((state) => {
-        if (!meshRef.current) return;
-        const { clock, pointer, size } = state;
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const { clock, pointer, size } = state;
 
-        const material = meshRef.current.material as THREE.ShaderMaterial;
-        if (material.uniforms) {
-            material.uniforms.uTime.value = clock.getElapsedTime();
-            material.uniforms.uResolution.value.set(size.width, size.height);
+    const material = meshRef.current.material as THREE.ShaderMaterial;
+    if (material.uniforms) {
+      material.uniforms.uTime.value = clock.getElapsedTime();
+      material.uniforms.uResolution.value.set(size.width, size.height);
 
-            // Pointer is normalized (-1 to 1). Convert to 0 to 1 for shader uv space.
-            // UV 0,0 is bottom-left. Pointer -1,-1 is bottom-left.
-            const u = (pointer.x + 1) / 2;
-            const v = (pointer.y + 1) / 2;
+      // Pointer is normalized (-1 to 1). Convert to 0 to 1 for shader uv space.
+      // UV 0,0 is bottom-left. Pointer -1,-1 is bottom-left.
+      const u = (pointer.x + 1) / 2;
+      const v = (pointer.y + 1) / 2;
 
-            // Lerp for smooth movement
-            material.uniforms.uMouse.value.lerp(new THREE.Vector2(u, v), 0.1);
-        }
-    });
+      // Lerp for smooth movement
+      material.uniforms.uMouse.value.lerp(new THREE.Vector2(u, v), 0.1);
+    }
+  });
 
-    return (
-        <mesh ref={meshRef}>
-            <planeGeometry args={[2, 2]} />
-            <shaderMaterial
-                vertexShader={vertexShader}
-                fragmentShader={fragmentShader}
-                uniforms={uniforms}
-                transparent={true} // Allow background to show if needed, though shader is opaque
-            />
-        </mesh>
-    );
+  return (
+    <mesh ref={meshRef}>
+      <planeGeometry args={[2, 2]} />
+      <shaderMaterial
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
+        uniforms={uniforms}
+        transparent={true} // Allow background to show if needed, though shader is opaque
+      />
+    </mesh>
+  );
 };
 
 export default function NeuralBackground() {
-    const [dpr, setDpr] = useState(1);
+  const [dpr, setDpr] = useState(1);
 
-    return (
-        <div className="absolute inset-0 w-full h-full -z-10 bg-[#FAFAFA] dark:bg-[#111111] transition-colors duration-500">
-            {/* 
+  return (
+    <div className="absolute inset-0 w-full h-full -z-10 bg-[#FAFAFA] dark:bg-[#111111] transition-colors duration-500">
+      {/* 
          Use key to force re-render if needed, but here it's static.
          eventSource={document.body} allows pointer events to work even if canvas is covered 
          (though usually 'pointer-events-none' on overlaying content blocks it).
@@ -172,16 +172,14 @@ export default function NeuralBackground() {
          For a background, usually we listen to global mouse, but R3F uses canvas events.
          We'll stick to canvas events for now.
        */}
-            <Canvas
-                camera={{ position: [0, 0, 1] }}
-                dpr={dpr}
-                resize={{ scroll: false }}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-            >
-                <PerformanceMonitor onIncline={() => setDpr(2)} onDecline={() => setDpr(1)}>
-                    <NeuralScene />
-                </PerformanceMonitor>
-            </Canvas>
-        </div>
-    );
+      <Canvas
+        camera={{ position: [0, 0, 1] }}
+        dpr={dpr}
+        resize={{ scroll: false }}
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+      >
+        <NeuralScene />
+      </Canvas>
+    </div>
+  );
 }
