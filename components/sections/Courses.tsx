@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
-import { User, Clock, CheckCircle2 } from "lucide-react";
+import { User, Clock, CheckCircle2, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // --- Fonts ---
@@ -236,8 +236,11 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
         bg-[#F0EFE9] dark:bg-[#1E2024]
         border-r border-b border-[#2D3436]/10 dark:border-white/10
         p-7 flex flex-col justify-between overflow-hidden
-        transition-all duration-300
-        hover:border-[#FF5C00] dark:hover:border-[#FF5C00] hover:z-20 hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] hover:-translate-y-1
+        transition-all duration-300 ease-out
+        hover:border-[#FF5C00] dark:hover:border-[#FF5C00] hover:z-20 
+        hover:shadow-[0_30px_60px_-10px_rgba(0,0,0,0.15)] 
+        hover:-translate-y-2
+        hover:bg-[#F5F1EB] dark:hover:bg-[#25282D]
       `}
     >
       {/* Paper Texture Overlay */}
@@ -289,7 +292,7 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
             {course.title}
           </h3>
 
-          <p className="text-[#2D3436]/70 dark:text-[#E2D7CE]/70 leading-relaxed text-sm font-medium pr-4">
+          <p className="text-[#2D3436]/70 dark:text-[#E2D7CE]/70 leading-relaxed text-sm font-medium pr-4 group-hover:opacity-50 transition-opacity duration-300">
             {course.desc}
           </p>
         </div>
@@ -299,15 +302,18 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
           <div className="grid grid-cols-1 gap-y-3 mb-8 border-t border-[#2D3436]/10 dark:border-white/10 pt-6">
 
             {/* Educator */}
-            <div className="flex items-center gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-colors">
+            <div className="flex items-center gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
               <User strokeWidth={1.5} size={14} />
               <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest`}>
                 {course.educator}
               </span>
             </div>
 
-            {/* Schedule */}
-            <div className="flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-colors">
+            {/* Schedule with Marker */}
+            <div className="relative flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold">
+              {/* Orange Marker Bar */}
+              <div className="absolute -left-3 top-0.5 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
+
               <Clock strokeWidth={1.5} size={14} className="mt-0.5 shrink-0" />
               <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
                 {course.schedule}
@@ -315,7 +321,7 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
             </div>
 
             {/* Unit */}
-            <div className="flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-colors">
+            <div className="flex items-start gap-3 text-[#2D3436]/60 dark:text-[#E2D7CE]/60 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300">
               <CheckCircle2 strokeWidth={1.5} size={14} className="mt-0.5 shrink-0" />
               <span className={`${jetbrainsMono.className} text-[10px] uppercase tracking-widest leading-tight`}>
                 {course.unit}
@@ -323,15 +329,21 @@ function CourseCard({ course, index }: { course: CourseData; index: number }) {
             </div>
           </div>
 
-          {/* Price Anchor */}
-          <div className="flex items-baseline justify-end">
+          {/* Price Anchor with Progressive Arrow */}
+          <div className="flex items-center justify-end gap-2 text-[#2D3436] dark:text-[#E2D7CE]">
             <span className={`
                       ${instrumentSerif.className} 
-                      text-5xl text-[#2D3436] dark:text-[#E2D7CE]
-                      group-hover:text-[#FF5C00] transition-colors duration-300
+                      text-5xl 
+                      group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300
                   `}>
               {course.price}
             </span>
+
+            {/* Progressive Arrow */}
+            <ArrowRight
+              className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#FF5C00]"
+              size={24}
+            />
           </div>
         </div>
       </div>
