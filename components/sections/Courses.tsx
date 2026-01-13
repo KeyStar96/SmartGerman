@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
-import { User, Clock, CheckCircle2, ArrowRight } from "lucide-react";
+import { User, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // --- Fonts ---
@@ -245,53 +245,47 @@ function CourseCard({ course }: { course: CourseData }) {
 
           {/* Accessible Meta-Data Block */}
           <div className="mt-8">
-            <div className="grid grid-cols-1 gap-y-4 mb-8 pt-6 border-t border-[#2D3436]/10 dark:border-white/10">
-
-              {/* Educator (Larger Text, Size 16 Icon) */}
+            {/* Educator Row (Top of Footer Section) */}
+            <div className="mb-6 pt-6 border-t border-[#2D3436]/10 dark:border-white/10">
               <div className="flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
                 <User strokeWidth={1.5} size={16} className="text-black/30 dark:text-white/30" />
                 <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider`}>
                   {course.educator}
                 </span>
               </div>
+            </div>
 
-              {/* Schedule (Larger Text, Size 16 Icon) */}
-              <div className="relative flex items-start gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold">
+            {/* Price & Schedule Layout (Bottom Row) */}
+            <div className="flex items-end justify-between text-[#2D3436] dark:text-[#E2D7CE]">
+
+              {/* LEFT: Schedule (Time Block) */}
+              <div className="relative flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold pb-1">
                 {/* Marker */}
                 <div className="absolute -left-3 top-1 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
 
-                <Clock strokeWidth={1.5} size={16} className="mt-0.5 shrink-0 text-black/30 dark:text-white/30" />
-                <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider leading-tight`}>
+                <Clock strokeWidth={1.5} size={16} className="shrink-0 text-black/30 dark:text-white/30" />
+                <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider leading-tight max-w-[140px]`}>
                   {course.schedule}
                 </span>
               </div>
-            </div>
 
-            {/* Price & Unit Block (Unified) */}
-            <div className="flex items-end justify-between text-[#2D3436] dark:text-[#E2D7CE]">
+              {/* RIGHT: Price & Unit (Cost Block) */}
+              <div className="flex flex-col items-end">
+                {/* Price */}
+                <span className={`
+                            ${instrumentSerif.className} 
+                            text-5xl 
+                            group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300 leading-none
+                        `}>
+                  {course.price}
+                </span>
 
-              {/* Unit Context - Linked to Price */}
-              <div className="flex items-center gap-2 mb-2 group-hover:opacity-100 opacity-60 transition-opacity">
-                <CheckCircle2 strokeWidth={1.5} size={16} className="text-black/30 dark:text-white/30" />
-                <span className={`${jetbrainsMono.className} text-xs uppercase tracking-widest`}>
+                {/* Unit */}
+                <span className={`${jetbrainsMono.className} text-[10px] text-[#2D3436]/50 dark:text-[#E2D7CE]/50 uppercase tracking-widest mt-1`}>
                   {course.unit}
                 </span>
               </div>
 
-              {/* Price with Arrow */}
-              <div className="flex items-center gap-2">
-                <span className={`
-                            ${instrumentSerif.className} 
-                            text-5xl 
-                            group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300
-                        `}>
-                  {course.price}
-                </span>
-                <ArrowRight
-                  className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[#FF5C00]"
-                  size={24}
-                />
-              </div>
             </div>
           </div>
         </div>
