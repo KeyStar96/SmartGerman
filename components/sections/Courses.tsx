@@ -64,6 +64,12 @@ const cardVariants = {
 export default function Courses({ dictionary }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
 
+  // Safe access to dictionary data with fallback to prevent crashes if dictionary is missing
+  const sectionData = dictionary?.sections?.courses_v2;
+  const listData = sectionData?.list?.[filter] || [];
+
+  if (!sectionData) return null; // Or return a skeleton/loading state
+
   return (
     <section
       id="courses"
@@ -77,11 +83,11 @@ export default function Courses({ dictionary }: CoursesProps) {
           {/* Headline - High Contrast & Authority */}
           <div className="text-center md:text-left">
             <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4">
-              ZEITPLAN & FORMATE
+              {sectionData.label_small}
             </span>
             <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#111111] dark:text-[#E2D7CE] leading-none">
-              UNSER AKADEMISCHES <br />
-              <span className="text-[#FF5C00]">LEHRANGEBOT.</span>
+              {sectionData.headline.line1} <br />
+              <span className="text-[#FF5C00]">{sectionData.headline.line2}</span>
             </h2>
           </div>
 
@@ -115,7 +121,7 @@ export default function Courses({ dictionary }: CoursesProps) {
                       }}
                     />
                   )}
-                  <span className="relative z-10">{tab}</span>
+                  <span className="relative z-10">{sectionData.tabs[tab]}</span>
                 </button>
               );
             })}
@@ -134,7 +140,7 @@ export default function Courses({ dictionary }: CoursesProps) {
               exit="exit"
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pl-px pt-px"
             >
-              {COURSES_DATA[filter].map((course, index) => (
+              {listData.map((course: CourseData) => (
                 <CourseCard key={course.id} course={course} />
               ))}
             </motion.div>
@@ -148,7 +154,7 @@ export default function Courses({ dictionary }: CoursesProps) {
               ${jetbrainsMono.className} 
               text-xs opacity-60 text-center max-w-lg
             `}>
-            Alle Kurse sind monatlich kündbar. Telegram-Support inklusive. Alle Preise inkl. MwSt.
+            {sectionData.footer_note}
           </p>
         </div>
 
