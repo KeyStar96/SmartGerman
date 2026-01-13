@@ -351,6 +351,11 @@
     }
   },
   "about_v2": {
+    "header": {
+      "label": "Arka Plan ve Profil",
+      "title_Line1": "Kişilik",
+      "title_Line2": "ve Uzmanlık."
+    },
     "headline": "Anastasia Sitov - Kurucu ve Eğitmen",
     "subline": "Bilimsel temelli. İki dilli. Empatik.",
     "body": "İki dilli büyüdüğüm için dil öğrenmenin zorluklarını kendi deneyimlerimden biliyorum. Yaklaşımım, nörobiyolojik bulguları bireysel öğrenme stratejileriyle birleştiriyor – gerçekten işe yarayan, kendi hızınızda bir öğrenme için.",

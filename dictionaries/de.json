@@ -491,6 +491,11 @@
     }
   },
   "about_v2": {
+    "header": {
+      "label": "Hintergrund & Profil",
+      "title_Line1": "Persönlichkeit",
+      "title_Line2": "trifft Expertise."
+    },
     "headline": "Anastasia Sitov - Gründerin & Lehrkraft",
     "subline": "Wissenschaftlich fundiert. Zweisprachig. Empathisch.",
     "body": "Zweisprachig aufgewachsen, verstehe ich die Herausforderungen des Sprachenlernens aus eigener Erfahrung. Mein Ansatz kombiniert neurobiologische Erkenntnisse mit individuellen Lernstrategien – für ein Lernen im eigenen Tempo, das wirklich funktioniert.",

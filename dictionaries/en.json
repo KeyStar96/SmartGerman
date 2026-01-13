@@ -351,6 +351,11 @@
     }
   },
   "about_v2": {
+    "header": {
+      "label": "Background & Profile",
+      "title_Line1": "Personality",
+      "title_Line2": "meets Expertise."
+    },
     "headline": "Anastasia Sitov - Founder & Instructor",
     "subline": "Scientifically based. Bilingual. Empathetic.",
     "body": "Growing up bilingual, I understand the challenges of language learning from my own experience. My approach combines neurobiological insights with individual learning strategies – for learning at your own pace that actually works.",

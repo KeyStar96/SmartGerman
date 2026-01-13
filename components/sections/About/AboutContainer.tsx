@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import NeuralBackground from "./NeuralBackground";
 import BioReveal from "./BioReveal";
 import TimelineCV from "./TimelineCV";
 import LanguageMatrix from "./LanguageMatrix";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { useScroll, useTransform, motion, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface AboutContainerProps {
@@ -17,16 +17,7 @@ const PaperCard = ({ children, className, isOrange = false }: { children: React.
     return (
         <div
             className={cn(
-                "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card rounded-xl", // Added rounded-xl to match previous look if needed, but WhyUs uses sharp paper? WhyUs PaperCard doesn't have rounded-xl in the snippet I saw? Wait, snippet says "rounded-xl" in About, but WhyUs snippet didn't show it. WhyUs snippet: `className={cn("relative w-full h-full overflow-hidden ...", ...)}`. It seems WhyUs cards are rectangular or handled by parent? 
-                // WhyUsBento PaperCard does NOT have rounded corners in the snippet. But the user liked WhyUs. 
-                // However, AboutContainer previously used `rounded-3xl`. 
-                // I'll stick to the WhyUs PaperCard exact consistency: No excessive rounding unless WhyUs has it.
-                // Looking at WhyUsBento step 203: No `rounded` classes in PaperCard.
-                // I will add `rounded-xl` to be safe as Bento grids usually have it, or maybe `rounded-none` if strict Swiss. 
-                // Let's assume `rounded-2xl` is a safe bet for a modern Bento, or check if WhyUs has it on the parent grid items? 
-                // Step 203 line 119: `<motion.div ...><PaperCard ...>`
-                // I will use `rounded-none` or `rounded-sm`? 
-                // Actually, the user says "same surface structure". I'll use the exact classes.
+                "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card rounded-xl",
                 isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9] dark:bg-[#1E2024]",
                 "border-[0.5px] border-black/10 dark:border-white/5",
                 "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]",
@@ -50,15 +41,36 @@ const PaperCard = ({ children, className, isOrange = false }: { children: React.
 };
 
 export default function AboutContainer({ dictionary }: AboutContainerProps) {
+    const containerRef = useRef(null);
+    const isInView = useInView(containerRef, { once: true, margin: "-100px" });
     const data = dictionary?.about_v2;
     if (!data) return null;
 
     return (
-        <section id="about" className="relative w-full min-h-screen py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500">
+        <section id="about" ref={containerRef} className="relative w-full min-h-screen py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500">
 
             <NeuralBackground />
 
             <div className="container mx-auto px-6 md:px-12 relative z-10 pointer-events-none">
+
+                {/* Header Section */}
+                <div className="mb-20 pointer-events-auto">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={isInView ? { opacity: 1, x: 0 } : {}}
+                        transition={{ delay: 0.2 }}
+                        className="inline-block mb-4"
+                    >
+                        <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
+                            {data.header?.label || "PROFIL"}
+                        </span>
+                    </motion.div>
+                    <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none">
+                        {data.header?.title_Line1 || "About"} <br />
+                        <span className="text-[#FF5C00]">{data.header?.title_Line2 || "Us"}</span>
+                    </h2>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
                     {/* Bio Section */}
