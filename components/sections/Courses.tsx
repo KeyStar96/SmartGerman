@@ -65,7 +65,7 @@ export default function Courses({ dictionary }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
 
   // Safe access to dictionary data with fallback to prevent crashes if dictionary is missing
-  const sectionData = dictionary?.sections?.courses_v2;
+  const sectionData = dictionary?.courses_v2;
   const listData = sectionData?.list?.[filter] || [];
 
   if (!sectionData) return null; // Or return a skeleton/loading state
