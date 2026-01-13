@@ -264,7 +264,7 @@ function CourseCard({ course }: { course: CourseData }) {
         
         /* Border Collapsing Trick: Negative Margins */
         -ml-px -mt-px
-        border-[0.5px] border-black/10 dark:border-white/5
+        border-[0.5px] border-black/10 dark:border-transparent
 
         flex flex-col justify-between overflow-hidden
         transition-all duration-300 ease-out
@@ -276,7 +276,10 @@ function CourseCard({ course }: { course: CourseData }) {
         
         /* Thickness Simulation */
         shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.1)]
+        dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_1px_3px_0_rgba(0,0,0,0.5)]
+        
         hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_25px_50px_-12px_rgba(0,0,0,0.25)]
+        dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_25px_50px_-12px_rgba(0,0,0,0.5)]
       `}
     >
       {/* Paper Texture Overlay (3% Opacity) */}
