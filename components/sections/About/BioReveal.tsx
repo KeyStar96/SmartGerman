@@ -1,37 +1,96 @@
 "use client";
 
-// import { motion, useInView, useReducedMotion, Variants } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface BioRevealProps {
     headline: string;
     subline: string;
     body: string;
     className?: string;
+    imageUrl?: string;
 }
 
-const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+export default function BioReveal({ headline, subline, body, className, imageUrl }: BioRevealProps) {
+    // Parsing logic: Split "Anastasia Sitov - Gründerin & Lehrkraft"
+    // Result: name="Anastasia Sitov", label="GRÜNDERIN & LEHRKRAFT"
+    // Fallback included if no separator found.
+    const parts = headline.split("-");
+    const name = parts[0]?.trim() || headline;
+    const label = parts[1]?.trim() || "GRÜNDERIN & LEHRKRAFT";
 
-export default function BioReveal({ headline, subline, body, className }: BioRevealProps) {
     return (
-        <div className={cn("relative z-10 flex flex-col justify-end h-full p-8 md:p-12", className)}>
-            {/* Header Block */}
-            <div className="mb-8">
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#2D3436] dark:text-[#E2D7CE] mb-2 leading-tight">
-                    {headline}
-                </h2>
-                <div className="w-24 h-1 bg-[#FF6B00] mb-4" />
-                <p className="text-lg md:text-xl font-medium text-[#FF6B00] uppercase tracking-wide">
-                    {subline}
-                </p>
+        <div className={cn("relative h-full flex flex-col justify-between p-8 md:p-12 overflow-hidden", className)}>
+
+            {/* Content Layer (z-20 to sit above image) */}
+            <div className="relative z-20 flex flex-col h-full pointer-events-none">
+
+                {/* 1. Label */}
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                >
+                    <span className="font-mono text-xs md:text-sm font-bold tracking-widest text-[#FF5C00] uppercase block mb-2">
+                        {label}
+                    </span>
+                </motion.div>
+
+                {/* 2. Headline (Display Serif) */}
+                <motion.h2
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+                    className="font-instrument-serif text-5xl md:text-6xl lg:text-7xl leading-[0.85] text-[#2D3436] dark:text-[#E2D7CE] mb-8 tracking-tight"
+                >
+                    {name}
+                </motion.h2>
+
+                {/* 3. Body Text */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="max-w-md"
+                >
+                    <p className="text-lg md:text-xl leading-relaxed text-[#2D3436] dark:text-[#E2D7CE] font-medium tracking-tight">
+                        {body}
+                    </p>
+                </motion.div>
+
             </div>
 
-            {/* Body Text */}
-            <div className="max-w-2xl">
-                <p className="text-lg md:text-xl leading-relaxed text-[#2D3436] dark:text-[#E2D7CE] font-bold tracking-tight">
-                    {body}
-                </p>
-            </div>
+            {/* Image Layer (Bottom Right) */}
+            {imageUrl && (
+                <motion.div
+                    initial={{ opacity: 0, filter: "grayscale(100%)", y: 50 }}
+                    whileInView={{ opacity: 1, filter: "grayscale(0%)", y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    className="absolute bottom-[-10%] right-[-10%] w-[80%] md:w-[60%] lg:w-[50%] h-[80%] z-10 pointer-events-none"
+                >
+                    {/* 
+                        Using Next.js Image for optimization. 
+                        object-fit: contain to preserve cutout aspect ratio.
+                        object-position: bottom right.
+                     */}
+                    <div className="relative w-full h-full">
+                        <Image
+                            src={imageUrl}
+                            alt="Anastasia Sitov"
+                            fill
+                            className="object-contain object-bottom-right"
+                            sizes="(max-width: 768px) 80vw, 50vw"
+                            priority
+                        />
+                    </div>
+                </motion.div>
+            )}
         </div>
     );
 }

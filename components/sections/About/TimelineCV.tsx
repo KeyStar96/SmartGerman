@@ -69,40 +69,41 @@ export default function TimelineCV({ title, items }: TimelineCVProps) {
         offset: ["start end", "end start"], // Trigger from when top enters to when bottom leaves
     });
 
-    // Smooth the scroll progress for drawing
-    const scaleY = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
+
 
     return (
-        <div ref={containerRef} className="relative h-full p-8 md:p-12 overflow-hidden">
+        <div ref={containerRef} className="relative h-full p-8 md:p-12 overflow-hidden flex flex-col">
             {/* Component Title */}
             <motion.h3
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                className="text-xs font-mono tracking-[0.2em] text-[#1A1A1A]/40 dark:text-[#FAFAFA]/40 uppercase mb-8"
+                className="text-xs font-mono tracking-[0.2em] text-[#2D3436]/40 dark:text-[#FAFAFA]/40 uppercase mb-12 flex-shrink-0"
             >
                 {title}
             </motion.h3>
 
-            <div className="relative border-l border-[#1A1A1A]/10 dark:border-[#FAFAFA]/10 ml-1">
+            <div className="relative flex-1 flex">
 
-                {/* The Animated "Impulse" Line */}
-                <motion.div
-                    style={{ scaleY: scaleY }}
-                    className="absolute top-0 left-[-1px] w-[2px] h-full bg-[#FF6B00] origin-top z-0"
-                />
+                {/* SCROLL LINE CONTAINER (Left Side) */}
+                <div className="relative w-[2px] mr-8 md:mr-12 flex-shrink-0">
+                    {/* 1. Background Gray Line */}
+                    <div className="absolute top-0 bottom-0 left-0 right-0 bg-[#2D3436]/10 dark:bg-white/10 w-full h-full rounded-full" />
 
-                <div className="flex flex-col">
+                    {/* 2. Active Orange Line (Scroll Linked) */}
+                    <motion.div
+                        style={{ height: useTransform(scrollYProgress, [0, 1], ["0%", "100%"]) }}
+                        className="absolute top-0 left-0 w-full bg-[#FF5C00] rounded-full"
+                    />
+                </div>
+
+                {/* TIMELINE ITEMS */}
+                <div className="flex flex-col justify-between w-full py-2">
                     {items.map((item, i) => (
                         <TimelinePoint key={i} item={item} index={i} />
                     ))}
                 </div>
             </div>
-
 
         </div>
     );

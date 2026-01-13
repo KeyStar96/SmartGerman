@@ -81,11 +81,12 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                         transition={{ duration: 0.8 }}
                         className="lg:col-span-7 h-full pointer-events-auto" // removed old classes
                     >
-                        <PaperCard className="rounded-2xl"> {/* Added rounded-2xl for consistency with Bento grids usually */}
+                        <PaperCard className="rounded-2xl overflow-hidden"> {/* Ensure overflow hidden for image cutoff */}
                             <BioReveal
                                 headline={data.headline}
                                 subline={data.subline}
                                 body={data.body}
+                                imageUrl="/Bilder/Nastja.png"
                             />
                         </PaperCard>
                     </motion.div>
