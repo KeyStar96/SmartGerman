@@ -92,7 +92,7 @@ const COURSES_DATA: Record<CourseType, CourseData[]> = {
   online: [
     {
       id: "o1",
-      title: "Grundlagen der deutschen Sprache A1.1",
+      title: "Grundlagen A1.1",
       tags: ["A1.1", "Online"],
       educator: "Anastasia Sitov",
       schedule: "Do & Fr 19:00-20:30",
@@ -185,7 +185,7 @@ export default function Courses({ dictionary }: CoursesProps) {
           </div>
 
           {/* The Physical Toggle Switch */}
-          <div className="bg-[#2D3436] p-2 rounded-full flex relative shadow-2xl h-[60px] items-center">
+          <div className="bg-white dark:bg-[#2D3436] p-2 rounded-full flex relative shadow-2xl h-[60px] items-center">
             {(["presence", "online"] as const).map((tab) => {
               const isActive = filter === tab;
               return (
@@ -196,7 +196,10 @@ export default function Courses({ dictionary }: CoursesProps) {
                     relative z-10 px-8 h-full rounded-full 
                     text-sm font-bold uppercase tracking-widest 
                     transition-colors duration-300 flex items-center justify-center
-                    ${isActive ? "text-[#1A1A1A]" : "text-white/60 hover:text-white"}
+                    ${isActive
+                      ? "text-[#1A1A1A] dark:text-[#1A1A1A]"
+                      : "text-[#2D3436]/60 hover:text-[#2D3436] dark:text-white/60 dark:hover:text-white"
+                    }
                     ${jetbrainsMono.className}
                   `}
                 >
