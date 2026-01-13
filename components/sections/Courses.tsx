@@ -287,7 +287,12 @@ function CourseCard({ course }: { course: CourseData }) {
                 </span>
 
                 {/* Unit */}
-                <span className={`${jetbrainsMono.className} text-[10px] text-[#2D3436]/50 dark:text-[#E2D7CE]/50 uppercase tracking-widest mt-1`}>
+                <span className={`
+                  ${jetbrainsMono.className} 
+                  text-[10px] text-[#2D3436]/50 dark:text-[#E2D7CE]/50 uppercase tracking-widest mt-1
+                  group-hover:text-[#FF5C00] group-hover:font-bold group-hover:opacity-100
+                  transition-all duration-300
+                `}>
                   {course.unit}
                 </span>
               </div>
