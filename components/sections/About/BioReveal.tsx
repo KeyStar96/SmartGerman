@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface BioRevealProps {
@@ -61,7 +61,7 @@ const ScrambleText = ({ text, className }: { text: string; className?: string })
 
 export default function BioReveal({ headline, subline, body, className }: BioRevealProps) {
     // Animation variants for body text staggered reveal
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -72,7 +72,7 @@ export default function BioReveal({ headline, subline, body, className }: BioRev
         },
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
     };
