@@ -18,8 +18,8 @@ export default async function HomePage({
     <div className="flex flex-col items-center w-full overflow-visible relative bg-transparent">
       <Hero dictionary={dictionary} lang={lang} />
       <ScienceSection dictionary={dictionary} />
-      <WhyUsBento dictionary={dictionary} />
       <AboutContainer dictionary={dictionary} />
+      <WhyUsBento dictionary={dictionary} />
       <Courses dictionary={dictionary} />
       <Schedule dictionary={dictionary} lang={lang} />
       {/* Spacer am Ende hilft beim Testen des Scroll-Endes */}
