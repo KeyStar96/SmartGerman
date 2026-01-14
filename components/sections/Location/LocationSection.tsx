@@ -81,23 +81,23 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
 
             <div className="container mx-auto px-6 md:px-12 relative z-20">
 
-                {/* Header Section */}
+                {/* Header Section - Matches Courses.tsx Typography */}
                 <motion.div
                     style={{ opacity, y: useTransform(scrollYProgress, [0, 0.3], [50, 0]) }}
-                    className="max-w-4xl mb-16"
+                    className="max-w-4xl mb-16 md:mb-24"
                 >
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-[1px] bg-primary-orange" />
-                        <span className="text-primary-orange font-mono text-xs tracking-widest uppercase">
-                            {t.label || "Where to find us"}
-                        </span>
-                    </div>
-                    <h2 className="text-5xl md:text-7xl font-serif font-medium leading-[0.9] text-lm-text-espresso dark:text-dm-text-main mb-6">
-                        {t.title}
+                    {/* Label */}
+                    <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4">
+                        {t.label || "Standort"}
+                    </span>
+
+                    {/* Headline - High Contrast & Authority */}
+                    <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-lm-text-espresso dark:text-dm-text-main leading-none mb-6">
+                        {t.title} <br />
+                        <span className="text-[#FF5C00]">{t.subtitle}</span>
                     </h2>
-                    <p className="text-xl md:text-2xl text-lm-text-espresso/60 dark:text-dm-text-muted font-light max-w-2xl font-sans">
-                        {t.subtitle}
-                    </p>
+
+                    {/* Subtitle / Description moved to main text block or removed if redundant with h2 */}
                 </motion.div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -138,14 +138,13 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                                 href={`https://www.google.com/maps/dir/?api=1&destination=${LOCATION_DATA.lat},${LOCATION_DATA.lng}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-lm-text-espresso/5 dark:bg-dm-text-main/5 hover:bg-lm-text-espresso/10 dark:hover:bg-dm-text-main/10 border border-lm-text-espresso/10 dark:border-dm-text-main/10 rounded-full transition-all duration-300 overflow-hidden"
+                                // BUTTON FIX: Solid Orange, White Text, Rounded Full
+                                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#FF5C00] hover:bg-[#e05200] text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 overflow-hidden"
                             >
-                                <span className="relative z-10 font-mono text-sm tracking-wide uppercase group-hover:text-primary-orange transition-colors text-lm-text-espresso/80 dark:text-dm-text-main/80">
+                                <span className="relative z-10 font-mono text-sm tracking-wide uppercase font-bold">
                                     {t.get_directions}
                                 </span>
-                                <Navigation size={16} className="relative z-10 text-lm-text-espresso/60 dark:text-dm-text-main/60 group-hover:text-primary-orange transition-colors group-hover:translate-x-1" />
-
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-lm-text-espresso/5 dark:via-dm-text-main/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                                <Navigation size={16} className="relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
                             </a>
                         </div>
                     </motion.div>
