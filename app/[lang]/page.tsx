@@ -4,6 +4,7 @@ import WhyUsBento from "@/components/sections/WhyUsBento";
 import AboutContainer from "@/components/sections/About/AboutContainer";
 import Courses from "@/components/sections/Courses";
 import Schedule from "@/components/sections/Schedule";
+import { LocationSection } from "@/components/sections/Location/LocationSection";
 import { getDictionary } from "@/lib/dictionary";
 
 export default async function HomePage({
@@ -22,6 +23,7 @@ export default async function HomePage({
       <WhyUsBento dictionary={dictionary} />
       <Courses dictionary={dictionary} />
       <Schedule dictionary={dictionary} lang={lang} />
+      <LocationSection dictionary={dictionary} />
       {/* Spacer am Ende hilft beim Testen des Scroll-Endes */}
       <div className="h-[20vh] w-full" />
     </div>
