@@ -301,6 +301,17 @@
       "plasticity_value": "0.94 INDEX"
     }
   },
+  "location": {
+    "label": "Where to find us",
+    "title": "Location",
+    "subtitle": "Culture & Community in the Heart of Hannover",
+    "address_label": "Address",
+    "description": "Our courses take place at the Freizeitheim Vahrenwald – a modern, cultural meeting place with excellent accessibility. Only 10 minutes from the main station.",
+    "get_directions": "Get Directions",
+    "privacy_title": "Activate Map",
+    "privacy_text": "For privacy reasons, Google Maps needs your active consent to load external scripts.",
+    "load_map": "Load Map"
+  },
   "footer": {
     "rights": "© 2025 SmartGerman Hannover. All rights reserved.",
     "links": {

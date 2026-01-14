@@ -441,6 +441,17 @@
       "plasticity_value": "0.94 INDEX"
     }
   },
+  "location": {
+    "label": "So finden Sie uns",
+    "title": "Standort",
+    "subtitle": "Kultur & Gemeinschaft im Herzen von Hannover",
+    "address_label": "Adresse",
+    "description": "Unsere Kurse finden im Freizeitheim Vahrenwald statt – ein moderner, kultureller Treffpunkt mit bester Erreichbarkeit. Nur 10 Minuten vom Hauptbahnhof entfernt.",
+    "get_directions": "Route Planen",
+    "privacy_title": "Karte Aktivieren",
+    "privacy_text": "Aus Datenschutzgründen benötigt Google Maps Ihre aktive Zustimmung, um externe Skripte zu laden.",
+    "load_map": "Karte Laden"
+  },
   "footer": {
     "rights": "© 2025 SmartGerman Hannover. Alle Rechte vorbehalten.",
     "links": {
