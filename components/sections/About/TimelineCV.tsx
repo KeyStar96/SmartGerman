@@ -42,7 +42,7 @@ const TimelinePoint = ({ item, index }: { item: TimelineItem; index: number }) =
                     {item.year.includes("-") || item.year.includes("–") ? (
                         item.year.split(/[-–]/).map((part, dateIndex) => (
                             <span key={dateIndex} className="block">
-                                {part.trim()}
+                                {dateIndex > 0 ? `- ${part.trim()}` : part.trim()}
                             </span>
                         ))
                     ) : (
