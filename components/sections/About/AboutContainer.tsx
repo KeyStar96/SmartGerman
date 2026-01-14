@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef } from "react";
-import NeuralBackground from "./NeuralBackground";
 import BioReveal from "./BioReveal";
 import TimelineCV from "./TimelineCV";
 import LanguageMatrix from "./LanguageMatrix";
@@ -48,8 +47,6 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
 
     return (
         <section id="about" ref={containerRef} className="relative w-full min-h-screen py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500">
-
-            <NeuralBackground />
 
             <div className="container mx-auto px-6 md:px-12 relative z-10 pointer-events-none">
 
