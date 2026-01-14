@@ -23,6 +23,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
         offset: ["start end", "end start"],
     });
 
+    // Parallax effects
     const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
     const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
 
@@ -43,7 +44,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
         load_map: "Load Map",
     };
 
-    // Theme Detection (matches NeuralBrain logic)
+    // Theme Detection
     useEffect(() => {
         const updateTheme = () => {
             const isDark = document.documentElement.classList.contains('dark');
@@ -71,11 +72,12 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
     return (
         <section
             ref={containerRef}
-            className="relative w-full py-24 md:py-32 overflow-hidden bg-[#F2EFE9] dark:bg-chinese-black text-chinese-black dark:text-white transition-colors duration-500"
+            // BG REMOVED: Now transparent to blend with page
+            className="relative w-full py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500"
         >
             {/* Background Noise/Gradient - Adaptive */}
-            <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none mix-blend-multiply dark:mix-blend-overlay" />
-            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-[#F2EFE9] dark:from-chinese-black to-transparent z-10 transition-colors duration-500" />
+            <div className="absolute inset-0 bg-noise opacity-[0.05] pointer-events-none mix-blend-multiply dark:mix-blend-overlay" />
+            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-transparent to-transparent z-10 transition-colors duration-500" />
 
             <div className="container mx-auto px-6 md:px-12 relative z-20">
 
@@ -85,15 +87,15 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                     className="max-w-4xl mb-16"
                 >
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-[1px] bg-brand-orange" />
-                        <span className="text-brand-orange font-mono text-xs tracking-widest uppercase">
+                        <div className="w-12 h-[1px] bg-primary-orange" />
+                        <span className="text-primary-orange font-mono text-xs tracking-widest uppercase">
                             {t.label || "Where to find us"}
                         </span>
                     </div>
-                    <h2 className="text-5xl md:text-7xl font-serif font-medium leading-[0.9] text-chinese-black dark:text-off-white mb-6">
+                    <h2 className="text-5xl md:text-7xl font-serif font-medium leading-[0.9] text-lm-text-espresso dark:text-dm-text-main mb-6">
                         {t.title}
                     </h2>
-                    <p className="text-xl md:text-2xl text-chinese-black/60 dark:text-white/60 font-light max-w-2xl font-sans">
+                    <p className="text-xl md:text-2xl text-lm-text-espresso/60 dark:text-dm-text-muted font-light max-w-2xl font-sans">
                         {t.subtitle}
                     </p>
                 </motion.div>
@@ -110,22 +112,22 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                     >
                         {/* Address Block */}
                         <div className="relative group">
-                            <div className="absolute -left-6 top-0 w-[1px] h-full bg-chinese-black/10 dark:bg-white/10 group-hover:bg-brand-orange/50 transition-colors duration-500" />
-                            <h3 className="text-sm font-mono text-chinese-black/40 dark:text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <div className="absolute -left-6 top-0 w-[1px] h-full bg-lm-text-espresso/10 dark:bg-dm-text-main/10 group-hover:bg-primary-orange/50 transition-colors duration-500" />
+                            <h3 className="text-sm font-mono text-lm-text-espresso/40 dark:text-dm-text-muted uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <MapPin size={14} />
                                 {t.address_label}
                             </h3>
-                            <p className="text-2xl font-serif text-chinese-black/90 dark:text-white/90 leading-relaxed">
+                            <p className="text-2xl font-serif text-lm-text-espresso dark:text-dm-text-main leading-relaxed">
                                 Freizeitheim Vahrenwald<br />
-                                <span className="text-chinese-black/60 dark:text-white/60">Vahrenwalder Straße 92</span><br />
-                                <span className="text-brand-orange">30165 Hannover</span>
+                                <span className="text-lm-text-espresso/60 dark:text-dm-text-muted">Vahrenwalder Straße 92</span><br />
+                                <span className="text-primary-orange">30165 Hannover</span>
                             </p>
                         </div>
 
                         {/* Description */}
                         <div className="relative">
-                            <div className="absolute -left-6 top-0 w-[1px] h-full bg-chinese-black/10 dark:bg-white/10" />
-                            <p className="text-lg text-chinese-black/60 dark:text-white/50 leading-relaxed">
+                            <div className="absolute -left-6 top-0 w-[1px] h-full bg-lm-text-espresso/10 dark:bg-dm-text-main/10" />
+                            <p className="text-lg text-lm-text-espresso/60 dark:text-dm-text-muted leading-relaxed">
                                 {t.description}
                             </p>
                         </div>
@@ -136,14 +138,14 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                                 href={`https://www.google.com/maps/dir/?api=1&destination=${LOCATION_DATA.lat},${LOCATION_DATA.lng}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-chinese-black/5 dark:bg-white/5 hover:bg-chinese-black/10 dark:hover:bg-white/10 border border-chinese-black/10 dark:border-white/10 rounded-full transition-all duration-300 overflow-hidden"
+                                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-lm-text-espresso/5 dark:bg-dm-text-main/5 hover:bg-lm-text-espresso/10 dark:hover:bg-dm-text-main/10 border border-lm-text-espresso/10 dark:border-dm-text-main/10 rounded-full transition-all duration-300 overflow-hidden"
                             >
-                                <span className="relative z-10 font-mono text-sm tracking-wide uppercase group-hover:text-brand-orange transition-colors text-chinese-black/80 dark:text-white/80">
+                                <span className="relative z-10 font-mono text-sm tracking-wide uppercase group-hover:text-primary-orange transition-colors text-lm-text-espresso/80 dark:text-dm-text-main/80">
                                     {t.get_directions}
                                 </span>
-                                <Navigation size={16} className="relative z-10 text-chinese-black/60 dark:text-white/60 group-hover:text-brand-orange transition-colors group-hover:translate-x-1" />
+                                <Navigation size={16} className="relative z-10 text-lm-text-espresso/60 dark:text-dm-text-main/60 group-hover:text-primary-orange transition-colors group-hover:translate-x-1" />
 
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-chinese-black/5 dark:via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-lm-text-espresso/5 dark:via-dm-text-main/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
                             </a>
                         </div>
                     </motion.div>
@@ -154,26 +156,27 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                         whileInView={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                         viewport={{ once: true }}
-                        className="lg:col-span-8 h-[500px] md:h-[600px] relative rounded-3xl overflow-hidden shadow-2xl border border-chinese-black/5 dark:border-white/5 bg-[#e0e0e0] dark:bg-[#1a1a1a]"
+                        className="lg:col-span-8 h-[500px] md:h-[600px] relative rounded-3xl overflow-hidden shadow-2xl border border-lm-text-espresso/5 dark:border-dm-text-main/5 bg-transparent"
                     >
                         {/* Privacy Shield */}
                         {!mapConsent && (
                             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-6 text-center">
-                                <div className="absolute inset-0 bg-[#F2EFE9] dark:bg-[#1a1a1a] bg-opacity-80 backdrop-blur-sm z-0 transition-colors" />
+                                <div className="absolute inset-0 bg-lm-bg-bone/80 dark:bg-dm-surface-teal/80 backdrop-blur-sm z-0 transition-colors duration-500" />
                                 <div className="absolute inset-0 bg-noise opacity-10 z-0"></div>
 
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="relative z-10 max-w-md bg-white dark:bg-[#111] border border-chinese-black/10 dark:border-white/10 p-8 rounded-2xl shadow-2xl"
+                                    // GLASS CARD: Semi-transparent instead of solid white, blends with transparent background
+                                    className="relative z-10 max-w-md bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/60 dark:border-white/10 p-8 rounded-2xl shadow-2xl"
                                 >
-                                    <Lock className="w-8 h-8 text-brand-orange mx-auto mb-4" />
-                                    <h3 className="text-xl font-serif text-chinese-black dark:text-white mb-2">{t.privacy_title}</h3>
-                                    <p className="text-sm text-chinese-black/60 dark:text-white/50 mb-6">{t.privacy_text}</p>
+                                    <Lock className="w-8 h-8 text-primary-orange mx-auto mb-4" />
+                                    <h3 className="text-xl font-serif text-lm-text-espresso dark:text-white mb-2">{t.privacy_title}</h3>
+                                    <p className="text-sm text-lm-text-espresso/80 dark:text-white/70 mb-6">{t.privacy_text}</p>
 
                                     <button
                                         onClick={() => setMapConsent(true)}
-                                        className="w-full py-3 bg-chinese-black dark:bg-white text-white dark:text-black font-bold uppercase tracking-widest text-xs rounded-lg hover:bg-brand-orange hover:text-white dark:hover:bg-brand-orange dark:hover:text-white transition-colors duration-300 shadow-lg flex items-center justify-center gap-2"
+                                        className="w-full py-4 bg-primary-orange text-white font-bold uppercase tracking-widest text-xs rounded-lg hover:bg-orange-600 transition-colors duration-300 shadow-lg flex items-center justify-center gap-2"
                                     >
                                         <CheckCircle2 size={16} />
                                         {t.load_map}
