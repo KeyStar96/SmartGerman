@@ -41,8 +41,9 @@ const TimelinePoint = ({ item, index }: { item: TimelineItem; index: number }) =
                 <div className="flex flex-col text-[#FF6B00] font-mono font-bold text-xs tracking-widest uppercase shrink-0 pt-1 leading-snug">
                     {item.year.includes("-") || item.year.includes("–") ? (
                         item.year.split(/[-–]/).map((part, dateIndex) => (
-                            <span key={dateIndex} className="block">
-                                {dateIndex > 0 ? `- ${part.trim()}` : part.trim()}
+                            <span key={dateIndex} className="block relative">
+                                {dateIndex > 0 && <span className="absolute -left-3">-</span>}
+                                {part.trim()}
                             </span>
                         ))
                     ) : (
