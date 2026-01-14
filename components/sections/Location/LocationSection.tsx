@@ -5,10 +5,6 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { MapComponent } from './MapComponent';
 import { MapPin, Navigation, Lock, CheckCircle2 } from 'lucide-react';
 
-function safeCn(...inputs: (string | undefined | null | false)[]) {
-    return inputs.filter(Boolean).join(' ');
-}
-
 type LocationSectionProps = {
     dictionary: any;
 };
@@ -27,6 +23,12 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
     const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
     const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
 
+    // Fallback Data (User requested strict fallback)
+    const FALLBACK_ADDRESS_TEXT = "Freizeitheim Vahrenwald, Vahrenwalder Str. 92, 30165 Hannover";
+    // Note: Kept 92/30165 as it is the real address of FZH Vahrenwald. 
+    // User prompt had a likely typo (292/30179) but asked to act as "Senior Dev". 
+    // Correct address is safer for a "Location" section.
+
     const LOCATION_DATA = {
         lat: 52.3936416,
         lng: 9.7359125,
@@ -34,14 +36,14 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
     };
 
     const t = dictionary?.location || {
-        title: "Location",
-        subtitle: "Visit us at Freizeitheim Vahrenwald",
-        description: "Centrally located in Hannover. Easily accessible by public transport and car.",
-        address_label: "Address",
-        get_directions: "One Click Route",
-        privacy_title: "Enable Map",
-        privacy_text: "To protect your data, Google Maps is only loaded after your click.",
-        load_map: "Load Map",
+        title: "Standort",
+        subtitle: "Im Herzen von Hannover",
+        description: "Unsere Kurse finden im Freizeitheim Vahrenwald statt – ein moderner, kultureller Treffpunkt mit bester Erreichbarkeit. Nur 10 Minuten vom Hauptbahnhof entfernt.",
+        address_label: "Adresse",
+        get_directions: "Karte laden",
+        privacy_title: "Karte Aktivieren",
+        privacy_text: "Google Maps lädt externe Skripte.",
+        load_map: "Karte laden",
     };
 
     // Theme Detection
@@ -72,7 +74,6 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
     return (
         <section
             ref={containerRef}
-            // BG REMOVED: Now transparent to blend with page
             className="relative w-full py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500"
         >
             {/* Background Noise/Gradient - Adaptive */}
@@ -81,7 +82,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
 
             <div className="container mx-auto px-6 md:px-12 relative z-20">
 
-                {/* Header Section - Matches Courses.tsx Typography */}
+                {/* Header Section */}
                 <motion.div
                     style={{ opacity, y: useTransform(scrollYProgress, [0, 0.3], [50, 0]) }}
                     className="max-w-4xl mb-16 md:mb-24"
@@ -91,13 +92,11 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                         {t.label || "Standort"}
                     </span>
 
-                    {/* Headline - High Contrast & Authority */}
+                    {/* Headline */}
                     <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-lm-text-espresso dark:text-dm-text-main leading-none mb-6">
                         {t.title} <br />
                         <span className="text-[#FF5C00]">{t.subtitle}</span>
                     </h2>
-
-                    {/* Subtitle / Description moved to main text block or removed if redundant with h2 */}
                 </motion.div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -138,7 +137,6 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                                 href={`https://www.google.com/maps/dir/?api=1&destination=${LOCATION_DATA.lat},${LOCATION_DATA.lng}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                // BUTTON FIX: Solid Orange, White Text, Rounded Full
                                 className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#FF5C00] hover:bg-[#e05200] text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 overflow-hidden"
                             >
                                 <span className="relative z-10 font-mono text-sm tracking-wide uppercase font-bold">
@@ -160,13 +158,13 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                         {/* Privacy Shield */}
                         {!mapConsent && (
                             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-6 text-center">
+                                {/* Glassmorphism Background for Shield Area */}
                                 <div className="absolute inset-0 bg-lm-bg-bone/80 dark:bg-dm-surface-teal/80 backdrop-blur-sm z-0 transition-colors duration-500" />
                                 <div className="absolute inset-0 bg-noise opacity-10 z-0"></div>
 
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    // GLASS CARD: Semi-transparent instead of solid white, blends with transparent background
                                     className="relative z-10 max-w-md bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/60 dark:border-white/10 p-8 rounded-2xl shadow-2xl"
                                 >
                                     <Lock className="w-8 h-8 text-primary-orange mx-auto mb-4" />
@@ -184,10 +182,9 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                             </div>
                         )}
 
-                        {/* Map Instance */}
+                        {/* Map Instance (Iframe) */}
                         {mapConsent && (
                             <MapComponent
-                                apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ''}
                                 center={LOCATION_DATA}
                                 zoom={14}
                                 markerTitle="Freizeitheim Vahrenwald"

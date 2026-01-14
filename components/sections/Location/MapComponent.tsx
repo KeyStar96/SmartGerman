@@ -3,7 +3,6 @@
 import React from 'react';
 
 interface MapComponentProps {
-    // apiKey is no longer needed for the standard embed but we keep the prop signature compatible or optional
     apiKey?: string;
     center: { lat: number; lng: number };
     zoom: number;
@@ -16,18 +15,18 @@ export const MapComponent: React.FC<MapComponentProps> = ({
     markerAddress,
     theme = 'dark',
 }) => {
-    // Encode address for the URL
     const encodedAddress = encodeURIComponent(markerAddress);
 
-    // CSS Filters for Theming
-    // Dark: Invert colors to make map dark, slightly grayscale to reduce saturation
-    // Light: Slight sepia to match the "Bone" aesthetic
+    // --- Cinematic Filter Logic ---
+    // Transforms the standard Google Maps iframe into a custom-looking map
     const filterStyle = theme === 'dark'
-        ? 'grayscale(100%) invert(90%) contrast(83%) brightness(110%) hue-rotate(180deg)'
-        : 'grayscale(20%) sepia(10%) contrast(95%)';
+        ? 'grayscale(100%) invert(90%) hue-rotate(180deg) brightness(95%) contrast(85%)'
+        : 'grayscale(30%) sepia(20%) contrast(90%)';
 
     return (
-        <div className="w-full h-full relative group">
+        <div className="w-full h-full relative group bg-[#e0e0e0] dark:bg-[#1a1a1a] overflow-hidden">
+
+            {/* 1. The Iframe (Filtered) */}
             <iframe
                 width="100%"
                 height="100%"
@@ -36,13 +35,25 @@ export const MapComponent: React.FC<MapComponentProps> = ({
                 marginHeight={0}
                 marginWidth={0}
                 src={`https://maps.google.com/maps?q=${encodedAddress}&t=m&z=15&output=embed&iwloc=near`}
-                title="Freizeitheim Vahrenwald Location"
-                className="w-full h-full transition-all duration-700 ease-in-out"
+                title="Location Map"
+                className="w-full h-full transition-all duration-700 ease-in-out relative z-10"
                 style={{ filter: filterStyle }}
             />
 
-            {/* Interaction Overlay - helps with scrolling behavior */}
-            <div className="absolute inset-0 pointer-events-none border border-black/5 dark:border-white/5 rounded-3xl" />
+            {/* 2. Blending Overlay (Tinting) */}
+            {/* Adds a color tint to unify the map with the brand colors */}
+            <div
+                className={`absolute inset-0 z-20 pointer-events-none mix-blend-overlay transition-colors duration-700
+          ${theme === 'dark' ? 'bg-[#1a1a1a]/40' : 'bg-[#8d7b68]/10'}
+        `}
+            />
+
+            {/* 3. Vignette (Hides UI Borders) */}
+            {/* Strong inner shadow to fade out the edges and Google UI elements */}
+            <div className="absolute inset-0 z-30 pointer-events-none shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] dark:shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]" />
+
+            {/* 4. Glass Border (Inset) */}
+            <div className="absolute inset-0 z-40 pointer-events-none border border-black/5 dark:border-white/5 rounded-3xl" />
         </div>
     );
 };
