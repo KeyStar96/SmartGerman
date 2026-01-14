@@ -17,11 +17,19 @@ export const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
     const encodedAddress = encodeURIComponent(markerAddress);
 
-    // --- Cinematic Filter Logic ---
-    // Transforms the standard Google Maps iframe into a custom-looking map
-    const filterStyle = theme === 'dark'
-        ? 'grayscale(100%) invert(90%) hue-rotate(180deg) brightness(95%) contrast(85%)'
-        : 'grayscale(30%) sepia(20%) contrast(90%)';
+    // --- Cinematic & Paper Filter Logic ---
+    // Transforms the standard Google Maps iframe into Custom Styles via CSS
+
+    // Dark Mode: "Cinematic Blueprint"
+    // High contrast, inverted colors, metallic/slate look.
+    const darkFilter = 'grayscale(100%) invert(90%) hue-rotate(180deg) brightness(95%) contrast(85%)';
+
+    // Light Mode: "Swiss Paper Print"
+    // 100% Grayscale (Black/White Ink) -> Tinted by Overlay
+    // Slight contrast boost to make streets ("Ink") visible.
+    const lightFilter = 'grayscale(100%) contrast(105%) brightness(105%)';
+
+    const filterStyle = theme === 'dark' ? darkFilter : lightFilter;
 
     return (
         <div className="w-full h-full relative group bg-[#e0e0e0] dark:bg-[#1a1a1a] overflow-hidden">
@@ -41,16 +49,26 @@ export const MapComponent: React.FC<MapComponentProps> = ({
             />
 
             {/* 2. Blending Overlay (Tinting) */}
-            {/* Adds a color tint to unify the map with the brand colors */}
+            {/* 
+          Dark: mix-blend-overlay to add tint
+          Light: mix-blend-multiply to tint the white parts of the map into the paper color (#FCF4E6)
+      */}
             <div
-                className={`absolute inset-0 z-20 pointer-events-none mix-blend-overlay transition-colors duration-700
-          ${theme === 'dark' ? 'bg-[#1a1a1a]/40' : 'bg-[#8d7b68]/10'}
+                className={`absolute inset-0 z-20 pointer-events-none transition-all duration-700
+          ${theme === 'dark'
+                        ? 'bg-[#1a1a1a]/40 mix-blend-overlay'
+                        : 'bg-[#FCF4E6] mix-blend-multiply opacity-100' // Solid tint color that multiplies with B/W map
+                    }
         `}
             />
 
-            {/* 3. Vignette (Hides UI Borders) */}
-            {/* Strong inner shadow to fade out the edges and Google UI elements */}
-            <div className="absolute inset-0 z-30 pointer-events-none shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] dark:shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]" />
+            {/* 3. Vignette (Hides UI Borders/Buttons) */}
+            <div className={`absolute inset-0 z-30 pointer-events-none transition-opacity duration-700
+         ${theme === 'dark'
+                    ? 'shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]' // Heavy dark vignette
+                    : 'shadow-[inset_0_0_60px_rgba(252,244,230,1)]' // "Paper" Vignette (fades to solid paper color at edges)
+                }
+      `} />
 
             {/* 4. Glass Border (Inset) */}
             <div className="absolute inset-0 z-40 pointer-events-none border border-black/5 dark:border-white/5 rounded-3xl" />
