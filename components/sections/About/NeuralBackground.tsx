@@ -73,15 +73,14 @@ export default function NeuralBackground() {
           p.y -= Math.sin(angle) * force * 0.5;
         }
 
+        // Color strategy: Scientific Minimalism (Adaptive)
+        const isDark = document.documentElement.classList.contains("dark");
+        const baseColor = isDark ? "226, 215, 206" : "26, 26, 26"; // using #E2D7CE (Bone) for dark mode text match, or white
+
         // Draw Node
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-
-        // Color strategy: Scientific Minimalism (Gray/White/Orange)
-        // We use a subtle gray for nodes
-        ctx.fillStyle = "rgba(26, 26, 26, 0.1)"; // Dark gray low opacity
-        // Check for dark mode support if needed, but Canvas is unthemed by default unless we check computed styles.
-        // For now, hardcoded "Scientific Light" style matching the light mode preference.
+        ctx.arc(p.x, p.y, isDark ? 1.5 : 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${baseColor === "26, 26, 26" ? "26, 26, 26" : "226, 215, 206"}, ${isDark ? 0.3 : 0.1})`;
         ctx.fill();
 
         // Draw Connections
@@ -98,7 +97,7 @@ export default function NeuralBackground() {
 
             // Opacity based on distance
             const alpha = 1 - (dist2 / CONNECTION_DISTANCE);
-            ctx.strokeStyle = `rgba(26, 26, 26, ${alpha * 0.15})`;
+            ctx.strokeStyle = `rgba(${baseColor === "26, 26, 26" ? "26, 26, 26" : "226, 215, 206"}, ${alpha * (isDark ? 0.2 : 0.15)})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
