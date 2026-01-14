@@ -21,9 +21,9 @@ export default function NeuralBackground() {
     let animationFrameId: number;
 
     // Configuration
-    const PARTICLE_COUNT = 60;
-    const CONNECTION_DISTANCE = 150;
-    const MOUSE_DISTANCE = 200;
+    const PARTICLE_COUNT = 100;
+    const CONNECTION_DISTANCE = 200;
+    const MOUSE_DISTANCE = 250;
 
     // State
     const particles: { x: number; y: number; vx: number; vy: number; }[] = [];
@@ -75,12 +75,12 @@ export default function NeuralBackground() {
 
         // Color strategy: Scientific Minimalism (Adaptive)
         const isDark = document.documentElement.classList.contains("dark");
-        const baseColor = isDark ? "226, 215, 206" : "26, 26, 26"; // using #E2D7CE (Bone) for dark mode text match, or white
+        const baseColor = isDark ? "255, 255, 255" : "26, 26, 26"; // Explicit White for Dark Mode
 
         // Draw Node
         ctx.beginPath();
-        ctx.arc(p.x, p.y, isDark ? 1.5 : 2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${baseColor === "26, 26, 26" ? "26, 26, 26" : "226, 215, 206"}, ${isDark ? 0.3 : 0.1})`;
+        ctx.arc(p.x, p.y, isDark ? 2.5 : 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${baseColor === "26, 26, 26" ? "26, 26, 26" : "255, 255, 255"}, ${isDark ? 0.6 : 0.2})`; // High Opacity
         ctx.fill();
 
         // Draw Connections
@@ -97,8 +97,8 @@ export default function NeuralBackground() {
 
             // Opacity based on distance
             const alpha = 1 - (dist2 / CONNECTION_DISTANCE);
-            ctx.strokeStyle = `rgba(${baseColor === "26, 26, 26" ? "26, 26, 26" : "226, 215, 206"}, ${alpha * (isDark ? 0.2 : 0.15)})`;
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = `rgba(${baseColor}, ${alpha * (isDark ? 0.4 : 0.15)})`;
+            ctx.lineWidth = isDark ? 1.5 : 1;
             ctx.stroke();
           }
         }
@@ -141,7 +141,7 @@ export default function NeuralBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full -z-10 pointer-events-none opacity-60"
+      className="absolute inset-0 w-full h-full z-0 pointer-events-none"
     />
   );
 }
