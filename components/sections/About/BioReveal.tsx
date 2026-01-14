@@ -72,14 +72,13 @@ export default function BioReveal({ headline, subline, body, className, imageUrl
                     whileInView={{ opacity: 1, filter: "grayscale(0%)", y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 1.2, ease: "easeOut" }}
-                    className="absolute bottom-0 right-[-10%] md:right-0 w-[80%] md:w-[40%] h-[60%] md:h-[75%] z-0 pointer-events-none opacity-30 md:opacity-100 mix-blend-multiply dark:mix-blend-overlay"
+                    className="absolute bottom-0 right-[-10%] md:right-0 w-[80%] md:w-[40%] h-[60%] md:h-[75%] z-0 pointer-events-none mix-blend-multiply dark:mix-blend-overlay"
                 >
                     {/* 
                         Using Next.js Image for optimization. 
-                        object-fit: contain to preserve cutout aspect ratio.
-                        object-position: bottom right.
-                     */}
-                    <div className="relative w-full h-full">
+                        Opacity is handled here in the child to avoid conflict with Framer Motion's opacity animation.
+                    */}
+                    <div className="relative w-full h-full opacity-20 md:opacity-100 transition-opacity duration-500">
                         <Image
                             src={imageUrl}
                             alt="Anastasia Sitov"
