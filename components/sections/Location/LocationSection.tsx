@@ -118,7 +118,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                             </h3>
                             <p className="text-2xl font-sans font-bold tracking-tight text-lm-text-espresso dark:text-dm-text-main leading-relaxed">
                                 Freizeitheim Vahrenwald<br />
-                                <span className="text-lm-text-espresso/60 dark:text-dm-text-muted">Vahrenwalder Straße 92</span><br />
+                                <span className="text-lm-text-espresso dark:text-dm-text-main">Vahrenwalder Straße 92</span><br />
                                 <span className="text-primary-orange">30165 Hannover</span>
                             </p>
                         </div>

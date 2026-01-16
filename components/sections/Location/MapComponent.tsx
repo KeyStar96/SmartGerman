@@ -17,17 +17,17 @@ export const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
     const encodedAddress = encodeURIComponent(markerAddress);
 
-    // --- Filter Logic für Zielgruppe 50+ ---
+    // --- Filter Logic Update ---
 
-    // Dark Mode: Hoher Kontrast bleibt wichtig.
-    // Wir reduzieren die Invertierung leicht, damit es nicht zu "negativ" wirkt,
-    // aber behalten den dunklen Look bei.
-    const darkFilter = 'grayscale(100%) invert(90%) hue-rotate(180deg) brightness(90%) contrast(90%)';
+    // DARK MODE: "Midnight City"
+    // 1. invert(100%): Macht die Karte dunkel.
+    // 2. hue-rotate(180deg): Dreht Farben zurück (Wasser = Dunkelblau, Parks = Dunkelgrün).
+    // 3. brightness(95%): Hält die Helligkeit angenehm niedrig.
+    // 4. grayscale(30%): Nimmt die "Neon"-Spitzen raus, damit es edel wirkt.
+    // 5. contrast(1.1): Erhöht die Lesbarkeit der Straßennamen.
+    const darkFilter = 'invert(100%) hue-rotate(180deg) brightness(95%) grayscale(30%) contrast(110%)';
 
-    // Light Mode: "Soft Reality"
-    // Statt 100% Grau (schwer zu lesen) nehmen wir nur 30% der Farbe raus.
-    // Das lässt Wasser blau und Parks grün erscheinen, aber nicht so "neon-artig" grell.
-    // Sepia(10%) gibt eine minimale Wärme passend zu deinem Sand-Hintergrund.
+    // LIGHT MODE: "Soft Reality" (Unverändert, da es dir gefällt)
     const lightFilter = 'grayscale(30%) sepia(10%) contrast(95%) opacity(0.9)';
 
     const filterStyle = theme === 'dark' ? darkFilter : lightFilter;
@@ -49,21 +49,21 @@ export const MapComponent: React.FC<MapComponentProps> = ({
                 style={{ filter: filterStyle }}
             />
 
-            {/* 2. Blending Overlay (Nur noch sehr subtil) */}
+            {/* 2. Blending Overlay */}
             <div
                 className={`absolute inset-0 z-20 pointer-events-none transition-all duration-700
           ${theme === 'dark'
-                        ? 'bg-[#1a1a1a]/20 mix-blend-overlay' // Dunkler Schleier
-                        : 'bg-[#FCF4E6]/10 mix-blend-multiply' // Hauchzarter Sand-Ton, kaum sichtbar
+                        ? 'bg-[#1a1a1a]/10 mix-blend-hard-light' // Subtileres Blending für mehr Farbtreue
+                        : 'bg-[#FCF4E6]/10 mix-blend-multiply'
                     }
         `}
             />
 
-            {/* 3. Vignette (Bleibt, hilft beim Fokus auf die Mitte) */}
+            {/* 3. Vignette */}
             <div className={`absolute inset-0 z-30 pointer-events-none transition-opacity duration-700
          ${theme === 'dark'
-                    ? 'shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]'
-                    : 'shadow-[inset_0_0_40px_rgba(100,100,100,0.1)]' // Viel weichere Vignette im Light Mode
+                    ? 'shadow-[inset_0_0_80px_rgba(0,0,0,0.6)]' // Etwas weicher im Dark Mode
+                    : 'shadow-[inset_0_0_40px_rgba(100,100,100,0.1)]'
                 }
       `} />
 
