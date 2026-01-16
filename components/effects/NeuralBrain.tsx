@@ -568,16 +568,29 @@ export default function NeuralBrain() {
                 // Distance from center
                 const dist = Math.abs(elementCenter - viewCenter);
 
-                // Define range:
-                // 0 dist -> 1.0 expansion
-                // viewH * 0.35 dist -> 0.0 expansion (faded out before leaving screen entirely)
-                const maxDist = viewH * 0.35;
+                // UPDATED LOGIC: "Plateau" behavior from user request
+                // Keep 1.0 expansion for a long time, then fade out quickly near the edge.
 
-                // Smoothstep for organic falloff
-                // We use inverted smoothstep logic: 1 at 0, 0 at maxDist
-                const normDist = Math.max(0, Math.min(1, dist / maxDist));
-                // cubic ease out/in manual or smoothstep
-                targetExpansion = 1.0 - (normDist * normDist * (3 - 2 * normDist));
+                // 1. Define "Safe Zone" where expansion is locked to 1.0
+                // viewH * 0.35 means: +/- 35% from center is SAFE. (Total 70% of screen height is full size)
+                const safeZone = viewH * 0.35;
+
+                // 2. Define "Fade Out Zone"
+                // Fade starts after safeZone and ends at fadeEnd.
+                // viewH * 0.55 means: It fades out completely just as it leaves the screen (or slightly after)
+                const fadeEnd = viewH * 0.55;
+
+                if (dist <= safeZone) {
+                    targetExpansion = 1.0;
+                } else {
+                    // Normalize distance between safeZone and fadeEnd -> 0..1
+                    // 0 = at safeZone (Full), 1 = at fadeEnd (Empty)
+                    const fadeProgress = Math.max(0, Math.min(1, (dist - safeZone) / (fadeEnd - safeZone)));
+
+                    // Simple linear fade or smoothstep
+                    const smoothFade = fadeProgress * fadeProgress * (3 - 2 * fadeProgress);
+                    targetExpansion = 1.0 - smoothFade;
+                }
             }
 
             // If observer says Hidden, force 0 (Optimization safety)
