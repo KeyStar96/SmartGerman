@@ -116,7 +116,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                                 <MapPin size={14} />
                                 {t.address_label}
                             </h3>
-                            <p className="text-2xl font-serif text-lm-text-espresso dark:text-dm-text-main leading-relaxed">
+                            <p className="text-2xl font-sans font-bold tracking-tight text-lm-text-espresso dark:text-dm-text-main leading-relaxed">
                                 Freizeitheim Vahrenwald<br />
                                 <span className="text-lm-text-espresso/60 dark:text-dm-text-muted">Vahrenwalder Straße 92</span><br />
                                 <span className="text-primary-orange">30165 Hannover</span>
@@ -168,7 +168,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                                     className="relative z-10 max-w-md bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/60 dark:border-white/10 p-8 rounded-2xl shadow-2xl"
                                 >
                                     <Lock className="w-8 h-8 text-primary-orange mx-auto mb-4" />
-                                    <h3 className="text-xl font-serif text-lm-text-espresso dark:text-white mb-2">{t.privacy_title}</h3>
+                                    <h3 className="text-xl font-sans font-bold tracking-tight text-lm-text-espresso dark:text-white mb-2">{t.privacy_title}</h3>
                                     <p className="text-sm text-lm-text-espresso/80 dark:text-white/70 mb-6">{t.privacy_text}</p>
 
                                     <button

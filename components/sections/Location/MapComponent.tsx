@@ -17,24 +17,25 @@ export const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
     const encodedAddress = encodeURIComponent(markerAddress);
 
-    // --- Cinematic & Paper Filter Logic ---
-    // Transforms the standard Google Maps iframe into Custom Styles via CSS
+    // --- Filter Logic für Zielgruppe 50+ ---
 
-    // Dark Mode: "Cinematic Blueprint"
-    // High contrast, inverted colors, metallic/slate look.
-    const darkFilter = 'grayscale(100%) invert(90%) hue-rotate(180deg) brightness(95%) contrast(85%)';
+    // Dark Mode: Hoher Kontrast bleibt wichtig.
+    // Wir reduzieren die Invertierung leicht, damit es nicht zu "negativ" wirkt,
+    // aber behalten den dunklen Look bei.
+    const darkFilter = 'grayscale(100%) invert(90%) hue-rotate(180deg) brightness(90%) contrast(90%)';
 
-    // Light Mode: "Swiss Paper Print"
-    // 100% Grayscale (Black/White Ink) -> Tinted by Overlay
-    // Slight contrast boost to make streets ("Ink") visible.
-    const lightFilter = 'grayscale(100%) contrast(105%) brightness(105%)';
+    // Light Mode: "Soft Reality"
+    // Statt 100% Grau (schwer zu lesen) nehmen wir nur 30% der Farbe raus.
+    // Das lässt Wasser blau und Parks grün erscheinen, aber nicht so "neon-artig" grell.
+    // Sepia(10%) gibt eine minimale Wärme passend zu deinem Sand-Hintergrund.
+    const lightFilter = 'grayscale(30%) sepia(10%) contrast(95%) opacity(0.9)';
 
     const filterStyle = theme === 'dark' ? darkFilter : lightFilter;
 
     return (
-        <div className="w-full h-full relative group bg-[#e0e0e0] dark:bg-[#1a1a1a] overflow-hidden">
+        <div className="w-full h-full relative group bg-[#F0EFE9] dark:bg-[#1a1a1a] overflow-hidden">
 
-            {/* 1. The Iframe (Filtered) */}
+            {/* 1. The Iframe */}
             <iframe
                 width="100%"
                 height="100%"
@@ -48,30 +49,26 @@ export const MapComponent: React.FC<MapComponentProps> = ({
                 style={{ filter: filterStyle }}
             />
 
-            {/* 2. Blending Overlay (Tinting) */}
-            {/* 
-          Dark: mix-blend-overlay to add tint
-          Light: mix-blend-multiply to tint the white parts of the map into the paper color (#FCF4E6)
-      */}
+            {/* 2. Blending Overlay (Nur noch sehr subtil) */}
             <div
                 className={`absolute inset-0 z-20 pointer-events-none transition-all duration-700
           ${theme === 'dark'
-                        ? 'bg-[#1a1a1a]/40 mix-blend-overlay'
-                        : 'bg-[#FCF4E6] mix-blend-multiply opacity-100' // Solid tint color that multiplies with B/W map
+                        ? 'bg-[#1a1a1a]/20 mix-blend-overlay' // Dunkler Schleier
+                        : 'bg-[#FCF4E6]/10 mix-blend-multiply' // Hauchzarter Sand-Ton, kaum sichtbar
                     }
         `}
             />
 
-            {/* 3. Vignette (Hides UI Borders/Buttons) */}
+            {/* 3. Vignette (Bleibt, hilft beim Fokus auf die Mitte) */}
             <div className={`absolute inset-0 z-30 pointer-events-none transition-opacity duration-700
          ${theme === 'dark'
-                    ? 'shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]' // Heavy dark vignette
-                    : 'shadow-[inset_0_0_60px_rgba(252,244,230,1)]' // "Paper" Vignette (fades to solid paper color at edges)
+                    ? 'shadow-[inset_0_0_80px_rgba(0,0,0,0.8)]'
+                    : 'shadow-[inset_0_0_40px_rgba(100,100,100,0.1)]' // Viel weichere Vignette im Light Mode
                 }
       `} />
 
-            {/* 4. Glass Border (Inset) */}
-            <div className="absolute inset-0 z-40 pointer-events-none border border-black/5 dark:border-white/5 rounded-3xl" />
+            {/* 4. Glass Border */}
+            <div className="absolute inset-0 z-40 pointer-events-none border border-black/10 dark:border-white/5 rounded-3xl" />
         </div>
     );
 };

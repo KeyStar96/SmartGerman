@@ -114,7 +114,7 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-full">
                                 {/* Visual Label */}
                                 <div className="p-12 md:border-r border-black/10 dark:border-white/5 bg-transparent">
-                                    <h3 className="text-4xl font-instrument-serif text-[#2D3436] dark:text-[#E2D7CE] leading-none mb-4">
+                                    <h3 className="text-4xl font-sans font-extrabold tracking-tight text-[#2D3436] dark:text-[#E2D7CE] leading-none mb-4">
                                         CV
                                     </h3>
                                     <div className="w-12 h-1 bg-[#FF6B00]" />

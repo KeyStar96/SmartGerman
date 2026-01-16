@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import { User, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // --- Fonts ---
-const instrumentSerif = Instrument_Serif({ weight: "400", subsets: ["latin"] });
+// Instrument Serif removed. Inter is global default.
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
 // --- Types ---
@@ -234,9 +234,9 @@ function CourseCard({ course }: { course: CourseData }) {
           </div>
 
           <h3 className={`
-              ${instrumentSerif.className} 
+              font-sans font-extrabold tracking-tight
               text-4xl md:text-5xl leading-[0.9]
-              text-[#111111] dark:text-[#E2D7CE] font-medium
+              text-[#111111] dark:text-[#E2D7CE]
             `}>
             {course.title}
           </h3>
@@ -279,9 +279,9 @@ function CourseCard({ course }: { course: CourseData }) {
               <div className="flex flex-col items-end">
                 {/* Price */}
                 <span className={`
-                            ${instrumentSerif.className} 
+                            font-sans font-extrabold tracking-tight
                             text-5xl 
-                            group-hover:text-[#FF5C00] group-hover:font-bold transition-all duration-300 leading-none
+                            group-hover:text-[#FF5C00] transition-all duration-300 leading-none
                         `}>
                   {course.price}
                 </span>

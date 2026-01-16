@@ -58,7 +58,7 @@ const TimelinePoint = ({ item, index }: { item: TimelineItem; index: number }) =
                         {item.institution}
                     </p>
                     {item.desc && (
-                        <p className="text-xs text-[#1A1A1A]/50 dark:text-[#FAFAFA]/50 mt-2 italic font-serif">
+                        <p className="text-xs text-[#1A1A1A]/50 dark:text-[#FAFAFA]/50 mt-2 italic font-sans font-medium">
                             {item.desc}
                         </p>
                     )}

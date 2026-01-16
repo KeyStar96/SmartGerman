@@ -45,7 +45,7 @@ export default function BioReveal({ headline, subline, body, className, imageUrl
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-                    className="font-instrument-serif text-5xl md:text-6xl lg:text-7xl leading-[0.85] text-[#2D3436] dark:text-[#E2D7CE] mb-8 tracking-tight"
+                    className="font-sans font-extrabold text-5xl md:text-6xl lg:text-7xl leading-[0.85] text-[#2D3436] dark:text-[#E2D7CE] mb-8 tracking-tight"
                 >
                     {name}
                 </motion.h2>
