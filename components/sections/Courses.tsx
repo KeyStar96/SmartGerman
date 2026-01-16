@@ -221,8 +221,8 @@ function CourseCard({ course }: { course: CourseData }) {
               </span>
             ) : <div />}
 
-            {/* Start Badge */}
-            {course.start_badge && (
+            {/* Start Badge - ONLY for A1.1 */}
+            {course.start_badge && course.title.includes("A1.1") && (
               <span className={`
                    ${jetbrainsMono.className}
                    bg-[#FF5C00] text-white

@@ -67,6 +67,9 @@ export const MapComponent: React.FC<MapComponentProps> = ({
                 }
       `} />
 
+            {/* 4. Glass Border */}
+            <div className="absolute inset-0 z-40 pointer-events-none border border-black/10 dark:border-white/5 rounded-3xl" />
+
         </div>
     );
 };

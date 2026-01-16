@@ -153,11 +153,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                         whileInView={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                         viewport={{ once: true }}
-                        className="lg:col-span-8 h-[500px] md:h-[600px] relative rounded-3xl overflow-hidden bg-transparent"
-                        style={{
-                            maskImage: "radial-gradient(ellipse at center, black 60%, transparent 98%)",
-                            WebkitMaskImage: "radial-gradient(ellipse at center, black 60%, transparent 98%)"
-                        }}
+                        className="lg:col-span-8 h-[500px] md:h-[600px] relative rounded-3xl overflow-hidden shadow-2xl border border-lm-text-espresso/5 dark:border-dm-text-main/5 bg-transparent"
                     >
                         {/* Privacy Shield */}
                         {!mapConsent && (
