@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
 import { ArrowUpRight, Copy, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import Magnetic from '@/components/ui/Magnetic';
 import { isOpenNow } from '@/lib/time-utils';
