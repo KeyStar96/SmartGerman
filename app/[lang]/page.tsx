@@ -23,26 +23,45 @@ export default async function HomePage({
   return (
     <div className="flex flex-col items-center w-full overflow-x-hidden">
 
-      {/* Layer 1: Fixed Background */}
-      {/* Remains fixed in view (z-0) while content scrolls over it */}
-      <div className="fixed top-0 left-0 w-full h-screen z-0">
-        <ArchitecturalBackground />
-      </div>
+      {/* 
+        CURTAIN LAYOUT SYSTEM
+        The <main> element acts as the "Curtain".
+        Inside it, we have:
+        1. Sticky Background: Acts as the opaque backing "sheet" of the curtain.
+        2. Content: Scrolls over the Sticky Background.
+        
+        When the Curtain (main) scrolls out of view, it pulls the Sticky Background with it,
+        revealing the Fixed Footer underneath.
+      */}
+      <main
+        className="relative z-10 w-full shadow-2xl"
+        style={{
+          // Use clip-path for rounded bottom to support 'sticky' children (overflow: hidden breaks sticky)
+          clipPath: "inset(0 0 0 0 round 0 0 40px 40px)"
+        }}
+      >
+        {/* Layer A: Sticky Background (The Backing) */}
+        {/* Absolute positioned to fill the Curtain, but sticky inside to stay in view */}
+        <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none">
+          <div className="sticky top-0 h-[100vh] w-full">
+            <ArchitecturalBackground />
+          </div>
+        </div>
 
-      {/* Layer 2: Content (Curtain) */}
-      {/* Slides over the Fixed Background and pulls up to reveal Footer */}
-      {/* Added shadow-2xl for depth separation from Footer/Background */}
-      <main className="relative z-10 w-full bg-background rounded-b-[40px] shadow-2xl">
-        <Hero dictionary={dictionary} lang={lang} />
-        <ScienceSection dictionary={dictionary} />
-        <AboutContainer dictionary={dictionary} />
-        <WhyUsBento dictionary={dictionary} />
-        <Courses dictionary={dictionary} />
-        <LocationSection dictionary={dictionary} />
+        {/* Layer B: Content (Transparent) */}
+        {/* Text scrolls freely over the sticky background */}
+        <div className="relative z-20 w-full">
+          <Hero dictionary={dictionary} lang={lang} />
+          <ScienceSection dictionary={dictionary} />
+          <AboutContainer dictionary={dictionary} />
+          <WhyUsBento dictionary={dictionary} />
+          <Courses dictionary={dictionary} />
+          <LocationSection dictionary={dictionary} />
+        </div>
       </main>
 
       {/* Layer 3: Footer */}
-      {/* Contains spacer (in flow) + fixed footer (z-0) */}
+      {/* Revealed when the Curtain lifts */}
       <FooterLayout dictionary={dictionary} />
     </div>
   );
