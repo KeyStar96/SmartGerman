@@ -26,18 +26,18 @@ export default async function HomePage({
         This slides UP over the fixed footer.
         Added rounded-b-[40px] and shadow-2xl for better visual layering.
       */}
-      <div className="relative w-full">
+      <main className="relative z-10 w-full bg-transparent rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
         {/* 
             The 'Wall' Background:
-            - Fixed Positioning (handled internally)
-            - Moves up via JS transform
-            - z-1 to sit on top of Footer (z-0) but behind Content (z-10)
-            - Shadow and Rounded Corners now managed here creates the "Sheet" look
+            - CSS Sticky Positioning
+            - Stays fixed while content scrolls
+            - Moves up naturally when container ends (Curtain Effect)
+            - z-0 to sit behind content
         */}
-        <ArchitecturalBackground className="z-1 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
+        <ArchitecturalBackground />
 
         {/* Content sits on top of background */}
-        <div className="relative z-10 w-full overflow-hidden rounded-b-[40px]">
+        <div className="relative z-10 w-full">
           <Hero dictionary={dictionary} lang={lang} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
@@ -46,7 +46,7 @@ export default async function HomePage({
 
           <LocationSection dictionary={dictionary} />
         </div>
-      </div>
+      </main>
 
       {/* 
         Footer Layout:
