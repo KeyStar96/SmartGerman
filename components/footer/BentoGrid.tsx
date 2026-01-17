@@ -1,9 +1,9 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Mail, Send, MapPin, ArrowUpRight } from 'lucide-react';
-import { useRef, useEffect, useState } from 'react';
-import { cn } from '@/lib/utils';
+import { ArrowUpRight, Copy, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import Magnetic from '@/components/ui/Magnetic';
 import { isOpenNow } from '@/lib/time-utils';
 
@@ -12,166 +12,139 @@ interface BentoGridProps {
 }
 
 export default function BentoGrid({ dictionary }: BentoGridProps) {
-    const t = dictionary.Footer;
-    const [openStatus, setOpenStatus] = useState(false);
+    // Fallback falls Dictionary noch lädt
+    const t = dictionary?.Footer || {};
+    const navItems = ['home', 'courses', 'prices', 'about', 'location'];
+
+    // Status Logic
+    const [isOpen, setIsOpen] = useState(false);
+    const [currentTime, setCurrentTime] = useState("");
 
     useEffect(() => {
-        setOpenStatus(isOpenNow());
-        const interval = setInterval(() => {
-            setOpenStatus(isOpenNow());
-        }, 60000);
+        setIsOpen(isOpenNow());
+        // Uhrzeit live updaten (Berlin)
+        const updateTime = () => {
+            const now = new Date().toLocaleTimeString("de-DE", {
+                timeZone: "Europe/Berlin",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+            setCurrentTime(now);
+        };
+        updateTime();
+        const interval = setInterval(updateTime, 60000);
         return () => clearInterval(interval);
     }, []);
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.2
-            }
-        }
+    // Copy Email
+    const [isCopied, setIsCopied] = useState(false);
+    const handleCopyEmail = () => {
+        navigator.clipboard.writeText("info@smart-german.com");
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
     };
-
-    const itemVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } }
-    };
-
-    const tickerContent = t.Ticker.content;
 
     return (
-        <motion.div
-            className="w-full max-w-[1400px] mx-auto p-4 md:p-6 mb-24 md:mb-0"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-        >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+        <div className="w-full h-full px-6 md:px-12 py-12 flex flex-col justify-between">
 
-                {/* --- 1. HERO --- */}
-                <motion.div
-                    variants={itemVariants}
-                    className="col-span-1 md:col-span-2 lg:col-span-1 bg-neutral-900/50 backdrop-blur-md border border-white/5 rounded-3xl p-8 flex flex-col justify-between group hover:border-white/10 transition-colors"
-                >
+            {/* TOP ROW: Navigation & Brand */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 h-full items-start">
+
+                {/* 1. Brand / Mission (Left Column) */}
+                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-8">
                     <div>
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 rounded-full bg-[#FF5C00] flex items-center justify-center">
-                                <span className="text-white font-bold text-lg">S</span>
-                            </div>
-                            <span className="text-white text-xl font-medium tracking-tight">{t.Hero.title}</span>
-                        </div>
-                        <p className="text-neutral-400 leading-relaxed text-sm">
-                            {t.Hero.mission}
+                        <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter text-white mix-blend-difference mb-6">
+                            Smart<br />German<span className="text-[#FF5C00]">.</span>
+                        </h2>
+                        <p className="text-white/50 max-w-sm text-sm font-mono uppercase tracking-wide leading-relaxed">
+                            {t.Hero?.mission || "Language acquisition based on science."}
                         </p>
                     </div>
 
-                    <div className="mt-12">
-                        <div className="flex items-center gap-2 text-xs font-mono text-neutral-500 uppercase tracking-wider">
-                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                            <span>System Active</span>
+                    {/* Status Indicator */}
+                    <div className="flex items-center gap-3">
+                        <div className="relative flex items-center justify-center w-3 h-3">
+                            <div className={`absolute inset-0 rounded-full opacity-50 animate-ping ${isOpen ? 'bg-green-500' : 'bg-red-500'}`} />
+                            <div className={`relative w-2 h-2 rounded-full ${isOpen ? 'bg-green-500' : 'bg-red-500'}`} />
                         </div>
+                        <span className="font-mono text-xs text-white/70 uppercase tracking-widest">
+                            Hannover {currentTime} • {isOpen ? "Open" : "Closed"}
+                        </span>
                     </div>
-                </motion.div>
+                </div>
 
-                {/* --- 2. NAV --- */}
-                <motion.div
-                    variants={itemVariants}
-                    className="col-span-1 md:col-span-1 bg-neutral-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 flex flex-col justify-between min-h-[300px]"
-                >
-                    <h3 className="text-neutral-500 text-xs font-mono uppercase tracking-wider mb-6">Navigation</h3>
-                    <nav className="flex flex-col gap-2">
-                        {[
-                            { label: t.Nav.home, href: '/' },
-                            { label: t.Nav.courses, href: '/courses' },
-                            { label: t.Nav.prices, href: '/prices' },
-                            { label: t.Nav.about, href: '/about' },
-                            { label: t.Nav.location, href: '/location' },
-                        ].map((item, i) => (
+                {/* 2. Navigation (Middle - Big Type) */}
+                <div className="lg:col-span-4 flex flex-col justify-start">
+                    <nav className="flex flex-col space-y-2">
+                        {navItems.map((key) => (
                             <a
-                                key={i}
-                                href={item.href}
-                                className="group flex items-center justify-between text-neutral-300 py-2 border-b border-white/5 hover:text-white hover:border-white/20 transition-all"
+                                key={key}
+                                href={`#${key}`}
+                                className="group flex items-center justify-between py-2 border-b border-white/10 hover:border-white/40 transition-colors cursor-pointer"
                             >
-                                <span className="group-hover:translate-x-2 transition-transform duration-300">{item.label}</span>
-                                <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300 text-[#FF5C00]" />
+                                <span className="text-2xl md:text-3xl font-light text-white/60 group-hover:text-white group-hover:translate-x-4 transition-all duration-300 ease-out">
+                                    {t.Nav?.[key] || key}
+                                </span>
+                                <ArrowUpRight className="w-5 h-5 text-[#FF5C00] opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300" />
                             </a>
                         ))}
                     </nav>
-                </motion.div>
-
-                {/* --- 3. STATUS & CONTACT --- */}
-                <div className="col-span-1 md:col-span-1 flex flex-col gap-4">
-
-                    {/* STATUS */}
-                    <motion.div
-                        variants={itemVariants}
-                        className="bg-neutral-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-6 flex-1 flex flex-col justify-center relative overflow-hidden"
-                    >
-                        <div className="absolute top-4 right-4 text-neutral-600">
-                            <div className={cn("w-3 h-3 rounded-full", openStatus ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" : "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]")} />
-                        </div>
-
-                        <h3 className="text-neutral-500 text-xs font-mono uppercase tracking-wider mb-2">{t.Status.title}</h3>
-                        <div className="text-2xl font-medium text-white mb-1">
-                            {openStatus ? t.Status.open : t.Status.closed}
-                        </div>
-                        <div className="text-neutral-400 text-sm">
-                            {openStatus ? t.Status.hours : t.Status.weekend}
-                        </div>
-                    </motion.div>
-
-                    {/* CONTACT ACTIONS */}
-                    <motion.div
-                        variants={itemVariants}
-                        className="flex gap-4"
-                    >
-                        <Magnetic>
-                            <a href={`mailto:${t.Contact.email}`} className="w-16 h-16 rounded-full bg-neutral-800 border border-white/10 flex items-center justify-center text-white hover:bg-[#FF5C00] hover:border-[#FF5C00] transition-colors duration-300">
-                                <Mail className="w-6 h-6" />
-                            </a>
-                        </Magnetic>
-                        <Magnetic>
-                            <a href="https://t.me/smartgerman" target="_blank" rel="noopener noreferrer" className="flex-1 h-16 rounded-full bg-neutral-800 border border-white/10 flex items-center justify-center gap-2 text-white hover:bg-[#0088cc] hover:border-[#0088cc] transition-colors duration-300 px-6">
-                                <Send className="w-5 h-5" />
-                                <span className="font-medium hidden sm:inline">{t.Contact.telegram}</span>
-                            </a>
-                        </Magnetic>
-                    </motion.div>
                 </div>
 
-                {/* --- 4. TICKER & LEGAL --- */}
-                <motion.div
-                    variants={itemVariants}
-                    className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col gap-4"
-                >
-                    {/* TICKER */}
-                    <div className="bg-[#FF5C00] rounded-3xl p-6 overflow-hidden relative flex items-center h-[120px]">
-                        <div className="flex whitespace-nowrap animate-marquee">
-                            {[...tickerContent, ...tickerContent, ...tickerContent].map((text: string, i: number) => (
-                                <span key={i} className="text-black font-bold text-2xl mx-4 uppercase tracking-tighter">
-                                    {text} •
+                {/* 3. Contact & Actions (Right Column) */}
+                <div className="lg:col-span-3 flex flex-col gap-6 lg:items-end">
+
+                    {/* Magnetic Buttons */}
+                    <div className="flex flex-col gap-3 w-full sm:w-auto">
+                        <Magnetic>
+                            <button
+                                onClick={handleCopyEmail}
+                                className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white flex items-center justify-between px-6 transition-all group"
+                            >
+                                <span className="font-mono text-xs uppercase tracking-widest">
+                                    {isCopied ? "Copied!" : "Email Me"}
                                 </span>
-                            ))}
-                        </div>
+                                <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    {isCopied ? <Check size={14} /> : <ArrowUpRight size={14} />}
+                                </div>
+                            </button>
+                        </Magnetic>
+
+                        <Magnetic>
+                            <a
+                                href="https://t.me/smartgerman"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 hover:bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-between px-6 transition-all group"
+                            >
+                                <span className="font-mono text-xs uppercase tracking-widest">Telegram</span>
+                                <MessageCircle size={20} className="group-hover:rotate-12 transition-transform" />
+                            </a>
+                        </Magnetic>
                     </div>
 
-                    {/* LEGAL */}
-                    <div className="bg-neutral-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 flex-1 flex flex-col justify-end">
-                        <div className="flex flex-wrap gap-x-6 gap-y-2 mb-4 text-sm text-neutral-400">
-                            <a href="/legal/privacy" className="hover:text-white transition-colors">{t.Legal.privacy}</a>
-                            <a href="/legal/imprint" className="hover:text-white transition-colors">{t.Legal.imprint}</a>
-                            <a href="/legal/terms" className="hover:text-white transition-colors">{t.Legal.terms}</a>
-                        </div>
-                        <div className="text-xs text-neutral-600 font-mono">
-                            {t.Legal.copyright}
-                        </div>
+                    {/* Socials Minimal */}
+                    <div className="flex gap-4 mt-auto">
+                        <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/40 transition-all">
+                            <Instagram size={16} />
+                        </a>
+                        <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/40 transition-all">
+                            <Linkedin size={16} />
+                        </a>
                     </div>
-                </motion.div>
-
+                </div>
             </div>
-        </motion.div>
+
+            {/* BOTTOM ROW: Footer Meta */}
+            <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
+                <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
+
+                <div className="flex gap-8">
+                    <a href="/imprint" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</a>
+                    <a href="/privacy" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</a>
+                    <a href="/terms" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</a>
+                </div>
+            </div>
+        </div>
     );
 }

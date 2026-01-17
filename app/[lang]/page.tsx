@@ -22,8 +22,9 @@ export default async function HomePage({
         Content Curtain: 
         Wraps the efficient main content in a solid background with z-index.
         This slides UP over the fixed footer.
+        Added rounded-b-[40px] and shadow-2xl for better visual layering.
       */}
-      <main className="relative z-10 w-full bg-background mb-[0px] shadow-2xl">
+      <main className="relative z-10 w-full bg-background rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
         <Hero dictionary={dictionary} lang={lang} />
         <ScienceSection dictionary={dictionary} />
         <AboutContainer dictionary={dictionary} />
