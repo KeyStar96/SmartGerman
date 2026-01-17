@@ -10,14 +10,14 @@ export default function FooterLayout({ dictionary }: FooterLayoutProps) {
     return (
         <div
             className="relative h-[800px]"
-            style={{ clipPath: "inset(0 0 0 0)" }} // Ensure footer doesn't overlap unexpectedly
+        // clipPath removed to ensure 'fixed' child positions relative to viewport
         >
             {/* 
             Spacer div to take up space in the document flow.
         */}
-            <div className="h-[800px] w-full" />
+            <div className="h-[800px] w-full pointer-events-none" />
 
-            <footer className="fixed bottom-0 left-0 w-full h-[800px] -z-10 flex flex-col justify-end overflow-hidden">
+            <footer className="fixed bottom-0 left-0 w-full h-[800px] z-0 flex flex-col justify-end overflow-hidden">
                 {/* Background Visuals */}
                 <div className="absolute inset-0 bg-neutral-950">
                     <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-[#FF5C00] rounded-full mix-blend-screen filter blur-[128px] opacity-10" />

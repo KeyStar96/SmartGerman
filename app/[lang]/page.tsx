@@ -18,13 +18,26 @@ export default async function HomePage({
 
   return (
     <div className="flex flex-col items-center w-full overflow-visible relative bg-transparent">
-      <Hero dictionary={dictionary} lang={lang} />
-      <ScienceSection dictionary={dictionary} />
-      <AboutContainer dictionary={dictionary} />
-      <WhyUsBento dictionary={dictionary} />
-      <Courses dictionary={dictionary} />
-      <Schedule dictionary={dictionary} lang={lang} />
-      <LocationSection dictionary={dictionary} />
+      {/* 
+        Content Curtain: 
+        Wraps the efficient main content in a solid background with z-index.
+        This slides UP over the fixed footer.
+      */}
+      <main className="relative z-10 w-full bg-background mb-[0px] shadow-2xl">
+        <Hero dictionary={dictionary} lang={lang} />
+        <ScienceSection dictionary={dictionary} />
+        <AboutContainer dictionary={dictionary} />
+        <WhyUsBento dictionary={dictionary} />
+        <Courses dictionary={dictionary} />
+        <Schedule dictionary={dictionary} lang={lang} />
+        <LocationSection dictionary={dictionary} />
+      </main>
+
+      {/* 
+        Footer Layout:
+        Contains the spacer (in flow) and the fixed footer (z-0, behind curtain).
+        When the curtain scrolls up, the spacer reveals the footer.
+      */}
       <FooterLayout dictionary={dictionary} />
     </div>
   );
