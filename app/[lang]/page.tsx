@@ -26,18 +26,22 @@ export default async function HomePage({
         This slides UP over the fixed footer.
         Added rounded-b-[40px] and shadow-2xl for better visual layering.
       */}
-      <main className="relative z-10 w-full bg-transparent rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
-        {/* 
-            The 'Wall' Background:
-            - CSS Sticky Positioning
-            - Stays fixed while content scrolls
-            - Moves up naturally when container ends (Curtain Effect)
-            - z-0 to sit behind content
-        */}
-        <ArchitecturalBackground />
+      {/* 
+        MAIN CURTAIN CONTAINER 
+        - Uses CSS Grid to stack Content on top of Sticky Background
+        - Resolves 'separate section' issue by making them overlap exactly
+        - Resolves Mobile issues by using natural flow (height defined by content)
+        - Sticky Background stays Fixed until the whole container scrolls up (Curtain Effect)
+      */}
+      <main className="relative z-10 w-full grid grid-cols-1 bg-transparent rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
 
-        {/* Content sits on top of background */}
-        <div className="relative z-10 w-full">
+        {/* Layer 1: The Sticky Background (Behaves like Fixed, but attached to this container) */}
+        <div className="col-start-1 row-start-1 h-[100vh] sticky top-0 left-0 w-full -z-10 overflow-hidden rounded-b-[40px]">
+          <ArchitecturalBackground />
+        </div>
+
+        {/* Layer 2: The Content (Scrolls naturally) */}
+        <div className="col-start-1 row-start-1 z-10 w-full pb-0">
           <Hero dictionary={dictionary} lang={lang} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />

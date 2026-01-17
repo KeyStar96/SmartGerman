@@ -12,7 +12,7 @@ export default function ArchitecturalBackground({ className }: { className?: str
     return (
         <div
             className={cn(
-                "sticky top-0 left-0 w-full h-[100vh] overflow-hidden pointer-events-none select-none z-0 backface-hidden",
+                "relative w-full h-full overflow-hidden pointer-events-none select-none z-0 backface-hidden",
                 className
             )}
         >
