@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export default function ArchitecturalBackground({ className }: { className?: string }) {
     // Cast to any to bypass TS error: "JSX element class does not support attributes"
