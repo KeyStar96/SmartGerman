@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowUpRight, Copy, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { ArrowUpRight, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import Magnetic from '@/components/ui/Magnetic';
 import { isOpenNow } from '@/lib/time-utils';
 
@@ -10,7 +11,6 @@ interface BentoGridProps {
 }
 
 export default function BentoGrid({ dictionary }: BentoGridProps) {
-    // Fallback falls Dictionary noch lädt
     const t = dictionary?.Footer || {};
     const navItems = ['home', 'courses', 'prices', 'about', 'location'];
 
@@ -20,7 +20,6 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
 
     useEffect(() => {
         setIsOpen(isOpenNow());
-        // Uhrzeit live updaten (Berlin)
         const updateTime = () => {
             const now = new Date().toLocaleTimeString("de-DE", {
                 timeZone: "Europe/Berlin",
@@ -45,14 +44,20 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
     return (
         <div className="w-full h-full px-6 md:px-12 py-12 flex flex-col justify-between">
 
-            {/* TOP ROW: Navigation & Brand */}
+            {/* TOP ROW */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 h-full items-start">
 
                 {/* 1. Brand / Mission (Left Column) */}
                 <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-8">
                     <div>
-                        <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter text-white mix-blend-difference mb-6">
-                            Smart<br />German<span className="text-[#FF5C00]">.</span>
+                        {/* OPTIMIERUNG 1: Brand Colors wie im Hero 
+                           "Smart" = Weiß (auf Dark Background)
+                           "German" = Orange (#FF5C00)
+                           Punkt = Weiß (oder Orange, je nach Geschmack - hier Weiß als Abschluss)
+                        */}
+                        <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter mb-6">
+                            <span className="text-white block">Smart</span>
+                            <span className="text-[#FF5C00] block">German<span className="text-white">.</span></span>
                         </h2>
                         <p className="text-white/50 max-w-sm text-sm font-mono uppercase tracking-wide leading-relaxed">
                             {t.Hero?.mission || "Language acquisition based on science."}
@@ -71,19 +76,25 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                     </div>
                 </div>
 
-                {/* 2. Navigation (Middle - Big Type) */}
+                {/* 2. Navigation (Middle) */}
                 <div className="lg:col-span-4 flex flex-col justify-start">
-                    <nav className="flex flex-col space-y-2">
+                    {/* OPTIMIERUNG 2: Focus Hover Effect
+                        'group/nav' auf dem Container.
+                        Beim Hovern des Containers werden ALLE Kinder gedimmt (opacity-30).
+                        Das gehoverte Kind (:hover) bekommt wieder volle Power (opacity-100).
+                    */}
+                    <nav className="flex flex-col space-y-2 group/nav">
                         {navItems.map((key) => (
                             <a
                                 key={key}
                                 href={`#${key}`}
-                                className="group flex items-center justify-between py-2 border-b border-white/10 hover:border-white/40 transition-colors cursor-pointer"
+                                className="group/item flex items-center justify-between py-2 border-b border-white/10 hover:border-white/40 cursor-pointer transition-all duration-300
+                                           group-hover/nav:opacity-30 hover:!opacity-100"
                             >
-                                <span className="text-2xl md:text-3xl font-light text-white/60 group-hover:text-white group-hover:translate-x-4 transition-all duration-300 ease-out">
+                                <span className="text-2xl md:text-3xl font-light text-white group-hover/item:translate-x-4 transition-transform duration-300 ease-out">
                                     {t.Nav?.[key] || key}
                                 </span>
-                                <ArrowUpRight className="w-5 h-5 text-[#FF5C00] opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300" />
+                                <ArrowUpRight className="w-5 h-5 text-[#FF5C00] opacity-0 -translate-x-4 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300" />
                             </a>
                         ))}
                     </nav>
@@ -99,12 +110,14 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                                 onClick={handleCopyEmail}
                                 className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white flex items-center justify-between px-6 transition-all group"
                             >
-                                <span className="font-mono text-xs uppercase tracking-widest">
+                                <span className="font-mono text-xs uppercase tracking-widest relative z-10">
                                     {isCopied ? "Copied!" : "Email Me"}
                                 </span>
-                                <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center group-hover:scale-110 transition-transform relative z-10">
                                     {isCopied ? <Check size={14} /> : <ArrowUpRight size={14} />}
                                 </div>
+                                {/* Subtle Hover Gradient Background */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                             </button>
                         </Magnetic>
 
@@ -115,18 +128,18 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                                 rel="noopener noreferrer"
                                 className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 hover:bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-between px-6 transition-all group"
                             >
-                                <span className="font-mono text-xs uppercase tracking-widest">Telegram</span>
-                                <MessageCircle size={20} className="group-hover:rotate-12 transition-transform" />
+                                <span className="font-mono text-xs uppercase tracking-widest relative z-10">Telegram</span>
+                                <MessageCircle size={20} className="group-hover:rotate-12 transition-transform relative z-10" />
                             </a>
                         </Magnetic>
                     </div>
 
                     {/* Socials Minimal */}
                     <div className="flex gap-4 mt-auto">
-                        <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/40 transition-all">
+                        <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/40 transition-all hover:scale-110">
                             <Instagram size={16} />
                         </a>
-                        <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/40 transition-all">
+                        <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/40 transition-all hover:scale-110">
                             <Linkedin size={16} />
                         </a>
                     </div>
