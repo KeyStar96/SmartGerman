@@ -421,5 +421,47 @@
         }
       ]
     }
+  },
+  "Footer": {
+    "Hero": {
+      "title": "SmartGerman",
+      "mission": "Tailored German courses for newcomers in Germany. Making language and culture accessible."
+    },
+    "Nav": {
+      "home": "Home",
+      "courses": "Courses",
+      "prices": "Prices",
+      "about": "About Me",
+      "location": "Location"
+    },
+    "Contact": {
+      "title": "Contact",
+      "email": "info@smart-german.com",
+      "phone": "+49 171 4758620",
+      "telegram": "Chat on Telegram",
+      "copySuccess": "Email copied!"
+    },
+    "Status": {
+      "title": "Opening Hours",
+      "open": "Open Now",
+      "closed": "Currently Closed",
+      "hours": "Mon - Fri: 09:00 - 18:00",
+      "weekend": "Sat - Sun: Closed"
+    },
+    "Ticker": {
+      "content": [
+        "Language Science",
+        "Neuro-Didactics",
+        "Hannover",
+        "Community",
+        "Growth"
+      ]
+    },
+    "Legal": {
+      "copyright": "© 2025 SmartGerman. All rights reserved.",
+      "privacy": "Privacy Policy",
+      "imprint": "Imprint",
+      "terms": "Terms & Conditions"
+    }
   }
 }
