@@ -21,19 +21,20 @@ export default async function HomePage({
   const dictionary = await getDictionary(lang);
 
   return (
-    <div className="flex flex-col items-center w-full overflow-x-hidden">
+    // REMOVED 'overflow-x-hidden' to prevent breaking sticky positioning
+    <div className="flex flex-col items-center w-full">
 
       {/* 
         CURTAIN LAYOUT SYSTEM
-        The <main> element acts as the "Curtain".
+        The <div> element acts as the "Curtain".
         Inside it, we have:
         1. Sticky Background: Acts as the opaque backing "sheet" of the curtain.
         2. Content: Scrolls over the Sticky Background.
         
-        When the Curtain (main) scrolls out of view, it pulls the Sticky Background with it,
+        When the Curtain (div) scrolls out of view, it pulls the Sticky Background with it,
         revealing the Fixed Footer underneath.
       */}
-      <main
+      <div
         className="relative z-10 w-full shadow-2xl"
         style={{
           // Use clip-path for rounded bottom to support 'sticky' children (overflow: hidden breaks sticky)
@@ -58,7 +59,7 @@ export default async function HomePage({
           <Courses dictionary={dictionary} />
           <LocationSection dictionary={dictionary} />
         </div>
-      </main>
+      </div>
 
       {/* Layer 3: Footer */}
       {/* Revealed when the Curtain lifts */}
