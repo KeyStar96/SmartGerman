@@ -410,5 +410,47 @@
         }
       ]
     }
+  },
+  "Footer": {
+    "Hero": {
+      "title": "SmartGerman",
+      "mission": "Almanya'ya yeni gelenler için özel Almanca kursları. Dil ve kültürü erişilebilir kılmak."
+    },
+    "Nav": {
+      "home": "Ana Sayfa",
+      "courses": "Kurslar",
+      "prices": "Fiyatlar",
+      "about": "Hakkımda",
+      "location": "Konum"
+    },
+    "Contact": {
+      "title": "İletişim",
+      "email": "info@smart-german.com",
+      "phone": "+49 171 4758620",
+      "telegram": "Telegram'da Sohbet",
+      "copySuccess": "E-posta kopyalandı!"
+    },
+    "Status": {
+      "title": "Çalışma Saatleri",
+      "open": "Şu an Açık",
+      "closed": "Şu an Kapalı",
+      "hours": "Pzt - Cum: 09:00 - 18:00",
+      "weekend": "Cmt - Paz: Kapalı"
+    },
+    "Ticker": {
+      "content": [
+        "Dil Bilimi",
+        "Nöro-Didaktik",
+        "Hannover",
+        "Topluluk",
+        "Büyüme"
+      ]
+    },
+    "Legal": {
+      "copyright": "© 2025 SmartGerman. Tüm hakları saklıdır.",
+      "privacy": "Gizlilik",
+      "imprint": "Künye",
+      "terms": "Şartlar"
+    }
   }
 }

@@ -561,5 +561,47 @@
         }
       ]
     }
+  },
+  "Footer": {
+    "Hero": {
+      "title": "SmartGerman",
+      "mission": "Maßgeschneiderte Deutschkurse für Neuankömmlinge in Deutschland. Sprache und Kultur zugänglich machen."
+    },
+    "Nav": {
+      "home": "Home",
+      "courses": "Kurse",
+      "prices": "Preise",
+      "about": "Über mich",
+      "location": "Standort"
+    },
+    "Contact": {
+      "title": "Kontakt",
+      "email": "info@smart-german.com",
+      "phone": "+49 171 4758620",
+      "telegram": "Chat auf Telegram",
+      "copySuccess": "Email kopiert!"
+    },
+    "Status": {
+      "title": "Öffnungszeiten",
+      "open": "Jetzt Geöffnet",
+      "closed": "Derzeit Geschlossen",
+      "hours": "Mo - Fr: 09:00 - 18:00",
+      "weekend": "Sa - So: Geschlossen"
+    },
+    "Ticker": {
+      "content": [
+        "Sprachwissenschaft",
+        "Neuro-Didaktik",
+        "Hannover",
+        "Gemeinschaft",
+        "Wachstum"
+      ]
+    },
+    "Legal": {
+      "copyright": "© 2025 SmartGerman. Alle Rechte vorbehalten.",
+      "privacy": "Datenschutz",
+      "imprint": "Impressum",
+      "terms": "AGB"
+    }
   }
 }
