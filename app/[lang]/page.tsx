@@ -32,20 +32,19 @@ export default async function HomePage({
       </div>
 
       {/* ========================================
-          LAYER 2: SCROLLABLE CONTENT CURTAIN
+          LAYER 2: SCROLLABLE CONTENT - ALLE TRANSPARENT
           - Position: relative (normale Document Flow)
           - z-index: 10 (über Background)
-          - bg-background (undurchsichtig → verdeckt Background)
-          - rounded-b-[40px] (schöner Vorhang-Effekt am Ende)
+          - bg-transparent (Background überall durchscheinen lassen)
           ======================================== */}
-      <main className="relative z-10 w-full bg-background rounded-b-[40px] shadow-[0_25px_50px_rgba(0,0,0,0.5)]">
+      <div className="relative z-10 w-full bg-transparent">
         <Hero dictionary={dictionary} lang={lang} />
         <ScienceSection dictionary={dictionary} />
         <AboutContainer dictionary={dictionary} />
         <WhyUsBento dictionary={dictionary} />
         <Courses dictionary={dictionary} />
         <LocationSection dictionary={dictionary} />
-      </main>
+      </div>
 
       {/* ========================================
           LAYER 3: FOOTER WITH REVEAL MECHANISM
