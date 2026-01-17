@@ -3,7 +3,7 @@ import ScienceSection from "@/components/sections/ScienceSection";
 import WhyUsBento from "@/components/sections/WhyUsBento";
 import AboutContainer from "@/components/sections/About/AboutContainer";
 import Courses from "@/components/sections/Courses";
-import Schedule from "@/components/sections/Schedule";
+
 import { LocationSection } from "@/components/sections/Location/LocationSection";
 import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
@@ -42,7 +42,7 @@ export default async function HomePage({
           <AboutContainer dictionary={dictionary} />
           <WhyUsBento dictionary={dictionary} />
           <Courses dictionary={dictionary} />
-          <Schedule dictionary={dictionary} lang={lang} />
+
           <LocationSection dictionary={dictionary} />
         </div>
       </main>
