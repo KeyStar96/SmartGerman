@@ -13,12 +13,12 @@ export default function ArchitecturalBackground({ className }: { className?: str
                     alt="Architectural Background Light"
                     fill
                     priority
-                    className="object-cover object-center"
+                    className="object-cover object-center dark:opacity-0 transition-opacity duration-[1500ms]"
                     quality={90}
                 />
             </div>
 
-            <div className="absolute inset-0 w-full h-full transition-opacity duration-[1500ms] ease-in-out opacity-0 dark:opacity-100">
+            <div className="absolute inset-0 w-full h-full opacity-0 dark:opacity-100 transition-opacity duration-[1500ms]">
                 <Img
                     src="/Bilder/SG_BG_Dark.JPG"
                     alt="Architectural Background Dark"
@@ -29,11 +29,7 @@ export default function ArchitecturalBackground({ className }: { className?: str
                 />
             </div>
 
-            {/* Gradient Mask to fade into background color at the bottom */}
-            <div
-                className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background"
-                style={{ background: 'linear-gradient(to bottom, transparent 0%, transparent 40%, var(--background) 100%)' }}
-            />
+
         </div>
     );
 }
