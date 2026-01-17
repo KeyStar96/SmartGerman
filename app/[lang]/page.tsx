@@ -26,20 +26,14 @@ export default async function HomePage({
         This slides UP over the fixed footer.
         Added rounded-b-[40px] and shadow-2xl for better visual layering.
       */}
-      <main className="relative z-10 w-full bg-background rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
+      <main className="relative z-10 w-full bg-transparent rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
         {/* 
             The 'Wall' Background:
-            - Absolute to sit behind content (z-0)
-            - Height 'full' matches the main container (content height)
-            - Sticky top-0 h-screen ensures the Image stays viewport-sized and "fixed" 
-              WHILE the main container is in view. 
-            - When main scrolls up (curtain reveal), this sticky container hits the bottom and moves up.
+            - Fixed Positioning (handled internally by component)
+            - Moves up via JS transform when hitting footer zone
+            - z-0 to sit behind content
         */}
-        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
-          <div className="sticky top-0 w-full h-screen">
-            <ArchitecturalBackground />
-          </div>
-        </div>
+        <ArchitecturalBackground />
 
         {/* Content sits on top of background */}
         <div className="relative z-10 w-full">
