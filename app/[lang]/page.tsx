@@ -46,7 +46,8 @@ export default async function HomePage({
         >
           {/* Layer A: Sticky Background */}
           {/* h-screen to fill viewport, sticky to stay put, and -z-10 to stay behind content */}
-          <div className="col-start-1 row-start-1 h-[100vh] sticky top-0 left-0 w-full -z-10">
+          {/* IMPORTANT: self-start is required to prevent grid stretching, which breaks sticky */}
+          <div className="col-start-1 row-start-1 h-[100vh] sticky top-0 left-0 w-full -z-10 self-start">
             <ArchitecturalBackground />
           </div>
 
