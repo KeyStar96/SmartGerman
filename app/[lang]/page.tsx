@@ -33,22 +33,33 @@ export default async function HomePage({
         - Resolves Mobile issues by using natural flow (height defined by content)
         - Sticky Background stays Fixed until the whole container scrolls up (Curtain Effect)
       */}
-      <main className="relative z-10 w-full grid grid-cols-1 bg-transparent rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
+      <main className="relative z-10 w-full bg-transparent">
 
-        {/* Layer 1: The Sticky Background (Behaves like Fixed, but attached to this container) */}
-        <div className="col-start-1 row-start-1 h-[100vh] sticky top-0 left-0 w-full -z-10 overflow-hidden rounded-b-[40px]">
-          <ArchitecturalBackground />
-        </div>
+        {/* 1. SHADOW LAYER (Separate because clip-path clips shadows) */}
+        <div className="absolute inset-0 z-0 rounded-b-[40px] shadow-[0_25px_50px_rgba(0,0,0,0.5)] pointer-events-none" />
 
-        {/* Layer 2: The Content (Scrolls naturally) */}
-        <div className="col-start-1 row-start-1 z-10 w-full pb-0">
-          <Hero dictionary={dictionary} lang={lang} />
-          <ScienceSection dictionary={dictionary} />
-          <AboutContainer dictionary={dictionary} />
-          <WhyUsBento dictionary={dictionary} />
-          <Courses dictionary={dictionary} />
+        {/* 2. CONTENT CONTAINER (Clipped for Rounded Bottom with inset) */}
+        {/* Using clip-path instead of overflow-hidden allows 'sticky' to work for children! */}
+        <div
+          className="relative w-full grid grid-cols-1 overflow-visible"
+          style={{ clipPath: "inset(0 0 0 0 round 0 0 40px 40px)" }}
+        >
+          {/* Layer A: Sticky Background */}
+          {/* h-screen to fill viewport, sticky to stay put, and -z-10 to stay behind content */}
+          <div className="col-start-1 row-start-1 h-[100vh] sticky top-0 left-0 w-full -z-10">
+            <ArchitecturalBackground />
+          </div>
 
-          <LocationSection dictionary={dictionary} />
+          {/* Layer B: The Actual Content */}
+          <div className="col-start-1 row-start-1 z-10 w-full pb-0 pointer-events-auto">
+            <Hero dictionary={dictionary} lang={lang} />
+            <ScienceSection dictionary={dictionary} />
+            <AboutContainer dictionary={dictionary} />
+            <WhyUsBento dictionary={dictionary} />
+            <Courses dictionary={dictionary} />
+
+            <LocationSection dictionary={dictionary} />
+          </div>
         </div>
       </main>
 
