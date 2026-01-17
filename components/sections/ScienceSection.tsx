@@ -16,7 +16,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
             className="relative min-h-screen py-32 overflow-hidden bg-transparent"
         >
             {/* Background Texture: Global Paper Noise (opacity 0.03) */}
-            <div className="absolute inset-0 z-0 pointer-events-none mix-blend-multiply dark:mix-blend-overlay opacity-[0.03] bg-noise-paper"></div>
+
 
             <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-10 gap-12 items-center relative z-10">
 
