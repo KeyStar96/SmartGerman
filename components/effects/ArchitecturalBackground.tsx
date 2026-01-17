@@ -6,7 +6,7 @@ export default function ArchitecturalBackground({ className }: { className?: str
     const Img = Image as any;
 
     return (
-        <div className={cn("fixed inset-0 overflow-hidden pointer-events-none select-none z-0", className)}>
+        <div className={cn("relative w-full h-full overflow-hidden pointer-events-none select-none", className)}>
             <div className="absolute inset-0 w-full h-full opacity-100">
                 <Img
                     src="/Bilder/SG_BG_Light.png"

@@ -56,7 +56,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                         */}
                         <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter mb-6">
                             <span className="text-white block">Smart</span>
-                            <span className="text-[#FF5C00] block">German<span className="text-white">.</span></span>
+                            <span className="text-[#FF5C00] block">German</span>
                         </h2>
                         <p className="text-white/50 max-w-sm text-sm font-mono uppercase tracking-wide leading-relaxed">
                             {t.Hero?.mission || "Language acquisition based on science."}
