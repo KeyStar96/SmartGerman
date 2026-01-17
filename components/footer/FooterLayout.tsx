@@ -8,7 +8,7 @@ interface FooterLayoutProps {
 
 export default function FooterLayout({ dictionary }: FooterLayoutProps) {
     return (
-        <div className="relative h-[600px] md:h-[500px]" style={{ clipPath: "inset(0 0 0 0)" }}>
+        <div className="relative h-[600px] md:h-[500px]">
             {/* Spacer: Hält den Platz im Fluss der Seite frei.
                Die Höhe muss exakt mit dem Footer übereinstimmen.
             */}
