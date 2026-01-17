@@ -34,8 +34,9 @@ export default async function HomePage({
       {/* ========================================
           LAYER 2: SCROLLABLE CONTENT - ALLE TRANSPARENT
           - Position: relative (normale Document Flow)
-          - z-index: 10 (über Background)
-          - bg-transparent (Background überall durchscheinen lassen)
+          - z-index: 10 (über Background UND Footer)
+          - bg-transparent (Background durchscheinen lassen)
+          - min-h-screen (Content muss Footer initial überdecken)
           ======================================== */}
       <div className="relative z-10 w-full bg-transparent">
         <Hero dictionary={dictionary} lang={lang} />
@@ -44,6 +45,9 @@ export default async function HomePage({
         <WhyUsBento dictionary={dictionary} />
         <Courses dictionary={dictionary} />
         <LocationSection dictionary={dictionary} />
+
+        {/* Spacer: Drückt Footer nach unten, sodass er erst am Ende sichtbar wird */}
+        <div className="h-[700px]" aria-hidden="true" />
       </div>
 
       {/* ========================================
