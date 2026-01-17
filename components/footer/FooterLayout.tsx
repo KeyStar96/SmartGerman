@@ -2,7 +2,11 @@
 
 import BentoGrid from './BentoGrid';
 
-export default function FooterLayout() {
+interface FooterLayoutProps {
+    dictionary: any;
+}
+
+export default function FooterLayout({ dictionary }: FooterLayoutProps) {
     return (
         <div
             className="relative h-[800px]"
@@ -10,14 +14,6 @@ export default function FooterLayout() {
         >
             {/* 
             Spacer div to take up space in the document flow.
-            The height should match the footer height roughly, or be enough to scroll past content.
-            In a curtain reveal, the content scrolls UP, revealing the footer BEHIND it.
-            So the footer needs to be fixed at the bottom, with z-index -1.
-            And the last section of the page content needs to have a higher z-index and a background color.
-            However, since we are just a component at the end of the page, we act as the spacer.
-            Actually, for the curtain effect to work properly in a component structure:
-            1. This component should render a 'spacer' that effectively allows scrolling 'away' the previous content.
-            2. The actual footer content is fixed at bottom.
         */}
             <div className="h-[800px] w-full" />
 
@@ -30,7 +26,7 @@ export default function FooterLayout() {
 
                 {/* Grid Content */}
                 <div className="relative z-10 w-full h-full flex flex-col justify-end pb-8">
-                    <BentoGrid />
+                    <BentoGrid dictionary={dictionary} />
                 </div>
             </footer>
         </div>
