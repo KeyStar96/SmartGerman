@@ -8,6 +8,8 @@ import { LocationSection } from "@/components/sections/Location/LocationSection"
 import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
 
+import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
+
 export default async function HomePage({
   params,
 }: {
@@ -25,13 +27,19 @@ export default async function HomePage({
         Added rounded-b-[40px] and shadow-2xl for better visual layering.
       */}
       <main className="relative z-10 w-full bg-background rounded-b-[40px] shadow-2xl shadow-black/50 overflow-hidden">
-        <Hero dictionary={dictionary} lang={lang} />
-        <ScienceSection dictionary={dictionary} />
-        <AboutContainer dictionary={dictionary} />
-        <WhyUsBento dictionary={dictionary} />
-        <Courses dictionary={dictionary} />
-        <Schedule dictionary={dictionary} lang={lang} />
-        <LocationSection dictionary={dictionary} />
+        {/* The 'Wall' Background - Moves with the curtain */}
+        <ArchitecturalBackground className="absolute inset-0 h-full w-full pointer-events-none z-0" />
+
+        {/* Content sits on top of background */}
+        <div className="relative z-10 w-full">
+          <Hero dictionary={dictionary} lang={lang} />
+          <ScienceSection dictionary={dictionary} />
+          <AboutContainer dictionary={dictionary} />
+          <WhyUsBento dictionary={dictionary} />
+          <Courses dictionary={dictionary} />
+          <Schedule dictionary={dictionary} lang={lang} />
+          <LocationSection dictionary={dictionary} />
+        </div>
       </main>
 
       {/* 

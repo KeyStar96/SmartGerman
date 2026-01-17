@@ -1,12 +1,13 @@
-"use client";
+import { cn } from "@/lib/utils";
 
-import Image from "next/image";
+export default function ArchitecturalBackground({ className }: { className?: string }) {
+    // Cast to any to bypass TS error: "JSX element class does not support attributes"
+    const Img = Image as any;
 
-export default function ArchitecturalBackground() {
     return (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none select-none z-0">
+        <div className={cn("fixed inset-0 overflow-hidden pointer-events-none select-none z-0", className)}>
             <div className="absolute inset-0 w-full h-full opacity-100">
-                <Image
+                <Img
                     src="/Bilder/SG_BG_Light.png"
                     alt="Architectural Background Light"
                     fill
@@ -17,7 +18,7 @@ export default function ArchitecturalBackground() {
             </div>
 
             <div className="absolute inset-0 w-full h-full transition-opacity duration-[1500ms] ease-in-out opacity-0 dark:opacity-100">
-                <Image
+                <Img
                     src="/Bilder/SG_BG_Dark.JPG"
                     alt="Architectural Background Dark"
                     fill

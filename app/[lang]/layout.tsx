@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
-import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
 import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 
@@ -48,10 +47,12 @@ export default async function RootLayout({
           - Das erlaubt backdrop-filter, die Hintergründe zu bluren
         */}
 
-        {/* 1. Die unterste Ebene: Der Architectural Background (Bilder) */}
-        <div className="fixed inset-0 liquid-background-container" style={{ zIndex: 0 }}>
-          <ArchitecturalBackground />
-        </div>
+        {/* 
+          CHROME FIX für backdrop-filter:
+          - Hintergründe mit z-index: 0/1 statt negativen Werten
+          - Main Content OHNE z-index, damit kein isolierter Stacking-Context entsteht
+          - Das erlaubt backdrop-filter, die Hintergründe zu bluren
+        */}
 
         {/* 3. Die oberste Ebene: Header (z-index: 50 für sticky) */}
         <Header lang={lang} dictionary={dictionary} />
