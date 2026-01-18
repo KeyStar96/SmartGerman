@@ -43,7 +43,7 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
                 const rawName = dayNames[day.toLowerCase()] || day;
                 const dayLabel = rawName;
 
-                const needsFiller = courses.length < 2;
+
 
                 return (
                     <div key={day} className="relative flex flex-col h-full group/column">
@@ -80,19 +80,7 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
                             )}
 
                             {/* Filler Card: Technical Placeholder */}
-                            {needsFiller && (
-                                <motion.div variants={item} className="relative flex gap-4 opacity-40 grayscale group-hover/column:opacity-60 transition-opacity">
-                                    <div className="flex flex-col items-center pt-2">
-                                        {/* Ghost Dot */}
-                                        <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-700 bg-transparent z-10" />
-                                    </div>
-                                    <div className="flex-1 p-6 rounded-sm border border-dashed border-slate-300 dark:border-slate-700 flex items-center justify-center min-h-[100px]">
-                                        <span className="text-sm font-mono uppercase tracking-widest text-slate-400 dark:text-slate-600">
-                                            Self Study
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            )}
+
                         </div>
                     </div>
                 );

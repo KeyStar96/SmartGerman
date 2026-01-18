@@ -63,7 +63,7 @@ export default function TimetableCard({ course, dictionary, variant = "desktop" 
                             jetbrainsMono.className,
                             "text-xs font-medium tracking-widest text-black/80 dark:text-white/80"
                         )}>
-                            {course.startTime}
+                            {course.startTime} - {course.endTime}
                         </div>
                         <div className="text-black/50 dark:text-white/50">
                             {isEvening ? <Moon size={14} /> : <Sun size={14} />}
