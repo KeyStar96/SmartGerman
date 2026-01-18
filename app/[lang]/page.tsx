@@ -42,7 +42,7 @@ export default async function HomePage({
           - Rendered normally in the flow
           - Background attached to sticky container acts as their background
         */}
-        <div className="relative w-full z-20">
+        <div className="relative w-full z-20 pt-28">
           <Hero dictionary={dictionary} lang={lang} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />

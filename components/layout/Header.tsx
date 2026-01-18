@@ -112,7 +112,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
               alt="SmartGerman Logo"
               width={192}
               height={40}
-              className={`h-auto object-contain transition-all duration-500 group-hover:scale-105`}
+              className={`h-9 w-auto object-contain transition-all duration-500 group-hover:scale-105`}
               priority={true}
             />
           </Link>

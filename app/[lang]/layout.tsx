@@ -59,7 +59,7 @@ export default async function RootLayout({
 
         {/* 4. Main Content: KEIN z-index damit backdrop-filter funktioniert! */}
         <SmoothScroll>
-          <main id="main-content" className="pt-24 scroll-3d-container min-h-screen relative">
+          <main id="main-content" className="pt-0 scroll-3d-container min-h-screen relative">
             {children}
           </main>
         </SmoothScroll>
