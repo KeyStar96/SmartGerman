@@ -39,38 +39,51 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            className="hidden md:grid grid-cols-5 gap-0 relative" // Gap 0 because columns handle spacing internally if needed, or we keep gap for columns
+            className="hidden md:grid grid-cols-5 gap-8 relative mt-16"
         >
-            {/* Background Grid Lines (optional, but requested "Timeline Structure" implies vertical lines) */}
-
-            {DAYS.map((day, index) => {
+            {DAYS.map((day) => {
                 const courses = getDayCourses(day);
-                const dayLabel = dayNames[day.toLowerCase()] || day;
 
-                // Filler Logic: Less than 2 courses?
+                // Ensure day name handling is robust
+                const rawName = dayNames[day.toLowerCase()] || day; // "Montag"
+                const dayLabel = rawName;
+
+                // Filler Logic: Less than 2 courses need a filler
                 const needsFiller = courses.length < 2;
 
                 return (
-                    <div key={day} className="relative flex flex-col h-full pl-4 pr-2 group/column">
-                        {/* Timeline Line: Continuous vertical line through the column */}
-                        <div className="absolute left-[1.35rem] top-0 bottom-0 w-px bg-black/5 dark:bg-white/5 group-hover/column:bg-black/10 dark:group-hover/column:bg-white/10 transition-colors" />
+                    <div key={day} className="relative flex flex-col h-full group/column">
 
-                        {/* Header: Giant Watermark */}
-                        <div className="relative h-32 mb-8 overflow-hidden">
-                            <span className={cn(
+                        {/* 1. Header: Editorial Style */}
+                        <div className="flex flex-col mb-8 relative z-10">
+                            <h3 className={cn(
                                 instrumentSerif.className,
-                                "absolute -top-4 -left-2 text-7xl md:text-8xl text-black/5 dark:text-white/5 select-none transition-transform duration-500 group-hover/column:scale-110 origin-top-left"
+                                "text-4xl text-slate-900 dark:text-white mb-2"
                             )}>
-                                {dayLabel.substring(0, 3).toUpperCase()}
-                            </span>
-                            {/* Foregound Label (Readable) */}
-                            <span className="relative z-10 block pt-8 pl-8 text-xs font-bold uppercase tracking-widest text-[#FF5C00]">
                                 {dayLabel}
-                            </span>
+                            </h3>
+                            {/* Decorative Separator / Timeline Start */}
+                            <div className="w-12 h-[2px] bg-black dark:bg-white mb-6" />
                         </div>
 
+                        {/* 2. Timeline Line: Starts EXACTLY below the header area to align with cards */}
+                        {/* 
+                Calculated Placement: 
+                TimetableCard has a "flex-col items-center" wrapper for the dot first.
+                The dot is 12px wide (w-3).
+                The wrapper doesn't have extra padding.
+                So the center of the dot is at 6px from the start of the card content.
+                The card is inside this column.
+                If we want the line to be behind the dot:
+                left = 6px (center of dot) - 0.5px (center of 1px line) = ~5.5px.
+                Let's use calc or absolute positioning.
+                Better: TimetableCard left side is the start of the column.
+                Dot center is at 6px.
+              */}
+                        <div className="absolute left-[6px] top-[4.5rem] bottom-0 w-px bg-slate-200 dark:bg-white/10 z-0" />
+
                         {/* Courses Stack */}
-                        <div className="flex flex-col gap-6 pb-12">
+                        <div className="flex flex-col gap-8 relative z-10">
                             {courses.length > 0 ? (
                                 courses.map((course) => (
                                     <motion.div key={course.id} variants={item}>
@@ -83,20 +96,20 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
                                 ))
                             ) : (
                                 // No Courses State
-                                <div className="pl-12 text-sm text-black/20 dark:text-white/20 italic">
+                                <div className="pl-8 text-sm text-slate-400 italic font-medium">
                                     -
                                 </div>
                             )}
 
                             {/* Filler Card */}
                             {needsFiller && (
-                                <motion.div variants={item} className="relative flex gap-4 opacity-50 grayscale hover:grayscale-0 transition-all">
-                                    <div className="flex flex-col items-center">
+                                <motion.div variants={item} className="relative flex gap-4 opacity-40 grayscale">
+                                    <div className="flex flex-col items-center pt-2">
                                         {/* Ghost Dot */}
-                                        <div className="w-3 h-3 rounded-full border-2 border-black/10 dark:border-white/10 bg-transparent z-10 mt-[0.4rem]" />
+                                        <div className="w-3 h-3 rounded-full border-2 border-slate-300 dark:border-white/20 bg-transparent z-10" />
                                     </div>
-                                    <div className="flex-1 p-5 rounded-sm border-2 border-dashed border-black/5 dark:border-white/5 flex items-center justify-center min-h-[120px]">
-                                        <span className={cn(instrumentSerif.className, "text-xl text-black/20 dark:text-white/20")}>
+                                    <div className="flex-1 p-6 rounded-sm border border-dashed border-slate-300 dark:border-white/10 flex items-center justify-center min-h-[120px]">
+                                        <span className={cn(instrumentSerif.className, "text-xl text-slate-400 dark:text-white/40 italic")}>
                                             Self Study
                                         </span>
                                     </div>
