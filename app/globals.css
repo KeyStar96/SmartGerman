@@ -48,11 +48,13 @@ body {
   /* Swiss Scientific Base Size */
   overflow-x: hidden;
   /* Wichtig für ScrollTrigger */
+  overscroll-behavior-y: none;
 }
 
 html {
   overflow-y: scroll;
   /* Prevents layout shift when scrollbar appears */
+  overscroll-behavior-y: none;
 }
 
 /* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
