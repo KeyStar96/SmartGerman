@@ -37,7 +37,14 @@
 }
 
 body {
-  background-color: var(--background);
+  /* Optimized Gradient Background: Top 1/3 Theme Color, Bottom 2/3 Footer Color */
+  /* This prevents the "Beige Corner Glitch" when revealing the footer */
+  background: linear-gradient(to bottom,
+      var(--background) 0%,
+      var(--background) 35vh,
+      #050505 35vh,
+      #050505 100%);
+  background-attachment: fixed;
   color: var(--foreground);
   /* Sanfter Übergang für das gesamte Layout beim Theme-Wechsel */
   transition: background-color 0.2s ease, color 0.2s ease;
