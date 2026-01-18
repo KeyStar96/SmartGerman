@@ -13,9 +13,10 @@ interface TimetableCardProps {
     course: CourseData;
     dictionary: any;
     variant?: "desktop" | "mobile";
+    isLive?: boolean;
 }
 
-export default function TimetableCard({ course, dictionary, variant = "desktop" }: TimetableCardProps) {
+export default function TimetableCard({ course, dictionary, variant = "desktop", isLive = false }: TimetableCardProps) {
     // Translations
     const t = dictionary?.timetable || {};
     const instructor = t.instructors?.[course.instructorKey] || course.instructorKey;
@@ -36,8 +37,15 @@ export default function TimetableCard({ course, dictionary, variant = "desktop" 
         >
             {/* 1. Timeline Graphic (Left Axis) */}
             <div className="flex flex-col items-center">
-                {/* The Dot: Technical "Hollow Point" */}
-                <div className="w-3 h-3 rounded-full bg-[var(--background)] border-2 border-[#FF5C00] z-10 mt-[0.6rem] transition-all duration-300 group-hover:bg-[#FF5C00] group-hover:scale-110" />
+                {/* The Dot: Technical "Hollow Point" OR Live Pulse */}
+                <div
+                    className={cn(
+                        "w-3 h-3 rounded-full border-2 z-10 mt-[0.6rem] transition-all duration-300",
+                        isLive
+                            ? "bg-[#FF5C00] border-[#FF5C00] animate-pulse shadow-[0_0_10px_rgba(255,92,0,0.6)]"
+                            : "bg-[var(--background)] border-[#FF5C00] group-hover:bg-[#FF5C00] group-hover:scale-110"
+                    )}
+                />
             </div>
 
             {/* 2. The Card Content (Clinical Paper) */}
@@ -53,15 +61,25 @@ export default function TimetableCard({ course, dictionary, variant = "desktop" 
                     // Dark Mode: Technical Dark
                     "dark:bg-[#1E2024] dark:border-white/10",
                     // Hover State
-                    "group-hover:border-[#FF5C00] dark:group-hover:border-[#FF5C00] group-hover:shadow-md"
+                    "group-hover:border-[#FF5C00] dark:group-hover:border-[#FF5C00] group-hover:shadow-md",
+                    // Live State Border
+                    isLive && "border-[#FF5C00]/40 dark:border-[#FF5C00]/40 shadow-sm"
                 )}
             >
+                {/* LIVE Badge */}
+                {isLive && (
+                    <div className="absolute top-0 right-0 px-2 py-1 bg-[#FF5C00] text-white text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20">
+                        LIVE
+                    </div>
+                )}
+
                 <div className="relative z-10 flex flex-col gap-3">
                     {/* Header: Time & Icon */}
                     <div className="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2 mb-1">
                         <div className={cn(
                             jetbrainsMono.className,
-                            "text-xs font-medium tracking-widest text-black/80 dark:text-white/80"
+                            "text-xs font-medium tracking-widest text-black/80 dark:text-white/80",
+                            isLive && "text-[#FF5C00] dark:text-[#FF5C00]"
                         )}>
                             {course.startTime} - {course.endTime}
                         </div>
@@ -71,12 +89,18 @@ export default function TimetableCard({ course, dictionary, variant = "desktop" 
                     </div>
 
                     {/* Title: Sans-Serif Bold Clinical */}
-                    <h3 className="font-sans font-bold text-xl leading-tight text-slate-900 dark:text-slate-100 group-hover:text-[#FF5C00] transition-colors duration-300">
+                    <h3 className={cn(
+                        "font-sans font-bold text-xl leading-tight transition-colors duration-300",
+                        isLive ? "text-[#FF5C00]" : "text-slate-900 dark:text-slate-100 group-hover:text-[#FF5C00]"
+                    )}>
                         {course.title}
                     </h3>
 
                     {/* Meta */}
-                    <div className="flex flex-col gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                    <div className={cn(
+                        "flex flex-col gap-1.5 transition-opacity",
+                        isLive ? "opacity-100" : "opacity-70 group-hover:opacity-100"
+                    )}>
                         <div className="flex items-center gap-2 text-xs font-medium text-black/70 dark:text-white/70">
                             <User size={12} className="text-[#FF5C00]" />
                             <span className="uppercase tracking-wide font-sans">{instructor}</span>

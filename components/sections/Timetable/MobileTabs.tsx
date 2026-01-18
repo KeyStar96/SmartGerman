@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DAYS, getDayCourses } from "./data";
 import TimetableCard from "./TimetableCard";
 import { cn } from "@/lib/utils";
+import { getCurrentDayName, isCourseLive } from "@/lib/time-utils";
 
 interface MobileTabsProps {
     dictionary: any;
@@ -14,8 +15,18 @@ export default function MobileTabs({ dictionary }: MobileTabsProps) {
     const t = dictionary?.timetable || {};
     const dayNames = t.days || {};
 
-    // Default to Monday (or current day logic if desired, but Monday is safe)
+    // Hydration-safe default (Monday), updated on mount
     const [activeDay, setActiveDay] = useState<typeof DAYS[number]>(DAYS[0]);
+    const [ticker, setTicker] = useState(0);
+
+    useEffect(() => {
+        // Set correct start day once mounted (client-side)
+        setActiveDay(getCurrentDayName());
+
+        // Refresh live status
+        const interval = setInterval(() => setTicker(t => t + 1), 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <div className="md:hidden flex flex-col gap-8">
@@ -59,14 +70,18 @@ export default function MobileTabs({ dictionary }: MobileTabsProps) {
                         className="flex flex-col gap-6"
                     >
                         {getDayCourses(activeDay).length > 0 ? (
-                            getDayCourses(activeDay).map((course) => (
-                                <TimetableCard
-                                    key={course.id}
-                                    course={course}
-                                    dictionary={dictionary}
-                                    variant="mobile"
-                                />
-                            ))
+                            getDayCourses(activeDay).map((course) => {
+                                const isLive = isCourseLive(activeDay, course.startTime, course.endTime);
+                                return (
+                                    <TimetableCard
+                                        key={course.id}
+                                        course={course}
+                                        dictionary={dictionary}
+                                        variant="mobile"
+                                        isLive={isLive}
+                                    />
+                                );
+                            })
                         ) : (
                             <div className="pl-12 py-12 text-sm text-black/40 dark:text-white/40 italic">
                                 No courses scheduled.

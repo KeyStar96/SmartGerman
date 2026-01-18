@@ -19,3 +19,39 @@ export function isOpenNow(): boolean {
 
     return false;
 }
+
+export function getCurrentDayName(): "Mo" | "Di" | "Mi" | "Do" | "Fr" {
+    const now = new Date();
+    const berlinTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Berlin" }));
+    const dayIndex = berlinTime.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+
+    const DAYS = ["Mo", "Di", "Mi", "Do", "Fr"] as const;
+
+    // specific mapping: 1=Mo (index 0), 5=Fr (index 4)
+    if (dayIndex >= 1 && dayIndex <= 5) {
+        return DAYS[dayIndex - 1];
+    }
+    // Access on Weekend -> Default to Monday
+    return "Mo";
+}
+
+export function isCourseLive(day: string, startTime: string, endTime: string): boolean {
+    const currentDay = getCurrentDayName();
+    if (currentDay !== day) return false;
+
+    const now = new Date();
+    const berlinTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Berlin" }));
+
+    // Parse HH:MM
+    const [startH, startM] = startTime.split(":").map(Number);
+    const [endH, endM] = endTime.split(":").map(Number);
+
+    const currentH = berlinTime.getHours();
+    const currentM = berlinTime.getMinutes();
+    const currentTotal = currentH * 60 + currentM;
+
+    const startTotal = startH * 60 + startM;
+    const endTotal = endH * 60 + endM;
+
+    return currentTotal >= startTotal && currentTotal < endTotal;
+}

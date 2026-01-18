@@ -5,6 +5,7 @@ import { motion, useScroll, useSpring } from "framer-motion";
 import { DAYS, getDayCourses } from "./data";
 import TimetableCard from "./TimetableCard";
 import { cn } from "@/lib/utils";
+import { isCourseLive } from "@/lib/time-utils";
 
 interface DesktopGridProps {
     dictionary: any;
@@ -14,6 +15,13 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
     const t = dictionary?.timetable || {};
     const dayNames = t.days || {};
     const containerRef = useRef(null);
+    const [ticker, setTicker] = React.useState(0);
+
+    // Refresh every minute
+    React.useEffect(() => {
+        const interval = setInterval(() => setTicker(t => t + 1), 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Scroll Animation for the Orange Line ("Nerve" Effect)
     const { scrollYProgress } = useScroll({
@@ -81,15 +89,19 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
                         {/* Courses Stack */}
                         <div className="flex flex-col gap-8 relative z-10 pt-4">
                             {courses.length > 0 ? (
-                                courses.map((course) => (
-                                    <motion.div key={course.id} variants={item}>
-                                        <TimetableCard
-                                            course={course}
-                                            dictionary={dictionary}
-                                            variant="desktop"
-                                        />
-                                    </motion.div>
-                                ))
+                                courses.map((course) => {
+                                    const isLive = isCourseLive(day, course.startTime, course.endTime);
+                                    return (
+                                        <motion.div key={course.id} variants={item}>
+                                            <TimetableCard
+                                                course={course}
+                                                dictionary={dictionary}
+                                                variant="desktop"
+                                                isLive={isLive}
+                                            />
+                                        </motion.div>
+                                    );
+                                })
                             ) : (
                                 <div className="pl-8 text-sm text-slate-300 dark:text-slate-600 font-mono uppercase tracking-widest">
                                     -
