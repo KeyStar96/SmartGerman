@@ -84,7 +84,6 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
 
                 {/* Header Section */}
                 <motion.div
-                    style={{ opacity, y: useTransform(scrollYProgress, [0, 0.3], [50, 0]) }}
                     className="max-w-4xl mb-16 md:mb-24"
                 >
                     {/* Label */}
