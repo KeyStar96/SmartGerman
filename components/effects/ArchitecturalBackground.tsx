@@ -13,7 +13,7 @@ export default function ArchitecturalBackground({ className }: { className?: str
         <div
             className={cn(
                 "relative w-full h-full overflow-hidden pointer-events-none select-none z-0 backface-hidden",
-                "bg-background transition-colors duration-[1500ms]",
+                "transition-colors duration-[1500ms]",
                 className
             )}
         >
