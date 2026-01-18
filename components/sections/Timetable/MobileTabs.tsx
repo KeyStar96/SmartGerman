@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { DAYS, getDayCourses } from "./data";
-import TimetableCard from "./TimetableCard";
+import { COURSES, Day } from "@/lib/course-config";
+import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
 import { getCurrentDayName, isCourseLive } from "@/lib/time-utils";
+
+const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr"];
 
 interface MobileTabsProps {
     dictionary: any;
@@ -14,20 +16,47 @@ interface MobileTabsProps {
 export default function MobileTabs({ dictionary }: MobileTabsProps) {
     const t = dictionary?.timetable || {};
     const dayNames = t.days || {};
+    const courseTexts = dictionary?.CourseData || {};
 
     // Hydration-safe default (Monday), updated on mount
-    const [activeDay, setActiveDay] = useState<typeof DAYS[number]>(DAYS[0]);
+    const [activeDay, setActiveDay] = useState<Day>("Mo");
     const [ticker, setTicker] = useState(0);
 
     useEffect(() => {
         // Set correct start day once mounted (client-side)
         // If weekend (null), default to "Mo"
-        setActiveDay(getCurrentDayName() || "Mo");
+        const current = getCurrentDayName();
+        // Validate current is a Day (it returns string | null). 
+        // Cast or check. getCurrentDayName likely returns "Mo", "Di", etc.
+        if (current && DAYS.includes(current as Day)) {
+            setActiveDay(current as Day);
+        } else {
+            setActiveDay("Mo");
+        }
 
         // Refresh live status
         const interval = setInterval(() => setTicker(t => t + 1), 60000);
         return () => clearInterval(interval);
     }, []);
+
+    const getDayCourses = (day: Day): TimetableCourse[] => {
+        const dayCourses: TimetableCourse[] = [];
+        COURSES.forEach(course => {
+            course.sessions.forEach(session => {
+                if (session.day === day) {
+                    dayCourses.push({
+                        id: `${course.id}-${session.day}-${session.startTime}`,
+                        startTime: session.startTime,
+                        endTime: session.endTime,
+                        title: courseTexts[course.translationKey]?.title || course.id,
+                        instructorKey: course.instructor,
+                        locationKey: course.type
+                    });
+                }
+            });
+        });
+        return dayCourses.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    };
 
     return (
         <div className="md:hidden flex flex-col gap-8">

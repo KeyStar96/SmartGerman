@@ -497,5 +497,73 @@
       "imprint": "Imprint",
       "terms": "Terms & Conditions"
     }
+  },
+  "courses_v2": {
+    "label_small": "SCHEDULE & FORMATS",
+    "headline": {
+      "line1": "OUR ACADEMIC",
+      "line2": "OFFER."
+    },
+    "tabs": {
+      "presence": "IN-PERSON",
+      "online": "ONLINE"
+    },
+    "footer_note": "All courses are monthly cancellable. Telegram support included. All prices incl. VAT."
+  },
+  "CourseData": {
+    "a1_1_50plus": {
+      "title": "German 50+ A1.1",
+      "description": "Specially designed for learners 50+. Slow pace, relaxed atmosphere.",
+      "level": "A1.1",
+      "location": "Königstraße 20"
+    },
+    "a1_2_50plus": {
+      "title": "German 50+ A1.2",
+      "description": "Advanced beginners. Deepening the basics.",
+      "level": "A1.2",
+      "location": "Königstraße 20"
+    },
+    "a2_50plus": {
+      "title": "German 50+ A2",
+      "description": "Independent communication (doctors, authorities).",
+      "level": "A2",
+      "location": "Königstraße 20"
+    },
+    "speech_a1_1": {
+      "title": "Speaking Training A1.1",
+      "description": "Lose shyness, gain confidence.",
+      "level": "A1.1",
+      "location": "Königstraße 20"
+    },
+    "speech_a1_2": {
+      "title": "Speaking Training A1.2",
+      "description": "Deepening speaking skills.",
+      "level": "A1.2",
+      "location": "Königstraße 20"
+    },
+    "speech_a2": {
+      "title": "Speaking Training A2",
+      "description": "Confident speaking in everyday situations.",
+      "level": "A2",
+      "location": "Königstraße 20"
+    },
+    "online_a1_1": {
+      "title": "Basics A1.1 (Online)",
+      "description": "Comfortably from home. Incl. Telegram support.",
+      "level": "A1.1",
+      "location": "Microsoft Teams"
+    },
+    "online_b1": {
+      "title": "German B1 (Online)",
+      "description": "Intermediate level for advanced learners.",
+      "level": "B1",
+      "location": "Microsoft Teams"
+    },
+    "online_b2": {
+      "title": "German B2 (Online)",
+      "description": "For Career & Studies.",
+      "level": "B2",
+      "location": "Microsoft Teams"
+    }
   }
 }

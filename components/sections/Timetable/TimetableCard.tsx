@@ -3,14 +3,22 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { MapPin, User, Monitor, Sun, Moon } from "lucide-react";
-import { CourseData } from "./data";
 import { JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
+export interface TimetableCourse {
+    id: string;
+    startTime: string;
+    endTime: string;
+    title: string;
+    instructorKey: string;
+    locationKey: string;
+}
+
 interface TimetableCardProps {
-    course: CourseData;
+    course: TimetableCourse;
     dictionary: any;
     variant?: "desktop" | "mobile";
     isLive?: boolean;

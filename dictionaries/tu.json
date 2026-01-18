@@ -71,145 +71,7 @@
         "presence": "Yüz yüze",
         "online": "Online"
       },
-      "categories": {
-        "presence": [
-          {
-            "id": "de50_a1_1",
-            "group": "Grup 1: Yüz yüze (Yaşlılar Odaklı)",
-            "title": "Almanca 50+ A1.1",
-            "level": "A1.1",
-            "instructor": "Anastasia Sitov",
-            "time": "Pzt 9:00-10:30 & Sal 10:30-12:00",
-            "freq": "2x 90 dk",
-            "price": "2,50€",
-            "price_unit": "/ 45 Dk",
-            "price_note": "(Sosyal Tarife)",
-            "description": "50 yaş üstü öğrenciler için özel. Yavaş tempo, rahat atmosfer.",
-            "max_participants": "Maks: 20 Kissi",
-            "badge": "Yüz yüze"
-          },
-          {
-            "id": "de50_a1_2",
-            "group": "Grup 1: Yüz yüze (Yaşlılar Odaklı)",
-            "title": "Almanca 50+ A1.2",
-            "level": "A1.2",
-            "instructor": "Anastasia Sitov",
-            "time": "Sal 9:00-10:30 & Çar 10:30-12:00",
-            "freq": "2x 90 dk",
-            "price": "2,50€",
-            "price_unit": "/ 45 Dk",
-            "price_note": "",
-            "description": "Geliştirme kursu. Temellerin derinleştirilmesi.",
-            "max_participants": "Maks: 20 Kisi",
-            "badge": "Yüz yüze"
-          },
-          {
-            "id": "de50_a2",
-            "group": "Grup 1: Yüz yüze (Yaşlılar Odaklı)",
-            "title": "Almanca 50+ A2",
-            "level": "A2",
-            "instructor": "Anastasia Sitov",
-            "time": "Pzt 10:30-12:00 & Çar 9:00-10:30",
-            "freq": "2x 90 dk",
-            "price": "2,50€",
-            "price_unit": "/ 45 Dk",
-            "price_note": "",
-            "description": "Bağımsız iletişim (doktor, resmi daireler).",
-            "max_participants": "Maks: 20 Kisi",
-            "badge": "Yüz yüze"
-          },
-          {
-            "id": "speech_a1_1",
-            "group": "Grup 2: Yüz yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A1.1",
-            "level": "A1.1",
-            "instructor": "Anastasia Sitov",
-            "time": "Sal 12:00-13:00",
-            "freq": "1x 60 dk",
-            "price": "3,50€",
-            "price_unit": "/ 60 Dk",
-            "price_note": "",
-            "description": "Çekingenliği yenmek, özgüven kazanmak.",
-            "max_participants": "",
-            "badge": "Yüz yüze"
-          },
-          {
-            "id": "speech_a1_2",
-            "group": "Grup 2: Yüz yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A1.2",
-            "level": "A1.2",
-            "instructor": "Anastasia Sitov",
-            "time": "Çar 12:00-13:00",
-            "freq": "1x 60 dk",
-            "price": "3,50€",
-            "price_unit": "/ 60 Dk",
-            "price_note": "",
-            "description": "Konuşma becerilerini derinleştirme.",
-            "max_participants": "",
-            "badge": "Yüz yüze"
-          },
-          {
-            "id": "speech_a2",
-            "group": "Grup 2: Yüz yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A2",
-            "level": "A2",
-            "instructor": "Anastasia Sitov",
-            "time": "Pzt 12:00-13:00",
-            "freq": "1x 60 dk",
-            "price": "3,50€",
-            "price_unit": "/ 60 Dk",
-            "price_note": "",
-            "description": "Günlük durumlarda özgüvenli konuşma.",
-            "max_participants": "",
-            "badge": "Yüz yüze"
-          },
-          {
-            "id": "online_a1_1",
-            "group": "Grup 3: Online (Başlangıç Mart 2026)",
-            "title": "Temeller A1.1 (Online)",
-            "level": "A1.1",
-            "instructor": "Anastasia Sitov",
-            "time": "Per & Cum 19:00-20:30",
-            "freq": "",
-            "price": "15€",
-            "price_unit": "/ 90 Dk",
-            "price_note": "",
-            "description": "Evinizden rahatça. Telegram desteği dahil.",
-            "max_participants": "Maks: 10 Kisi",
-            "badge": "Online"
-          },
-          {
-            "id": "online_b1",
-            "group": "Grup 3: Online (Başlangıç Mart 2026)",
-            "title": "Almanca B1 (Online)",
-            "level": "B1",
-            "instructor": "Anastasia Sitov",
-            "time": "Pzt & Sal 14:30-16:00",
-            "freq": "",
-            "price": "15€",
-            "price_unit": "/ 90 Dk",
-            "price_note": "",
-            "description": "İleri seviye için orta düzey.",
-            "max_participants": "",
-            "badge": "Online"
-          },
-          {
-            "id": "online_b2",
-            "group": "Grup 3: Online (Başlangıç Mart 2026)",
-            "title": "Almanca B2 (Online)",
-            "level": "B2",
-            "instructor": "Lisa Kahl",
-            "time": "Pzt & Çar 16:00-17:30",
-            "freq": "",
-            "price": "15€",
-            "price_unit": "/ 90 Dk",
-            "price_note": "",
-            "description": "İş ve Eğitim için.",
-            "max_participants": "",
-            "badge": "Online"
-          }
-        ]
-      },
+      "categories": {},
       "usp": {
         "telegram_title": "Telegram Grubu & Materyaller",
         "telegram_desc": "7/24 erişim, öğretmenle doğrudan hat, kaçırılan dersleri kolayca telafi etme.",
@@ -260,6 +122,74 @@
       "desc": "İş ve günlük yaşamda güvenli performans."
     }
   },
+  "CourseData": {
+    "de50_a1_1": {
+      "title": "Almanca 50+ A1.1",
+      "description": "50 yaş üstü öğrenciler için özel. Yavaş tempo, rahat atmosfer.",
+      "level": "A1.1",
+      "location": "Yüz yüze"
+    },
+    "de50_a1_2": {
+      "title": "Almanca 50+ A1.2",
+      "description": "Geliştirme kursu. Temellerin derinleştirilmesi.",
+      "level": "A1.2",
+      "location": "Yüz yüze"
+    },
+    "de50_a2": {
+      "title": "Almanca 50+ A2",
+      "description": "Bağımsız iletişim (doktor, resmi daireler).",
+      "level": "A2",
+      "location": "Yüz yüze"
+    },
+    "speech_a1_1": {
+      "title": "Konuşma Eğitimi A1.1",
+      "description": "Çekingenliği yenmek, özgüven kazanmak.",
+      "level": "A1.1",
+      "location": "Yüz yüze"
+    },
+    "speech_a1_2": {
+      "title": "Konuşma Eğitimi A1.2",
+      "description": "Konuşma becerilerini derinleştirme.",
+      "level": "A1.2",
+      "location": "Yüz yüze"
+    },
+    "speech_a2": {
+      "title": "Konuşma Eğitimi A2",
+      "description": "Günlük durumlarda özgüvenli konuşma.",
+      "level": "A2",
+      "location": "Yüz yüze"
+    },
+    "online_a1_1": {
+      "title": "Temeller A1.1 (Online)",
+      "description": "Evinizden rahatça. Telegram desteği dahil.",
+      "level": "A1.1",
+      "location": "Online"
+    },
+    "online_b1": {
+      "title": "Almanca B1 (Online)",
+      "description": "İleri seviye için orta düzey.",
+      "level": "B1",
+      "location": "Online"
+    },
+    "online_b2": {
+      "title": "Almanca B2 (Online)",
+      "description": "İş ve Eğitim için.",
+      "level": "B2",
+      "location": "Online"
+    }
+  },
+  "courses_v2": {
+    "label_small": "PROGRAM VE FORMATLAR",
+    "headline": {
+      "line1": "BİZİM AKADEMİK",
+      "line2": "TEKLİFİMİZ."
+    },
+    "tabs": {
+      "presence": "YÜZ YÜZE",
+      "online": "ONLİNE"
+    },
+    "footer_note": "Tüm kurslar aylık iptal edilebilir. Telegram desteği dahil. Fiyatlar KDV dahil."
+  },
   "schedule": {
     "title": "Başarıya Giden Yolunuz – Haftalık Program",
     "subtitle": "Kursları görmek için bir gün seçin",
@@ -278,6 +208,23 @@
     "wednesday": "Çarşamba",
     "thursday": "Perşembe",
     "friday": "Cuma"
+  },
+  "timetable": {
+    "days": {
+      "mo": "Pzt",
+      "di": "Sal",
+      "mi": "Çar",
+      "do": "Per",
+      "fr": "Cum"
+    },
+    "instructors": {
+      "standard": "Anastasia Sitov",
+      "lisa": "Lisa Kahl"
+    },
+    "locations": {
+      "presence": "Yüz yüze",
+      "online": "Online"
+    }
   },
   "science": {
     "protocol": "Bilimsel Temel",

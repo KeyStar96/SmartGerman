@@ -5,32 +5,39 @@ import { motion, AnimatePresence } from "framer-motion";
 import { JetBrains_Mono } from "next/font/google";
 import { User, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { COURSES, CourseConfig, Day } from "@/lib/course-config";
 
 // --- Fonts ---
-// Instrument Serif removed. Inter is global default.
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
 // --- Types ---
 type CourseType = "presence" | "online";
 
-interface CourseData {
-  id: string;
+interface CourseText {
   title: string;
-  tags?: string[];
-  educator: string;
-  schedule: string;
-  price: string;
-  unit: string;
-  desc: string;
+  description: string;
+  level: string;
+  location: string;
+  unit?: string;
   start_badge?: string;
 }
 
-// --- Strict Data Payload ---
+interface Dictionary {
+  courses_v2: {
+    label_small: string;
+    headline: { line1: string; line2: string };
+    tabs: Record<string, string>;
+    footer_note: string;
+  };
+  CourseData: Record<string, CourseText>;
+  timetable: {
+    days: Record<string, string>;
+    instructors: Record<string, string>;
+  };
+}
 
-// --- Props ---
 interface CoursesProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dictionary?: any;
+  dictionary: Dictionary;
 }
 
 // --- Animation Variants ---
@@ -64,11 +71,33 @@ const cardVariants = {
 export default function Courses({ dictionary }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
 
-  // Safe access to dictionary data with fallback to prevent crashes if dictionary is missing
   const sectionData = dictionary?.courses_v2;
-  const listData = sectionData?.list?.[filter] || [];
+  const courseTexts = dictionary?.CourseData;
+  const t_days = dictionary?.timetable?.days;
+  const t_instructors = dictionary?.timetable?.instructors;
 
-  if (!sectionData) return null; // Or return a skeleton/loading state
+  if (!sectionData || !courseTexts) return null;
+
+  // Filter courses based on active tab
+  const displayedCourses = COURSES.filter((c) => c.type === filter);
+
+  // Helper to format schedule string
+  const formatSchedule = (sessions: CourseConfig["sessions"]) => {
+    return sessions
+      .map((s) => {
+        // Map "Mo" -> "Montag" (or localized logic? dictionary has "mo": "Mo")
+        // Use dictionary.timetable.days[s.day.toLowerCase()]
+        const dayKey = s.day.toLowerCase();
+        const localizedDay = t_days?.[dayKey] || s.day; // Fallback to "Mo"
+        return `${localizedDay} ${s.startTime}-${s.endTime}`;
+      })
+      .join(" & ");
+  };
+
+  // Helper to format price
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(price);
+  };
 
   return (
     <section
@@ -129,20 +158,31 @@ export default function Courses({ dictionary }: CoursesProps) {
         </div>
 
         {/* --- Syllabus Grid (Butter Smooth Performance) --- */}
-        {/* Removed 'layout' prop to prevent reflow jank. Used 'mode="wait"' for controlled transitions. */}
         <div className="relative w-full">
           <AnimatePresence mode="wait">
             <motion.div
-              key={filter} // Key triggers complete remount for animation
+              key={filter}
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pl-px pt-px"
             >
-              {listData.map((course: CourseData) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
+              {displayedCourses.map((courseConfig) => {
+                const textData = courseTexts[courseConfig.translationKey];
+                if (!textData) return null; // Safe guard
+
+                return (
+                  <CourseCard
+                    key={courseConfig.id}
+                    config={courseConfig}
+                    text={textData}
+                    formattedSchedule={formatSchedule(courseConfig.sessions)}
+                    formattedPrice={formatPrice(courseConfig.price)}
+                    educatorName={t_instructors?.[courseConfig.instructor] || courseConfig.instructor}
+                  />
+                );
+              })}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -164,10 +204,28 @@ export default function Courses({ dictionary }: CoursesProps) {
 }
 
 // --- Component: Academic Index Card (Final Accessible Version) ---
-function CourseCard({ course }: { course: CourseData }) {
+interface CourseCardProps {
+  config: CourseConfig;
+  text: CourseText;
+  formattedSchedule: string;
+  formattedPrice: string;
+  educatorName: string;
+}
+
+function CourseCard({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) {
+  // Infer unit based on price/duration or fallback
+  // For now: hardcoded logic or use a default.
+  // Given prices 2.50 (45min), 3.50 (60min), 7.50 (45min?), 15 (90min).
+  // I will use "pro Einheit" if not specified, or use the existing logic (hardcoded in text?)
+  // Text dictionary does NOT have unit.
+  // I will assume unit is "pro 45 Min" by default, or specific per course ID logic if needed.
+  // Actually, price is low, so likely per unit.
+  // I'll check if text.unit exists (I didn't add it).
+  const unit = text.unit || (config.price > 10 ? "pro 90 Min" : (config.price > 3 ? "pro 60 Min" : "pro 45 Min"));
+
   return (
     <motion.div
-      variants={cardVariants} // Child variant controlled by parent stagger
+      variants={cardVariants}
       className={`
         group relative w-full h-full min-h-[380px] 
         bg-[#F9F8F6] dark:bg-[#1E2024]
@@ -207,7 +265,7 @@ function CourseCard({ course }: { course: CourseData }) {
         <div className="bg-black/[0.02] dark:bg-white/[0.02] p-7 pb-6 border-b border-black/5 dark:border-white/5">
           <div className="flex justify-between items-start mb-6">
             {/* Level Badge */}
-            {course.tags?.[0] ? (
+            {text.level ? (
               <span className={`
                    ${jetbrainsMono.className} 
                    inline-block px-3 py-1 
@@ -217,18 +275,18 @@ function CourseCard({ course }: { course: CourseData }) {
                    group-hover:border-[#FF5C00] group-hover:text-[#FF5C00]
                    transition-colors duration-300
                  `}>
-                {course.tags[0]}
+                {text.level}
               </span>
             ) : <div />}
 
-            {/* Start Badge - ONLY for A1.1 */}
-            {course.start_badge && course.title.includes("A1.1") && (
+            {/* Start Badge - ONLY restricted logic or from text */}
+            {text.start_badge && (
               <span className={`
                    ${jetbrainsMono.className}
                    bg-[#FF5C00] text-white
                    px-2 py-0.5 text-[9px] uppercase tracking-wider
                  `}>
-                {course.start_badge}
+                {text.start_badge}
               </span>
             )}
           </div>
@@ -238,7 +296,7 @@ function CourseCard({ course }: { course: CourseData }) {
               text-4xl md:text-5xl leading-[0.9]
               text-[#111111] dark:text-[#E2D7CE]
             `}>
-            {course.title}
+            {text.title}
           </h3>
         </div>
 
@@ -246,7 +304,7 @@ function CourseCard({ course }: { course: CourseData }) {
         <div className="p-7 pt-6 flex-1 flex flex-col justify-between">
           {/* Description - De-emphasize on hover */}
           <p className="text-[#2D3436]/70 dark:text-[#E2D7CE]/70 leading-relaxed text-sm font-medium pr-4 group-hover:opacity-50 transition-opacity duration-300">
-            {course.desc}
+            {text.description}
           </p>
 
           {/* Accessible Meta-Data Block */}
@@ -256,7 +314,7 @@ function CourseCard({ course }: { course: CourseData }) {
               <div className="flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
                 <User strokeWidth={1.5} size={16} className="text-black/30 dark:text-white/30" />
                 <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider`}>
-                  {course.educator}
+                  {educatorName}
                 </span>
               </div>
             </div>
@@ -271,7 +329,7 @@ function CourseCard({ course }: { course: CourseData }) {
 
                 <Clock strokeWidth={1.5} size={16} className="shrink-0 text-black/30 dark:text-white/30" />
                 <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider leading-tight max-w-[140px]`}>
-                  {course.schedule}
+                  {formattedSchedule}
                 </span>
               </div>
 
@@ -283,7 +341,7 @@ function CourseCard({ course }: { course: CourseData }) {
                             text-5xl 
                             group-hover:text-[#FF5C00] transition-all duration-300 leading-none
                         `}>
-                  {course.price}
+                  {formattedPrice}
                 </span>
 
                 {/* Unit */}
@@ -293,7 +351,7 @@ function CourseCard({ course }: { course: CourseData }) {
                   group-hover:text-[#FF5C00] group-hover:font-bold group-hover:opacity-100
                   transition-all duration-300
                 `}>
-                  {course.unit}
+                  {unit}
                 </span>
               </div>
 

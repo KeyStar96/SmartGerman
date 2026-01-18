@@ -2,10 +2,12 @@
 
 import React, { useRef } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { DAYS, getDayCourses } from "./data";
-import TimetableCard from "./TimetableCard";
+import { COURSES, Day } from "@/lib/course-config";
+import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
 import { isCourseLive } from "@/lib/time-utils";
+
+const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr"];
 
 interface DesktopGridProps {
     dictionary: any;
@@ -14,6 +16,8 @@ interface DesktopGridProps {
 export default function DesktopGrid({ dictionary }: DesktopGridProps) {
     const t = dictionary?.timetable || {};
     const dayNames = t.days || {};
+    const courseTexts = dictionary?.CourseData || {};
+
     const containerRef = useRef(null);
     const [ticker, setTicker] = React.useState(0);
 
@@ -49,6 +53,28 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0 }
     };
+
+    const getDayCourses = (day: Day): TimetableCourse[] => {
+        const dayCourses: TimetableCourse[] = [];
+
+        COURSES.forEach(course => {
+            course.sessions.forEach(session => {
+                if (session.day === day) {
+                    dayCourses.push({
+                        id: `${course.id}-${session.day}-${session.startTime}`,
+                        startTime: session.startTime,
+                        endTime: session.endTime,
+                        title: courseTexts[course.translationKey]?.title || course.id,
+                        instructorKey: course.instructor,
+                        locationKey: course.type
+                    });
+                }
+            });
+        });
+
+        return dayCourses.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    };
+
 
     return (
         <motion.div
