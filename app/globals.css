@@ -42,22 +42,18 @@ body {
   /* Sanfter Übergang für das gesamte Layout beim Theme-Wechsel */
   transition: background-color 0.2s ease, color 0.2s ease;
   min-height: 100vh;
-  /* Explicit height for overscroll fix */
-  height: 100%;
   overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 18px;
   /* Swiss Scientific Base Size */
   overflow-x: hidden;
   /* Wichtig für ScrollTrigger */
-  overscroll-behavior: none;
+  overscroll-behavior-y: none;
 }
 
 html {
   overflow-y: scroll;
   /* Prevents layout shift when scrollbar appears */
-  overscroll-behavior: none;
-  height: 100%;
 }
 
 /* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
