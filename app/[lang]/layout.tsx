@@ -51,7 +51,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} ${jetbrainsMono.variable} bg-background text-foreground antialiased font-sans`}>
+      <body className={`${inter.className} ${jetbrainsMono.variable} text-foreground antialiased font-sans`}>
         {/* 
           CHROME FIX für backdrop-filter:
           - Hintergründe mit z-index: 0/1 statt negativen Werten
