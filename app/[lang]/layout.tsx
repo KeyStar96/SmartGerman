@@ -11,6 +11,18 @@ const jetbrainsMono = JetBrains_Mono({
   variable: '--font-mono',
 });
 
+// STATIC GENERATION (SSG)
+// This tells Next.js to pre-build these routes at build time.
+export async function generateStaticParams() {
+  return [
+    { lang: 'de' },
+    { lang: 'en' },
+    { lang: 'uk' },
+    { lang: 'ru' },
+    { lang: 'tu' },
+  ];
+}
+
 // Wir machen die Funktion 'async'
 export default async function RootLayout({
   children,

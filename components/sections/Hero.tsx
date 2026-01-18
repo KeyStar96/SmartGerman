@@ -28,13 +28,9 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const claimWords = claimText.split(" ");
 
   useEffect(() => {
-    if (document.readyState === "complete") {
-      setIsLoaded(true);
-    } else {
-      const handleLoad = () => setIsLoaded(true);
-      window.addEventListener("load", handleLoad);
-      return () => window.removeEventListener("load", handleLoad);
-    }
+    // OPTIMIZATION: Start animation immediately after hydration (LCP improvement)
+    // We don't need to wait for window.load (all images), just for the component to mount.
+    setIsLoaded(true);
   }, []);
 
   useGSAP(() => {
