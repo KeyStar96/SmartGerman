@@ -3,9 +3,9 @@
 import React from "react";
 import DesktopGrid from "./DesktopGrid";
 import MobileTabs from "./MobileTabs";
-import { Instrument_Serif } from "next/font/google"; // Assuming font usage from user request context "Instrument Serif"
+import { JetBrains_Mono } from "next/font/google";
 
-const instrumentSerif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "italic" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
 interface TimetableSectionProps {
     dictionary: any;
@@ -19,13 +19,18 @@ export default function TimetableSection({ dictionary }: TimetableSectionProps) 
             {/* Container */}
             <div className="container mx-auto px-4 md:px-8">
 
-                {/* Header */}
-                <div className="text-center mb-16 md:mb-24">
-                    <span className="text-xs font-mono uppercase tracking-widest text-[#FF5C00] mb-4 block">
-                        {t.subtitle || "Weekly Schedule"}
+                {/* Header - Aligned with Courses.tsx */}
+                <div className="text-center md:text-left mb-16 md:mb-24">
+                    <span className={`${jetbrainsMono.className} text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4`}>
+                        {t.subtitle || "ALL COURSES AT A GLANCE"}
                     </span>
-                    <h2 className={`text-4xl md:text-6xl text-slate-900 ${instrumentSerif.className}`}>
-                        {t.title || "Timetable"}
+                    <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#111111] dark:text-[#E2D7CE] leading-none">
+                        {t.title ? (
+                            <>
+                                {t.title.split(" ").slice(0, -1).join(" ")} <br className="hidden md:block" />
+                                <span className="text-[#FF5C00]">{t.title.split(" ").pop()}</span>
+                            </>
+                        ) : "TIMETABLE"}
                     </h2>
                 </div>
 

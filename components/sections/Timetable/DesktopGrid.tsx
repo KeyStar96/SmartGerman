@@ -46,7 +46,7 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
                     <div key={day} className="flex flex-col gap-4">
                         {/* Column Header */}
                         <div className="text-center pb-2 border-b border-slate-200">
-                            <h3 className="text-xl font-serif text-slate-800 italic">
+                            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-widest font-mono">
                                 {dayLabel}
                             </h3>
                         </div>
