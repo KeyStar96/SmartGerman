@@ -17,49 +17,55 @@ export default async function HomePage({
   const dictionary = await getDictionary(lang);
 
   return (
-    <div className="relative w-full min-h-screen">
+    <>
+      {/* 
+        MAIN CONTENT WRAPPER 
+        - Creates the scrollable document flow
+        - Margin bottom reserves space for the fixed footer
+        - z-index: 10 ensures it sits on top of the footer initially
+      */}
+      <main className="relative z-10 mb-[600px] md:mb-[500px] bg-transparent">
 
-      {/* ========================================
-          LAYER 1: FIXED BACKGROUND
-          - Bleibt immer an Position fixed
-          - Immer sichtbar durch transparente Sections
-          ======================================== */}
-      <div className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none">
-        <ArchitecturalBackground />
-      </div>
+        {/* 
+          STICKY BACKGROUND CONTAINER
+          - Sticks to viewport top while scrolling through this main container
+          - -z-10 ensures it stays behind the content sections
+        */}
+        <div className="sticky top-0 h-screen w-full -z-10">
+          <ArchitecturalBackground />
+        </div>
 
-      {/* ========================================
-          LAYER 2: CONTENT MIT SOLIDEM BACKGROUND
-          - Transparent am Anfang (Background sichtbar)
-          - Am Ende: Solid Background überdeckt Footer
-          - Beim Weiterscrolln: Schiebt sich hoch → Footer wird sichtbar
-          ======================================== */}
-      <div className="relative z-10 w-full">
-        {/* Sections - TRANSPARENT */}
-        <div className="bg-transparent">
+        {/* 
+          CONTENT SECTIONS 
+          - Rendered normally in the flow
+          - Background attached to sticky container acts as their background
+          - mt-[-100vh] pulls content up to overlap the sticky container starting at top
+        */}
+        <div className="relative w-full mt-[-100vh]">
           <Hero dictionary={dictionary} lang={lang} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
           <WhyUsBento dictionary={dictionary} />
           <Courses dictionary={dictionary} />
           <LocationSection dictionary={dictionary} />
+
+          {/*
+             THE CURTAIN
+             - A solid background block at the end of content
+             - Scrolls up to cover the sticky background
+             - When this block finishes scrolling, the footer (fixed behind main) is revealed
+          */}
+          <div className="h-screen w-full bg-background" />
         </div>
+      </main>
 
-        {/* SOLID CURTAIN: Überdeckt Footer, bis man weitersrollt
-            - bg-background: Solid color (überdeckt Footer komplett)
-            - h-screen: So hoch wie Viewport (Footer initial versteckt)
-            - Beim Scrollen: Schiebt sich hoch → Footer erscheint
-        */}
-        <div className="bg-background h-screen" aria-hidden="true" />
-      </div>
-
-      {/* ========================================
-          LAYER 3: FOOTER (wird durch Curtain enthüllt)
-          - z-[-1]: Unter Content
-          - fixed bottom-0: Immer am unteren Rand
-          - Wird sichtbar wenn Curtain hochscrollt
-          ======================================== */}
+      {/* 
+        FOOTER LAYOUT
+        - Fixed at bottom
+        - z-0 (or -1) puts it underneath the Main Wrapper
+        - Revealed when Main Wrapper scrolls away (due to margin-bottom)
+      */}
       <FooterLayout dictionary={dictionary} />
-    </div>
+    </>
   );
 }

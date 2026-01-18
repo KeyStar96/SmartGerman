@@ -197,8 +197,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                 </div>
             </div>
 
-            {/* Reveal Spacer */}
-            <div className="h-[700px]" aria-hidden="true" />
+
         </section>
     );
 };
