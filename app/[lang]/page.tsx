@@ -17,44 +17,47 @@ export default async function HomePage({
   const dictionary = await getDictionary(lang);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full min-h-screen">
 
       {/* ========================================
-          LAYER 1: TRULY FIXED BACKGROUND
-          - Position: fixed (bleibt IMMER an gleicher Stelle)
-          - top: 0, left: 0 (startet bei Viewport-Anfang)
-          - width/height: 100vw/100vh (füllt komplette Viewport)
-          - z-index: 0 (hinter allem anderen)
-          - pointer-events: none (nicht klickbar)
+          LAYER 1: FIXED BACKGROUND
+          - Bleibt immer an Position fixed
+          - Immer sichtbar durch transparente Sections
           ======================================== */}
-      <div className="sticky top-0 w-full h-screen z-0 pointer-events-none">
+      <div className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none">
         <ArchitecturalBackground />
       </div>
 
       {/* ========================================
-          LAYER 2: SCROLLABLE CONTENT - ALLE TRANSPARENT
-          - Position: relative (normale Document Flow)
-          - z-index: 10 (über Background UND Footer)
-          - bg-transparent (Background durchscheinen lassen)
-          - min-h-screen (Content muss Footer initial überdecken)
+          LAYER 2: CONTENT MIT SOLIDEM BACKGROUND
+          - Transparent am Anfang (Background sichtbar)
+          - Am Ende: Solid Background überdeckt Footer
+          - Beim Weiterscrolln: Schiebt sich hoch → Footer wird sichtbar
           ======================================== */}
-      <div className="relative z-10 w-full bg-transparent">
-        <Hero dictionary={dictionary} lang={lang} />
-        <ScienceSection dictionary={dictionary} />
-        <AboutContainer dictionary={dictionary} />
-        <WhyUsBento dictionary={dictionary} />
-        <Courses dictionary={dictionary} />
-        <LocationSection dictionary={dictionary} />
+      <div className="relative z-10 w-full">
+        {/* Sections - TRANSPARENT */}
+        <div className="bg-transparent">
+          <Hero dictionary={dictionary} lang={lang} />
+          <ScienceSection dictionary={dictionary} />
+          <AboutContainer dictionary={dictionary} />
+          <WhyUsBento dictionary={dictionary} />
+          <Courses dictionary={dictionary} />
+          <LocationSection dictionary={dictionary} />
+        </div>
 
-        {/* Spacer: Drückt Footer nach unten, sodass er erst am Ende sichtbar wird */}
-        <div className="h-[700px]" aria-hidden="true" />
+        {/* SOLID CURTAIN: Überdeckt Footer, bis man weitersrollt
+            - bg-background: Solid color (überdeckt Footer komplett)
+            - h-screen: So hoch wie Viewport (Footer initial versteckt)
+            - Beim Scrollen: Schiebt sich hoch → Footer erscheint
+        */}
+        <div className="bg-background h-screen" aria-hidden="true" />
       </div>
 
       {/* ========================================
-          LAYER 3: FOOTER WITH REVEAL MECHANISM
-          - Spacer pusht Content nach unten
-          - Fixed Footer wird sichtbar wenn Content hochscrollt
-          - z-index: 0 (unter Content-Curtain)
+          LAYER 3: FOOTER (wird durch Curtain enthüllt)
+          - z-[-1]: Unter Content
+          - fixed bottom-0: Immer am unteren Rand
+          - Wird sichtbar wenn Curtain hochscrollt
           ======================================== */}
       <FooterLayout dictionary={dictionary} />
     </div>
