@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef, ReactNode } from "react";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 
