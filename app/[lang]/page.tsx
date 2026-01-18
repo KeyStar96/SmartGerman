@@ -7,6 +7,7 @@ import { LocationSection } from "@/components/sections/Location/LocationSection"
 import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
 import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
+import BackgroundPinner from "@/components/effects/BackgroundPinner";
 
 export default async function HomePage({
   params,
@@ -24,24 +25,23 @@ export default async function HomePage({
         - Margin bottom reserves space for the fixed footer
         - z-index: 10 ensures it sits on top of the footer initially
       */}
-      <main className="relative z-10 mb-[600px] md:mb-[500px] bg-transparent">
+      <main className="relative z-10 mb-[600px] md:mb-[500px] bg-transparent w-full">
 
         {/* 
-          STICKY BACKGROUND CONTAINER
-          - Sticks to viewport top while scrolling through this main container
-          - -z-10 ensures it stays behind the content sections
+          GSAP PINNED BACKGROUND
+          - Uses ScrollTrigger to Force-Pin the background
+          - Much more robust than position: sticky
         */}
-        <div className="sticky top-0 h-screen w-full -z-10">
+        <BackgroundPinner>
           <ArchitecturalBackground />
-        </div>
+        </BackgroundPinner>
 
         {/* 
           CONTENT SECTIONS 
           - Rendered normally in the flow
           - Background attached to sticky container acts as their background
-          - mt-[-100vh] pulls content up to overlap the sticky container starting at top
         */}
-        <div className="relative w-full mt-[-100vh]">
+        <div className="relative w-full z-20">
           <Hero dictionary={dictionary} lang={lang} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
