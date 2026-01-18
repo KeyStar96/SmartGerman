@@ -419,6 +419,39 @@
     "thursday": "Donnerstag",
     "friday": "Freitag"
   },
+  "timetable": {
+    "title": "Stundenplan",
+    "subtitle": "Alle Kurse auf einen Blick",
+    "days": {
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "mo": "Mo",
+      "di": "Di",
+      "mi": "Mi",
+      "do": "Do",
+      "fr": "Fr"
+    },
+    "course_types": {
+      "presence": "Präsenz",
+      "online": "Online"
+    },
+    "locations": {
+      "presence": "Königstraße 20",
+      "online": "Microsoft Teams"
+    },
+    "instructors": {
+      "standard": "Anastasia Sitov",
+      "special": "Lisa Kahl"
+    },
+    "labels": {
+      "time": "Uhrzeit",
+      "course": "Kurs",
+      "room": "Raum"
+    }
+  },
   "science": {
     "protocol": "Wissenschaftliches Fundament",
     "title_part1": "Wissenschaft",

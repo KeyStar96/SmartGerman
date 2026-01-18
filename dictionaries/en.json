@@ -279,6 +279,39 @@
     "thursday": "Thursday",
     "friday": "Friday"
   },
+  "timetable": {
+    "title": "Timetable",
+    "subtitle": "All courses at a glance",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "mo": "Mon",
+      "di": "Tue",
+      "mi": "Wed",
+      "do": "Thu",
+      "fr": "Fri"
+    },
+    "course_types": {
+      "presence": "In-Person",
+      "online": "Online"
+    },
+    "locations": {
+      "presence": "Königstraße 20",
+      "online": "Microsoft Teams"
+    },
+    "instructors": {
+      "standard": "Anastasia Sitov",
+      "special": "Lisa Kahl"
+    },
+    "labels": {
+      "time": "Time",
+      "course": "Course",
+      "room": "Room"
+    }
+  },
   "science": {
     "protocol": "Scientific Foundation",
     "title_part1": "Science",
