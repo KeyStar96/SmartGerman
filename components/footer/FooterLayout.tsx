@@ -13,7 +13,7 @@ export default function FooterLayout({ dictionary }: FooterLayoutProps) {
             <div className="h-full w-full pointer-events-none bg-transparent" />
 
             {/* Der eigentliche Footer: Fixed + z-0 */}
-            <footer className="fixed bottom-0 left-0 w-full h-[600px] md:h-[500px] z-0 flex flex-col justify-end overflow-hidden bg-[#050505] text-[#E2D7CE]">
+            <footer className="fixed bottom-0 left-0 w-full h-[600px] md:h-[500px] z-[-1] flex flex-col justify-end overflow-hidden bg-[#050505] text-[#E2D7CE]">
 
                 {/* --- AMBIENT LIGHTING (BRAND UPDATED) --- */}
                 <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
