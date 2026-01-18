@@ -15,7 +15,7 @@ export default function TimetableSection({ dictionary }: TimetableSectionProps) 
     const t = dictionary?.timetable || {};
 
     return (
-        <section className="relative w-full py-24 md:py-32 bg-slate-50/50" id="timetable">
+        <section className="relative w-full py-24 md:py-32 bg-transparent" id="timetable">
             {/* Container */}
             <div className="container mx-auto px-4 md:px-8">
 
@@ -25,12 +25,8 @@ export default function TimetableSection({ dictionary }: TimetableSectionProps) 
                         {t.subtitle || "ALL COURSES AT A GLANCE"}
                     </span>
                     <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#111111] dark:text-[#E2D7CE] leading-none">
-                        {t.title ? (
-                            <>
-                                {t.title.split(" ").slice(0, -1).join(" ")} <br className="hidden md:block" />
-                                <span className="text-[#FF5C00]">{t.title.split(" ").pop()}</span>
-                            </>
-                        ) : "TIMETABLE"}
+                        {t.title_line1 || "THE CURRENT"} <br />
+                        <span className="text-[#FF5C00]">{t.title_line2 || "TIMETABLE"}</span>
                     </h2>
                 </div>
 

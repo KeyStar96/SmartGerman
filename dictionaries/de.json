@@ -420,7 +420,8 @@
     "friday": "Freitag"
   },
   "timetable": {
-    "title": "Stundenplan",
+    "title_line1": "DER AKTUELLE",
+    "title_line2": "STUNDENPLAN",
     "subtitle": "Alle Kurse auf einen Blick",
     "days": {
       "monday": "Montag",

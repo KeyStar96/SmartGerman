@@ -280,7 +280,8 @@
     "friday": "Friday"
   },
   "timetable": {
-    "title": "Timetable",
+    "title_line1": "THE CURRENT",
+    "title_line2": "TIMETABLE",
     "subtitle": "All courses at a glance",
     "days": {
       "monday": "Monday",
