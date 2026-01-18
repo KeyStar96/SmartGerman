@@ -49,13 +49,7 @@ export default async function HomePage({
           <Courses dictionary={dictionary} />
           <LocationSection dictionary={dictionary} />
 
-          {/*
-             THE CURTAIN
-             - A solid background block at the end of content
-             - Scrolls up to cover the sticky background
-             - When this block finishes scrolling, the footer (fixed behind main) is revealed
-          */}
-          <div className="h-screen w-full bg-background" />
+
         </div>
       </main>
 
