@@ -83,15 +83,13 @@ export default function Courses({ dictionary }: CoursesProps) {
 
   // Helper to format schedule string
   const formatSchedule = (sessions: CourseConfig["sessions"]) => {
-    return sessions
-      .map((s) => {
-        // Map "Mo" -> "Montag" (or localized logic? dictionary has "mo": "Mo")
-        // Use dictionary.timetable.days[s.day.toLowerCase()]
-        const dayKey = s.day.toLowerCase();
-        const localizedDay = t_days?.[dayKey] || s.day; // Fallback to "Mo"
-        return `${localizedDay} ${s.startTime}-${s.endTime}`;
-      })
-      .join(" & ");
+    return sessions.map((s) => {
+      // Map "Mo" -> "Montag" (or localized logic? dictionary has "mo": "Mo")
+      // Use dictionary.timetable.days[s.day.toLowerCase()]
+      const dayKey = s.day.toLowerCase();
+      const localizedDay = t_days?.[dayKey] || s.day; // Fallback to "Mo"
+      return `${localizedDay} ${s.startTime}-${s.endTime}`;
+    });
   };
 
   // Helper to format price
@@ -207,7 +205,7 @@ export default function Courses({ dictionary }: CoursesProps) {
 interface CourseCardProps {
   config: CourseConfig;
   text: CourseText;
-  formattedSchedule: string;
+  formattedSchedule: string[];
   formattedPrice: string;
   educatorName: string;
 }
@@ -233,7 +231,7 @@ function CourseCard({ config, text, formattedSchedule, formattedPrice, educatorN
         /* Border Collapsing Trick: Negative Margins */
         -ml-px -mt-px
         border-[0.5px] border-black/10 dark:border-transparent
-
+        
         flex flex-col justify-between overflow-hidden
         transition-all duration-300 ease-out
         
@@ -327,10 +325,15 @@ function CourseCard({ config, text, formattedSchedule, formattedPrice, educatorN
                 {/* Marker */}
                 <div className="absolute -left-3 top-1 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
 
-                <Clock strokeWidth={1.5} size={16} className="shrink-0 text-black/30 dark:text-white/30" />
-                <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider leading-tight max-w-[140px]`}>
-                  {formattedSchedule}
-                </span>
+                <Clock strokeWidth={1.5} size={16} className="shrink-0 text-black/30 dark:text-white/30 self-start mt-0.5" />
+                <div className={`${jetbrainsMono.className} flex flex-col gap-0.5 text-sm font-medium uppercase tracking-wider leading-tight max-w-[140px]`}>
+                  {formattedSchedule.map((item, i) => (
+                    <React.Fragment key={i}>
+                      {i > 0 && <span className="text-[#FF5C00]">&</span>}
+                      <span>{item}</span>
+                    </React.Fragment>
+                  ))}
+                </div>
               </div>
 
               {/* RIGHT: Price & Unit (Cost Block) */}
