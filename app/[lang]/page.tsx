@@ -27,7 +27,7 @@ export default async function HomePage({
           - z-index: 0 (hinter allem anderen)
           - pointer-events: none (nicht klickbar)
           ======================================== */}
-      <div className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none">
+      <div className="sticky top-0 w-full h-screen z-0 pointer-events-none">
         <ArchitecturalBackground />
       </div>
 
