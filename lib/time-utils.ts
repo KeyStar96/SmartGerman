@@ -20,7 +20,7 @@ export function isOpenNow(): boolean {
     return false;
 }
 
-export function getCurrentDayName(): "Mo" | "Di" | "Mi" | "Do" | "Fr" {
+export function getCurrentDayName(): "Mo" | "Di" | "Mi" | "Do" | "Fr" | null {
     const now = new Date();
     const berlinTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Berlin" }));
     const dayIndex = berlinTime.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
@@ -31,13 +31,13 @@ export function getCurrentDayName(): "Mo" | "Di" | "Mi" | "Do" | "Fr" {
     if (dayIndex >= 1 && dayIndex <= 5) {
         return DAYS[dayIndex - 1];
     }
-    // Access on Weekend -> Default to Monday
-    return "Mo";
+    // Return null on weekends
+    return null;
 }
 
 export function isCourseLive(day: string, startTime: string, endTime: string): boolean {
     const currentDay = getCurrentDayName();
-    if (currentDay !== day) return false;
+    if (!currentDay || currentDay !== day) return false;
 
     const now = new Date();
     const berlinTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Berlin" }));

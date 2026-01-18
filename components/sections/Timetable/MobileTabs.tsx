@@ -21,7 +21,8 @@ export default function MobileTabs({ dictionary }: MobileTabsProps) {
 
     useEffect(() => {
         // Set correct start day once mounted (client-side)
-        setActiveDay(getCurrentDayName());
+        // If weekend (null), default to "Mo"
+        setActiveDay(getCurrentDayName() || "Mo");
 
         // Refresh live status
         const interval = setInterval(() => setTicker(t => t + 1), 60000);
