@@ -37,7 +37,7 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: #050505;
   color: var(--foreground);
   /* Sanfter Übergang für das gesamte Layout beim Theme-Wechsel */
   transition: background-color 0.2s ease, color 0.2s ease;

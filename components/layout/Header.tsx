@@ -95,7 +95,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   const currentLanguage = languages.find((l) => l.code === lang) || languages[0];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300">
+    <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300 rounded-t-[60px] overflow-hidden">
 
 
       {/* 2. Navigation mit Glassmorphismus */}
