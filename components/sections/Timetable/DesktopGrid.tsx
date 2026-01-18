@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { DAYS, getDayCourses } from "./data";
 import TimetableCard from "./TimetableCard";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,19 @@ interface DesktopGridProps {
 export default function DesktopGrid({ dictionary }: DesktopGridProps) {
     const t = dictionary?.timetable || {};
     const dayNames = t.days || {};
+    const containerRef = useRef(null);
+
+    // Scroll Animation for the Orange Line ("Nerve" Effect)
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start 80%", "end 80%"],
+    });
+
+    const scaleY = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
 
     const container = {
         hidden: { opacity: 0 },
@@ -31,6 +44,7 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
 
     return (
         <motion.div
+            ref={containerRef}
             variants={container}
             initial="hidden"
             whileInView="show"
@@ -42,8 +56,6 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
 
                 const rawName = dayNames[day.toLowerCase()] || day;
                 const dayLabel = rawName;
-
-
 
                 return (
                     <div key={day} className="relative flex flex-col h-full group/column">
@@ -58,8 +70,13 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
                         </div>
 
                         {/* 2. Timeline Line: Measured Precision */}
-                        {/* Starts below header, aligns with card dot (6px offset) */}
-                        <div className="absolute left-[6px] top-[5.5rem] bottom-0 w-px bg-black/10 dark:bg-white/10 z-0" />
+                        <div className="absolute left-[6px] top-[5.5rem] bottom-0 w-px bg-black/10 dark:bg-white/10 z-0">
+                            {/* 3. Orange "Nerve" Line Animation */}
+                            <motion.div
+                                style={{ scaleY }}
+                                className="absolute top-0 left-0 w-full h-full bg-[#FF5C00] origin-top z-1"
+                            />
+                        </div>
 
                         {/* Courses Stack */}
                         <div className="flex flex-col gap-8 relative z-10 pt-4">
@@ -78,9 +95,6 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
                                     -
                                 </div>
                             )}
-
-                            {/* Filler Card: Technical Placeholder */}
-
                         </div>
                     </div>
                 );
