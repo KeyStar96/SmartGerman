@@ -101,7 +101,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
       {/* 2. Navigation mit Glassmorphismus */}
       <nav className={`w-full transition-all duration-500 ${isScrolled
         ? "py-2 bg-background shadow-md border-none"
-        : "py-6 bg-transparent border-none"
+        : "py-2 bg-transparent border-none"
         }`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
 
