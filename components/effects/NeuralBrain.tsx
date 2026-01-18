@@ -68,6 +68,11 @@ export default function NeuralBrain() {
     const isVisibleRef = useRef(false);
     const lastTimeRef = useRef(0);
 
+    // Optimization Refs
+    const scrollRef = useRef(0);
+    const windowMetricRef = useRef(0);
+    const elementMetricRef = useRef({ top: 0, height: 0 });
+
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -555,42 +560,30 @@ export default function NeuralBrain() {
             const dt = Math.min((time - lastTimeRef.current) / 1000, 0.1);
             lastTimeRef.current = time;
 
-            // --- SCROLL-DRIVEN EXPANSION ---
+            if (!containerRef.current) return;
+
+            // --- SCROLL-DRIVEN EXPANSION (OPTIMIZED) ---
+            // Use cached values to avoid layout thrashing
+            const { top, height } = elementMetricRef.current;
+            const scrollY = scrollRef.current;
+            const viewH = windowMetricRef.current;
+
+            const elementCenter = (top - scrollY) + height / 2;
+            const viewCenter = viewH / 2;
+            const dist = Math.abs(elementCenter - viewCenter);
+
+            // UPDATED LOGIC: "Plateau" behavior
+            const safeZone = viewH * 0.35;
+            const fadeEnd = viewH * 0.55;
+
             let targetExpansion = 0.0;
 
-            if (containerRef.current) {
-                // Calculate position relative to viewport
-                const rect = containerRef.current.getBoundingClientRect();
-                const viewH = window.innerHeight;
-                const viewCenter = viewH / 2;
-                const elementCenter = rect.top + rect.height / 2;
-
-                // Distance from center
-                const dist = Math.abs(elementCenter - viewCenter);
-
-                // UPDATED LOGIC: "Plateau" behavior from user request
-                // Keep 1.0 expansion for a long time, then fade out quickly near the edge.
-
-                // 1. Define "Safe Zone" where expansion is locked to 1.0
-                // viewH * 0.35 means: +/- 35% from center is SAFE. (Total 70% of screen height is full size)
-                const safeZone = viewH * 0.35;
-
-                // 2. Define "Fade Out Zone"
-                // Fade starts after safeZone and ends at fadeEnd.
-                // viewH * 0.55 means: It fades out completely just as it leaves the screen (or slightly after)
-                const fadeEnd = viewH * 0.55;
-
-                if (dist <= safeZone) {
-                    targetExpansion = 1.0;
-                } else {
-                    // Normalize distance between safeZone and fadeEnd -> 0..1
-                    // 0 = at safeZone (Full), 1 = at fadeEnd (Empty)
-                    const fadeProgress = Math.max(0, Math.min(1, (dist - safeZone) / (fadeEnd - safeZone)));
-
-                    // Simple linear fade or smoothstep
-                    const smoothFade = fadeProgress * fadeProgress * (3 - 2 * fadeProgress);
-                    targetExpansion = 1.0 - smoothFade;
-                }
+            if (dist <= safeZone) {
+                targetExpansion = 1.0;
+            } else {
+                const fadeProgress = Math.max(0, Math.min(1, (dist - safeZone) / (fadeEnd - safeZone)));
+                const smoothFade = fadeProgress * fadeProgress * (3 - 2 * fadeProgress);
+                targetExpansion = 1.0 - smoothFade;
             }
 
             // If observer says Hidden, force 0 (Optimization safety)
@@ -607,13 +600,10 @@ export default function NeuralBrain() {
             linesMat.uniforms.uExpansion.value = newExp;
 
             // --- STOP OPTIMIZATION ---
-            // If target is 0 and we are practically 0, and Observer says hidden, STOP.
-            // (We keep running if visible even if expansion is low, to catch the scroll back in)
             if (!isVisibleRef.current && newExp < 0.001) {
                 if (requestRef.current) {
                     cancelAnimationFrame(requestRef.current);
                     requestRef.current = undefined;
-                    // Ensure it is strictly 0
                     particlesMat.uniforms.uExpansion.value = 0;
                     linesMat.uniforms.uExpansion.value = 0;
                 }
@@ -643,17 +633,9 @@ export default function NeuralBrain() {
             const signalArray = signalAttr.array as Float32Array;
 
             // Auto Pulse (Random / Organic)
-            // Low probability to avoid "Heartbeat" / "Clumping"
             if (CONFIG.autoPulseEnabled) {
-                // "Arbitrary and chaotic":
-                // Instead of 1 check per frame, we use a loop to allow 0, 1, 2... N triggers per frame.
-                // Target: ~40 triggers/sec (very active)
-                // At 60fps = ~0.66 triggers/frame. 
-                // We run 3 checks at 0.22 chance each to allow potential "double/triple strikes" in one frame (clustering)
-                // blocking the rythm.
-
                 for (let k = 0; k < 3; k++) {
-                    if (Math.random() < 0.25) { // ~45 triggers/sec total
+                    if (Math.random() < 0.25) {
                         triggerNeuron();
                     }
                 }
@@ -671,7 +653,6 @@ export default function NeuralBrain() {
             dirtyLines.length = 0;
 
             // Optimization: Iterate ONLY active pulses
-            // Use reverse loop for easy removal (Swap & Pop)
             for (let i = activePulseIndices.length - 1; i >= 0; i--) {
                 const pIdx = activePulseIndices[i];
                 const p = pulsePool[pIdx];
@@ -684,10 +665,9 @@ export default function NeuralBrain() {
                 const isReverse = p.fromIdx !== connectionPairs[lineIdx].from;
                 if (isReverse) shaderProgress = 1.0 - p.progress;
 
-                let encodedStrength = p.strength;   // Default to start strength
+                let encodedStrength = p.strength;
 
                 // --- VISUAL DECAY DURING TRAVEL ---
-                // "Light signal decreases luminosity with the path"
                 const travelDecay = Math.exp(-dist * p.progress * 2.0);
                 const currentStrength = p.strength * travelDecay;
 
@@ -706,16 +686,10 @@ export default function NeuralBrain() {
 
                 if (!p.hasTriggered && p.progress >= 1.0) {
                     const targetN = neurons[p.toIdx];
-
-                    // "Neuron lights up in same intensity as signal reached it"
                     targetN.flash += currentStrength;
 
-                    // "Sends new signal with reduced intensity" (Immediate, no delay)
-                    // We treat "reduced" as the value it arrived with.
                     if (currentStrength > CONFIG.minSignalStrength) {
-                        // Spread to others
                         targetN.connections.forEach(mateIdx => {
-                            // Don't send back to sender immediately (optional simple block)
                             if (mateIdx !== p.fromIdx) {
                                 spawnPulse(p.toIdx, mateIdx, currentStrength, 0.0);
                             }
@@ -724,13 +698,9 @@ export default function NeuralBrain() {
                     p.hasTriggered = true;
                 }
 
-                if (p.progress >= 1.0 + (CONFIG.trailDecay / dist)) { // Wait for trail to finish
+                if (p.progress >= 1.0 + (CONFIG.trailDecay / dist)) {
                     p.active = false;
-
-                    // Return to free pool
                     freePulseIndices.push(pIdx);
-
-                    // Fast removal from active list (Swap with last & pop)
                     const lastActive = activePulseIndices[activePulseIndices.length - 1];
                     activePulseIndices[i] = lastActive;
                     activePulseIndices.pop();
@@ -738,7 +708,6 @@ export default function NeuralBrain() {
             }
 
             signalAttr.needsUpdate = true;
-
             renderer.render(scene, camera);
         };
 
@@ -756,26 +725,46 @@ export default function NeuralBrain() {
                     startLoop();
                 }
             });
-        }, { threshold: 0.1, rootMargin: '-20% 0px' }); // Trigger earlier to show collapse
+        }, { threshold: 0.1, rootMargin: '-20% 0px' });
 
         intersectionObserver.observe(containerRef.current);
 
-        // --- 7. RESIZE & CLEANUP ---
-        const resizeObserver = new ResizeObserver(() => {
+        // --- 7. RESIZE & SCROLL HANDLERS (OPTIMIZED) ---
+        const updateMetrics = () => {
             if (!containerRef.current) return;
+            const rect = containerRef.current.getBoundingClientRect();
+            // Store absolute top position (current scroll + rect.top)
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            elementMetricRef.current = {
+                top: rect.top + scrollTop,
+                height: rect.height
+            };
+            windowMetricRef.current = window.innerHeight;
+
+            // Update renderer size
             const newW = containerRef.current.clientWidth;
             const newH = containerRef.current.clientHeight;
-
             camera.aspect = newW / newH;
             camera.updateProjectionMatrix();
             renderer.setSize(newW, newH);
-        });
+        };
 
-        resizeObserver.observe(containerRef.current);
+        const handleScroll = () => {
+            scrollRef.current = window.scrollY || document.documentElement.scrollTop;
+        };
+
+        // Initial setup
+        updateMetrics();
+        handleScroll();
+
+        window.addEventListener("resize", updateMetrics);
+        window.addEventListener("scroll", handleScroll, { passive: true });
 
         return () => {
             observer.disconnect();
-            resizeObserver.disconnect();
+            intersectionObserver.disconnect();
+            window.removeEventListener("resize", updateMetrics);
+            window.removeEventListener("scroll", handleScroll);
 
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);

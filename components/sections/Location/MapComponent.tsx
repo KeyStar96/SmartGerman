@@ -39,6 +39,7 @@ export const MapComponent: React.FC<MapComponentProps> = ({
             <iframe
                 width="100%"
                 height="100%"
+                loading="lazy"
                 frameBorder="0"
                 scrolling="no"
                 marginHeight={0}

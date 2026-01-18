@@ -22,7 +22,8 @@ export default function ArchitecturalBackground({ className }: { className?: str
                     src="/Bilder/SG_BG_Light.png"
                     alt="Architectural Background Light"
                     fill
-                    priority
+                    priority={true}
+                    sizes="100vw"
                     className="object-cover object-center"
                     quality={90}
                 />
@@ -33,7 +34,8 @@ export default function ArchitecturalBackground({ className }: { className?: str
                     src="/Bilder/SG_BG_Dark.JPG"
                     alt="Architectural Background Dark"
                     fill
-                    priority
+                    priority={true}
+                    sizes="100vw"
                     className="object-cover object-center"
                     quality={90}
                 />
