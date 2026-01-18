@@ -1,7 +1,5 @@
-"use client";
-
 import { useRef, ReactNode } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 
 export default function BackgroundPinner({ children }: { children: ReactNode }) {
     const container = useRef<HTMLDivElement>(null);
