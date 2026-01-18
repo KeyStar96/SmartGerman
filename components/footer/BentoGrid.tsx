@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ArrowUpRight, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import Magnetic from '@/components/ui/Magnetic';
-import { isOpenNow } from '@/lib/time-utils';
+import TimeStatus from './TimeStatus';
 
 interface BentoGridProps {
     dictionary: any;
@@ -13,32 +13,15 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
     const t = dictionary?.Footer || {};
     const navItems = ['home', 'courses', 'prices', 'about', 'location'];
 
-    // Status Logic
-    const [isOpen, setIsOpen] = useState(false);
-    const [currentTime, setCurrentTime] = useState("");
-
-    useEffect(() => {
-        setIsOpen(isOpenNow());
-        const updateTime = () => {
-            const now = new Date().toLocaleTimeString("de-DE", {
-                timeZone: "Europe/Berlin",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-            setCurrentTime(now);
-        };
-        updateTime();
-        const interval = setInterval(updateTime, 60000);
-        return () => clearInterval(interval);
-    }, []);
-
     // Copy Email
     const [isCopied, setIsCopied] = useState(false);
-    const handleCopyEmail = () => {
+
+    // OPTIMIZATION: Memoized handler to prevent re-creation on every render (if parent renders)
+    const handleCopyEmail = useCallback(() => {
         navigator.clipboard.writeText("info@smart-german.com");
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
-    };
+    }, []);
 
     return (
         <div className="w-full h-full px-6 md:px-12 py-12 flex flex-col justify-between">
@@ -63,16 +46,8 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                         </p>
                     </div>
 
-                    {/* Status Indicator */}
-                    <div className="flex items-center gap-3">
-                        <div className="relative flex items-center justify-center w-3 h-3">
-                            <div className={`absolute inset-0 rounded-full opacity-50 animate-ping ${isOpen ? 'bg-green-500' : 'bg-red-500'}`} />
-                            <div className={`relative w-2 h-2 rounded-full ${isOpen ? 'bg-green-500' : 'bg-red-500'}`} />
-                        </div>
-                        <span className="font-mono text-xs text-white/70 uppercase tracking-widest">
-                            Hannover {currentTime} • {isOpen ? "Open" : "Closed"}
-                        </span>
-                    </div>
+                    {/* Status Indicator (Isolated Component) */}
+                    <TimeStatus />
                 </div>
 
                 {/* 2. Navigation (Middle) */}
