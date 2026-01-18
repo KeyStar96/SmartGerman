@@ -15,7 +15,7 @@ export default function MobileTabs({ dictionary }: MobileTabsProps) {
     const dayNames = t.days || {};
 
     // Default to Monday (or current day logic if desired, but Monday is safe)
-    const [activeDay, setActiveDay] = useState(DAYS[0]);
+    const [activeDay, setActiveDay] = useState<typeof DAYS[number]>(DAYS[0]);
 
     return (
         <div className="md:hidden flex flex-col gap-8">
