@@ -183,7 +183,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
             </div>
 
             <Link
-              href={`/${lang}/anmeldung`}
+              href={`/${lang}/registration`}
               className="btn-primary px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105"
             >
               {dictionary.header.nav.enroll}
