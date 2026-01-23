@@ -399,5 +399,40 @@
       "imprint": "Künye",
       "terms": "Şartlar"
     }
+  },
+  "registration": {
+    "back_home": "ANA SAYFAYA DÖN",
+    "step_course": "KURS",
+    "step_personal": "KİŞİSEL",
+    "headline": "Akademik yolculuğunuza başlayın.",
+    "subline": "Lütfen formu doldurun. Verileriniz SSL ile şifrelenir ve gizli tutulur.",
+    "course_selection": "Modülünüzü seçin.",
+    "personal_data": "Kişisel Veriler.",
+    "labels": {
+      "firstname": "ADINIZ",
+      "lastname": "SOYADINIZ",
+      "email": "E-POSTA",
+      "phone": "TELEFON",
+      "street": "CADDE & NO",
+      "zip": "POSTA KODU",
+      "city": "ŞEHİR"
+    },
+    "buttons": {
+      "next": "Devam",
+      "back": "Geri",
+      "submit": "Kaydı Gönder"
+    },
+    "receipt": {
+      "title": "TAHMİNİ ÜCRETLER",
+      "tuition": "Eğitim Ücreti",
+      "total": "Toplam / EUR",
+      "note": "* KDV Dahil / Fatura alındıktan sonra ödenir",
+      "waiting": "[ Seçim bekleniyor ]"
+    },
+    "success": {
+      "title": "Kayıt Onaylandı",
+      "message": "Belgelerinizi aldık. Kısa süre içinde kurs katılımı ile ilgili detayları içeren bir e-posta alacaksınız.",
+      "ref": "REFERANS NO"
+    }
   }
 }

@@ -21,11 +21,10 @@ export default async function RegistrationPage({
             <div className="relative z-10 px-8 py-8 flex items-center justify-between">
                 <Link href={`/${lang}`} className="flex items-center gap-2 group text-gray-500 hover:text-[#FF5C00] transition-colors">
                     <ChevronLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                    <span className="font-mono text-xs uppercase tracking-widest">Zurück zum Campus</span>
+                    <span className="font-mono text-xs uppercase tracking-widest">{dictionary.registration?.back_home || "ZURÜCK ZUR STARTSEITE"}</span>
                 </Link>
                 <div className="text-right">
                     <h1 className="font-bold text-xl tracking-tight leading-none">Smart German</h1>
-                    <p className="font-mono text-[10px] uppercase text-gray-500 tracking-[0.2em]">Academic Admission Protocol</p>
                 </div>
             </div>
 
@@ -38,14 +37,11 @@ export default async function RegistrationPage({
 
                     <div className="relative z-10">
                         <header className="mb-16 md:pl-20 max-w-3xl">
-                            <span className="inline-block px-3 py-1 bg-[#2D3436] text-white text-[10px] font-mono uppercase tracking-widest mb-4">
-                                Secure Enrollment v2.0
-                            </span>
                             <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                                Starten Sie Ihre akademische Reise.
+                                {dictionary.registration?.headline || "Starten Sie Ihre akademische Reise."}
                             </h2>
                             <p className="text-lg text-gray-600 leading-relaxed">
-                                Bitte füllen Sie das folgende Protokoll vollständig aus. Ihre Daten werden SSL-verschlüsselt übertragen und vertraulich behandelt.
+                                {dictionary.registration?.subline || "Bitte füllen Sie das folgende Protokoll vollständig aus."}
                             </p>
                         </header>
 
@@ -56,7 +52,7 @@ export default async function RegistrationPage({
                                     <div className="h-4 bg-gray-100 rounded w-2/3"></div>
                                 </div>
                             }>
-                                <EnrollmentForm />
+                                <EnrollmentForm dictionary={dictionary} />
                             </React.Suspense>
                         </div>
                     </div>

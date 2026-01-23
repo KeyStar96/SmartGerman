@@ -94,6 +94,10 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
   const currentLanguage = languages.find((l) => l.code === lang) || languages[0];
 
+  if (pathname.includes("/registration")) {
+    return null;
+  }
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300">
 

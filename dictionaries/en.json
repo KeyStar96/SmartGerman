@@ -565,5 +565,40 @@
       "level": "B2",
       "location": "Microsoft Teams"
     }
+  },
+  "registration": {
+    "back_home": "BACK TO HOMEPAGE",
+    "step_course": "COURSE",
+    "step_personal": "PERSONAL",
+    "headline": "Start your academic journey.",
+    "subline": "Please complete the following protocol. Your data will be transmitted via SSL encryption and treated confidentially.",
+    "course_selection": "Select your module.",
+    "personal_data": "Personal Data.",
+    "labels": {
+      "firstname": "FIRST NAME",
+      "lastname": "LAST NAME",
+      "email": "E-MAIL CONTACT",
+      "phone": "MOBILE / LANDLINE",
+      "street": "STREET & NO.",
+      "zip": "ZIP",
+      "city": "CITY"
+    },
+    "buttons": {
+      "next": "Continue",
+      "back": "Back",
+      "submit": "Send Binding Registration"
+    },
+    "receipt": {
+      "title": "ESTIMATED FEES",
+      "tuition": "Tuition Fee",
+      "total": "Total / EUR",
+      "note": "* Incl. VAT / Payable upon receipt of invoice",
+      "waiting": "[ Waiting for selection ]"
+    },
+    "success": {
+      "title": "Enrollment Confirmed",
+      "message": "We have received your documents. You will shortly receive an e-mail with details on course participation.",
+      "ref": "REFERENCE-ID"
+    }
   }
 }

@@ -567,5 +567,40 @@
       "level": "B2",
       "location": "Microsoft Teams"
     }
+  },
+  "registration": {
+    "back_home": "ZURÜCK ZUR STARTSEITE",
+    "step_course": "KURS",
+    "step_personal": "PERSÖNLICHES",
+    "headline": "Starten Sie Ihre akademische Reise.",
+    "subline": "Bitte füllen Sie das folgende Protokoll vollständig aus. Ihre Daten werden SSL-verschlüsselt übertragen und vertraulich behandelt.",
+    "course_selection": "Wählen Sie Ihr Modul.",
+    "personal_data": "Persönliche Daten.",
+    "labels": {
+      "firstname": "VORNAME",
+      "lastname": "NACHNAME",
+      "email": "E-MAIL KONTAKT",
+      "phone": "MOBIL / FESTNETZ",
+      "street": "STRASSE & NR.",
+      "zip": "PLZ",
+      "city": "ORT"
+    },
+    "buttons": {
+      "next": "Fortfahren",
+      "back": "Zurück",
+      "submit": "Verbindliche Anmeldung senden"
+    },
+    "receipt": {
+      "title": "VORAUSSICHTLICHE GEBÜHREN",
+      "tuition": "Studiengebühr",
+      "total": "Total / EUR",
+      "note": "* Inkl. MwSt. / Zahlbar nach Rechnungserhalt",
+      "waiting": "[ Warten auf Auswahl ]"
+    },
+    "success": {
+      "title": "Immatrikulation bestätigt",
+      "message": "Wir haben Ihre Unterlagen erhalten. Sie erhalten in Kürze eine E-Mail mit den Details zur Kursteilnahme.",
+      "ref": "REFERENZ-ID"
+    }
   }
 }
