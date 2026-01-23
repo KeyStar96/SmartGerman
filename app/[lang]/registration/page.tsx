@@ -1,5 +1,5 @@
 import React from "react";
-import EnrollmentForm from "@/components/registration/EnrollmentForm";
+import EnrollmentWizard from "@/components/registration/EnrollmentWizard";
 import { getDictionary } from "@/lib/dictionary";
 
 export default async function RegistrationPage({
@@ -11,17 +11,15 @@ export default async function RegistrationPage({
     const dictionary = await getDictionary(lang);
 
     return (
-        <div className="h-screen w-full bg-[#F0EFE9] text-[#2D3436] font-sans overflow-hidden">
-            <React.Suspense fallback={
-                <div className="h-full w-full flex items-center justify-center">
-                    <div className="animate-pulse flex flex-col items-center gap-4">
-                        <div className="h-12 w-12 bg-gray-200 rounded-full"></div>
-                        <div className="h-4 w-32 bg-gray-100 rounded"></div>
-                    </div>
+        <React.Suspense fallback={
+            <div className="h-screen w-full flex items-center justify-center bg-[#F0EFE9]">
+                <div className="animate-pulse flex flex-col items-center gap-4">
+                    <div className="h-12 w-12 bg-gray-200 rounded-full"></div>
+                    <div className="h-4 w-32 bg-gray-100 rounded"></div>
                 </div>
-            }>
-                <EnrollmentForm dictionary={dictionary} lang={lang} />
-            </React.Suspense>
-        </div>
+            </div>
+        }>
+            <EnrollmentWizard dictionary={dictionary} lang={lang} />
+        </React.Suspense>
     );
 }
