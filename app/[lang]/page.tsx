@@ -9,6 +9,7 @@ import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
 import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
 import BackgroundPinner from "@/components/effects/BackgroundPinner";
+import RegistrationWizard from "@/components/sections/RegistrationWizard";
 
 export default async function HomePage({
   params,
@@ -48,6 +49,7 @@ export default async function HomePage({
           <AboutContainer dictionary={dictionary} />
           <WhyUsBento dictionary={dictionary} />
           <Courses dictionary={dictionary} />
+          <RegistrationWizard />
           <TimetableSection dictionary={dictionary} />
           <LocationSection dictionary={dictionary} />
 
