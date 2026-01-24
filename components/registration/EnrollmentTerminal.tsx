@@ -279,8 +279,8 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
             className={cn(
                 "group relative w-full cursor-pointer rounded-sm p-4 md:p-6 border transition-all duration-300",
                 selected
-                    ? "bg-[#FFF4EC] border-[#FF5C00] shadow-sm"
-                    : "bg-[#F0EFE9] border-black/10 hover:border-[#FF5C00] hover:shadow-md"
+                    ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] shadow-sm"
+                    : "bg-[#F0EFE9] dark:bg-[#1A1C1E] border-black/10 dark:border-white/10 hover:border-[#FF5C00] dark:hover:border-[#FF5C00] hover:shadow-md"
             )}
         >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -294,7 +294,7 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
                             "w-5 h-5 shrink-0 rounded border mr-3 md:mr-6 flex items-center justify-center transition-all duration-300 mt-1 md:mt-0",
                             selected
                                 ? "bg-[#FF5C00] border-[#FF5C00]"
-                                : "bg-transparent border-black/20 group-hover:border-black/40"
+                                : "bg-transparent border-black/20 dark:border-white/20 group-hover:border-black/40 dark:group-hover:border-white/40"
                         )}>
                             {selected && <Check size={12} className="text-white" strokeWidth={3} />}
                         </div>
@@ -304,7 +304,7 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
                             {/* Title */}
                             <span className={cn(
                                 "font-sans text-lg md:text-xl font-bold tracking-tight transition-colors md:w-[280px] break-words md:truncate pr-2",
-                                selected ? "text-[#FF5C00]" : "text-[#111111]"
+                                selected ? "text-[#FF5C00]" : "text-[#111111] dark:text-[#E2D7CE]"
                             )}>
                                 {title}
                             </span>
@@ -329,7 +329,7 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
 
                     {/* Right: Price (Mobile Only - moved up) */}
                     <div className="text-right shrink-0 md:hidden pl-2">
-                        <div className="font-mono text-sm text-gray-900 font-bold">{priceFormatted}</div>
+                        <div className="font-mono text-sm text-gray-900 dark:text-[#E2D7CE] font-bold">{priceFormatted}</div>
                         <div className="text-gray-400 text-[9px] uppercase">{t?.units_suffix || "/ Units"}</div>
                     </div>
                 </div>
@@ -357,7 +357,7 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
 
                 {/* Desktop: Price (Hidden on Mobile) */}
                 <div className="hidden md:block text-right pl-9 md:pl-0 w-full md:w-auto">
-                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">{t?.units_suffix || "/ Units"}</span></span>
+                    <span className="font-mono text-sm text-gray-900 dark:text-[#E2D7CE]">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">{t?.units_suffix || "/ Units"}</span></span>
                 </div>
             </div>
 
@@ -395,20 +395,20 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
             {...props}
             placeholder=" "
             className={cn(
-                "block w-full bg-transparent border-b border-gray-400/30 py-4 pt-6 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors peer placeholder-transparent autofill:bg-transparent",
-                // Force transparent background for autofill
-                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] [&:-webkit-autofill]:text-gray-900",
-                error && "border-red-500"
+                "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 pt-6 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors peer placeholder-transparent autofill:bg-transparent",
+                // Force transparent background for autofill and adjust text color
+                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset] [&:-webkit-autofill]:text-gray-900 dark:[&:-webkit-autofill]:text-[#E2D7CE]",
+                error && "border-red-500 dark:border-red-400"
             )}
         />
         <label className={cn(
-            "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 transition-all pointer-events-none font-mono",
-            "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500",
+            "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-all pointer-events-none font-mono",
+            "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-500",
             "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00] peer-focus:font-mono"
         )}>
             {label} {props.required && <span className="text-[#FF5C00]">*</span>}
         </label>
-        {error && <span className="text-red-500 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
+        {error && <span className="text-red-500 dark:text-red-400 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
     </div>
 );
 
@@ -433,9 +433,9 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
         <div className="relative w-full" ref={containerRef}>
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 cursor-pointer flex justify-between items-center group-hover:border-[#FF5C00] transition-colors"
+                className="block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] cursor-pointer flex justify-between items-center group-hover:border-[#FF5C00] dark:group-hover:border-[#FF5C00] transition-colors"
             >
-                <span className={!value ? "text-transparent" : "text-gray-900"}>
+                <span className={!value ? "text-transparent" : "text-gray-900 dark:text-[#E2D7CE]"}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
                 <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
@@ -447,7 +447,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute left-0 top-full w-full bg-[#F0EFE9] border border-black/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent"
+                        className="absolute left-0 top-full w-full bg-[#F0EFE9] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent"
                     >
                         {options.map((opt: any) => (
                             <div
@@ -458,7 +458,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
                                 }}
                                 className={cn(
                                     "px-4 py-2 hover:bg-[#FF5C00]/10 cursor-pointer text-sm font-mono transition-colors",
-                                    value === opt.value ? "text-[#FF5C00] font-bold" : "text-gray-600"
+                                    value === opt.value ? "text-[#FF5C00] font-bold" : "text-gray-600 dark:text-gray-300"
                                 )}
                             >
                                 {opt.label}
@@ -791,8 +791,30 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         footerRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // --- DARK MODE LOGIC ---
+    const [isDarkMode, setIsDarkMode] = useState(false); // Default to light until mounted check
+    useEffect(() => {
+        // Check localStorage or system pref
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") setIsDarkMode(true);
+        else if (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches) setIsDarkMode(true);
+    }, []);
+
+    // Also listen to class changes if Header throttles it, or just use class detection
+    useEffect(() => {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === "class") {
+                    setIsDarkMode(document.documentElement.classList.contains("dark"));
+                }
+            });
+        });
+        observer.observe(document.documentElement, { attributes: true });
+        return () => observer.disconnect();
+    }, []);
+
     return (
-        <div className="min-h-screen lg:h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex flex-col lg:flex-row overflow-x-hidden font-sans relative">
+        <div className="min-h-screen lg:h-screen w-full bg-[#F0EFE9] dark:bg-[#1A1C1E] text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
 
             {/* SCROLL INDICATOR (Mobile Mostly) */}
             <AnimatePresence>
@@ -819,7 +841,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
                         <Image
-                            src="/Bilder/SG_Logo_Lightmode.png"
+                            src={isDarkMode ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
                             alt="SmartGerman"
                             width={100}
                             height={28}
