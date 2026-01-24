@@ -5,15 +5,28 @@ import util from "util";
 
 const resolveMx = util.promisify(dns.resolveMx);
 
+
 export async function validateEmail(email: string): Promise<{ isValid: boolean }> {
     try {
         const domain = email.split("@")[1];
         if (!domain) return { isValid: false };
 
-        const addresses = await resolveMx(domain);
-        return { isValid: addresses && addresses.length > 0 };
+        // 1. Check MX Records (Primary)
+        try {
+            const mxAddresses = await resolveMx(domain);
+            if (mxAddresses && mxAddresses.length > 0) return { isValid: true };
+        } catch (e) {
+            // MX lookup failed.
+        }
+
+        // 2. Strict Mode: If MX fails, we usually REJECT.
+        // Some systems fallback to A record (RFC 5321), but for modern email (Gmail etc), MX is mandatory.
+        // User wants strictness. So we return false if MX missing.
+
+        return { isValid: false };
+
     } catch (error) {
-        // If query fails (ENODATA, ENOTFOUND), domain is invalid
+        console.error("Validation error:", error);
         return { isValid: false };
     }
 }

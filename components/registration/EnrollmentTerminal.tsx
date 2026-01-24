@@ -255,7 +255,7 @@ const createSchema = (t: any) => z.object({
             .refine(async (email) => {
                 const { isValid } = await validateEmail(email);
                 return isValid;
-            }, t.registration.errors.email_domain_invalid),
+            }, t.registration.errors.email_domain_invalid || "Invalid Domain"),
         phone: z.string().trim().refine((val) => val === "" || phoneRegex.test(val), t.registration.errors.phone_invalid).optional(),
         street: z.string().min(3, t.registration.errors.street_required),
         zip: z.string().length(5, t.registration.errors.zip_length).regex(/^\d+$/, t.registration.errors.zip_numeric),
