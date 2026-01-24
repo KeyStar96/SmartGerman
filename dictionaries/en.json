@@ -619,7 +619,10 @@
       "sessions": "Sessions",
       "monthly": "Monthly",
       "total_sum": "Total Amount",
-      "no_selection": "// No selection yet"
+      "no_selection": "// No selection yet",
+      "cancellation_s": "Cancellation",
+      "cancellation_p": "Cancellations",
+      "incl": "incl."
     },
     "success": {
       "title": "Enrollment Confirmed",
@@ -641,7 +644,13 @@
       "step3_sub": "Please check your details.",
       "progress_course": "Course Selection",
       "progress_personal": "Pers. Data",
-      "progress_review": "Review"
+      "progress_review": "Review",
+      "btn_next": "NEXT STEP",
+      "btn_continue": "CONTINUE",
+      "btn_almost": "ALMOST DONE",
+      "btn_overview": "TO OVERVIEW",
+      "btn_binding": "BINDING",
+      "btn_order": "ORDER NOW"
     }
   }
 }

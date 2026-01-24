@@ -453,7 +453,10 @@
       "sessions": "Занять",
       "monthly": "Щомісяця",
       "total_sum": "Загальна сума",
-      "no_selection": "// Поки нічого не обрано"
+      "no_selection": "// Поки нічого не обрано",
+      "cancellation_s": "Скасування",
+      "cancellation_p": "Скасувань",
+      "incl": "вкл."
     },
     "success": {
       "title": "Реєстрацію підтверджено",
@@ -475,7 +478,13 @@
       "step3_sub": "Будь ласка, перевірте дані.",
       "progress_course": "Вибір курсу",
       "progress_personal": "Особисті",
-      "progress_review": "Огляд"
+      "progress_review": "Огляд",
+      "btn_next": "НАСТУПНИЙ КРОК",
+      "btn_continue": "ДАЛІ",
+      "btn_almost": "МАЙЖЕ ГОТОВО",
+      "btn_overview": "ДО ОГЛЯДУ",
+      "btn_binding": "ОБОВ'ЯЗКОВО",
+      "btn_order": "ЗАМОВИТИ ПЛАТНО"
     }
   }
 }

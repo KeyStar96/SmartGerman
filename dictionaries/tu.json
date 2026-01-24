@@ -453,7 +453,10 @@
       "sessions": "Ders",
       "monthly": "Aylık",
       "total_sum": "Toplam Tutar",
-      "no_selection": "// Henüz seçim yok"
+      "no_selection": "// Henüz seçim yok",
+      "cancellation_s": "İptal",
+      "cancellation_p": "İptal",
+      "incl": "dahil"
     },
     "success": {
       "title": "Kayıt Onaylandı",
@@ -475,7 +478,13 @@
       "step3_sub": "Lütfen bilgilerinizi kontrol edin.",
       "progress_course": "Kurs Seçimi",
       "progress_personal": "Kişisel",
-      "progress_review": "Özet"
+      "progress_review": "Özet",
+      "btn_next": "SONRAKİ ADIM",
+      "btn_continue": "DEVAM ET",
+      "btn_almost": "NEREDEYSE BİTTİ",
+      "btn_overview": "ÖZETE GİT",
+      "btn_binding": "BAĞLAYICI",
+      "btn_order": "ÜCRETLİ SİPARİŞ VER"
     }
   }
 }

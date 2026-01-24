@@ -453,7 +453,10 @@
       "sessions": "Занятий",
       "monthly": "Ежемесячно",
       "total_sum": "Общая сумма",
-      "no_selection": "// Пока ничего не выбрано"
+      "no_selection": "// Пока ничего не выбрано",
+      "cancellation_s": "Отмена",
+      "cancellation_p": "Отмен",
+      "incl": "вкл."
     },
     "success": {
       "title": "Регистрация подтверждена",
@@ -475,7 +478,13 @@
       "step3_sub": "Пожалуйста, проверьте данные.",
       "progress_course": "Выбор курса",
       "progress_personal": "Личн. Данные",
-      "progress_review": "Обзор"
+      "progress_review": "Обзор",
+      "btn_next": "СЛЕДУЮЩИЙ ШАГ",
+      "btn_continue": "ПРОДОЛЖИТЬ",
+      "btn_almost": "ПОЧТИ ГОТОВО",
+      "btn_overview": "К ОБЗОРУ",
+      "btn_binding": "ОБЯЗАТЕЛЬНО",
+      "btn_order": "ЗАКАЗАТЬ ПЛАТНО"
     }
   }
 }

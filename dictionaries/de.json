@@ -621,7 +621,10 @@
       "sessions": "Termine",
       "monthly": "Monatlich",
       "total_sum": "Total Summe",
-      "no_selection": "// Noch keine Auswahl"
+      "no_selection": "// Noch keine Auswahl",
+      "cancellation_s": "Ausfall",
+      "cancellation_p": "Ausfälle",
+      "incl": "inkl."
     },
     "success": {
       "title": "Immatrikulation bestätigt",
@@ -643,7 +646,13 @@
       "step3_sub": "Bitte prüfen Sie Ihre Angaben.",
       "progress_course": "Kursauswahl",
       "progress_personal": "Pers. Daten",
-      "progress_review": "Überprüfung"
+      "progress_review": "Überprüfung",
+      "btn_next": "NÄCHSTER SCHRITT",
+      "btn_continue": "WEITER",
+      "btn_almost": "FAST GESCHAFFT",
+      "btn_overview": "ZUR ÜBERSICHT",
+      "btn_binding": "VERBINDLICH",
+      "btn_order": "KOSTENPFLICHTIG BESTELLEN"
     }
   }
 }

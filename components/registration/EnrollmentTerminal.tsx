@@ -466,7 +466,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                                     {/* Summary: Courses */}
                                     <div className="bg-white p-8 border border-black/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_courses_title} {nextMonthName})</h3>
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_courses_title} {nextMonthName}</h3>
                                         <div className="space-y-4">
                                             {selectedCoursesFull.map(c => {
                                                 const { totalUnits, deductions } = calculateMonthlyStats(c, lang);
@@ -478,7 +478,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                                             <span className="font-mono text-gray-900">{formatPrice(netPrice)} / {receipt?.monthly || "Monat"}</span>
                                                             {deductions.length > 0 && (
                                                                 <div className="text-[10px] text-red-500 text-right">
-                                                                    (inkl. {deductions.length} Ausfälle)
+                                                                    ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
                                                                 </div>
                                                             )}
                                                         </div>
