@@ -13,7 +13,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const container = useRef<HTMLDivElement>(null);
   const textContentRef = useRef<HTMLDivElement>(null); // New container for paint containment
 
-  const infoTagRef = useRef<HTMLParagraphElement>(null);
+
   const brandRef = useRef<HTMLHeadingElement>(null);
   const claimRef = useRef<HTMLHeadingElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
@@ -59,13 +59,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
     const claimCharElements = claimRef.current.querySelectorAll(".char");
 
-    // 1. Info Tag Fade In (Immediate)
-    if (infoTagRef.current) {
-      tl.fromTo(infoTagRef.current,
-        { autoAlpha: 0, y: -10 },
-        { autoAlpha: 1, y: 0, duration: 0.8, ease: "power2.out" }
-        , 0);
-    }
+
 
     // 2. Brand Fade In
     if (brandRef.current) {
@@ -158,25 +152,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           style={{ contain: 'paint' }} // Layout Stability Fix
         >
 
-          {/* Scientific Status Badge */}
-          <div
-            ref={infoTagRef}
-            className="inline-flex items-center gap-3 mb-8 px-4 py-2 border-[0.5px] border-[#FF5C00]/30 rounded-none bg-[#FF5C00]/5 backdrop-blur-sm w-fit"
-            style={{ opacity: 0, visibility: 'hidden' }}
-          >
-            {/* Pulsating Status Dot */}
-            <div className="relative flex h-2 w-2">
-              <span className="animate-status-pulse absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
-            </div>
 
-            <span
-              className="font-mono text-[10px] text-[#2D3436] dark:text-[#E2D7CE] tracking-[0.2em] uppercase whitespace-nowrap"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              {dictionary.hero.next_session}
-            </span>
-          </div>
 
           {/* Block A: Brand Split (Solid Colors) */}
           <h1
