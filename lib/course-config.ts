@@ -40,7 +40,7 @@ export const COURSES: CourseConfig[] = [
     // Präsenz-Kurse (Senioren / 50+)
     {
         id: "c_a1_1_50plus",
-        translationKey: "a1_1_50plus",
+        translationKey: "de50_a1_1",
         type: "presence",
         price: 2.50,
         unitDuration: 45,
@@ -52,7 +52,7 @@ export const COURSES: CourseConfig[] = [
     },
     {
         id: "c_a1_2_50plus",
-        translationKey: "a1_2_50plus",
+        translationKey: "de50_a1_2",
         type: "presence",
         price: 2.50,
         unitDuration: 45,
@@ -64,7 +64,7 @@ export const COURSES: CourseConfig[] = [
     },
     {
         id: "c_a2_50plus",
-        translationKey: "a2_50plus",
+        translationKey: "de50_a2",
         type: "presence",
         price: 2.50,
         unitDuration: 45,
