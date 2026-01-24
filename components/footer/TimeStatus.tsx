@@ -3,7 +3,12 @@
 import React, { useState, useEffect, memo } from 'react';
 import { isOpenNow } from '@/lib/time-utils';
 
-const TimeStatus = memo(function TimeStatus() {
+interface TimeStatusProps {
+    openLabel?: string;
+    closedLabel?: string;
+}
+
+const TimeStatus = memo(function TimeStatus({ openLabel = "Open", closedLabel = "Closed" }: TimeStatusProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [currentTime, setCurrentTime] = useState("");
 
@@ -29,7 +34,7 @@ const TimeStatus = memo(function TimeStatus() {
                 <div className={`relative w-2 h-2 rounded-full ${isOpen ? 'bg-green-500' : 'bg-red-500'}`} />
             </div>
             <span className="font-mono text-xs text-white/70 uppercase tracking-widest">
-                Hannover {currentTime} • {isOpen ? "Open" : "Closed"}
+                Hannover {currentTime} • {isOpen ? openLabel : closedLabel}
             </span>
         </div>
     );

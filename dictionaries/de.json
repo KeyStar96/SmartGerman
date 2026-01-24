@@ -487,12 +487,17 @@
       "email": "info@smart-german.com",
       "phone": "+49 171 4758620",
       "telegram": "Chat auf Telegram",
+      "telegram_button": "Telegram",
+      "email_button": "E-Mail",
+      "copied": "Kopiert!",
       "copySuccess": "Email kopiert!"
     },
     "Status": {
       "title": "Öffnungszeiten",
       "open": "Jetzt Geöffnet",
       "closed": "Derzeit Geschlossen",
+      "open_label": "Geöffnet",
+      "closed_label": "Geschlossen",
       "hours": "Mo - Fr: 09:00 - 18:00",
       "weekend": "Sa - So: Geschlossen"
     },

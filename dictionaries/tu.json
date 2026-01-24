@@ -384,12 +384,17 @@
       "email": "info@smart-german.com",
       "phone": "+49 171 4758620",
       "telegram": "Telegram'da Sohbet",
+      "telegram_button": "Telegram",
+      "email_button": "E-posta Gönder",
+      "copied": "Kopyalandı!",
       "copySuccess": "E-posta kopyalandı!"
     },
     "Status": {
       "title": "Çalışma Saatleri",
       "open": "Şu an Açık",
       "closed": "Şu an Kapalı",
+      "open_label": "Açık",
+      "closed_label": "Kapalı",
       "hours": "Pzt - Cum: 09:00 - 18:00",
       "weekend": "Cmt - Paz: Kapalı"
     },

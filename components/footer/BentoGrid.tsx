@@ -47,7 +47,10 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                     </div>
 
                     {/* Status Indicator (Isolated Component) */}
-                    <TimeStatus />
+                    <TimeStatus
+                        openLabel={t.Status?.open_label}
+                        closedLabel={t.Status?.closed_label}
+                    />
                 </div>
 
                 {/* 2. Navigation (Middle) */}
@@ -85,7 +88,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                                 className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 lg:hover:bg-white/10 text-white flex items-center justify-between px-6 transition-all group"
                             >
                                 <span className="font-mono text-xs uppercase tracking-widest relative z-10">
-                                    {isCopied ? "Copied!" : "Email Me"}
+                                    {isCopied ? (t.Contact?.copied || "Copied!") : (t.Contact?.email_button || "Email Me")}
                                 </span>
                                 <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center lg:group-hover:scale-110 transition-transform relative z-10">
                                     {isCopied ? <Check size={14} /> : <ArrowUpRight size={14} />}
@@ -102,7 +105,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                                 rel="noopener noreferrer"
                                 className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 lg:hover:bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-between px-6 transition-all group"
                             >
-                                <span className="font-mono text-xs uppercase tracking-widest relative z-10">Telegram</span>
+                                <span className="font-mono text-xs uppercase tracking-widest relative z-10">{t.Contact?.telegram_button || "Telegram"}</span>
                                 <MessageCircle size={20} className="lg:group-hover:rotate-12 transition-transform relative z-10" />
                             </a>
                         </Magnetic>

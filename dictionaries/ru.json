@@ -389,12 +389,17 @@
       "email": "info@smart-german.com",
       "phone": "+49 171 4758620",
       "telegram": "Чат в Telegram",
+      "telegram_button": "Telegram",
+      "email_button": "Написать",
+      "copied": "Скопировано!",
       "copySuccess": "Email скопирован!"
     },
     "Status": {
       "title": "Часы работы",
       "open": "Сейчас открыто",
       "closed": "Сейчас закрыто",
+      "open_label": "Открыто",
+      "closed_label": "Закрыто",
       "hours": "Пн - Пт: 09:00 - 18:00",
       "weekend": "Сб - Вс: Закрыто"
     },
