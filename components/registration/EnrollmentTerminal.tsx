@@ -98,17 +98,150 @@ const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
         monthName
     };
 };
-const formatDateInput = (value: string) => {
-    // Remove non-digit characters
-    const digits = value.replace(/\D/g, '').slice(0, 8);
 
-    // Format as DD.MM.YYYY
-    if (digits.length >= 5) {
-        return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
-    } else if (digits.length >= 3) {
-        return `${digits.slice(0, 2)}.${digits.slice(2)}`;
-    }
-    return digits;
+const MaskedDateInput = ({
+    value,
+    onChange,
+    placeholder = "DD.MM.YYYY",
+    label,
+    error,
+    required
+}: any) => {
+    const defaultPlaceholder = placeholder;
+
+    // Internal state to manage cursor and display
+    const [displayVal, setDisplayVal] = useState(value || defaultPlaceholder);
+
+    useEffect(() => {
+        // Prepare initial value if empty or partial
+        if (!value) {
+            setDisplayVal(defaultPlaceholder);
+        } else {
+            // Overlay existing value onto placeholder
+            let result = "";
+            let valIdx = 0;
+            for (let i = 0; i < defaultPlaceholder.length; i++) {
+                if (valIdx < value.length && /\d/.test(value[valIdx])) {
+                    // If char at i in placeholder is a separator, keep it and don't advance valIdx
+                    if (/[^a-zA-Z0-9]/.test(defaultPlaceholder[i])) {
+                        result += defaultPlaceholder[i];
+                    } else {
+                        result += value[valIdx];
+                        valIdx++;
+                    }
+                } else if (/[^a-zA-Z0-9]/.test(defaultPlaceholder[i])) {
+                    result += defaultPlaceholder[i];
+                } else {
+                    result += defaultPlaceholder[i]; // Placeholder char
+                }
+            }
+            setDisplayVal(result);
+        }
+    }, [value, defaultPlaceholder]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const inputVal = e.target.value;
+        const lastVal = displayVal;
+
+        let cursor = e.target.selectionStart || 0;
+        let digits = inputVal.replace(/\D/g, '');
+
+        // --- STRICT VALIDATION LOGIC ---
+        // We accumulate digits and validate chunks
+        // Chunks: Day (2), Month (2), Year (4)
+
+        let validDigits = "";
+
+        // Day
+        let day = "";
+        if (digits.length > 0) day += digits[0];
+        if (digits.length > 1) day += digits[1];
+
+        if (day.length === 1 && parseInt(day) > 3) day = "0" + day; // Auto 0 prefix logic? Or strict limit? User said "01-31".
+        // Strict limit: If first digit > 3, reject? Or allow? 
+        // User wants "control". Let's stick strictly to range.
+
+        if (day.length === 2) {
+            const d = parseInt(day);
+            if (d < 1 || d > 31) {
+                // Invalid day, keep only valid part or nothing? 
+                // Let's truncate to last valid length.
+                day = day.slice(0, 1);
+            }
+        }
+        validDigits += day;
+
+        // Month
+        let month = "";
+        if (digits.length > 2) month += digits[2];
+        if (digits.length > 3) month += digits[3];
+
+        if (month.length === 2) {
+            const m = parseInt(month);
+            if (m < 1 || m > 12) {
+                month = month.slice(0, 1);
+            }
+        }
+        validDigits += month;
+
+        // Year
+        let year = "";
+        if (digits.length > 4) year = digits.slice(4, 8);
+
+        if (year.length === 4) {
+            const y = parseInt(year);
+            const currentYear = new Date().getFullYear();
+            if (y < 1900 || y > currentYear) {
+                year = year.slice(0, 3);
+            }
+        }
+        validDigits += year;
+
+        // --- Reconstruct Display ---
+        let result = "";
+        let dIdx = 0;
+        for (let i = 0; i < defaultPlaceholder.length; i++) {
+            const pChar = defaultPlaceholder[i];
+            if (/[^a-zA-Z0-9]/.test(pChar)) {
+                result += pChar;
+            } else {
+                if (dIdx < validDigits.length) {
+                    result += validDigits[dIdx];
+                    dIdx++;
+                } else {
+                    result += pChar;
+                }
+            }
+        }
+
+        // Call Parent with CLEAN format DD.MM.YYYY (digits with dots) if complete, or partial?
+        // Zod expects text string. Parent expects `onChange` with event or string.
+        // We should trigger onChange with the MASKED value or RAW?
+        // Let's adhere to DD.MM.YYYY standard output.
+
+        onChange(result);
+
+        // Need to restore cursor position? React handles this poorly with formatted inputs.
+        // This is complex. For now, simple update.
+    };
+
+    return (
+        <TerminalInput
+            label={label}
+            required={required}
+            value={displayVal}
+            onChange={handleChange}
+            error={error}
+            maxLength={10}
+            // Logic to select text on focus so user can start typing immediately replacing placeholder?
+            onFocus={(e: any) => {
+                if (displayVal === defaultPlaceholder) {
+                    // Move cursor to start
+                    e.target.setSelectionRange(0, 0);
+                }
+            }}
+        />
+    );
 };
 
 // --- ZOD SCHEMA ---
@@ -444,17 +577,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                                         <div className="grid grid-cols-2 gap-8">
                                             <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                            <TerminalInput
+                                            <MaskedDateInput
                                                 label={formLabels?.birthdate || "Birthdate"}
                                                 required
                                                 placeholder={formLabels?.date_placeholder || "DD.MM.YYYY"}
-                                                registration={{
-                                                    ...register("personal.birthDate"),
-                                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                                                        const formatted = formatDateInput(e.target.value);
-                                                        form.setValue("personal.birthDate", formatted);
-                                                    }
-                                                }}
+                                                value={watch("personal.birthDate")}
+                                                onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
                                                 error={errors.personal?.birthDate?.message}
                                             />
                                         </div>
