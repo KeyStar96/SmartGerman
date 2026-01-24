@@ -424,6 +424,7 @@
       "firstname_required": "Имя обязательно",
       "lastname_required": "Фамилия обязательна",
       "email_invalid": "Неверный адрес эл. почты",
+      "email_domain_invalid": "Домен не существует",
       "phone_invalid": "Неверный номер телефона",
       "street_required": "Улица и номер дома обязательны",
       "zip_length": "Индекс должен состоять из 5 цифр",

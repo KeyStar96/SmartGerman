@@ -424,6 +424,7 @@
       "firstname_required": "Ім'я обов'язкове",
       "lastname_required": "Прізвище обов'язкове",
       "email_invalid": "Недійсна ел. пошта",
+      "email_domain_invalid": "Домен не існує",
       "phone_invalid": "Недійсний номер телефону",
       "street_required": "Вулиця та номер обов'язкові",
       "zip_length": "Індекс має містити 5 цифр",

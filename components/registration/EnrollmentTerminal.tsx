@@ -11,6 +11,7 @@ import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, Chev
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
+import { validateEmail } from "@/app/actions/validate-email";
 
 // --- CALENDAR LOGIC HELPER ---
 
@@ -250,7 +251,11 @@ const createSchema = (t: any) => z.object({
     personal: z.object({
         firstName: z.string().min(2, t.registration.errors.firstname_required),
         lastName: z.string().min(2, t.registration.errors.lastname_required),
-        email: z.string().email(t.registration.errors.email_invalid),
+        email: z.string().email(t.registration.errors.email_invalid)
+            .refine(async (email) => {
+                const { isValid } = await validateEmail(email);
+                return isValid;
+            }, t.registration.errors.email_domain_invalid),
         phone: z.string().trim().refine((val) => val === "" || phoneRegex.test(val), t.registration.errors.phone_invalid).optional(),
         street: z.string().min(3, t.registration.errors.street_required),
         zip: z.string().length(5, t.registration.errors.zip_length).regex(/^\d+$/, t.registration.errors.zip_numeric),

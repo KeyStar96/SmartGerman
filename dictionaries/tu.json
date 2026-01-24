@@ -430,6 +430,7 @@
       "firstname_required": "Adınız gerekli",
       "lastname_required": "Soyadınız gerekli",
       "email_invalid": "Geçersiz e-posta adresi",
+      "email_domain_invalid": "Alan adı mevcut değil",
       "phone_invalid": "Geçersiz telefon numarası",
       "street_required": "Cadde ve kapı numarası gerekli",
       "zip_length": "Posta kodu 5 haneli olmalı",

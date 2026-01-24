@@ -590,6 +590,7 @@
       "firstname_required": "First name is required",
       "lastname_required": "Last name is required",
       "email_invalid": "Invalid email address",
+      "email_domain_invalid": "Domain does not exist",
       "phone_invalid": "Invalid phone number",
       "street_required": "Street and house number required",
       "zip_length": "ZIP code must be 5 digits",

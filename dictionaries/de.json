@@ -592,6 +592,7 @@
       "firstname_required": "Vorname ist erforderlich",
       "lastname_required": "Nachname ist erforderlich",
       "email_invalid": "Ungültige E-Mail Adresse",
+      "email_domain_invalid": "Domain existiert nicht",
       "phone_invalid": "Ungültige Telefonnummer",
       "street_required": "Straße und Hausnummer erforderlich",
       "zip_length": "PLZ muss 5-stellig sein",
