@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { COURSES, Day } from "@/lib/course-config";
 import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
@@ -58,10 +58,22 @@ export default function MobileTabs({ dictionary }: MobileTabsProps) {
         return dayCourses.sort((a, b) => a.startTime.localeCompare(b.startTime));
     };
 
+    // Scroll Animation for Mobile Timeline Stripe
+    const containerRef = React.useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start 80%", "end 80%"],
+    });
+    const scaleY = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
+
     return (
-        <div className="md:hidden flex flex-col gap-8">
+        <div ref={containerRef} className="md:hidden flex flex-col gap-8 relative">
             {/* 1. Pill Tabs Scroll Container */}
-            <div className="overflow-x-auto pb-4 hide-scrollbar">
+            <div className="overflow-x-auto pb-4 hide-scrollbar sticky top-[60px] z-20 bg-[#F0EFE9]/95 dark:bg-[#111111]/95 backdrop-blur-md py-2 -mx-4 px-4 w-[calc(100%+2rem)]">
                 <div className="flex gap-2 px-2">
                     {DAYS.map((day) => {
                         const dayLabel = dayNames[day.toLowerCase()] || day;
@@ -88,7 +100,12 @@ export default function MobileTabs({ dictionary }: MobileTabsProps) {
             {/* 2. Content Area (Timeline) */}
             <div className="relative min-h-[400px] pl-4">
                 {/* Timeline Line (Continuous) */}
-                <div className="absolute left-[1.35rem] top-0 bottom-0 w-px bg-black/5 dark:bg-white/5" />
+                <div className="absolute left-[1.35rem] top-0 bottom-0 w-px bg-black/5 dark:bg-white/5 overflow-hidden">
+                    <motion.div
+                        style={{ scaleY }}
+                        className="absolute top-0 left-0 w-full h-full bg-[#FF5C00] origin-top"
+                    />
+                </div>
 
                 <AnimatePresence mode="wait">
                     <motion.div
