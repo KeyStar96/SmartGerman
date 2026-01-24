@@ -871,15 +871,15 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         <span className="font-mono text-xs text-gray-400">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
-                    <h1 className="text-2xl md:text-4xl font-bold tracking-tighter text-[#111111]">
+                    <h1 className="text-2xl md:text-4xl font-bold tracking-tighter text-[#111111] dark:text-[#E2D7CE]">
                         {step === 1 && wizard?.step1_title}
                         {step === 2 && wizard?.step2_title}
                         {step === 3 && wizard?.step3_title}
                     </h1>
-                    {step === 1 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
-                    {step === 2 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step2_sub}</p>}
-                    {step === 3 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step3_sub}</p>}
-                </header>
+                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
+                    {step === 2 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">{wizard?.step2_sub}</p>}
+                    {step === 3 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">{wizard?.step3_sub}</p>}
+                </nav>
 
                 {/* SCROLLABLE CONTENT AREA */}
                 {/* On mobile: standard scroll. On Desktop: overflow-y-auto */}
