@@ -56,7 +56,7 @@ const CourseCard = ({ course, selected, onClick, title, desc, priceFormatted, le
         {/* Selection Indicator */}
         <div className={cn(
             "absolute top-4 right-4 w-4 h-4 rounded-full border transition-all duration-300",
-            selected ? "bg-[#FF5C00] border-[#FF5C00]" : "border-gray-300 group-hover:border-[#FF5C00]"
+            selected ? "bg-white border-[#FF5C00] border-2 shadow-[0_10px_40px_-10px_rgba(255,92,0,0.15)] scale-[1.02]" : "bg-white border-transparent hover:border-gray-200 hover:shadow-lg"
         )}>
             {selected && <Check size={10} className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />}
         </div>
@@ -70,7 +70,7 @@ const CourseCard = ({ course, selected, onClick, title, desc, priceFormatted, le
             <h3 className={cn("text-3xl font-sans font-bold leading-[0.9] tracking-tighter mb-2 transition-colors", selected ? "text-[#FF5C00]" : "text-gray-900")}>
                 {title}
             </h3>
-            <p className="text-sm text-gray-500 font-sans leading-relaxed line-clamp-3">
+            <p className="text-sm text-gray-500 font-sans leading-relaxed line-clamp-3 min-h-[4.5em]">
                 {desc}
             </p>
         </div>
@@ -191,8 +191,31 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
         setValue("courseSelection.courseIds", updated, { shouldValidate: true });
     };
 
-    // Dictionary Helpers
-    const t = dictionary?.registration || {};
+    const t = {
+        back_home: dictionary?.registration?.back_home || (lang === 'de' ? "Zurück zur Startseite" : "Back to Home"),
+        headline: dictionary?.registration?.headline || "Wähle deinen Kurs.",
+        subline: dictionary?.registration?.subline || "Kuratiert für maximale Effizienz. Wähle beliebig viele Module.",
+        personal_data: dictionary?.registration?.personal_data || "Deine Identität",
+        live_receipt: dictionary?.registration?.receipt?.live_title || (lang === 'de' ? "Live Übersicht" : "Live Receipt"),
+        labels: {
+            firstname: dictionary?.registration?.labels?.firstname || "Vorname",
+            lastname: dictionary?.registration?.labels?.lastname || "Nachname",
+            email: dictionary?.registration?.labels?.email || "E-Mail Adresse",
+            phone: dictionary?.registration?.labels?.phone || "Telefonnummer",
+            street: dictionary?.registration?.labels?.street || "Straße & Hausnummer",
+            zip: dictionary?.registration?.labels?.zip || "PLZ",
+            city: dictionary?.registration?.labels?.city || "Ort"
+        },
+        buttons: {
+            submit: dictionary?.registration?.buttons?.submit || "Kostenpflichtig anmelden",
+            processing: "Wird verarbeitet..."
+        },
+        success: {
+            title: "Anmeldung erfolgreich!",
+            message: "Wir haben deine Anmeldung erhalten. Du erhältst in Kürze eine E-Mail mit der Rechnung.",
+            back: "Zurück zur Startseite"
+        }
+    };
     const getCourseTitle = (key: string) => dictionary?.CourseData?.[key]?.title || key;
     const getCourseDesc = (key: string) => dictionary?.CourseData?.[key]?.description || "";
 
@@ -213,7 +236,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                         <h2 className="text-4xl font-sans font-bold text-gray-900 mb-4 tracking-tighter">{t.success?.title || "Success"}</h2>
                         <p className="text-gray-500 mb-8 font-sans">{t.success?.message || "Registration received."}</p>
                         <Link href={`/${lang}`} className="inline-flex items-center gap-2 text-[#FF5C00] font-mono uppercase tracking-widest hover:underline">
-                            <ChevronRight size={16} className="rotate-180" /> {t.back_home || "Back Home"}
+                            <ChevronRight size={16} className="rotate-180" /> {t.success.back}
                         </Link>
                     </motion.div>
                 </div>
@@ -227,7 +250,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
             {/* --- LEFT: THE STAGE (60%) --- */}
             <div className="w-full lg:w-[60%] h-full relative flex flex-col">
                 {/* Header Stage */}
-                <div className="px-8 py-6 flex items-center justify-between">
+                <div className="px-8 py-6 flex items-center justify-between shrink-0">
                     <Link href={`/${lang}`} className="text-gray-400 hover:text-gray-900 transition-colors">
                         <span className="font-mono text-[10px] uppercase tracking-widest flex items-center gap-2">
                             <ChevronRight size={14} className="rotate-180" /> Back
@@ -239,8 +262,8 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                     </div>
                 </div>
 
-                {/* Main Scroll Area */}
-                <div className="flex-1 overflow-y-auto hide-scrollbar px-4 lg:px-12 pb-24 lg:pb-12">
+                {/* Main Scroll Area - Force flex basis to allow scrolling */}
+                <div className="flex-1 overflow-y-auto min-h-0 bg-[#F0EFE9] px-4 lg:px-12 pb-32 lg:pb-12 scrollbar-thin scrollbar-thumb-gray-300">
                     <AnimatePresence mode="wait">
                         {step === 1 && (
                             <motion.div
@@ -273,7 +296,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                                                     title={getCourseTitle(c.translationKey)}
                                                     desc={getCourseDesc(c.translationKey)}
                                                     priceFormatted={formatPrice(c.price)}
-                                                    level="A1 - C1"
+                                                    level={c.type === 'online' ? (lang === 'de' ? "Online" : "Online") : c.level || "A1 - C1"}
                                                     course={c}
                                                     selected={selectedCourseIds.includes(c.id)}
                                                     onClick={() => toggleCourse(c.id)}
@@ -295,7 +318,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                                                         title={getCourseTitle(c.translationKey)}
                                                         desc={getCourseDesc(c.translationKey)}
                                                         priceFormatted={formatPrice(c.price)}
-                                                        level="Online"
+                                                        level={c.type === 'online' ? (lang === 'de' ? "Online" : "Online") : c.level || "A1 - C1"}
                                                         course={c}
                                                         selected={selectedCourseIds.includes(c.id)}
                                                         onClick={() => toggleCourse(c.id)}
@@ -427,7 +450,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                 <div className="flex-1 px-12 relative z-10 flex flex-col justify-center">
                     {step < 3 && (
                         <div className="space-y-4 opacity-50 transition-opacity duration-500 hover:opacity-100">
-                            <h4 className="font-mono text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-700 pb-2 mb-4">Live Receipt</h4>
+                            <h4 className="font-mono text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-700 pb-2 mb-4">{t.live_receipt}</h4>
                             {selectedCoursesData.length === 0 ? (
                                 <p className="font-mono text-xs text-gray-600 italic">// Noch keine Auswahl</p>
                             ) : (

@@ -17,6 +17,7 @@ export interface CourseConfig {
     highlight?: boolean;
     sessions: CourseSession[];
     instructor: InstructorKey; // For logic if needed, or specific name lookup
+    level?: string;
 }
 
 export const COURSES: CourseConfig[] = [
