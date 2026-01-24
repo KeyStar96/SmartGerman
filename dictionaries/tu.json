@@ -422,7 +422,8 @@
       "street": "CADDE & NO",
       "zip": "POSTA KODU",
       "city": "ŞEHİR",
-      "birthdate": "DOĞUM TARİHİ"
+      "birthdate": "DOĞUM TARİHİ",
+      "required_hint": "* Zorunlu alan"
     },
     "errors": {
       "firstname_required": "Adınız gerekli",

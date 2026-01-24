@@ -416,7 +416,8 @@
       "street": "УЛИЦА И №",
       "zip": "ИНДЕКС",
       "city": "ГОРОД",
-      "birthdate": "ДАТА РОЖДЕНИЯ"
+      "birthdate": "ДАТА РОЖДЕНИЯ",
+      "required_hint": "* Обязательное поле"
     },
     "errors": {
       "firstname_required": "Имя обязательно",

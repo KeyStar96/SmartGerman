@@ -582,7 +582,8 @@
       "street": "STREET & NO.",
       "zip": "ZIP",
       "city": "CITY",
-      "birthdate": "DATE OF BIRTH"
+      "birthdate": "DATE OF BIRTH",
+      "required_hint": "* Required field"
     },
     "errors": {
       "firstname_required": "First name is required",

@@ -416,7 +416,8 @@
       "street": "ВУЛИЦЯ ТА №",
       "zip": "ІНДЕКС",
       "city": "МІСТО",
-      "birthdate": "ДАТА НАРОДЖЕННЯ"
+      "birthdate": "ДАТА НАРОДЖЕННЯ",
+      "required_hint": "* Обов'язкове поле"
     },
     "errors": {
       "firstname_required": "Ім'я обов'язкове",

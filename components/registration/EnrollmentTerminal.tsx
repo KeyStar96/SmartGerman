@@ -106,7 +106,7 @@ const createSchema = (t: any) => z.object({
         firstName: z.string().min(2, t.registration.errors.firstname_required),
         lastName: z.string().min(2, t.registration.errors.lastname_required),
         email: z.string().email(t.registration.errors.email_invalid),
-        phone: z.string().regex(phoneRegex, t.registration.errors.phone_invalid),
+        phone: z.string().trim().refine((val) => val === "" || phoneRegex.test(val), t.registration.errors.phone_invalid).optional(),
         street: z.string().min(3, t.registration.errors.street_required),
         zip: z.string().length(5, t.registration.errors.zip_length).regex(/^\d+$/, t.registration.errors.zip_numeric),
         city: z.string().min(2, t.registration.errors.city_required),
@@ -221,7 +221,7 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
             "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500",
             "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00] peer-focus:font-mono"
         )}>
-            {label}
+            {label} {props.required && <span className="text-[#FF5C00]">*</span>}
         </label>
         {error && <span className="text-red-500 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
     </div>
@@ -424,20 +424,24 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     <div className="space-y-12">
 
                                         <div className="grid grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.firstname || "First Name"} registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label={formLabels?.lastname || "Last Name"} registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
+                                            <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
+                                            <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
                                         </div>
 
-                                        <TerminalInput label={formLabels?.email || "Email"} type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                        <div className="grid grid-cols-2 gap-8">
+                                            <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                            <TerminalInput label={formLabels?.birthdate || "Birthdate"} required registration={register("personal.birthDate")} error={errors.personal?.birthDate?.message} />
+                                        </div>
                                         <TerminalInput label={formLabels?.phone || "Phone"} registration={register("personal.phone")} error={errors.personal?.phone?.message} />
 
                                         <div className="grid grid-cols-[3fr_1fr] gap-8">
-                                            <TerminalInput label={formLabels?.street || "Street"} registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label={formLabels?.zip || "ZIP"} registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                            <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
+                                            <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
                                         </div>
-                                        <div className="grid grid-cols-[2fr_1fr] gap-8">
-                                            <TerminalInput label={formLabels?.city || "City"} registration={register("personal.city")} error={errors.personal?.city?.message} />
-                                            <TerminalInput label={formLabels?.birthdate || "Birthdate"} registration={register("personal.birthDate")} error={errors.personal?.birthDate?.message} />
+                                        <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
+
+                                        <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
+                                            {formLabels?.required_hint}
                                         </div>
 
                                     </div>

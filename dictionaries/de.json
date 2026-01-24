@@ -584,7 +584,8 @@
       "street": "STRASSE & NR.",
       "zip": "PLZ",
       "city": "ORT",
-      "birthdate": "GEBURTSDATUM"
+      "birthdate": "GEBURTSDATUM",
+      "required_hint": "* Pflichtfeld"
     },
     "errors": {
       "firstname_required": "Vorname ist erforderlich",
