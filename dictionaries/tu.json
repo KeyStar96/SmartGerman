@@ -100,6 +100,17 @@
     "price_label": "Fiyat",
     "flip_hint": "DETAY",
     "back_hint": "GERİ",
+    "location": {
+      "label": "KONUM",
+      "title": "Konum",
+      "subtitle": "Hannover'in Kalbinde",
+      "description": "Kurslarımız, mükemmel ulaşım imkanlarına sahip modern bir kültür merkezi olan Freizeitheim Vahrenwald'da gerçekleşmektedir. Ana istasyondan sadece 10 dakika uzaklıkta.",
+      "address_label": "Adres",
+      "get_directions": "Yol Tarifi Al",
+      "privacy_title": "Haritayı Etkinleştir",
+      "privacy_text": "Google Maps harici betikler yükler.",
+      "load_map": "Haritayı Yükle"
+    },
     "backface_labels": {
       "unit": "BİRİM",
       "appointments": "RANDEVULAR",
