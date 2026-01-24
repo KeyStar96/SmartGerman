@@ -296,7 +296,7 @@
   "timetable": {
     "title_line1": "DER AKTUELLE",
     "title_line2": "STUNDENPLAN",
-    "subtitle": "Alle Kurse auf einen Blick",
+    "subtitle": "ALLE KURSE AUF EINEN BLICK",
     "days": {
       "monday": "Montag",
       "tuesday": "Dienstag",
@@ -350,15 +350,15 @@
     }
   },
   "location": {
-    "label": "So finden Sie uns",
+    "label": "STANDORT",
     "title": "Standort",
     "subtitle": "Im Herzen von Hannover",
     "address_label": "Adresse",
     "description": "Unsere Kurse finden im Freizeitheim Vahrenwald statt – ein moderner, kultureller Treffpunkt mit bester Erreichbarkeit. Nur 10 Minuten vom Hauptbahnhof entfernt.",
-    "get_directions": "Route Planen",
+    "get_directions": "Karte laden",
     "privacy_title": "Karte Aktivieren",
-    "privacy_text": "Aus Datenschutzgründen benötigt Google Maps Ihre aktive Zustimmung, um externe Skripte zu laden.",
-    "load_map": "Karte Laden"
+    "privacy_text": "Google Maps lädt externe Skripte.",
+    "load_map": "Karte laden"
   },
   "footer": {
     "rights": "© 2025 SmartGerman Hannover. Alle Rechte vorbehalten.",

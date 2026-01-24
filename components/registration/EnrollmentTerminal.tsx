@@ -260,7 +260,7 @@ const createSchema = (t: any) => z.object({
         street: z.string().min(3, t.registration.errors.street_required),
         zip: z.string().length(5, t.registration.errors.zip_length).regex(/^\d+$/, t.registration.errors.zip_numeric),
         city: z.string().min(2, t.registration.errors.city_required),
-        birthDate: z.string().min(1, t.registration.errors.birthdate_required),
+        birthDate: z.string().min(1, t.registration.errors.birthdate_required).regex(/^\d{2}\.\d{2}\.\d{4}$/, t.registration.errors.birthdate_incomplete || "Complete Date Required"),
     }),
 });
 

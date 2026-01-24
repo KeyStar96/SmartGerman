@@ -282,7 +282,7 @@
   "timetable": {
     "title_line1": "THE CURRENT",
     "title_line2": "TIMETABLE",
-    "subtitle": "All courses at a glance",
+    "subtitle": "ALL COURSES AT A GLANCE",
     "days": {
       "monday": "Monday",
       "tuesday": "Tuesday",
@@ -336,14 +336,14 @@
     }
   },
   "location": {
-    "label": "Where to find us",
+    "label": "LOCATION",
     "title": "Location",
-    "subtitle": "Heart of Hannover",
+    "subtitle": "In the Heart of Hanover",
     "address_label": "Address",
-    "description": "Our courses take place at the Freizeitheim Vahrenwald – a modern, cultural meeting place with excellent accessibility. Only 10 minutes from the main station.",
+    "description": "Our courses take place at leisure center Vahrenwald – a modern, cultural meeting point with excellent accessibility. Only 10 minutes from the main station.",
     "get_directions": "Get Directions",
     "privacy_title": "Activate Map",
-    "privacy_text": "For privacy reasons, Google Maps needs your active consent to load external scripts.",
+    "privacy_text": "Google Maps loads external scripts.",
     "load_map": "Load Map"
   },
   "footer": {
