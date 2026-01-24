@@ -588,19 +588,25 @@
     "buttons": {
       "next": "Fortfahren",
       "back": "Zurück",
-      "submit": "Verbindliche Anmeldung senden"
+      "submit": "Verbindliche Anmeldung senden",
+      "processing": "Wird verarbeitet..."
     },
     "receipt": {
       "title": "VORAUSSICHTLICHE GEBÜHREN",
       "tuition": "Studiengebühr",
       "total": "Total / EUR",
       "note": "* Inkl. MwSt. / Zahlbar nach Rechnungserhalt",
-      "waiting": "[ Warten auf Auswahl ]"
+      "waiting": "[ Warten auf Auswahl ]",
+      "live_title": "Live Übersicht"
     },
     "success": {
       "title": "Immatrikulation bestätigt",
       "message": "Wir haben Ihre Unterlagen erhalten. Sie erhalten in Kürze eine E-Mail mit den Details zur Kursteilnahme.",
       "ref": "REFERENZ-ID"
+    },
+    "course_card": {
+      "online_label": "Online",
+      "level_range": "A1 - C1"
     }
   }
 }

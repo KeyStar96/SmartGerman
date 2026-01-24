@@ -586,19 +586,25 @@
     "buttons": {
       "next": "Continue",
       "back": "Back",
-      "submit": "Send Binding Registration"
+      "submit": "Send Binding Registration",
+      "processing": "Processing..."
     },
     "receipt": {
       "title": "ESTIMATED FEES",
       "tuition": "Tuition Fee",
       "total": "Total / EUR",
       "note": "* Incl. VAT / Payable upon receipt of invoice",
-      "waiting": "[ Waiting for selection ]"
+      "waiting": "[ Waiting for selection ]",
+      "live_title": "Live Receipt"
     },
     "success": {
       "title": "Enrollment Confirmed",
       "message": "We have received your documents. You will shortly receive an e-mail with details on course participation.",
       "ref": "REFERENCE-ID"
+    },
+    "course_card": {
+      "online_label": "Online",
+      "level_range": "A1 - C1"
     }
   }
 }

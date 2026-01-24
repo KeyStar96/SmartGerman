@@ -420,19 +420,25 @@
     "buttons": {
       "next": "Devam",
       "back": "Geri",
-      "submit": "Kaydı Gönder"
+      "submit": "Kaydı Gönder",
+      "processing": "İşleniyor..."
     },
     "receipt": {
       "title": "TAHMİNİ ÜCRETLER",
       "tuition": "Eğitim Ücreti",
       "total": "Toplam / EUR",
       "note": "* KDV Dahil / Fatura alındıktan sonra ödenir",
-      "waiting": "[ Seçim bekleniyor ]"
+      "waiting": "[ Seçim bekleniyor ]",
+      "live_title": "Canlı Özet"
     },
     "success": {
       "title": "Kayıt Onaylandı",
       "message": "Belgelerinizi aldık. Kısa süre içinde kurs katılımı ile ilgili detayları içeren bir e-posta alacaksınız.",
       "ref": "REFERANS NO"
+    },
+    "course_card": {
+      "online_label": "Çevrimiçi",
+      "level_range": "A1 - C1"
     }
   }
 }

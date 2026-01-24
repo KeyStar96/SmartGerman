@@ -192,28 +192,32 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
     };
 
     const t = {
-        back_home: dictionary?.registration?.back_home || (lang === 'de' ? "Zurück zur Startseite" : "Back to Home"),
-        headline: dictionary?.registration?.headline || "Wähle deinen Kurs.",
-        subline: dictionary?.registration?.subline || "Kuratiert für maximale Effizienz. Wähle beliebig viele Module.",
-        personal_data: dictionary?.registration?.personal_data || "Deine Identität",
-        live_receipt: dictionary?.registration?.receipt?.live_title || (lang === 'de' ? "Live Übersicht" : "Live Receipt"),
+        back_home: dictionary?.registration?.back_home,
+        headline: dictionary?.registration?.headline,
+        subline: dictionary?.registration?.subline,
+        personal_data: dictionary?.registration?.personal_data,
+        live_receipt: dictionary?.registration?.receipt?.live_title,
         labels: {
-            firstname: dictionary?.registration?.labels?.firstname || "Vorname",
-            lastname: dictionary?.registration?.labels?.lastname || "Nachname",
-            email: dictionary?.registration?.labels?.email || "E-Mail Adresse",
-            phone: dictionary?.registration?.labels?.phone || "Telefonnummer",
-            street: dictionary?.registration?.labels?.street || "Straße & Hausnummer",
-            zip: dictionary?.registration?.labels?.zip || "PLZ",
-            city: dictionary?.registration?.labels?.city || "Ort"
+            firstname: dictionary?.registration?.labels?.firstname,
+            lastname: dictionary?.registration?.labels?.lastname,
+            email: dictionary?.registration?.labels?.email,
+            phone: dictionary?.registration?.labels?.phone,
+            street: dictionary?.registration?.labels?.street,
+            zip: dictionary?.registration?.labels?.zip,
+            city: dictionary?.registration?.labels?.city
         },
         buttons: {
-            submit: dictionary?.registration?.buttons?.submit || "Kostenpflichtig anmelden",
-            processing: "Wird verarbeitet..."
+            submit: dictionary?.registration?.buttons?.submit,
+            processing: dictionary?.registration?.buttons?.processing
         },
         success: {
-            title: "Anmeldung erfolgreich!",
-            message: "Wir haben deine Anmeldung erhalten. Du erhältst in Kürze eine E-Mail mit der Rechnung.",
-            back: "Zurück zur Startseite"
+            title: dictionary?.registration?.success?.title,
+            message: dictionary?.registration?.success?.message,
+            back: dictionary?.registration?.back_home
+        },
+        course_card: {
+            online: dictionary?.registration?.course_card?.online_label || "Online",
+            level: dictionary?.registration?.course_card?.level_range || "A1 - C1"
         }
     };
     const getCourseTitle = (key: string) => dictionary?.CourseData?.[key]?.title || key;
@@ -296,7 +300,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                                                     title={getCourseTitle(c.translationKey)}
                                                     desc={getCourseDesc(c.translationKey)}
                                                     priceFormatted={formatPrice(c.price)}
-                                                    level={c.type === 'online' ? (lang === 'de' ? "Online" : "Online") : c.level || "A1 - C1"}
+                                                    level={c.type === 'online' ? t.course_card.online : (c.level || t.course_card.level)}
                                                     course={c}
                                                     selected={selectedCourseIds.includes(c.id)}
                                                     onClick={() => toggleCourse(c.id)}
@@ -318,7 +322,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                                                         title={getCourseTitle(c.translationKey)}
                                                         desc={getCourseDesc(c.translationKey)}
                                                         priceFormatted={formatPrice(c.price)}
-                                                        level={c.type === 'online' ? (lang === 'de' ? "Online" : "Online") : c.level || "A1 - C1"}
+                                                        level={c.type === 'online' ? t.course_card.online : (c.level || t.course_card.level)}
                                                         course={c}
                                                         selected={selectedCourseIds.includes(c.id)}
                                                         onClick={() => toggleCourse(c.id)}
