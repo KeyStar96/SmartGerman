@@ -371,9 +371,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             {step === 2 && (
                                 <motion.div
                                     key="step2"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
+                                    initial={{ opacity: 1 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
                                     className="py-8 max-w-2xl"
                                 >
                                     <div className="space-y-12">
@@ -400,8 +400,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             {step === 3 && (
                                 <motion.div
                                     key="step3"
-                                    initial={{ opacity: 0, scale: 0.98 }}
-                                    animate={{ opacity: 1, scale: 1 }}
+                                    initial={{ opacity: 1 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
                                     className="py-8"
                                 >
                                     <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
