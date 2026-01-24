@@ -1,19 +1,43 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Check, X, ArrowRight, Loader2, Info } from "lucide-react";
+import { ChevronLeft, Check, X, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { COURSES, CourseConfig } from "@/lib/course-config";
+import { COURSES, CourseConfig, Day } from "@/lib/course-config";
 
-// --- ANIMATION CONFIG ---
-const transitionSpring = { type: "spring", stiffness: 300, damping: 30 };
+// --- CALENDAR LOGIC HELPER ---
+
+// Mapping: Deutsches Kürzel -> JS Date Day Index (0=Sonntag, 1=Montag...)
+const DAY_MAP: Record<Day, number> = {
+    "So": 0, "Mo": 1, "Di": 2, "Mi": 3, "Do": 4, "Fr": 5, "Sa": 6
+};
+
+// Berechnet, wie oft die Kurstage im NÄCHSTEN Monat vorkommen
+const calculateSessionsInNextMonth = (courseSessions: { day: Day }[]) => {
+    const now = new Date();
+    // Nächsten Monat bestimmen (Wenn heute Jan 2026 -> Ziel: Feb 2026)
+    const targetYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
+    const targetMonth = now.getMonth() === 11 ? 0 : now.getMonth() + 1;
+
+    const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+    const targetSessionDays = courseSessions.map(s => DAY_MAP[s.day]);
+
+    let count = 0;
+    // Durch jeden Tag des nächsten Monats iterieren
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(targetYear, targetMonth, d);
+        if (targetSessionDays.includes(date.getDay())) {
+            count++;
+        }
+    }
+    return { count, monthName: new Date(targetYear, targetMonth, 1).toLocaleString('de-DE', { month: 'long', year: 'numeric' }) };
+};
 
 // --- ZOD SCHEMA ---
 const phoneRegex = /^[\d\s\+\-\(\)\/]{8,}$/;
@@ -30,30 +54,27 @@ const enrollmentSchema = z.object({
 });
 type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 
-// --- HELPER COMPONENTS ---
+// --- COMPONENT: ROW ---
 
-// 1. Compact Swiss Row (Replaces Giant Cards)
 const CourseRow = ({ course, selected, onToggle, title, desc, priceFormatted, level }: any) => {
     return (
         <motion.div
             onClick={onToggle}
             layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
             className={cn(
-                "group relative w-full cursor-pointer border-b border-gray-200 hover:bg-white transition-colors duration-300",
-                selected ? "bg-white" : "bg-transparent"
+                "group relative w-full cursor-pointer border-b border-gray-100 transition-all duration-200 select-none",
+                selected ? "bg-[#FFF4EC]" : "bg-white hover:bg-gray-50"
             )}
         >
-            {/* Selection Indicator Line */}
+            {/* Active Indicator Line (Left) */}
             <div className={cn(
                 "absolute left-0 top-0 bottom-0 w-1 transition-all duration-300",
-                selected ? "bg-[#FF5C00]" : "bg-transparent group-hover:bg-gray-300"
+                selected ? "bg-[#FF5C00]" : "bg-transparent"
             )} />
 
-            <div className="py-4 px-4 pl-6 grid grid-cols-[1fr_auto_auto] gap-6 items-center">
-                {/* Col 1: Title & Info */}
-                <div className="flex flex-col">
+            <div className="py-5 px-6 grid grid-cols-[1fr_auto_auto] gap-6 items-center">
+                {/* Info */}
+                <div>
                     <div className="flex items-center gap-3">
                         <span className={cn(
                             "font-sans text-lg font-bold tracking-tight transition-colors",
@@ -62,30 +83,41 @@ const CourseRow = ({ course, selected, onToggle, title, desc, priceFormatted, le
                             {title}
                         </span>
                         {level && (
-                            <span className="text-[10px] font-mono uppercase border border-gray-200 px-1.5 py-0.5 rounded text-gray-400">
+                            <span className="text-[10px] font-mono uppercase border border-gray-200 bg-white px-1.5 py-0.5 rounded text-gray-400">
                                 {level}
                             </span>
                         )}
                     </div>
+                    <div className="text-xs text-gray-500 font-sans mt-1 flex items-center gap-3 leading-relaxed opacity-80">
+                        <span className={cn("font-mono uppercase text-[10px]", course.type === 'online' ? "text-blue-600" : "text-gray-400")}>
+                            {course.type === 'online' ? 'ONLINE' : 'PRÄSENZ'}
+                        </span>
+                        <span className="w-px h-3 bg-gray-300" />
+                        <span className="truncate max-w-[300px]">{desc}</span>
+                    </div>
                 </div>
 
-                {/* Col 2: Schedule (Hidden on super small screens, visible on desktop) */}
-                <div className="hidden xl:flex flex-col items-end gap-1">
-                    {course.sessions.map((s: any, i: number) => (
-                        <div key={i} className="text-[10px] font-mono uppercase text-gray-400 bg-gray-50 px-2 py-0.5 rounded">
-                            {s.day} {s.startTime}
-                        </div>
-                    ))}
+                {/* Schedule & Price Info */}
+                <div className="hidden sm:flex flex-col items-end gap-0.5 text-right">
+                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">/ Einheit</span></span>
+                    <div className="flex gap-1 mt-1">
+                        {course.sessions.map((s: any, i: number) => (
+                            <span key={i} className="text-[9px] font-mono uppercase text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+                                {s.day} {s.startTime}
+                            </span>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Col 3: Price & Check */}
-                <div className="flex items-center gap-4 min-w-[100px] justify-end">
-                    <span className="font-mono font-medium text-gray-900">{priceFormatted}</span>
+                {/* Checkbox / Selection State */}
+                <div className="pl-4">
                     <div className={cn(
-                        "w-5 h-5 border rounded-sm flex items-center justify-center transition-all duration-300",
-                        selected ? "bg-[#FF5C00] border-[#FF5C00]" : "border-gray-300 group-hover:border-gray-400"
+                        "w-6 h-6 rounded-md border flex items-center justify-center transition-all duration-300 shadow-sm",
+                        selected
+                            ? "bg-[#FF5C00] border-[#FF5C00] shadow-orange-200"
+                            : "bg-white border-gray-300 group-hover:border-gray-400"
                     )}>
-                        <Check size={12} className={cn("text-white transition-transform", selected ? "scale-100" : "scale-0")} />
+                        <Check size={14} strokeWidth={3} className={cn("text-white transition-all duration-300", selected ? "scale-100 opacity-100" : "scale-50 opacity-0")} />
                     </div>
                 </div>
             </div>
@@ -121,22 +153,23 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const searchParams = useSearchParams();
     const initialCourseId = searchParams.get("courseId");
 
-    // States: 'SELECTION' | 'CHECKOUT' | 'SUCCESS'
     const [viewState, setViewState] = useState<'SELECTION' | 'CHECKOUT' | 'SUCCESS'>('SELECTION');
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Filter Courses
+    // Grouping
     const presenceCourses = COURSES.filter(c => c.type === 'presence' && !c.id.includes('speech'));
     const onlineCourses = COURSES.filter(c => c.type === 'online');
     const speechCourses = COURSES.filter(c => c.id.includes('speech'));
 
-    // Form
+    // Calc Next Month for UI Display
+    const nextMonthName = calculateSessionsInNextMonth([]).monthName;
+
     const form = useForm<EnrollmentFormData>({
         resolver: zodResolver(enrollmentSchema),
         mode: "onBlur"
     });
-    const { register, handleSubmit, formState: { errors, isValid }, trigger } = form;
+    const { register, handleSubmit, formState: { errors } } = form;
 
     // Init
     useEffect(() => {
@@ -157,168 +190,143 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     });
 
     const selectedCoursesFull = COURSES.filter(c => selectedCourseIds.includes(c.id));
-    const totalPrice = selectedCoursesFull.reduce((acc, c) => acc + c.price, 0);
+
+    // --- DYNAMIC TOTAL CALCULATION ---
+    const totalMonthlyPrice = selectedCoursesFull.reduce((acc, c) => {
+        const { count } = calculateSessionsInNextMonth(c.sessions);
+        return acc + (c.price * count);
+    }, 0);
+
     const formatPrice = (p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p);
 
     const onSubmit = async (data: EnrollmentFormData) => {
         setIsSubmitting(true);
         await new Promise(r => setTimeout(r, 1500));
-        console.log({ courses: selectedCourseIds, personal: data });
+        console.log({ courses: selectedCourseIds, personal: data, total: totalMonthlyPrice });
         setViewState('SUCCESS');
         setIsSubmitting(false);
     };
 
-    const handleProceedToCheckout = () => {
-        if (selectedCourseIds.length > 0) setViewState('CHECKOUT');
-    };
-
-    // --- RENDER SUCCESS ---
-    if (viewState === 'SUCCESS') {
-        return (
-            <div className="h-screen w-full flex items-center justify-center bg-[#F0EFE9] text-[#2D3436]">
-                <div className="text-center">
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-20 h-20 bg-[#FF5C00] rounded-full mx-auto flex items-center justify-center text-white mb-6">
-                        <Check size={40} />
-                    </motion.div>
-                    <h1 className="text-4xl font-bold tracking-tighter mb-4">Alles erledigt.</h1>
-                    <p className="text-gray-500 mb-8">Wir haben deine Anmeldung erhalten.</p>
-                    <Link href={`/${lang}`} className="text-sm font-mono uppercase border-b border-black pb-1 hover:text-[#FF5C00] hover:border-[#FF5C00] transition-colors">
-                        Zurück zur Startseite
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex overflow-hidden font-sans">
 
-            {/* --- LEFT PANEL: THE MATRIX (Course Selection) --- */}
-            {/* Width: 65% on Desktop. Scrollable internally if list is HUGE, but designed to fit. */}
+            {/* LEFT: LIST */}
             <div className={cn(
                 "flex-1 flex flex-col h-full transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]",
                 viewState === 'CHECKOUT' ? "opacity-30 pointer-events-none scale-[0.98] blur-[2px]" : "opacity-100"
             )}>
-                {/* Header */}
                 <header className="px-8 py-6 flex justify-between items-center border-b border-gray-200 shrink-0 bg-[#F0EFE9]/90 backdrop-blur z-10">
                     <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
-                        <ChevronLeft size={14} /> {dictionary?.registration?.back_home || "Back"}
+                        <ChevronLeft size={14} /> Zurück zur Startseite
                     </Link>
-                    <Image src="/Bilder/SG_Logo_Lightmode.png" alt="SmartGerman Logo" width={140} height={32} className="h-8 w-auto" />
+                    <div className="font-bold tracking-tight text-lg">Smart<span className="text-[#FF5C00]">German</span></div>
                 </header>
 
-                {/* Scrollable List */}
-                <div data-lenis-prevent className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 p-8">
-                    <div className="max-w-4xl mx-auto space-y-10">
-
+                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 p-8 pb-32">
+                    <div className="max-w-4xl mx-auto space-y-12">
                         <div className="mb-8">
                             <h1 className="text-4xl font-bold tracking-tighter mb-2">Kursauswahl</h1>
-                            <p className="text-gray-500">Bitte wähle die gewünschten Module.</p>
+                            <p className="text-gray-500">Wähle deine Module für den Start im <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>
                         </div>
 
-                        {/* SECTION 1: PRÄSENZ */}
-                        <section>
-                            <div className="flex items-center gap-3 mb-4 opacity-50">
-                                <span className="font-mono text-[10px] uppercase tracking-widest">01 // Präsenz</span>
-                                <div className="h-px bg-black flex-1 opacity-20" />
-                            </div>
-                            <div className="bg-white/50 border border-gray-200 rounded-sm overflow-hidden backdrop-blur-sm">
-                                {presenceCourses.map(c => (
-                                    <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* SECTION 2: SPEECH (Moved up) */}
-                        <section>
-                            <div className="flex items-center gap-3 mb-4 opacity-50">
-                                <span className="font-mono text-[10px] uppercase tracking-widest">02 // Sprechtraining</span>
-                                <div className="h-px bg-black flex-1 opacity-20" />
-                            </div>
-                            <div className="bg-white/50 border border-gray-200 rounded-sm overflow-hidden backdrop-blur-sm">
-                                {speechCourses.map(c => (
-                                    <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* SECTION 3: ONLINE (Moved down & Renamed) */}
-                        <section>
-                            <div className="flex items-center gap-3 mb-4 opacity-50">
-                                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF5C00]">03 // Online</span>
-                                <div className="h-px bg-[#FF5C00] flex-1 opacity-20" />
-                            </div>
-                            <div className="bg-white/50 border border-gray-200 rounded-sm overflow-hidden backdrop-blur-sm">
-                                {onlineCourses.map(c => (
-                                    <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
-                                ))}
-                            </div>
-                        </section>
+                        {/* Groups */}
+                        {[
+                            { title: "01 // Präsenz 50+", courses: presenceCourses, color: "black" },
+                            { title: "02 // Online Campus", courses: onlineCourses, color: "#FF5C00" },
+                            { title: "03 // Sprechtraining", courses: speechCourses, color: "black" }
+                        ].map((group, idx) => (
+                            <section key={idx}>
+                                <div className="flex items-center gap-3 mb-4 opacity-60">
+                                    <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: group.color }}>{group.title}</span>
+                                    <div className="h-px bg-current flex-1 opacity-20" />
+                                </div>
+                                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                                    {group.courses.map(c => (
+                                        <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
+                                    ))}
+                                </div>
+                            </section>
+                        ))}
                     </div>
                 </div>
             </div>
 
-            {/* --- RIGHT PANEL: THE TERMINAL (Checkout) --- */}
-            {/* Fixed width: 450px or 35% */}
+            {/* RIGHT: TERMINAL */}
             <div className="w-[400px] xl:w-[480px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
-                {/* Noise Texture Overlay */}
                 <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
 
-                {/* 1. TOP: RECEIPT / SUMMARY */}
+                {/* 1. RECEIPT */}
                 <div className="flex-1 p-8 flex flex-col">
-                    <div className="flex items-baseline justify-between mb-8 border-b border-white/10 pb-4">
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
+                        <div className="flex items-center gap-2">
                             <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">Live Abrechnung</span>
-                            <div className="relative flex items-center justify-center w-2.5 h-2.5">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </div>
+                            {/* Blinking Dot */}
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
+                            </span>
                         </div>
+                        <span className="font-mono text-xs text-gray-500">{nextMonthName}</span>
                     </div>
 
-                    {/* Scrollable List of Items */}
-                    <div className="flex-1 overflow-y-auto mb-4 space-y-3 min-h-0">
+                    <div className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-0">
                         <AnimatePresence>
                             {selectedCoursesFull.length === 0 ? (
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
-                                    // Warten auf Eingabe...
+                                    // Warten auf Auswahl...
                                 </motion.div>
                             ) : (
-                                selectedCoursesFull.map(c => (
-                                    <motion.div
-                                        key={c.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="flex justify-between items-start font-mono text-sm border-b border-white/5 pb-2 last:border-0"
-                                    >
-                                        <span className="text-gray-300 truncate pr-4">{getCourseData(c).title}</span>
-                                        <span className="text-white">{formatPrice(c.price)}</span>
-                                    </motion.div>
-                                ))
+                                selectedCoursesFull.map(c => {
+                                    const { count } = calculateSessionsInNextMonth(c.sessions);
+                                    const subtotal = c.price * count;
+
+                                    return (
+                                        <motion.div
+                                            key={c.id}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
+                                        >
+                                            <div className="flex justify-between mb-1">
+                                                <span className="text-gray-200 truncate pr-2 font-bold">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
+                                                <span className="text-white">{formatPrice(subtotal)}</span>
+                                            </div>
+                                            <div className="flex justify-between text-[10px] text-gray-500 uppercase">
+                                                <span>{count} Termine × {formatPrice(c.price)}</span>
+                                                <span>Monatlich</span>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })
                             )}
                         </AnimatePresence>
                     </div>
 
-                    {/* Total Area */}
+                    {/* Total */}
                     <div className="pt-6 border-t border-white/20">
                         <div className="flex justify-between items-end mb-2">
                             <span className="font-mono text-xs uppercase text-gray-400">Gesamtbetrag</span>
-                            <span className="text-3xl font-bold tracking-tight text-[#FF5C00]">{formatPrice(totalPrice)}</span>
+                            <motion.span
+                                key={totalMonthlyPrice} // Trigger animation on change
+                                initial={{ scale: 1.1, color: '#fff' }}
+                                animate={{ scale: 1, color: '#FF5C00' }}
+                                className="text-3xl font-bold tracking-tight tabular-nums"
+                            >
+                                {formatPrice(totalMonthlyPrice)}
+                            </motion.span>
                         </div>
                         <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
+                            <span>Fällig nach Rechnungserhalt</span>
                             <span>Inkl. MwSt.</span>
-                            <span>EUR</span>
                         </div>
                     </div>
                 </div>
 
-                {/* 2. BOTTOM: ACTION AREA / FORM OVERLAY */}
-                {/* This area expands or transforms */}
+                {/* 2. ACTION / FORM */}
                 <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500">
-
                     <AnimatePresence mode="wait">
-                        {/* STATE A: START CHECKOUT BUTTON */}
+                        {/* BUTTON STATE */}
                         {viewState === 'SELECTION' && (
                             <motion.div
                                 key="btn"
@@ -328,13 +336,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 className="p-8"
                             >
                                 <button
-                                    onClick={handleProceedToCheckout}
+                                    onClick={() => selectedCourseIds.length > 0 && setViewState('CHECKOUT')}
                                     disabled={selectedCourseIds.length === 0}
                                     className={cn(
-                                        "w-full h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group",
+                                        "w-full h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 transition-all duration-300 group",
                                         selectedCourseIds.length > 0
-                                            ? "bg-[#FF5C00] text-white shadow-[0_4px_20px_rgba(255,92,0,0.4)] hover:bg-[#ff7a33] hover:shadow-[0_8px_30px_rgba(255,92,0,0.6)] hover:-translate-y-1"
-                                            : "bg-white text-black hover:bg-gray-100"
+                                            ? "bg-[#FF5C00] text-white hover:bg-[#FF7A33] shadow-[0_0_20px_rgba(255,92,0,0.3)] hover:shadow-[0_0_30px_rgba(255,92,0,0.5)]"
+                                            : "bg-white text-gray-400 cursor-not-allowed opacity-80"
                                     )}
                                 >
                                     <span>Zur Kasse</span>
@@ -343,7 +351,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             </motion.div>
                         )}
 
-                        {/* STATE B: THE FORM (Slides Up) */}
+                        {/* FORM STATE */}
                         {viewState === 'CHECKOUT' && (
                             <motion.div
                                 key="form"
@@ -355,7 +363,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 <div className="p-8 pt-6">
                                     <div className="flex justify-between items-center mb-6">
                                         <h3 className="font-bold text-lg">Deine Daten</h3>
-                                        <button onClick={() => setViewState('SELECTION')} className="text-gray-400 hover:text-red-500">
+                                        <button onClick={() => setViewState('SELECTION')} className="text-gray-400 hover:text-red-500 transition-colors">
                                             <X size={20} />
                                         </button>
                                     </div>
@@ -366,7 +374,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                             <TerminalInput label="Nachname" registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
                                         </div>
                                         <TerminalInput label="E-Mail" type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
-
                                         <div className="grid grid-cols-[2fr_1fr] gap-4">
                                             <TerminalInput label="Straße" registration={register("personal.street")} error={errors.personal?.street?.message} />
                                             <TerminalInput label="PLZ" registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
@@ -377,19 +384,30 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     <button
                                         onClick={handleSubmit(onSubmit)}
                                         disabled={isSubmitting}
-                                        className="w-full bg-[#1A1C1E] text-white h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 hover:bg-[#FF5C00] transition-colors"
+                                        className="w-full bg-[#1A1C1E] text-white h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 hover:bg-[#FF5C00] transition-colors shadow-lg"
                                     >
-                                        {isSubmitting ? <Loader2 className="animate-spin" /> : (
-                                            <>
-                                                Kostenpflichtig anmelden <Check size={16} />
-                                            </>
-                                        )}
+                                        {isSubmitting ? <Loader2 className="animate-spin" /> : "Kostenpflichtig anmelden"}
                                     </button>
-                                    <p className="text-[10px] text-gray-400 text-center mt-3 leading-tight">
-                                        Mit Klick stimmst du den AGB & Datenschutz zu.<br />
-                                        Widerrufsrecht verfällt bei vollständiger Erfüllung.
-                                    </p>
                                 </div>
+                            </motion.div>
+                        )}
+
+                        {/* SUCCESS STATE */}
+                        {viewState === 'SUCCESS' && (
+                            <motion.div
+                                key="success"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="bg-[#1A1C1E] text-white p-8 h-[500px] flex flex-col items-center justify-center text-center"
+                            >
+                                <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-4">
+                                    <Check size={32} />
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2">Erfolgreich!</h3>
+                                <p className="text-gray-400 text-sm mb-8">Rechnung & Bestätigung wurden an deine E-Mail gesendet.</p>
+                                <Link href={`/${lang}`} className="text-[#FF5C00] font-mono text-xs uppercase tracking-widest hover:underline">
+                                    Zurück zur Startseite
+                                </Link>
                             </motion.div>
                         )}
                     </AnimatePresence>
