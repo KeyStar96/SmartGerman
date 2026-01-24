@@ -374,6 +374,96 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
     </div>
 );
 
+const DateDropdowns = ({
+    value,
+    onChange,
+    label,
+    error,
+    required
+}: any) => {
+    // Value format: DD.MM.YYYY
+    // Parse initial value
+    const [day, month, year] = (value || "..").split(".");
+
+    // Generators
+    const days = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
+    const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => String(currentYear - i));
+
+    const handleUpdate = (type: 'day' | 'month' | 'year', val: string) => {
+        let nD = day || "";
+        let nM = month || "";
+        let nY = year || "";
+
+        if (type === 'day') nD = val;
+        if (type === 'month') nM = val;
+        if (type === 'year') nY = val;
+
+        if (nD && nM && nY) {
+            onChange(`${nD}.${nM}.${nY}`);
+        } else {
+            // If partial, maybe don't update or update partial?
+            // Zod expects string. If partial, it might fail validation, which is fine.
+            // But we need to keep state. 
+            // Better: update parent with partial string if needed or just keep local?
+            // Current EnrollmentForm expects "DD.MM.YYYY".
+            // Let's assume we pass what we have, but validation will fail if not complete.
+            onChange(`${nD || ""}.${nM || ""}.${nY || ""}`);
+        }
+    };
+
+    return (
+        <div className="relative group">
+            <span className={cn(
+                "absolute left-0 top-0 text-xs uppercase tracking-widest text-[#FF5C00] font-mono transition-all",
+                // Always show label at top for dropdowns
+            )}>
+                {label} {required && <span>*</span>}
+            </span>
+
+            <div className="flex gap-4 pt-6">
+                {/* Day */}
+                <div className="relative w-1/4">
+                    <select
+                        value={day || ""}
+                        onChange={(e) => handleUpdate('day', e.target.value)}
+                        className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors appearance-none rounded-none"
+                    >
+                        <option value="" disabled>DD</option>
+                        {days.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                </div>
+
+                {/* Month */}
+                <div className="relative w-1/4">
+                    <select
+                        value={month || ""}
+                        onChange={(e) => handleUpdate('month', e.target.value)}
+                        className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors appearance-none rounded-none"
+                    >
+                        <option value="" disabled>MM</option>
+                        {months.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                </div>
+
+                {/* Year */}
+                <div className="relative flex-1">
+                    <select
+                        value={year || ""}
+                        onChange={(e) => handleUpdate('year', e.target.value)}
+                        className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors appearance-none rounded-none"
+                    >
+                        <option value="" disabled>YYYY</option>
+                        {years.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                </div>
+            </div>
+            {error && <span className="text-red-500 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
+        </div>
+    );
+};
+
 // --- MAIN TERMINAL ---
 
 export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictionary: any, lang: string }) {
@@ -577,10 +667,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                                         <div className="grid grid-cols-2 gap-8">
                                             <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                            <MaskedDateInput
+                                            <DateDropdowns
                                                 label={formLabels?.birthdate || "Birthdate"}
                                                 required
-                                                placeholder={formLabels?.date_placeholder || "DD.MM.YYYY"}
                                                 value={watch("personal.birthDate")}
                                                 onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
                                                 error={errors.personal?.birthDate?.message}
