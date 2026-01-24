@@ -212,7 +212,8 @@ interface CourseCardProps {
 
 function CourseCard({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) {
   // Infer unit based on price/duration or fallback
-  const unit = text.unit || (config.price > 10 ? "/ 90 min" : (config.price > 3 ? "/ 60 min" : "/ 45 min"));
+  // Use configured duration or text override
+  const unit = text.unit || `/ ${config.unitDuration} min`;
 
   return (
     <motion.div
