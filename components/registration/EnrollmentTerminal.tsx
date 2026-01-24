@@ -312,7 +312,7 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
                             {/* Mobile: Metadata Row (Left Aligned under title) */}
                             <div className="flex items-center gap-2 md:hidden">
                                 {level && (
-                                    <span className="text-[10px] font-mono uppercase bg-white border border-black/10 px-1.5 py-0.5 rounded text-gray-500">
+                                    <span className="text-[10px] font-mono uppercase bg-white dark:bg-[#FF5C00] border border-black/10 dark:border-[#FF5C00] px-1.5 py-0.5 rounded text-gray-500 dark:text-white">
                                         {level}
                                     </span>
                                 )}
@@ -339,7 +339,7 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
                     {/* Badge */}
                     <div className="w-[60px] flex items-center shrink-0">
                         {level && (
-                            <span className="text-[10px] font-mono uppercase bg-white border border-black/10 px-1.5 py-0.5 rounded text-gray-500">
+                            <span className="text-[10px] font-mono uppercase bg-white dark:bg-[#FF5C00] border border-black/10 dark:border-[#FF5C00] px-1.5 py-0.5 rounded text-gray-500 dark:text-white">
                                 {level}
                             </span>
                         )}
@@ -835,9 +835,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
             <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full">
 
                 {/* Header with Progress */}
-                <header className="px-6 md:px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
-                    <div className="flex justify-between items-start mb-6">
-                        <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
+                <nav className="w-full h-[80px] flex items-center justify-between px-6 bg-[#F0EFE9] dark:bg-[#1A1C1E] shrink-0 sticky top-0 z-50">
+                    <div className="flex items-center gap-4">
+                        <Link href={`/${lang}`} className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2">
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
                         <Image
@@ -968,16 +968,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             )}
 
                             {/* STEP 3: SUMMARY */}
+                            {/* --- SUMMARY (STEP 3) --- */}
                             {step === 3 && (
                                 <motion.div
-                                    key="step3"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="py-8"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    className="flex flex-col gap-8 h-full"
                                 >
-                                    <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3>
+                                    <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
+                                        <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3></div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
                                             <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
                                             <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
