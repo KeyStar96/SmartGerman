@@ -204,7 +204,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
                         <ChevronLeft size={14} /> {dictionary?.registration?.back_home || "Back"}
                     </Link>
-                    <Image src="/Bilder/SG_Logo_Lightmode.png" alt="SmartGerman Logo" width={100} height={24} className="h-6 w-auto" />
+                    <Image src="/Bilder/SG_Logo_Lightmode.png" alt="SmartGerman Logo" width={140} height={32} className="h-8 w-auto" />
                 </header>
 
                 {/* Scrollable List */}
@@ -269,12 +269,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     <div className="flex items-baseline justify-between mb-8 border-b border-white/10 pb-4">
                         <div className="flex items-center gap-3">
                             <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">Live Abrechnung</span>
-                            <div className="relative w-2 h-2">
+                            <div className="relative flex items-center justify-center w-2.5 h-2.5">
                                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </div>
                         </div>
-                        <span className="font-mono text-xs text-gray-500">{new Date().toLocaleDateString('de-DE')}</span>
                     </div>
 
                     {/* Scrollable List of Items */}
