@@ -277,18 +277,18 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
             onClick={onToggle}
             layout
             className={cn(
-                "group relative w-full cursor-pointer rounded-sm p-6 border transition-all duration-300",
+                "group relative w-full cursor-pointer rounded-sm p-4 md:p-6 border transition-all duration-300",
                 selected
                     ? "bg-[#FFF4EC] border-[#FF5C00] shadow-sm"
                     : "bg-[#F0EFE9] border-black/10 hover:border-[#FF5C00] hover:shadow-md"
             )}
         >
-            <div className="flex justify-between items-center">
-                {/* Fixed Layout Columns */}
-                <div className="flex items-center">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                {/* Checkbox + Title + Meta */}
+                <div className="flex items-start md:items-center w-full md:w-auto">
                     {/* 1. Checkbox Visual (Left) */}
                     <div className={cn(
-                        "w-5 h-5 rounded border mr-6 flex items-center justify-center transition-all duration-300",
+                        "w-5 h-5 shrink-0 rounded border mr-4 md:mr-6 flex items-center justify-center transition-all duration-300 mt-1 md:mt-0",
                         selected
                             ? "bg-[#FF5C00] border-[#FF5C00]"
                             : "bg-transparent border-black/20 group-hover:border-black/40"
@@ -296,45 +296,48 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
                         {selected && <Check size={12} className="text-white" strokeWidth={3} />}
                     </div>
 
-                    {/* 2. Title (Fixed Width) */}
-                    <span className={cn(
-                        "font-sans text-xl font-bold tracking-tight transition-colors w-[280px] truncate pr-4",
-                        selected ? "text-[#FF5C00]" : "text-[#111111]"
-                    )}>
-                        {title}
-                    </span>
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 w-full">
+                        {/* 2. Title (Flexible Width) */}
+                        <span className={cn(
+                            "font-sans text-lg md:text-xl font-bold tracking-tight transition-colors md:w-[280px] break-words md:truncate pr-0 md:pr-4",
+                            selected ? "text-[#FF5C00]" : "text-[#111111]"
+                        )}>
+                            {title}
+                        </span>
 
-                    {/* 3. Badge (Fixed Slot) */}
-                    <div className="w-[60px] flex items-center">
-                        {level && (
-                            <span className="text-[10px] font-mono uppercase bg-white border border-black/10 px-1.5 py-0.5 rounded text-gray-500">
-                                {level}
+                        <div className="flex items-center gap-3">
+                            {/* 3. Badge (Fixed Slot) */}
+                            <div className="w-auto md:w-[60px] flex items-center shrink-0">
+                                {level && (
+                                    <span className="text-[10px] font-mono uppercase bg-white border border-black/10 px-1.5 py-0.5 rounded text-gray-500">
+                                        {level}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* 4. Type */}
+                            <span className={cn(
+                                "font-mono uppercase text-[10px] flex items-center gap-2 shrink-0",
+                                course.type === 'online' ? "text-blue-600" : "text-gray-500"
+                            )}>
+                                {course.type === 'online' ? <Monitor size={12} /> : <MapPin size={12} />}
+                                {course.type === 'online' ? (t?.online_label || "ONLINE").toUpperCase() : (t?.presence_label || "PRÄSENZ")}
                             </span>
-                        )}
+                        </div>
                     </div>
-
-                    {/* 4. Type */}
-                    <span className={cn(
-                        "font-mono uppercase text-[10px] flex items-center gap-2",
-                        course.type === 'online' ? "text-blue-600" : "text-gray-500"
-                    )}>
-                        {course.type === 'online' ? <Monitor size={12} /> : <MapPin size={12} />}
-                        {course.type === 'online' ? (t?.online_label || "ONLINE").toUpperCase() : (t?.presence_label || "PRÄSENZ")}
-                    </span>
                 </div>
 
-                {/* Right Side Info */}
-                <div className="text-right">
+                {/* Right Side Info (Price) */}
+                <div className="text-left md:text-right pl-9 md:pl-0 w-full md:w-auto">
                     <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">{t?.units_suffix || "/ Units"}</span></span>
                 </div>
             </div>
 
             {/* Expanded Details when selected */}
-            <div className="flex gap-1 mt-2 pl-[44px]">
+            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pl-9 md:pl-[44px]">
                 {course.sessions.map((s: any, i: number) => {
-                    const dayName = daysDict?.[s.day.toLowerCase()] || s.day; // "Mo" -> "mo" -> "Понедельник" (or short if available)
-                    // We might need short names? The dictionary has "mo": "Mo" (DE), "mo": "Mon" (EN).
-                    // Use `timetable.days.mo` etc directly.
+                    const daysDict = dictionary?.timetable?.days;
+                    // Properly access day properties
                     const shortWeekdays: Record<string, string> = {
                         "mo": daysDict?.mo || "Mo",
                         "di": daysDict?.di || "Di",
@@ -344,9 +347,11 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
                         "sa": daysDict?.sa || "Sa",
                         "so": daysDict?.so || "So"
                     };
+                    const dayKey = s.day.toLowerCase() as keyof typeof shortWeekdays;
+
                     return (
                         <span key={i} className="text-[10px] font-mono uppercase text-gray-400">
-                            {shortWeekdays[s.day.toLowerCase()]} {s.startTime}
+                            {shortWeekdays[dayKey] || s.day} {s.startTime}
                         </span>
                     );
                 })}
@@ -701,13 +706,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     }
 
     return (
-        <div className="h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex overflow-hidden font-sans">
+        <div className="min-h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex flex-col lg:flex-row overflow-x-hidden font-sans">
 
             {/* --- LEFT PANEL: WIZARD CONTENT --- */}
-            <div className="flex-1 flex flex-col h-full min-h-0 relative">
+            <div className="flex-1 flex flex-col min-h-0 relative w-full">
 
                 {/* Header with Progress */}
-                <header className="px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
+                <header className="px-6 md:px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
                     <div className="flex justify-between items-start mb-6">
                         <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
@@ -715,10 +720,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         <Image
                             src="/Bilder/SG_Logo_Lightmode.png"
                             alt="SmartGerman"
-                            width={120}
-                            height={32}
+                            width={100}
+                            height={28}
                             priority
-                            className="object-contain"
+                            className="object-contain md:w-[120px]"
                         />
                     </div>
 
@@ -743,18 +748,19 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         <span className="font-mono text-xs text-gray-400">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
-                    <h1 className="text-4xl font-bold tracking-tighter text-[#111111]">
+                    <h1 className="text-2xl md:text-4xl font-bold tracking-tighter text-[#111111]">
                         {step === 1 && wizard?.step1_title}
                         {step === 2 && wizard?.step2_title}
                         {step === 3 && wizard?.step3_title}
                     </h1>
-                    {step === 1 && <p className="text-gray-500 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
-                    {step === 2 && <p className="text-gray-500 mt-2">{wizard?.step2_sub}</p>}
-                    {step === 3 && <p className="text-gray-500 mt-2">{wizard?.step3_sub}</p>}
+                    {step === 1 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
+                    {step === 2 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step2_sub}</p>}
+                    {step === 3 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step3_sub}</p>}
                 </header>
 
                 {/* SCROLLABLE CONTENT AREA */}
-                <div data-lenis-prevent className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-12 pb-32 min-h-0">
+                {/* On mobile: standard scroll. On Desktop: overflow-y-auto */}
+                <div data-lenis-prevent className="flex-1 lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-4 md:px-12 pb-32 min-h-0">
                     <div className="max-w-4xl mx-auto">
                         <AnimatePresence mode="wait">
 
@@ -798,12 +804,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 >
                                     <div className="space-y-12">
 
-                                        <div className="grid grid-cols-2 gap-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
                                             <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                             <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
                                             <DateDropdowns
                                                 label={formLabels?.birthdate || "Birthdate"}
@@ -845,11 +851,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 >
                                     <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
                                         <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3>
-                                        <div className="grid grid-cols-2 gap-y-4 text-sm">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
                                             <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
                                             <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
                                             <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
-                                            <div className="font-medium">{formData?.email}<br />{formData?.phone}</div>
+                                            <div className="font-medium break-all">{formData?.email}<br />{formData?.phone}</div>
                                             <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
                                             <div className="font-medium">{formData?.birthDate}</div>
                                             <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
@@ -899,11 +905,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
             </div>
 
             {/* --- RIGHT PANEL: LIVE TERMINAL --- */}
-            <div className="w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
+            {/* Desktop: Fixed width Right Side. Mobile: Full width at bottom (or sticky). Here: stacked at bottom. */}
+            <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
                 <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
 
-                {/* RECEIPT HEADER */}
-                <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10">
+                {/* RECEIPT HEADER (Desktop Only likely? Or simplified for mobile?) */}
+                <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10 hidden lg:block">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
@@ -916,8 +923,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     </div>
                 </div>
 
-                {/* SCROLLABLE RECEIPT LIST */}
-                <div data-lenis-prevent className="flex-1 overflow-y-auto p-8 space-y-4 min-h-0">
+                {/* SCROLLABLE RECEIPT LIST (Collapsible on mobile?) */}
+                {/* For now, show on mobile too but maybe limit max height? Or keep as is at bottom. */}
+                <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-[200px] lg:min-h-0">
                     <AnimatePresence>
                         {selectedCoursesFull.length === 0 ? (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
@@ -939,7 +947,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                         className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
                                     >
                                         <div className="flex justify-between mb-1">
-                                            <span className="text-gray-200 truncate pr-2 font-bold w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                            <span className="text-gray-200 truncate pr-2 font-bold w-[150px] md:w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
                                             <span className="text-white">{formatPrice(grossPrice)}</span>
                                         </div>
 
@@ -962,16 +970,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 </div>
 
                 {/* FOOTER AREA (Total + Action) */}
-                <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0">
+                <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0 sticky bottom-0 z-50">
                     {/* TOTAL Display */}
-                    <div className="p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
+                    <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
                         <div className="flex justify-between items-end mb-2">
                             <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
                             <motion.span
                                 key={totalMonthlyPrice}
                                 initial={{ scale: 1.1, color: '#fff' }}
                                 animate={{ scale: 1, color: '#FF5C00' }}
-                                className="text-3xl font-bold tracking-tight tabular-nums"
+                                className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums"
                             >
                                 {formatPrice(totalMonthlyPrice)}
                             </motion.span>
@@ -987,7 +995,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
                         disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
                         className={cn(
-                            "w-full h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
+                            "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
                             ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid))
                                 ? "bg-gray-700 text-gray-500 cursor-not-allowed"
                                 : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
