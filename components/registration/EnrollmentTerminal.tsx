@@ -98,6 +98,18 @@ const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
         monthName
     };
 };
+const formatDateInput = (value: string) => {
+    // Remove non-digit characters
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+
+    // Format as DD.MM.YYYY
+    if (digits.length >= 5) {
+        return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+    } else if (digits.length >= 3) {
+        return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+    }
+    return digits;
+};
 
 // --- ZOD SCHEMA ---
 const phoneRegex = /^[\d\s\+\-\(\)\/]{8,}$/;
@@ -430,7 +442,18 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                                         <div className="grid grid-cols-2 gap-8">
                                             <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                            <TerminalInput label={formLabels?.birthdate || "Birthdate"} required registration={register("personal.birthDate")} error={errors.personal?.birthDate?.message} />
+                                            <TerminalInput
+                                                label={formLabels?.birthdate || "Birthdate"}
+                                                required
+                                                registration={{
+                                                    ...register("personal.birthDate"),
+                                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                                                        const formatted = formatDateInput(e.target.value);
+                                                        form.setValue("personal.birthDate", formatted);
+                                                    }
+                                                }}
+                                                error={errors.personal?.birthDate?.message}
+                                            />
                                         </div>
                                         <TerminalInput label={formLabels?.phone || "Phone"} registration={register("personal.phone")} error={errors.personal?.phone?.message} />
 
