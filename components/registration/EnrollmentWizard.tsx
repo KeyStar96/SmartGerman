@@ -222,6 +222,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
     };
     const getCourseTitle = (key: string) => dictionary?.CourseData?.[key]?.title || key;
     const getCourseDesc = (key: string) => dictionary?.CourseData?.[key]?.description || "";
+    const getCourseLevel = (key: string) => dictionary?.CourseData?.[key]?.level || "";
 
 
     // SUCCESS VIEW
@@ -257,7 +258,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                 <div className="px-8 py-6 flex items-center justify-between shrink-0">
                     <Link href={`/${lang}`} className="text-gray-400 hover:text-gray-900 transition-colors">
                         <span className="font-mono text-[10px] uppercase tracking-widest flex items-center gap-2">
-                            <ChevronRight size={14} className="rotate-180" /> Back
+                            <ChevronRight size={14} className="rotate-180" /> {t.back_home}
                         </span>
                     </Link>
                     <div className="lg:hidden">
@@ -267,7 +268,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                 </div>
 
                 {/* Main Scroll Area - Force flex basis to allow scrolling */}
-                <div className="flex-1 overflow-y-auto min-h-0 bg-[#F0EFE9] px-4 lg:px-12 pb-32 lg:pb-12 scrollbar-thin scrollbar-thumb-gray-300">
+                <div data-lenis-prevent className="flex-1 overflow-y-auto min-h-0 bg-[#F0EFE9] px-4 lg:px-12 pb-32 lg:pb-12 scrollbar-thin scrollbar-thumb-gray-300">
                     <AnimatePresence mode="wait">
                         {step === 1 && (
                             <motion.div
@@ -300,7 +301,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                                                     title={getCourseTitle(c.translationKey)}
                                                     desc={getCourseDesc(c.translationKey)}
                                                     priceFormatted={formatPrice(c.price)}
-                                                    level={c.type === 'online' ? t.course_card.online : (c.level || t.course_card.level)}
+                                                    level={c.type === 'online' ? t.course_card.online : (getCourseLevel(c.translationKey) || c.level || t.course_card.level)}
                                                     course={c}
                                                     selected={selectedCourseIds.includes(c.id)}
                                                     onClick={() => toggleCourse(c.id)}
@@ -322,7 +323,7 @@ export default function EnrollmentWizard({ dictionary, lang }: { dictionary: any
                                                         title={getCourseTitle(c.translationKey)}
                                                         desc={getCourseDesc(c.translationKey)}
                                                         priceFormatted={formatPrice(c.price)}
-                                                        level={c.type === 'online' ? t.course_card.online : (c.level || t.course_card.level)}
+                                                        level={c.type === 'online' ? t.course_card.online : (getCourseLevel(c.translationKey) || c.level || t.course_card.level)}
                                                         course={c}
                                                         selected={selectedCourseIds.includes(c.id)}
                                                         onClick={() => toggleCourse(c.id)}
