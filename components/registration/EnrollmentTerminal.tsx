@@ -18,24 +18,54 @@ const DAY_MAP: Record<Day, number> = {
     "So": 0, "Mo": 1, "Di": 2, "Mi": 3, "Do": 4, "Fr": 5, "Sa": 6
 };
 
-// Berechnet Termine im NÄCHSTEN Monat
-const calculateSessionsInNextMonth = (courseSessions: { day: Day }[]) => {
+// Helper: Minuten berechnen
+const getDurationMinutes = (start: string, end: string) => {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    return (eh * 60 + em) - (sh * 60 + sm);
+};
+
+// Berechnet Termine & Einheiten im NÄCHSTEN Monat
+const calculateMonthlyStats = (course: CourseConfig) => {
     const now = new Date();
     // Wenn heute Jan 2026 -> Ziel: Feb 2026
     const targetYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
     const targetMonth = now.getMonth() === 11 ? 0 : now.getMonth() + 1;
 
     const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
-    const targetSessionDays = courseSessions.map(s => DAY_MAP[s.day]);
 
-    let count = 0;
+    let sessionCount = 0;
+    let totalUnits = 0;
+
+    // Map sessions map for easy lookup
+    const sessionsByDay = new Map<number, typeof course.sessions>();
+    course.sessions.forEach(s => {
+        const dIndex = DAY_MAP[s.day];
+        const existing = sessionsByDay.get(dIndex) || [];
+        sessionsByDay.set(dIndex, [...existing, s]);
+    });
+
     for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(targetYear, targetMonth, d);
-        if (targetSessionDays.includes(date.getDay())) {
-            count++;
+        const dayOfWeek = date.getDay();
+
+        const sessionsToday = sessionsByDay.get(dayOfWeek);
+        if (sessionsToday) {
+            sessionsToday.forEach(s => {
+                sessionCount++;
+                const mins = getDurationMinutes(s.startTime, s.endTime);
+                // Fallback 45 if unitDuration missing (safety)
+                const units = mins / (course.unitDuration || 45);
+                totalUnits += units;
+            });
         }
     }
-    return { count, monthName: new Date(targetYear, targetMonth, 1).toLocaleString('de-DE', { month: 'long', year: 'numeric' }) };
+
+    return {
+        sessionCount,
+        totalUnits,
+        monthName: new Date(targetYear, targetMonth, 1).toLocaleString('de-DE', { month: 'long', year: 'numeric' })
+    };
 };
 
 // --- ZOD SCHEMA ---
@@ -158,7 +188,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const speechCourses = COURSES.filter(c => c.id.includes('speech'));
 
     // Calc Next Month for UI Display
-    const nextMonthName = calculateSessionsInNextMonth([]).monthName;
+    const nextMonthName = calculateMonthlyStats(COURSES[0]).monthName;
 
     const form = useForm<EnrollmentFormData>({
         resolver: zodResolver(enrollmentSchema),
@@ -188,8 +218,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     // Dynamic Total Calculation
     const totalMonthlyPrice = selectedCoursesFull.reduce((acc, c) => {
-        const { count } = calculateSessionsInNextMonth(c.sessions);
-        return acc + (c.price * count);
+        const { totalUnits } = calculateMonthlyStats(c);
+        return acc + (totalUnits * c.price);
     }, 0);
 
     const formatPrice = (p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p);
@@ -214,7 +244,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 {/* Header with LOGO */}
                 <header className="px-8 py-6 flex justify-between items-center border-b border-gray-200 shrink-0 bg-[#F0EFE9]/90 backdrop-blur z-10">
                     <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
-                        <ChevronLeft size={14} /> Zurück
+                        <ChevronLeft size={14} /> {dictionary?.registration?.back_home || "Back"}
                     </Link>
                     {/* LOGO RESTORED */}
                     <div className="relative w-[140px] h-8 flex justify-end">
@@ -231,7 +261,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                 {/* SCROLLABLE AREA */}
                 {/* min-h-0 is crucial here */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 p-8 pb-32 min-h-0">
+                <div data-lenis-prevent className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 p-8 pb-32 min-h-0">
                     <div className="max-w-4xl mx-auto space-y-12">
                         <div className="mb-8">
                             <h1 className="text-4xl font-bold tracking-tighter mb-2">Kursauswahl</h1>
@@ -277,7 +307,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         <span className="font-mono text-xs text-gray-500">{nextMonthName}</span>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-0 pr-2">
+                    <div data-lenis-prevent className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-0 pr-2">
                         <AnimatePresence>
                             {selectedCoursesFull.length === 0 ? (
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
@@ -285,8 +315,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 </motion.div>
                             ) : (
                                 selectedCoursesFull.map(c => {
-                                    const { count } = calculateSessionsInNextMonth(c.sessions);
-                                    const subtotal = c.price * count;
+                                    const { sessionCount, totalUnits } = calculateMonthlyStats(c);
+                                    const subtotal = c.price * totalUnits;
 
                                     return (
                                         <motion.div
@@ -301,7 +331,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                                 <span className="text-white">{formatPrice(subtotal)}</span>
                                             </div>
                                             <div className="flex justify-between text-[10px] text-gray-500 uppercase">
-                                                <span>{count} Termine × {formatPrice(c.price)}</span>
+                                                <span>{totalUnits} EH ({sessionCount} Termine)</span>
                                                 <span>Monatlich</span>
                                             </div>
                                         </motion.div>

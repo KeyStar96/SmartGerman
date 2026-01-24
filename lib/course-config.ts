@@ -18,6 +18,7 @@ export interface CourseConfig {
     sessions: CourseSession[];
     instructor: InstructorKey; // For logic if needed, or specific name lookup
     level?: string;
+    unitDuration: number;
 }
 
 export const COURSES: CourseConfig[] = [
@@ -27,6 +28,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "a1_1_50plus",
         type: "presence",
         price: 2.50,
+        unitDuration: 45,
         instructor: "standard",
         sessions: [
             { day: "Mo", startTime: "09:00", endTime: "10:30" },
@@ -38,6 +40,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "a1_2_50plus",
         type: "presence",
         price: 2.50,
+        unitDuration: 45,
         instructor: "standard",
         sessions: [
             { day: "Di", startTime: "09:00", endTime: "10:30" },
@@ -49,6 +52,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "a2_50plus",
         type: "presence",
         price: 2.50,
+        unitDuration: 45,
         instructor: "standard",
         sessions: [
             { day: "Mo", startTime: "10:30", endTime: "12:00" },
@@ -61,6 +65,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "speech_a1_1",
         type: "presence",
         price: 3.50,
+        unitDuration: 60,
         instructor: "standard",
         sessions: [
             { day: "Di", startTime: "12:00", endTime: "13:00" }
@@ -71,6 +76,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "speech_a1_2",
         type: "presence",
         price: 3.50,
+        unitDuration: 60,
         instructor: "standard",
         sessions: [
             { day: "Mi", startTime: "12:00", endTime: "13:00" }
@@ -81,6 +87,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "speech_a2",
         type: "presence",
         price: 3.50,
+        unitDuration: 60,
         instructor: "standard",
         sessions: [
             { day: "Mo", startTime: "12:00", endTime: "13:00" }
@@ -93,6 +100,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "online_a1_1",
         type: "online",
         price: 7.50,
+        unitDuration: 45,
         instructor: "standard",
         sessions: [
             { day: "Do", startTime: "19:00", endTime: "20:30" },
@@ -104,6 +112,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "online_b1",
         type: "online",
         price: 7.50,
+        unitDuration: 45,
         instructor: "standard",
         sessions: [
             { day: "Mo", startTime: "14:30", endTime: "16:00" },
@@ -115,6 +124,7 @@ export const COURSES: CourseConfig[] = [
         translationKey: "online_b2",
         type: "online",
         price: 7.50,
+        unitDuration: 45,
         instructor: "special",
         sessions: [
             { day: "Mo", startTime: "16:00", endTime: "17:30" },
