@@ -340,8 +340,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                             {/* STEP 1: SELECTION */}
                             {step === 1 && (
-                                {/* STEP 1: SELECTION */ }
-                            {step === 1 && (
                                 <motion.div
                                     key="step1"
                                     initial={{ opacity: 1 }}
