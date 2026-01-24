@@ -513,19 +513,19 @@
     }
   },
   "CourseData": {
-    "a1_1_50plus": {
+    "de50_a1_1": {
       "title": "Deutsch 50+ A1.1",
       "description": "Speziell für Lernende ab 50. Langsames Tempo, viel Wiederholung.",
       "level": "A1.1",
       "location": "Königstraße 20"
     },
-    "a1_2_50plus": {
+    "de50_a1_2": {
       "title": "Deutsch 50+ A1.2",
       "description": "Aufbaukurs. Vertiefen Sie Grundlagen und Wortschatz.",
       "level": "A1.2",
       "location": "Königstraße 20"
     },
-    "a2_50plus": {
+    "de50_a2": {
       "title": "Deutsch 50+ A2",
       "description": "Für selbstständige Kommunikation im Alltag.",
       "level": "A2",

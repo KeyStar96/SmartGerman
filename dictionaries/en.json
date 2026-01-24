@@ -511,19 +511,19 @@
     "footer_note": "All courses are monthly cancellable. Telegram support included. All prices incl. VAT."
   },
   "CourseData": {
-    "a1_1_50plus": {
+    "de50_a1_1": {
       "title": "German 50+ A1.1",
       "description": "Specially designed for learners 50+. Slow pace, relaxed atmosphere.",
       "level": "A1.1",
       "location": "Königstraße 20"
     },
-    "a1_2_50plus": {
+    "de50_a1_2": {
       "title": "German 50+ A1.2",
       "description": "Advanced beginners. Deepening the basics.",
       "level": "A1.2",
       "location": "Königstraße 20"
     },
-    "a2_50plus": {
+    "de50_a2": {
       "title": "German 50+ A2",
       "description": "Independent communication (doctors, authorities).",
       "level": "A2",

@@ -440,7 +440,7 @@
     },
     "course_card": {
       "online_label": "ОНЛАЙН",
-      "presence_label": "ОФЛАЙН",
+      "presence_label": "ОЧНО",
       "level_range": "A1 - C1",
       "units_suffix": "/ Единиц"
     },
@@ -467,7 +467,7 @@
       "back_button": "На главную"
     },
     "group_titles": {
-      "presence": "01 // ОФЛАЙН",
+      "presence": "01 // ОЧНО",
       "speech": "02 // РАЗГОВОРНЫЙ ТРЕНИНГ",
       "online": "03 // ОНЛАЙН"
     },
