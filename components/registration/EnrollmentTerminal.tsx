@@ -336,7 +336,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             ) : (
                                 selectedCoursesFull.map(c => {
                                     const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c);
-                                    const subtotal = c.price * totalUnits;
+                                    const netPrice = c.price * totalUnits;
+                                    const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
+                                    const grossPrice = netPrice + deductionSum;
 
                                     return (
                                         <motion.div
@@ -348,7 +350,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                         >
                                             <div className="flex justify-between mb-1">
                                                 <span className="text-gray-200 truncate pr-2 font-bold">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
-                                                <span className="text-white">{formatPrice(subtotal)}</span>
+                                                <span className="text-white">{formatPrice(grossPrice)}</span>
                                             </div>
 
                                             {deductions.map((d, i) => (
