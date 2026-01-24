@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Check, X, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -13,15 +14,14 @@ import { COURSES, CourseConfig, Day } from "@/lib/course-config";
 
 // --- CALENDAR LOGIC HELPER ---
 
-// Mapping: Deutsches Kürzel -> JS Date Day Index (0=Sonntag, 1=Montag...)
 const DAY_MAP: Record<Day, number> = {
     "So": 0, "Mo": 1, "Di": 2, "Mi": 3, "Do": 4, "Fr": 5, "Sa": 6
 };
 
-// Berechnet, wie oft die Kurstage im NÄCHSTEN Monat vorkommen
+// Berechnet Termine im NÄCHSTEN Monat
 const calculateSessionsInNextMonth = (courseSessions: { day: Day }[]) => {
     const now = new Date();
-    // Nächsten Monat bestimmen (Wenn heute Jan 2026 -> Ziel: Feb 2026)
+    // Wenn heute Jan 2026 -> Ziel: Feb 2026
     const targetYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
     const targetMonth = now.getMonth() === 11 ? 0 : now.getMonth() + 1;
 
@@ -29,7 +29,6 @@ const calculateSessionsInNextMonth = (courseSessions: { day: Day }[]) => {
     const targetSessionDays = courseSessions.map(s => DAY_MAP[s.day]);
 
     let count = 0;
-    // Durch jeden Tag des nächsten Monats iterieren
     for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(targetYear, targetMonth, d);
         if (targetSessionDays.includes(date.getDay())) {
@@ -54,9 +53,9 @@ const enrollmentSchema = z.object({
 });
 type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 
-// --- COMPONENT: ROW ---
+// --- COMPONENT: ROW (CLEAN VERSION) ---
 
-const CourseRow = ({ course, selected, onToggle, title, desc, priceFormatted, level }: any) => {
+const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level }: any) => {
     return (
         <motion.div
             onClick={onToggle}
@@ -73,7 +72,7 @@ const CourseRow = ({ course, selected, onToggle, title, desc, priceFormatted, le
             )} />
 
             <div className="py-5 px-6 grid grid-cols-[1fr_auto_auto] gap-6 items-center">
-                {/* Info */}
+                {/* Info (OHNE Beschreibung) */}
                 <div>
                     <div className="flex items-center gap-3">
                         <span className={cn(
@@ -87,13 +86,9 @@ const CourseRow = ({ course, selected, onToggle, title, desc, priceFormatted, le
                                 {level}
                             </span>
                         )}
-                    </div>
-                    <div className="text-xs text-gray-500 font-sans mt-1 flex items-center gap-3 leading-relaxed opacity-80">
-                        <span className={cn("font-mono uppercase text-[10px]", course.type === 'online' ? "text-blue-600" : "text-gray-400")}>
+                        <span className={cn("font-mono uppercase text-[10px] ml-2", course.type === 'online' ? "text-blue-600" : "text-gray-400")}>
                             {course.type === 'online' ? 'ONLINE' : 'PRÄSENZ'}
                         </span>
-                        <span className="w-px h-3 bg-gray-300" />
-                        <span className="truncate max-w-[300px]">{desc}</span>
                     </div>
                 </div>
 
@@ -109,7 +104,7 @@ const CourseRow = ({ course, selected, onToggle, title, desc, priceFormatted, le
                     </div>
                 </div>
 
-                {/* Checkbox / Selection State */}
+                {/* Checkbox */}
                 <div className="pl-4">
                     <div className={cn(
                         "w-6 h-6 rounded-md border flex items-center justify-center transition-all duration-300 shadow-sm",
@@ -157,7 +152,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Grouping
+    // Grouping Logic
     const presenceCourses = COURSES.filter(c => c.type === 'presence' && !c.id.includes('speech'));
     const onlineCourses = COURSES.filter(c => c.type === 'online');
     const speechCourses = COURSES.filter(c => c.id.includes('speech'));
@@ -171,7 +166,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     });
     const { register, handleSubmit, formState: { errors } } = form;
 
-    // Init
+    // Init Logic
     useEffect(() => {
         if (initialCourseId && !selectedCourseIds.includes(initialCourseId) && COURSES.some(c => c.id === initialCourseId)) {
             setSelectedCourseIds([initialCourseId]);
@@ -184,14 +179,14 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     const getCourseData = (c: CourseConfig) => ({
         title: dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey,
-        desc: dictionary?.CourseData?.[c.translationKey]?.description || "Intensivkurs",
+        // Description removed here
         priceFormatted: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
         level: dictionary?.CourseData?.[c.translationKey]?.level
     });
 
     const selectedCoursesFull = COURSES.filter(c => selectedCourseIds.includes(c.id));
 
-    // --- DYNAMIC TOTAL CALCULATION ---
+    // Dynamic Total Calculation
     const totalMonthlyPrice = selectedCoursesFull.reduce((acc, c) => {
         const { count } = calculateSessionsInNextMonth(c.sessions);
         return acc + (c.price * count);
@@ -210,30 +205,44 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     return (
         <div className="h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex overflow-hidden font-sans">
 
-            {/* LEFT: LIST */}
+            {/* LEFT PANEL: LIST */}
+            {/* Added min-h-0 to ensure inner scrolling works correctly with h-screen parent */}
             <div className={cn(
-                "flex-1 flex flex-col h-full transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]",
+                "flex-1 flex flex-col h-full min-h-0 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]",
                 viewState === 'CHECKOUT' ? "opacity-30 pointer-events-none scale-[0.98] blur-[2px]" : "opacity-100"
             )}>
+                {/* Header with LOGO */}
                 <header className="px-8 py-6 flex justify-between items-center border-b border-gray-200 shrink-0 bg-[#F0EFE9]/90 backdrop-blur z-10">
                     <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
-                        <ChevronLeft size={14} /> Zurück zur Startseite
+                        <ChevronLeft size={14} /> Zurück
                     </Link>
-                    <div className="font-bold tracking-tight text-lg">Smart<span className="text-[#FF5C00]">German</span></div>
+                    {/* LOGO RESTORED */}
+                    <div className="relative w-[140px] h-8 flex justify-end">
+                        <Image
+                            src="/Bilder/SG_Logo_Lightmode.png"
+                            alt="SmartGerman"
+                            width={140}
+                            height={40}
+                            className="object-contain object-right"
+                            priority
+                        />
+                    </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 p-8 pb-32">
+                {/* SCROLLABLE AREA */}
+                {/* min-h-0 is crucial here */}
+                <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 p-8 pb-32 min-h-0">
                     <div className="max-w-4xl mx-auto space-y-12">
                         <div className="mb-8">
                             <h1 className="text-4xl font-bold tracking-tighter mb-2">Kursauswahl</h1>
                             <p className="text-gray-500">Wähle deine Module für den Start im <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>
                         </div>
 
-                        {/* Groups */}
+                        {/* CORRECTED ORDER: 1. Präsenz, 2. Sprechtraining, 3. Online */}
                         {[
-                            { title: "01 // Präsenz 50+", courses: presenceCourses, color: "black" },
-                            { title: "02 // Online Campus", courses: onlineCourses, color: "#FF5C00" },
-                            { title: "03 // Sprechtraining", courses: speechCourses, color: "black" }
+                            { title: "01 // PRÄSENZ", courses: presenceCourses, color: "black" },
+                            { title: "02 // SPRECHTRAINING", courses: speechCourses, color: "black" },
+                            { title: "03 // ONLINE", courses: onlineCourses, color: "#FF5C00" }
                         ].map((group, idx) => (
                             <section key={idx}>
                                 <div className="flex items-center gap-3 mb-4 opacity-60">
@@ -251,16 +260,15 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 </div>
             </div>
 
-            {/* RIGHT: TERMINAL */}
+            {/* RIGHT PANEL: TERMINAL */}
             <div className="w-[400px] xl:w-[480px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
                 <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
 
                 {/* 1. RECEIPT */}
-                <div className="flex-1 p-8 flex flex-col">
-                    <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
+                <div className="flex-1 p-8 flex flex-col min-h-0">
+                    <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4 shrink-0">
                         <div className="flex items-center gap-2">
                             <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">Live Abrechnung</span>
-                            {/* Blinking Dot */}
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
@@ -269,7 +277,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         <span className="font-mono text-xs text-gray-500">{nextMonthName}</span>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-0">
+                    <div className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-0 pr-2">
                         <AnimatePresence>
                             {selectedCoursesFull.length === 0 ? (
                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
@@ -303,12 +311,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         </AnimatePresence>
                     </div>
 
-                    {/* Total */}
-                    <div className="pt-6 border-t border-white/20">
+                    {/* Total Area (Fixed at bottom of receipt panel) */}
+                    <div className="pt-6 border-t border-white/20 shrink-0">
                         <div className="flex justify-between items-end mb-2">
                             <span className="font-mono text-xs uppercase text-gray-400">Gesamtbetrag</span>
                             <motion.span
-                                key={totalMonthlyPrice} // Trigger animation on change
+                                key={totalMonthlyPrice}
                                 initial={{ scale: 1.1, color: '#fff' }}
                                 animate={{ scale: 1, color: '#FF5C00' }}
                                 className="text-3xl font-bold tracking-tight tabular-nums"
@@ -324,7 +332,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 </div>
 
                 {/* 2. ACTION / FORM */}
-                <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500">
+                <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0">
                     <AnimatePresence mode="wait">
                         {/* BUTTON STATE */}
                         {viewState === 'SELECTION' && (
