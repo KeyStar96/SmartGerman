@@ -423,17 +423,34 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     <div className="bg-white p-8 border border-black/10 rounded-sm space-y-6">
                                         <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">Deine Kurse (Start: {nextMonthName})</h3>
                                         <div className="space-y-4">
-                                            {selectedCoursesFull.map(c => (
-                                                <div key={c.id} className="flex justify-between items-center text-sm">
-                                                    <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
-                                                    <span className="font-mono text-gray-500">{formatPrice(c.price)} / Monat</span>
-                                                </div>
-                                            ))}
+                                            {selectedCoursesFull.map(c => {
+                                                const { totalUnits, deductions } = calculateMonthlyStats(c);
+                                                const netPrice = c.price * totalUnits;
+                                                return (
+                                                    <div key={c.id} className="flex justify-between items-center text-sm">
+                                                        <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
+                                                        <div className="text-right">
+                                                            <span className="font-mono text-gray-900">{formatPrice(netPrice)} / Monat</span>
+                                                            {deductions.length > 0 && (
+                                                                <div className="text-[10px] text-red-500 text-right">
+                                                                    (inkl. {deductions.length} Ausfälle)
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                         <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
                                             Kurswahl ändern
                                         </button>
                                     </div>
+
+                                    {/* Moved Legal Text Here */}
+                                    <p className="text-[10px] text-gray-500 leading-tight text-center max-w-sm mx-auto mt-8">
+                                        Mit Klick auf "Kostenpflichtig Bestellen" stimmst du den AGB & Datenschutz zu.
+                                        Widerrufsrecht verfällt bei vollständiger Erfüllung.
+                                    </p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
@@ -525,7 +542,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         </div>
                     </div>
 
-                    {/* ACTION BUTTONS */}
+                    {/* ACTION BUTTON */}
                     <button
                         onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
                         disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
@@ -551,15 +568,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid)) ? "opacity-20" : "group-hover:translate-x-2"
                         )} />
                     </button>
-
-                    {step === 3 && (
-                        <div className="p-4 bg-[#1A1C1E] text-center">
-                            <p className="text-[9px] text-gray-600 leading-tight">
-                                Mit Klick stimmst du den AGB & Datenschutz zu.<br />
-                                Widerrufsrecht verfällt bei vollständiger Erfüllung.
-                            </p>
-                        </div>
-                    )}
 
                 </div>
             </div>
