@@ -705,11 +705,62 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         );
     }
 
+    // --- SCROLL & UX LOGIC ---
+    const desktopScrollRef = React.useRef<HTMLDivElement>(null);
+    const footerRef = React.useRef<HTMLDivElement>(null);
+    const [showScrollHint, setShowScrollHint] = useState(false);
+
+    // 1. Scroll to Top on Step Change
+    useEffect(() => {
+        // Mobile: Scroll Window
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        // Desktop: Scroll Container
+        if (desktopScrollRef.current) {
+            desktopScrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    }, [step]);
+
+    // 2. Scroll Hint Observer
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // If footer is NOT intersecting (not visible), show hint
+                setShowScrollHint(!entry.isIntersecting);
+            },
+            { threshold: 0.1 }
+        );
+
+        if (footerRef.current) {
+            observer.observe(footerRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
+    const scrollToBottom = () => {
+        footerRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
     return (
-        <div className="min-h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex flex-col lg:flex-row overflow-x-hidden font-sans">
+        <div className="min-h-screen lg:h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex flex-col lg:flex-row overflow-x-hidden font-sans relative">
+
+            {/* SCROLL INDICATOR (Mobile Mostly) */}
+            <AnimatePresence>
+                {showScrollHint && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        onClick={scrollToBottom}
+                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#FF5C00] text-white rounded-full p-3 shadow-lg cursor-pointer lg:hidden"
+                    >
+                        <ChevronDown className="animate-bounce" size={24} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* --- LEFT PANEL: WIZARD CONTENT --- */}
-            <div className="flex-1 flex flex-col min-h-0 relative w-full">
+            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full">
 
                 {/* Header with Progress */}
                 <header className="px-6 md:px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
@@ -760,7 +811,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                 {/* SCROLLABLE CONTENT AREA */}
                 {/* On mobile: standard scroll. On Desktop: overflow-y-auto */}
-                <div data-lenis-prevent className="flex-1 lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-4 md:px-12 pb-32 min-h-0">
+                <div
+                    ref={desktopScrollRef}
+                    data-lenis-prevent
+                    className="flex-1 lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-4 md:px-12 pb-32 min-h-0"
+                >
                     <div className="max-w-4xl mx-auto">
                         <AnimatePresence mode="wait">
 
@@ -970,7 +1025,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 </div>
 
                 {/* FOOTER AREA (Total + Action) */}
-                <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0 sticky bottom-0 z-50">
+                <div
+                    ref={footerRef}
+                    className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0 sticky bottom-0 z-50"
+                >
+
                     {/* TOTAL Display */}
                     <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
                         <div className="flex justify-between items-end mb-2">
