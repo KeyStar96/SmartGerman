@@ -10,7 +10,7 @@ import Link from "next/link";
 import { ChevronLeft, Check, X, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { COURSES, CourseConfig, Day } from "@/lib/course-config";
+import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
 
 // --- CALENDAR LOGIC HELPER ---
 
@@ -36,6 +36,7 @@ const calculateMonthlyStats = (course: CourseConfig) => {
 
     let sessionCount = 0;
     let totalUnits = 0;
+    let deductions: { amount: number, reason: string, date: string }[] = [];
 
     // Map sessions map for easy lookup
     const sessionsByDay = new Map<number, typeof course.sessions>();
@@ -47,16 +48,31 @@ const calculateMonthlyStats = (course: CourseConfig) => {
 
     for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(targetYear, targetMonth, d);
+        const dateStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const dayOfWeek = date.getDay();
 
         const sessionsToday = sessionsByDay.get(dayOfWeek);
         if (sessionsToday) {
             sessionsToday.forEach(s => {
-                sessionCount++;
                 const mins = getDurationMinutes(s.startTime, s.endTime);
-                // Fallback 45 if unitDuration missing (safety)
                 const units = mins / (course.unitDuration || 45);
-                totalUnits += units;
+                const cost = units * course.price;
+
+                // Check for exception
+                const exception = EXCEPTIONS.find(e =>
+                    e.date === dateStr && (!e.courseIds || e.courseIds.includes(course.id))
+                );
+
+                if (exception) {
+                    deductions.push({
+                        amount: cost,
+                        reason: exception.reason,
+                        date: date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+                    });
+                } else {
+                    sessionCount++;
+                    totalUnits += units;
+                }
             });
         }
     }
@@ -64,6 +80,7 @@ const calculateMonthlyStats = (course: CourseConfig) => {
     return {
         sessionCount,
         totalUnits,
+        deductions,
         monthName: new Date(targetYear, targetMonth, 1).toLocaleString('de-DE', { month: 'long', year: 'numeric' })
     };
 };
@@ -219,6 +236,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     // Dynamic Total Calculation
     const totalMonthlyPrice = selectedCoursesFull.reduce((acc, c) => {
         const { totalUnits } = calculateMonthlyStats(c);
+        // Note: The totalUnits returned by calculateMonthlyStats ALREADY excludes the cancelled sessions
+        // because we only increment them in the 'else' block of the exception check.
+        // Therefore, we just multiply by price as normal.
         return acc + (totalUnits * c.price);
     }, 0);
 
@@ -315,7 +335,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 </motion.div>
                             ) : (
                                 selectedCoursesFull.map(c => {
-                                    const { sessionCount, totalUnits } = calculateMonthlyStats(c);
+                                    const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c);
                                     const subtotal = c.price * totalUnits;
 
                                     return (
@@ -330,8 +350,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                                 <span className="text-gray-200 truncate pr-2 font-bold">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
                                                 <span className="text-white">{formatPrice(subtotal)}</span>
                                             </div>
+
+                                            {deductions.map((d, i) => (
+                                                <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
+                                                    <span>{d.date}: {d.reason}</span>
+                                                    <span>- {formatPrice(d.amount)}</span>
+                                                </div>
+                                            ))}
+
                                             <div className="flex justify-between text-[10px] text-gray-500 uppercase">
-                                                <span>{totalUnits} EH ({sessionCount} Termine)</span>
+                                                <span>{totalUnits} Einheiten ({sessionCount} Termine)</span>
                                                 <span>Monatlich</span>
                                             </div>
                                         </motion.div>

@@ -21,6 +21,19 @@ export interface CourseConfig {
     unitDuration: number;
 }
 
+export interface CourseException {
+    date: string; // YYYY-MM-DD
+    reason: string;
+    courseIds?: string[]; // If empty/undefined, applies to ALL courses
+}
+
+export const EXCEPTIONS: CourseException[] = [
+    {
+        date: "2026-02-02",
+        reason: "Kursraum steht noch nicht zur Verfügung"
+    }
+];
+
 export const COURSES: CourseConfig[] = [
     // Präsenz-Kurse (Senioren / 50+)
     {
