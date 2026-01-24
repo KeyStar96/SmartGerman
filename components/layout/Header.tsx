@@ -33,13 +33,19 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     setIsDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
 
-    // PERFORMANCE: Throttle Scroll-Event mit requestAnimationFrame
+    // PERFORMANCE: Throttle Scroll-Event mit requestAnimationFrame + Hysteresis
     let scrollRafId: number | null = null;
     const handleScroll = () => {
       if (scrollRafId !== null) return;
 
       scrollRafId = requestAnimationFrame(() => {
-        setIsScrolled(window.scrollY > 50);
+        const currentScrollY = window.scrollY;
+        // Hysteresis: Buffer to prevent rapid toggling
+        setIsScrolled((prev) => {
+          if (!prev && currentScrollY > 50) return true;
+          if (prev && currentScrollY < 40) return false;
+          return prev;
+        });
         scrollRafId = null;
       });
     };
@@ -99,7 +105,8 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   }
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300">
+    // OPTIMIZATION: Removed transition-all, added transform-gpu backface-hidden for layer promotion
+    <header className="fixed top-0 left-0 w-full z-50 transition-colors duration-300 transform-gpu backface-hidden will-change-transform">
 
 
       {/* 2. Navigation mit Glassmorphismus */}
@@ -116,7 +123,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
               alt="SmartGerman Logo"
               width={192}
               height={40}
-              className={`h-9 w-auto object-contain transition-all duration-500 group-hover:scale-105`}
+              className={`h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105`}
               priority={true}
             />
           </Link>
@@ -159,7 +166,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
               >
                 <Globe className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`} />
                 <span>{currentLanguage.label}</span>
-                <ChevronDown className={`w-3 h-3 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isLanguageDropdownOpen && (
@@ -168,7 +175,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
                     className="fixed inset-0 z-40"
                     onClick={() => setIsLanguageDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-dm-surface-teal rounded-lg border border-black/10 dark:border-dm-border-slate z-50 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-dm-surface-teal rounded-lg border border-black/10 dark:border-dm-border-slate z-50 overflow-hidden shadow-lg animate-in fade-in zoom-in-95 duration-200">
                     {languages.map((language) => (
                       <button
                         key={language.code}
@@ -188,7 +195,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
             <Link
               href={`/${lang}/registration`}
-              className="btn-primary px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105"
+              className="btn-primary px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform"
             >
               {dictionary.header.nav.enroll}
             </Link>
