@@ -589,13 +589,22 @@
       "submit": "Send Binding Registration",
       "processing": "Processing..."
     },
+    "course_card": {
+      "online_label": "Online",
+      "presence_label": "IN-PERSON",
+      "level_range": "A1 - C1",
+      "units_suffix": "/ Units"
+    },
     "receipt": {
       "title": "ESTIMATED FEES",
       "tuition": "Tuition Fee",
       "total": "Total / EUR",
       "note": "* Incl. VAT / Payable upon receipt of invoice",
       "waiting": "[ Waiting for selection ]",
-      "live_title": "Live Receipt"
+      "live_title": "Live Receipt",
+      "units": "Units",
+      "sessions": "Sessions",
+      "monthly": "Monthly"
     },
     "success": {
       "title": "Enrollment Confirmed",

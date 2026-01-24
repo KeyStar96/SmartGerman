@@ -423,13 +423,22 @@
       "submit": "Отправить заявку",
       "processing": "Обработка..."
     },
+    "course_card": {
+      "online_label": "Онлайн",
+      "presence_label": "ОФЛАЙН",
+      "level_range": "A1 - C1",
+      "units_suffix": "/ Единиц"
+    },
     "receipt": {
       "title": "ПРЕДВАРИТЕЛЬНЫЙ РАСЧЕТ",
       "tuition": "Стоимость обучения",
       "total": "Итого / EUR",
       "note": "* Вкл. НДС / Оплата после получения счета",
       "waiting": "[ Ожидание выбора ]",
-      "live_title": "Обзор заказа"
+      "live_title": "Обзор заказа",
+      "units": "Единиц",
+      "sessions": "Занятий",
+      "monthly": "Ежемесячно"
     },
     "success": {
       "title": "Регистрация подтверждена",

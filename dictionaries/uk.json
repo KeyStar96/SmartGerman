@@ -423,13 +423,22 @@
       "submit": "Надіслати заявку",
       "processing": "Обробка..."
     },
+    "course_card": {
+      "online_label": "Онлайн",
+      "presence_label": "ОФЛАЙН",
+      "level_range": "A1 - C1",
+      "units_suffix": "/ Одиниць"
+    },
     "receipt": {
       "title": "ПОПЕРЕДНІЙ РОЗРАХУНОК",
       "tuition": "Вартість навчання",
       "total": "Разом / EUR",
       "note": "* Вкл. ПДВ / Оплата після отримання рахунку",
       "waiting": "[ Очікування вибору ]",
-      "live_title": "Огляд замовлення"
+      "live_title": "Огляд замовлення",
+      "units": "Одиниць",
+      "sessions": "Занять",
+      "monthly": "Щомісяця"
     },
     "success": {
       "title": "Реєстрацію підтверджено",

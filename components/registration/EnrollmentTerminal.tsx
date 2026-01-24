@@ -46,6 +46,15 @@ const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
         sessionsByDay.set(dIndex, [...existing, s]);
     });
 
+    const localeMap: Record<string, string> = {
+        'de': 'de-DE',
+        'en': 'en-US',
+        'ru': 'ru-RU',
+        'uk': 'uk-UA',
+        'tu': 'tr-TR'
+    };
+    const locale = localeMap[lang] || 'de-DE';
+
     for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(targetYear, targetMonth, d);
         const dateStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -67,7 +76,7 @@ const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
                     deductions.push({
                         amount: cost,
                         reason: exception.reason,
-                        date: date.toLocaleDateString(lang === 'en' ? 'en-US' : 'de-DE', { day: '2-digit', month: '2-digit' })
+                        date: date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' })
                     });
                 } else {
                     sessionCount++;
@@ -77,22 +86,24 @@ const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
         }
     }
 
-    const locale = lang === 'en' ? 'en-US' : 'de-DE';
+    let monthName = new Date(targetYear, targetMonth, 1).toLocaleString(locale, { month: 'long', year: 'numeric' });
+    if (['ru', 'uk'].includes(lang)) {
+        monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+    }
+
     return {
         sessionCount,
         totalUnits,
         deductions,
-        monthName: new Date(targetYear, targetMonth, 1).toLocaleString(locale, { month: 'long', year: 'numeric' })
+        monthName
     };
 };
 
 // --- ZOD SCHEMA ---
 const phoneRegex = /^[\d\s\+\-\(\)\/]{8,}$/;
-// TODO: Internationalize Zod Errors if needed, but simple strings are okay for now or can be passed via dict.
-// For full i18n, schema creation needs to be a function that accepts error messages.
 const createSchema = (dict: any) => z.object({
     personal: z.object({
-        firstName: z.string().min(2, "Min. 2 chars"), // Simplified fallback
+        firstName: z.string().min(2, "Min. 2 chars"),
         lastName: z.string().min(2, "Min. 2 chars"),
         email: z.string().email("Invalid Email"),
         phone: z.string().regex(phoneRegex, "Invalid Number"),
@@ -106,7 +117,10 @@ type EnrollmentFormData = z.infer<ReturnType<typeof createSchema>>;
 
 // --- COMPONENT: ROW (PAPER OPTIK) ---
 
-const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level }: any) => {
+const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, dictionary }: any) => {
+    const t = dictionary?.registration?.course_card;
+    const daysDict = dictionary?.timetable?.days;
+
     return (
         <motion.div
             onClick={onToggle}
@@ -154,29 +168,42 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level }:
                         course.type === 'online' ? "text-blue-600" : "text-gray-500"
                     )}>
                         {course.type === 'online' ? <Monitor size={12} /> : <MapPin size={12} />}
-                        {course.type === 'online' ? 'ONLINE' : 'PRÄSENZ'}
+                        {course.type === 'online' ? (t?.online_label || "ONLINE").toUpperCase() : (t?.presence_label || "PRÄSENZ")}
                     </span>
                 </div>
 
                 {/* Right Side Info */}
                 <div className="text-right">
-                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">/ Einheiten</span></span>
+                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">{t?.units_suffix || "/ Units"}</span></span>
                 </div>
             </div>
 
-            {/* Expanded Details when selected (optional visual cue) */}
+            {/* Expanded Details when selected */}
             <div className="flex gap-1 mt-2 pl-[44px]">
-                {course.sessions.map((s: any, i: number) => (
-                    <span key={i} className="text-[10px] font-mono uppercase text-gray-400">
-                        {s.day} {s.startTime}
-                    </span>
-                ))}
+                {course.sessions.map((s: any, i: number) => {
+                    const dayName = daysDict?.[s.day.toLowerCase()] || s.day; // "Mo" -> "mo" -> "Понедельник" (or short if available)
+                    // We might need short names? The dictionary has "mo": "Mo" (DE), "mo": "Mon" (EN).
+                    // Use `timetable.days.mo` etc directly.
+                    const shortWeekdays: Record<string, string> = {
+                        "mo": daysDict?.mo || "Mo",
+                        "di": daysDict?.di || "Di",
+                        "mi": daysDict?.mi || "Mi",
+                        "do": daysDict?.do || "Do",
+                        "fr": daysDict?.fr || "Fr",
+                        "sa": daysDict?.sa || "Sa",
+                        "so": daysDict?.so || "So"
+                    };
+                    return (
+                        <span key={i} className="text-[10px] font-mono uppercase text-gray-400">
+                            {shortWeekdays[s.day.toLowerCase()]} {s.startTime}
+                        </span>
+                    );
+                })}
             </div>
         </motion.div>
     );
 };
 
-// 2. Minimalist Input
 const TerminalInput = ({ label, error, registration, ...props }: any) => (
     <div className="relative group">
         <input
@@ -210,9 +237,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const labels = t?.labels;
     const wizard = t?.wizard;
     const success = t?.success;
+    const receipt = t?.receipt;
     const groupTitles = t?.group_titles;
 
-    const [step, setStep] = useState<1 | 2 | 3>(1); // [1] Selection, [2] Data, [3] Summary
+    const [step, setStep] = useState<1 | 2 | 3>(1);
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -233,21 +261,25 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const { register, handleSubmit, formState: { errors, isValid }, trigger, watch } = form;
     const formData = watch("personal");
 
-    // Init Logic
     useEffect(() => {
         if (initialCourseId && !selectedCourseIds.includes(initialCourseId) && COURSES.some(c => c.id === initialCourseId)) {
             setSelectedCourseIds([initialCourseId]);
         }
-    }, [initialCourseId]); // eslint-disable-line
+    }, [initialCourseId]);
 
     const toggleCourse = (id: string) => {
         setSelectedCourseIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
     };
 
     const getCourseData = (c: CourseConfig) => ({
-        title: dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey,
-        priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price), // Currency mostly constant
-        level: dictionary?.CourseData?.[c.translationKey]?.level
+        // Fix lookup logic: keys in course-config ('a1_1_50plus') vs keys in dictionary ('de50_a1_1' in RU/UK/TU vs 'a1_1_50plus' in DE/EN).
+        // To be safe, we should align course-config or dictionaries.
+        // Assuming dictionaries are the source of truth for CONTENT, and course-config for LOGIC.
+        // For now, let's try to lookup by translationKey.
+        title: dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
+        priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
+        level: dictionary?.CourseData?.[c.translationKey]?.level,
+        dictionary // Pass dictionary down
     });
 
     const selectedCoursesFull = COURSES.filter(c => selectedCourseIds.includes(c.id));
@@ -441,9 +473,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                                 const netPrice = c.price * totalUnits;
                                                 return (
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
-                                                        <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
+                                                        <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
                                                         <div className="text-right">
-                                                            <span className="font-mono text-gray-900">{formatPrice(netPrice)} / Monat</span>
+                                                            <span className="font-mono text-gray-900">{formatPrice(netPrice)} / {receipt?.monthly || "Monat"}</span>
                                                             {deductions.length > 0 && (
                                                                 <div className="text-[10px] text-red-500 text-right">
                                                                     (inkl. {deductions.length} Ausfälle)
@@ -478,7 +510,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{t?.receipt?.live_title || "Live Receipt"}</span>
+                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
@@ -493,7 +525,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     <AnimatePresence>
                         {selectedCoursesFull.length === 0 ? (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
-                                // {t?.receipt?.waiting || "Waiting..."}
+                                // {receipt?.waiting || "Waiting..."}
                             </motion.div>
                         ) : (
                             selectedCoursesFull.map(c => {
@@ -511,7 +543,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                         className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
                                     >
                                         <div className="flex justify-between mb-1">
-                                            <span className="text-gray-200 truncate pr-2 font-bold w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
+                                            <span className="text-gray-200 truncate pr-2 font-bold w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
                                             <span className="text-white">{formatPrice(grossPrice)}</span>
                                         </div>
 
@@ -523,8 +555,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                         ))}
 
                                         <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
-                                            <span>{totalUnits} Einheiten ({sessionCount} Termine)</span>
-                                            <span>Monatlich</span>
+                                            <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
+                                            <span>{receipt?.monthly || "Monatlich"}</span>
                                         </div>
                                     </motion.div>
                                 );

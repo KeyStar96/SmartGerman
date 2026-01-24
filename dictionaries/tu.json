@@ -423,13 +423,22 @@
       "submit": "Kaydı Gönder",
       "processing": "İşleniyor..."
     },
+    "course_card": {
+      "online_label": "Çevrimiçi",
+      "presence_label": "YÜZ YÜZE",
+      "level_range": "A1 - C1",
+      "units_suffix": "/ Birim"
+    },
     "receipt": {
       "title": "TAHMİNİ ÜCRETLER",
       "tuition": "Eğitim Ücreti",
       "total": "Toplam / EUR",
       "note": "* KDV Dahil / Fatura alındıktan sonra ödenir",
       "waiting": "[ Seçim bekleniyor ]",
-      "live_title": "Canlı Özet"
+      "live_title": "Canlı Özet",
+      "units": "Birim",
+      "sessions": "Ders",
+      "monthly": "Aylık"
     },
     "success": {
       "title": "Kayıt Onaylandı",

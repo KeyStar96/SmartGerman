@@ -591,13 +591,22 @@
       "submit": "Verbindliche Anmeldung senden",
       "processing": "Wird verarbeitet..."
     },
+    "course_card": {
+      "online_label": "Online",
+      "presence_label": "PRÄSENZ",
+      "level_range": "A1 - C1",
+      "units_suffix": "/ Einheiten"
+    },
     "receipt": {
       "title": "VORAUSSICHTLICHE GEBÜHREN",
       "tuition": "Studiengebühr",
       "total": "Total / EUR",
       "note": "* Inkl. MwSt. / Zahlbar nach Rechnungserhalt",
       "waiting": "[ Warten auf Auswahl ]",
-      "live_title": "Live Übersicht"
+      "live_title": "Live Übersicht",
+      "units": "Einheiten",
+      "sessions": "Termine",
+      "monthly": "Monatlich"
     },
     "success": {
       "title": "Immatrikulation bestätigt",
