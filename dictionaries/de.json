@@ -576,7 +576,7 @@
     "subline": "Bitte füllen Sie das folgende Protokoll vollständig aus. Ihre Daten werden SSL-verschlüsselt übertragen und vertraulich behandelt.",
     "course_selection": "Wählen Sie Ihr Modul.",
     "personal_data": "Persönliche Daten.",
-    "labels": {
+    "form": {
       "firstname": "VORNAME",
       "lastname": "NACHNAME",
       "email": "E-MAIL KONTAKT",
@@ -585,11 +585,24 @@
       "zip": "PLZ",
       "city": "ORT"
     },
+    "errors": {
+      "firstname_required": "Vorname ist erforderlich",
+      "lastname_required": "Nachname ist erforderlich",
+      "email_invalid": "Ungültige E-Mail Adresse",
+      "phone_invalid": "Ungültige Telefonnummer",
+      "street_required": "Straße und Hausnummer erforderlich",
+      "zip_length": "PLZ muss 5-stellig sein",
+      "zip_numeric": "Nur Zahlen erlaubt",
+      "city_required": "Ort ist erforderlich",
+      "selection_required": "Bitte wählen Sie mindestens einen Kurs."
+    },
     "buttons": {
       "next": "Fortfahren",
       "back": "Zurück",
       "submit": "Verbindliche Anmeldung senden",
-      "processing": "Wird verarbeitet..."
+      "processing": "Wird verarbeitet...",
+      "continue": "Weiter",
+      "order_binding": "Kostenpflichtig Bestellen"
     },
     "course_card": {
       "online_label": "Online",
@@ -606,43 +619,31 @@
       "live_title": "Live Übersicht",
       "units": "Einheiten",
       "sessions": "Termine",
-      "monthly": "Monatlich"
+      "monthly": "Monatlich",
+      "total_sum": "Total Summe",
+      "no_selection": "// Noch keine Auswahl"
     },
     "success": {
       "title": "Immatrikulation bestätigt",
       "message": "Wir haben Ihre Unterlagen erhalten. Sie erhalten in Kürze eine E-Mail mit den Details zur Kursteilnahme.",
-      "ref": "REFERENZ-ID"
-    },
-    "course_card": {
-      "online_label": "Online",
-      "level_range": "A1 - C1"
+      "ref": "REFERENZ-ID",
+      "back_button": "Zurück zur Startseite"
     },
     "group_titles": {
       "presence": "01 // PRÄSENZ",
       "speech": "02 // SPRECHTRAINING",
-      "online": "03 // ONLINE"
+      "online": "03 // ONLINE CAMPUS"
     },
     "wizard": {
-      "step1_title": "Kursauswahl",
-      "step1_sub": "Wähle deine Module für den Start im",
-      "step2_title": "Persönliche Daten",
-      "step2_sub": "Wir benötigen diese Daten für deine Rechnung.",
-      "step3_title": "Übersicht prüfen",
-      "step3_sub": "Bitte prüfe deine Angaben vor der verbindlichen Anmeldung.",
-      "summary_data_title": "Deine Daten",
-      "summary_courses_title": "Deine Kurse (Start:",
-      "edit": "Bearbeiten",
-      "change_selection": "Kurswahl ändern",
-      "legal_note": "Mit Klick auf \"Kostenpflichtig Bestellen\" stimmst du den AGB & Datenschutz zu. Widerrufsrecht verfällt bei vollständiger Erfüllung.",
-      "total_label": "Gesamtbetrag",
-      "total_sub_1": "Fällig nach Rechnungserhalt",
-      "total_sub_2": "Inkl. MwSt.",
-      "btn_next": "Nächster Schritt",
-      "btn_continue": "Weiter",
-      "btn_almost": "Fast fertig",
-      "btn_overview": "Zur Übersicht",
-      "btn_binding": "Verbindlich",
-      "btn_order": "Kostenpflichtig Bestellen"
+      "step1_title": "Wähle deinen Kurs.",
+      "step1_sub": "Kuratiert für maximale Effizienz. Wähle beliebig viele Module.",
+      "step2_title": "Deine Identität.",
+      "step2_sub": "Wir benötigen diese Daten für deine offizielle Einschreibung.",
+      "step3_title": "Einschreibungs-Protokoll",
+      "step3_sub": "Bitte prüfen Sie Ihre Angaben.",
+      "progress_course": "Kursauswahl",
+      "progress_personal": "Pers. Daten",
+      "progress_review": "Überprüfung"
     }
   }
 }

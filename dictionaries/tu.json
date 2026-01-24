@@ -408,7 +408,7 @@
     "subline": "Lütfen formu doldurun. Verileriniz SSL ile şifrelenir ve gizli tutulur.",
     "course_selection": "Modülünüzü seçin.",
     "personal_data": "Kişisel Veriler.",
-    "labels": {
+    "form": {
       "firstname": "ADINIZ",
       "lastname": "SOYADINIZ",
       "email": "E-POSTA",
@@ -417,14 +417,27 @@
       "zip": "POSTA KODU",
       "city": "ŞEHİR"
     },
+    "errors": {
+      "firstname_required": "Adınız gerekli",
+      "lastname_required": "Soyadınız gerekli",
+      "email_invalid": "Geçersiz e-posta adresi",
+      "phone_invalid": "Geçersiz telefon numarası",
+      "street_required": "Cadde ve kapı numarası gerekli",
+      "zip_length": "Posta kodu 5 haneli olmalı",
+      "zip_numeric": "Sadece rakamlar",
+      "city_required": "Şehir gerekli",
+      "selection_required": "Lütfen en az bir kurs seçin."
+    },
     "buttons": {
       "next": "Devam",
       "back": "Geri",
-      "submit": "Kaydı Gönder",
-      "processing": "İşleniyor..."
+      "submit": "Bağlayıcı Kayıt Gönder",
+      "processing": "İşleniyor...",
+      "continue": "Devam Et",
+      "order_binding": "Ödeme Yükümlülüğü ile Sipariş Ver"
     },
     "course_card": {
-      "online_label": "Çevrimiçi",
+      "online_label": "Online",
       "presence_label": "YÜZ YÜZE",
       "level_range": "A1 - C1",
       "units_suffix": "/ Birim"
@@ -438,43 +451,31 @@
       "live_title": "Canlı Özet",
       "units": "Birim",
       "sessions": "Ders",
-      "monthly": "Aylık"
+      "monthly": "Aylık",
+      "total_sum": "Toplam Tutar",
+      "no_selection": "// Henüz seçim yok"
     },
     "success": {
       "title": "Kayıt Onaylandı",
       "message": "Belgelerinizi aldık. Kısa süre içinde kurs katılımı ile ilgili detayları içeren bir e-posta alacaksınız.",
-      "ref": "REFERANS NO"
-    },
-    "course_card": {
-      "online_label": "Çevrimiçi",
-      "level_range": "A1 - C1"
+      "ref": "REFERANS NO",
+      "back_button": "Ana Sayfaya Dön"
     },
     "group_titles": {
       "presence": "01 // YÜZ YÜZE",
       "speech": "02 // KONUŞMA EĞİTİMİ",
-      "online": "03 // ONLİNE"
+      "online": "03 // ONLINE KAMPÜS"
     },
     "wizard": {
       "step1_title": "Kurs Seçimi",
       "step1_sub": "Başlangıç için modüllerinizi seçin:",
       "step2_title": "Kişisel Bilgiler",
       "step2_sub": "Fatura için bu bilgilere ihtiyacımız var.",
-      "step3_title": "Özeti Kontrol Et",
-      "step3_sub": "Lütfen kaydolmadan önce bilgilerinizi kontrol edin.",
-      "summary_data_title": "Bilgileriniz",
-      "summary_courses_title": "Kurslarınız (Başlangıç:",
-      "edit": "Düzenle",
-      "change_selection": "Seçimi Değiştir",
-      "legal_note": "\"Ücretli Sipariş Ver\" butonuna tıklayarak Şartlar ve Gizlilik Politikasını kabul etmiş olursunuz.",
-      "total_label": "Toplam Tutar",
-      "total_sub_1": "Fatura alındıktan sonra ödenir",
-      "total_sub_2": "KDV Dahil",
-      "btn_next": "Sonraki Adım",
-      "btn_continue": "Devam Et",
-      "btn_almost": "Neredeyse bitti",
-      "btn_overview": "Özete Git",
-      "btn_binding": "Bağlayıcı",
-      "btn_order": "Ücretli Sipariş Ver"
+      "step3_title": "Kayıt Protokolü",
+      "step3_sub": "Lütfen bilgilerinizi kontrol edin.",
+      "progress_course": "Kurs Seçimi",
+      "progress_personal": "Kişisel",
+      "progress_review": "Özet"
     }
   }
 }

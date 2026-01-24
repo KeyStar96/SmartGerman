@@ -101,15 +101,15 @@ const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
 
 // --- ZOD SCHEMA ---
 const phoneRegex = /^[\d\s\+\-\(\)\/]{8,}$/;
-const createSchema = (dict: any) => z.object({
+const createSchema = (t: any) => z.object({
     personal: z.object({
-        firstName: z.string().min(2, "Min. 2 chars"),
-        lastName: z.string().min(2, "Min. 2 chars"),
-        email: z.string().email("Invalid Email"),
-        phone: z.string().regex(phoneRegex, "Invalid Number"),
-        street: z.string().min(3, "Required"),
-        zip: z.string().length(5, "5 digits").regex(/^\d+$/, "Numbers only"),
-        city: z.string().min(2, "Required"),
+        firstName: z.string().min(2, t.registration.errors.firstname_required),
+        lastName: z.string().min(2, t.registration.errors.lastname_required),
+        email: z.string().email(t.registration.errors.email_invalid),
+        phone: z.string().regex(phoneRegex, t.registration.errors.phone_invalid),
+        street: z.string().min(3, t.registration.errors.street_required),
+        zip: z.string().length(5, t.registration.errors.zip_length).regex(/^\d+$/, t.registration.errors.zip_numeric),
+        city: z.string().min(2, t.registration.errors.city_required),
     }),
 });
 
@@ -234,7 +234,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     // Translation Shortcuts
     const t = dictionary?.registration;
-    const labels = t?.labels;
+    const formLabels = t?.form;
     const wizard = t?.wizard;
     const success = t?.success;
     const receipt = t?.receipt;
@@ -253,7 +253,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     // Calc Next Month for UI Display
     const nextMonthName = calculateMonthlyStats(COURSES[0], lang).monthName;
 
-    const enrollmentSchema = createSchema(dictionary);
+    const enrollmentSchema = React.useMemo(() => createSchema(dictionary), [dictionary]);
     const form = useForm<EnrollmentFormData>({
         resolver: zodResolver(enrollmentSchema),
         mode: "onChange"
@@ -423,18 +423,18 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     <div className="space-y-12">
 
                                         <div className="grid grid-cols-2 gap-8">
-                                            <TerminalInput label={labels?.firstname || "First Name"} registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label={labels?.lastname || "Last Name"} registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
+                                            <TerminalInput label={formLabels?.firstname || "First Name"} registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
+                                            <TerminalInput label={formLabels?.lastname || "Last Name"} registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
                                         </div>
 
-                                        <TerminalInput label={labels?.email || "Email"} type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                        <TerminalInput label={labels?.phone || "Phone"} registration={register("personal.phone")} error={errors.personal?.phone?.message} />
+                                        <TerminalInput label={formLabels?.email || "Email"} type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                        <TerminalInput label={formLabels?.phone || "Phone"} registration={register("personal.phone")} error={errors.personal?.phone?.message} />
 
                                         <div className="grid grid-cols-[3fr_1fr] gap-8">
-                                            <TerminalInput label={labels?.street || "Street"} registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label={labels?.zip || "ZIP"} registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                            <TerminalInput label={formLabels?.street || "Street"} registration={register("personal.street")} error={errors.personal?.street?.message} />
+                                            <TerminalInput label={formLabels?.zip || "ZIP"} registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
                                         </div>
-                                        <TerminalInput label={labels?.city || "City"} registration={register("personal.city")} error={errors.personal?.city?.message} />
+                                        <TerminalInput label={formLabels?.city || "City"} registration={register("personal.city")} error={errors.personal?.city?.message} />
 
                                     </div>
                                 </motion.div>

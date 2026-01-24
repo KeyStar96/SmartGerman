@@ -408,7 +408,7 @@
     "subline": "Пожалуйста, заполните форму. Ваши данные защищены SSL-шифрованием.",
     "course_selection": "Выберите модуль.",
     "personal_data": "Личные данные.",
-    "labels": {
+    "form": {
       "firstname": "ИМЯ",
       "lastname": "ФАМИЛИЯ",
       "email": "ЭЛ. ПОЧТА",
@@ -417,14 +417,27 @@
       "zip": "ИНДЕКС",
       "city": "ГОРОД"
     },
+    "errors": {
+      "firstname_required": "Имя обязательно",
+      "lastname_required": "Фамилия обязательна",
+      "email_invalid": "Неверный адрес эл. почты",
+      "phone_invalid": "Неверный номер телефона",
+      "street_required": "Улица и номер дома обязательны",
+      "zip_length": "Индекс должен состоять из 5 цифр",
+      "zip_numeric": "Разрешены только цифры",
+      "city_required": "Город обязателен",
+      "selection_required": "Пожалуйста, выберите хотя бы один курс."
+    },
     "buttons": {
       "next": "Далее",
       "back": "Назад",
-      "submit": "Отправить заявку",
-      "processing": "Обработка..."
+      "submit": "Отправить обязательную заявку",
+      "processing": "Обработка...",
+      "continue": "Продолжить",
+      "order_binding": "Заказать платно"
     },
     "course_card": {
-      "online_label": "Онлайн",
+      "online_label": "ОНЛАЙН",
       "presence_label": "ОФЛАЙН",
       "level_range": "A1 - C1",
       "units_suffix": "/ Единиц"
@@ -438,43 +451,31 @@
       "live_title": "Обзор заказа",
       "units": "Единиц",
       "sessions": "Занятий",
-      "monthly": "Ежемесячно"
+      "monthly": "Ежемесячно",
+      "total_sum": "Общая сумма",
+      "no_selection": "// Пока ничего не выбрано"
     },
     "success": {
       "title": "Регистрация подтверждена",
       "message": "Мы получили ваши документы. Вскоре вы получите письмо с деталями.",
-      "ref": "ID ЗАЯВКИ"
-    },
-    "course_card": {
-      "online_label": "Онлайн",
-      "level_range": "A1 - C1"
+      "ref": "ID ЗАЯВКИ",
+      "back_button": "На главную"
     },
     "group_titles": {
       "presence": "01 // ОФЛАЙН",
       "speech": "02 // РАЗГОВОРНЫЙ ТРЕНИНГ",
-      "online": "03 // ОНЛАЙН"
+      "online": "03 // ОНЛАЙН КАМПУС"
     },
     "wizard": {
       "step1_title": "Выбор курса",
       "step1_sub": "Выберите модули для старта в",
       "step2_title": "Личные данные",
       "step2_sub": "Эти данные нужны для выставления счета.",
-      "step3_title": "Проверка",
-      "step3_sub": "Пожалуйста, проверьте данные перед регистрацией.",
-      "summary_data_title": "Ваши данные",
-      "summary_courses_title": "Ваши курсы (Старт:",
-      "edit": "Изменить",
-      "change_selection": "Изменить выбор",
-      "legal_note": "Нажимая «Оформить платный заказ», вы соглашаетесь с условиями и политикой конфиденциальности.",
-      "total_label": "Итого",
-      "total_sub_1": "Оплата после получения счета",
-      "total_sub_2": "Вкл. НДС",
-      "btn_next": "Далее",
-      "btn_continue": "Продолжить",
-      "btn_almost": "Почти готово",
-      "btn_overview": "К обзору",
-      "btn_binding": "Обязательно",
-      "btn_order": "Оформить платный заказ"
+      "step3_title": "Протокол регистрации",
+      "step3_sub": "Пожалуйста, проверьте данные.",
+      "progress_course": "Выбор курса",
+      "progress_personal": "Личн. Данные",
+      "progress_review": "Обзор"
     }
   }
 }

@@ -408,7 +408,7 @@
     "subline": "Будь ласка, заповніть форму. Ваші дані захищені SSL-шифруванням.",
     "course_selection": "Оберіть модуль.",
     "personal_data": "Особисті дані.",
-    "labels": {
+    "form": {
       "firstname": "ІМ'Я",
       "lastname": "ПРІЗВИЩЕ",
       "email": "ЕЛ. ПОШТА",
@@ -417,14 +417,27 @@
       "zip": "ІНДЕКС",
       "city": "МІСТО"
     },
+    "errors": {
+      "firstname_required": "Ім'я обов'язкове",
+      "lastname_required": "Прізвище обов'язкове",
+      "email_invalid": "Недійсна ел. пошта",
+      "phone_invalid": "Недійсний номер телефону",
+      "street_required": "Вулиця та номер обов'язкові",
+      "zip_length": "Індекс має містити 5 цифр",
+      "zip_numeric": "Дозволені тільки цифри",
+      "city_required": "Місто обов'язкове",
+      "selection_required": "Будь ласка, оберіть хоча б один курс."
+    },
     "buttons": {
       "next": "Далі",
       "back": "Назад",
-      "submit": "Надіслати заявку",
-      "processing": "Обробка..."
+      "submit": "Надіслати обов'язкову заявку",
+      "processing": "Обробка...",
+      "continue": "Продовжити",
+      "order_binding": "Замовити платно"
     },
     "course_card": {
-      "online_label": "Онлайн",
+      "online_label": "ОНЛАЙН",
       "presence_label": "ОФЛАЙН",
       "level_range": "A1 - C1",
       "units_suffix": "/ Одиниць"
@@ -438,43 +451,31 @@
       "live_title": "Огляд замовлення",
       "units": "Одиниць",
       "sessions": "Занять",
-      "monthly": "Щомісяця"
+      "monthly": "Щомісяця",
+      "total_sum": "Загальна сума",
+      "no_selection": "// Поки нічого не обрано"
     },
     "success": {
       "title": "Реєстрацію підтверджено",
       "message": "Ми отримали ваші документи. Незабаром ви отримаєте лист з деталями.",
-      "ref": "ID ЗАЯВКИ"
-    },
-    "course_card": {
-      "online_label": "Онлайн",
-      "level_range": "A1 - C1"
+      "ref": "ID ЗАЯВКИ",
+      "back_button": "На головну"
     },
     "group_titles": {
       "presence": "01 // ОФЛАЙН",
       "speech": "02 // РОЗМОВНИЙ ТРЕНІНГ",
-      "online": "03 // ОНЛАЙН"
+      "online": "03 // ОНЛАЙН КАМПУС"
     },
     "wizard": {
       "step1_title": "Вибір курсу",
       "step1_sub": "Оберіть модулі для старту в",
       "step2_title": "Особисті дані",
       "step2_sub": "Ці дані потрібні для рахунку.",
-      "step3_title": "Перевірка",
-      "step3_sub": "Будь ласка, перевірте дані перед реєстрацією.",
-      "summary_data_title": "Ваші дані",
-      "summary_courses_title": "Ваші курси (Старт:",
-      "edit": "Змінити",
-      "change_selection": "Змінити вибір",
-      "legal_note": "Натискаючи «Оформити платне замовлення», ви погоджуєтесь з умовами та політикою конфіденційності.",
-      "total_label": "Разом",
-      "total_sub_1": "Оплата після отримання рахунку",
-      "total_sub_2": "Вкл. ПДВ",
-      "btn_next": "Далі",
-      "btn_continue": "Продовжити",
-      "btn_almost": "Майже готово",
-      "btn_overview": "До огляду",
-      "btn_binding": "Обов'язково",
-      "btn_order": "Оформити платне замовлення"
+      "step3_title": "Протокол реєстрації",
+      "step3_sub": "Будь ласка, перевірте дані.",
+      "progress_course": "Вибір курсу",
+      "progress_personal": "Особисті",
+      "progress_review": "Огляд"
     }
   }
 }

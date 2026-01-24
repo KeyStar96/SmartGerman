@@ -24,7 +24,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Text Content
-  const claimText = "Spracherwerb durch Wissenschaft.";
+  // Text Content
+  const claimText = dictionary.hero.claim || "Spracherwerb durch Wissenschaft.";
   const claimWords = claimText.split(" ");
 
   useEffect(() => {

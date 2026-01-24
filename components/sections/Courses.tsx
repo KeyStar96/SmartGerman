@@ -212,14 +212,7 @@ interface CourseCardProps {
 
 function CourseCard({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) {
   // Infer unit based on price/duration or fallback
-  // For now: hardcoded logic or use a default.
-  // Given prices 2.50 (45min), 3.50 (60min), 7.50 (45min?), 15 (90min).
-  // I will use "pro Einheit" if not specified, or use the existing logic (hardcoded in text?)
-  // Text dictionary does NOT have unit.
-  // I will assume unit is "pro 45 Min" by default, or specific per course ID logic if needed.
-  // Actually, price is low, so likely per unit.
-  // I'll check if text.unit exists (I didn't add it).
-  const unit = text.unit || (config.price > 10 ? "pro 90 Min" : (config.price > 3 ? "pro 60 Min" : "pro 45 Min"));
+  const unit = text.unit || (config.price > 10 ? "/ 90 min" : (config.price > 3 ? "/ 60 min" : "/ 45 min"));
 
   return (
     <motion.div
