@@ -21,16 +21,23 @@ export interface CourseConfig {
     unitDuration: number;
 }
 
+
 export interface CourseException {
     date: string; // YYYY-MM-DD
     reason: string;
-    courseIds?: string[]; // If empty/undefined, applies to ALL courses
+    courseIds?: string[]; // Optional: Specific Course IDs. If omitted, applies to ALL courses.
 }
 
 export const EXCEPTIONS: CourseException[] = [
     {
         date: "2026-02-02",
-        reason: "Kursraum steht noch nicht zur Verfügung"
+        reason: "Kursraum steht noch nicht zur Verfügung",
+        // courseIds: [] // Omitted = applies to all. Use ["c_id"] to restrict.
+    },
+    {
+        date: "2026-02-03",
+        reason: "Lehrerfortbildung (Nur A1.1)",
+        courseIds: ["c_a1_1_50plus"] // Applies ONLY to this specific course
     }
 ];
 
