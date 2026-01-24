@@ -417,6 +417,7 @@
       "zip": "ИНДЕКС",
       "city": "ГОРОД",
       "birthdate": "ДАТА РОЖДЕНИЯ",
+      "date_placeholder": "ДД.ММ.ГГГГ",
       "required_hint": "* Обязательное поле"
     },
     "errors": {

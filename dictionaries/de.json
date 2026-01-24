@@ -585,6 +585,7 @@
       "zip": "PLZ",
       "city": "ORT",
       "birthdate": "GEBURTSDATUM",
+      "date_placeholder": "TT.MM.JJJJ",
       "required_hint": "* Pflichtfeld"
     },
     "errors": {

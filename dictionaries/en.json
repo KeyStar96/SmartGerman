@@ -583,6 +583,7 @@
       "zip": "ZIP",
       "city": "CITY",
       "birthdate": "DATE OF BIRTH",
+      "date_placeholder": "DD.MM.YYYY",
       "required_hint": "* Required field"
     },
     "errors": {

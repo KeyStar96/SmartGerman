@@ -224,7 +224,9 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
             {...props}
             placeholder=" "
             className={cn(
-                "block w-full bg-transparent border-b border-gray-400/30 py-4 pt-6 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors peer placeholder-transparent",
+                "block w-full bg-transparent border-b border-gray-400/30 py-4 pt-6 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors peer placeholder-transparent autofill:bg-transparent",
+                // Force transparent background for autofill
+                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] [&:-webkit-autofill]:text-gray-900",
                 error && "border-red-500"
             )}
         />
@@ -445,6 +447,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                             <TerminalInput
                                                 label={formLabels?.birthdate || "Birthdate"}
                                                 required
+                                                placeholder={formLabels?.date_placeholder || "DD.MM.YYYY"}
                                                 registration={{
                                                     ...register("personal.birthDate"),
                                                     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {

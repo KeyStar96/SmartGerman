@@ -423,6 +423,7 @@
       "zip": "POSTA KODU",
       "city": "ŞEHİR",
       "birthdate": "DOĞUM TARİHİ",
+      "date_placeholder": "GG.AA.YYYY",
       "required_hint": "* Zorunlu alan"
     },
     "errors": {
