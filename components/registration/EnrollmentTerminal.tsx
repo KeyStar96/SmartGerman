@@ -156,7 +156,7 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level }:
 
                 {/* Right Side Info */}
                 <div className="text-right">
-                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">/ Ein.</span></span>
+                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">/ Einheiten</span></span>
                 </div>
             </div>
 
@@ -304,6 +304,14 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                     {/* Progress Bar */}
                     <div className="flex items-center gap-4 mb-2">
+                        {step > 1 && (
+                            <button
+                                onClick={() => setStep(s => s - 1 as 1 | 2 | 3)}
+                                className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-[#FF5C00] hover:text-white transition-colors text-gray-500"
+                            >
+                                <ChevronLeft size={14} />
+                            </button>
+                        )}
                         <div className="h-1 bg-gray-200 flex-1 rounded-full overflow-hidden">
                             <motion.div
                                 className="h-full bg-[#FF5C00]"
@@ -502,42 +510,31 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     </div>
 
                     {/* ACTION BUTTONS */}
-                    <div className="flex bg-[#FF5C00]">
-                        {step > 1 && (
-                            <button
-                                onClick={() => setStep(s => s - 1 as 1 | 2 | 3)}
-                                className="w-16 flex items-center justify-center bg-[#E54800] hover:bg-[#CC4100] transition-colors border-r border-black/10"
-                            >
-                                <ChevronLeft size={20} className="text-white" />
-                            </button>
+                    <button
+                        onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
+                        disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
+                        className={cn(
+                            "w-full h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
+                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid))
+                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
                         )}
-
-                        <button
-                            onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
-                            disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
-                            className={cn(
-                                "flex-1 h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
-                                ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid))
-                                    ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                    : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
-                            )}
-                        >
-                            <span className="flex flex-col items-start gap-1">
-                                <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
-                                    {step === 1 ? "Nächster Schritt" : step === 2 ? "Fast fertig" : "Verbindlich"}
-                                </span>
-                                <span>
-                                    {step === 1 && "Weiter"}
-                                    {step === 2 && "Zur Übersicht"}
-                                    {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : "Kostenpflichtig Bestellen")}
-                                </span>
+                    >
+                        <span className="flex flex-col items-start gap-1">
+                            <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
+                                {step === 1 ? "Nächster Schritt" : step === 2 ? "Fast fertig" : "Verbindlich"}
                             </span>
+                            <span>
+                                {step === 1 && "Weiter"}
+                                {step === 2 && "Zur Übersicht"}
+                                {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : "Kostenpflichtig Bestellen")}
+                            </span>
+                        </span>
 
-                            <ArrowRight className={cn("transition-transform duration-300",
-                                ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid)) ? "opacity-20" : "group-hover:translate-x-2"
-                            )} />
-                        </button>
-                    </div>
+                        <ArrowRight className={cn("transition-transform duration-300",
+                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid)) ? "opacity-20" : "group-hover:translate-x-2"
+                        )} />
+                    </button>
 
                     {step === 3 && (
                         <div className="p-4 bg-[#1A1C1E] text-center">
