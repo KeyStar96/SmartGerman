@@ -439,6 +439,33 @@
     "course_card": {
       "online_label": "Çevrimiçi",
       "level_range": "A1 - C1"
+    },
+    "group_titles": {
+      "presence": "01 // YÜZ YÜZE",
+      "speech": "02 // KONUŞMA EĞİTİMİ",
+      "online": "03 // ONLİNE"
+    },
+    "wizard": {
+      "step1_title": "Kurs Seçimi",
+      "step1_sub": "Başlangıç için modüllerinizi seçin:",
+      "step2_title": "Kişisel Bilgiler",
+      "step2_sub": "Fatura için bu bilgilere ihtiyacımız var.",
+      "step3_title": "Özeti Kontrol Et",
+      "step3_sub": "Lütfen kaydolmadan önce bilgilerinizi kontrol edin.",
+      "summary_data_title": "Bilgileriniz",
+      "summary_courses_title": "Kurslarınız (Başlangıç:",
+      "edit": "Düzenle",
+      "change_selection": "Seçimi Değiştir",
+      "legal_note": "\"Ücretli Sipariş Ver\" butonuna tıklayarak Şartlar ve Gizlilik Politikasını kabul etmiş olursunuz.",
+      "total_label": "Toplam Tutar",
+      "total_sub_1": "Fatura alındıktan sonra ödenir",
+      "total_sub_2": "KDV Dahil",
+      "btn_next": "Sonraki Adım",
+      "btn_continue": "Devam Et",
+      "btn_almost": "Neredeyse bitti",
+      "btn_overview": "Özete Git",
+      "btn_binding": "Bağlayıcı",
+      "btn_order": "Ücretli Sipariş Ver"
     }
   }
 }

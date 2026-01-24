@@ -607,6 +607,33 @@
     "course_card": {
       "online_label": "Online",
       "level_range": "A1 - C1"
+    },
+    "group_titles": {
+      "presence": "01 // PRÄSENZ",
+      "speech": "02 // SPRECHTRAINING",
+      "online": "03 // ONLINE"
+    },
+    "wizard": {
+      "step1_title": "Kursauswahl",
+      "step1_sub": "Wähle deine Module für den Start im",
+      "step2_title": "Persönliche Daten",
+      "step2_sub": "Wir benötigen diese Daten für deine Rechnung.",
+      "step3_title": "Übersicht prüfen",
+      "step3_sub": "Bitte prüfe deine Angaben vor der verbindlichen Anmeldung.",
+      "summary_data_title": "Deine Daten",
+      "summary_courses_title": "Deine Kurse (Start:",
+      "edit": "Bearbeiten",
+      "change_selection": "Kurswahl ändern",
+      "legal_note": "Mit Klick auf \"Kostenpflichtig Bestellen\" stimmst du den AGB & Datenschutz zu. Widerrufsrecht verfällt bei vollständiger Erfüllung.",
+      "total_label": "Gesamtbetrag",
+      "total_sub_1": "Fällig nach Rechnungserhalt",
+      "total_sub_2": "Inkl. MwSt.",
+      "btn_next": "Nächster Schritt",
+      "btn_continue": "Weiter",
+      "btn_almost": "Fast fertig",
+      "btn_overview": "Zur Übersicht",
+      "btn_binding": "Verbindlich",
+      "btn_order": "Kostenpflichtig Bestellen"
     }
   }
 }

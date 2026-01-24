@@ -26,7 +26,7 @@ const getDurationMinutes = (start: string, end: string) => {
 };
 
 // Berechnet Termine & Einheiten im NÄCHSTEN Monat
-const calculateMonthlyStats = (course: CourseConfig) => {
+const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
     const now = new Date();
     // Wenn heute Jan 2026 -> Ziel: Feb 2026
     const targetYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
@@ -67,7 +67,7 @@ const calculateMonthlyStats = (course: CourseConfig) => {
                     deductions.push({
                         amount: cost,
                         reason: exception.reason,
-                        date: date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+                        date: date.toLocaleDateString(lang === 'en' ? 'en-US' : 'de-DE', { day: '2-digit', month: '2-digit' })
                     });
                 } else {
                     sessionCount++;
@@ -77,28 +77,32 @@ const calculateMonthlyStats = (course: CourseConfig) => {
         }
     }
 
+    const locale = lang === 'en' ? 'en-US' : 'de-DE';
     return {
         sessionCount,
         totalUnits,
         deductions,
-        monthName: new Date(targetYear, targetMonth, 1).toLocaleString('de-DE', { month: 'long', year: 'numeric' })
+        monthName: new Date(targetYear, targetMonth, 1).toLocaleString(locale, { month: 'long', year: 'numeric' })
     };
 };
 
 // --- ZOD SCHEMA ---
 const phoneRegex = /^[\d\s\+\-\(\)\/]{8,}$/;
-const enrollmentSchema = z.object({
+// TODO: Internationalize Zod Errors if needed, but simple strings are okay for now or can be passed via dict.
+// For full i18n, schema creation needs to be a function that accepts error messages.
+const createSchema = (dict: any) => z.object({
     personal: z.object({
-        firstName: z.string().min(2, "Vorname fehlt"),
-        lastName: z.string().min(2, "Nachname fehlt"),
-        email: z.string().email("Ungültige E-Mail"),
-        phone: z.string().regex(phoneRegex, "Ungültige Nummer"),
-        street: z.string().min(3, "Straße fehlt"),
-        zip: z.string().length(5, "5 Ziffern").regex(/^\d+$/, "Nur Zahlen"),
-        city: z.string().min(2, "Ort fehlt"),
+        firstName: z.string().min(2, "Min. 2 chars"), // Simplified fallback
+        lastName: z.string().min(2, "Min. 2 chars"),
+        email: z.string().email("Invalid Email"),
+        phone: z.string().regex(phoneRegex, "Invalid Number"),
+        street: z.string().min(3, "Required"),
+        zip: z.string().length(5, "5 digits").regex(/^\d+$/, "Numbers only"),
+        city: z.string().min(2, "Required"),
     }),
 });
-type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
+
+type EnrollmentFormData = z.infer<ReturnType<typeof createSchema>>;
 
 // --- COMPONENT: ROW (PAPER OPTIK) ---
 
@@ -201,6 +205,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const searchParams = useSearchParams();
     const initialCourseId = searchParams.get("courseId");
 
+    // Translation Shortcuts
+    const t = dictionary?.registration;
+    const labels = t?.labels;
+    const wizard = t?.wizard;
+    const success = t?.success;
+    const groupTitles = t?.group_titles;
+
     const [step, setStep] = useState<1 | 2 | 3>(1); // [1] Selection, [2] Data, [3] Summary
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -212,8 +223,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const speechCourses = COURSES.filter(c => c.id.includes('speech'));
 
     // Calc Next Month for UI Display
-    const nextMonthName = calculateMonthlyStats(COURSES[0]).monthName;
+    const nextMonthName = calculateMonthlyStats(COURSES[0], lang).monthName;
 
+    const enrollmentSchema = createSchema(dictionary);
     const form = useForm<EnrollmentFormData>({
         resolver: zodResolver(enrollmentSchema),
         mode: "onChange"
@@ -234,7 +246,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     const getCourseData = (c: CourseConfig) => ({
         title: dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey,
-        priceFormatted: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
+        priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price), // Currency mostly constant
         level: dictionary?.CourseData?.[c.translationKey]?.level
     });
 
@@ -242,7 +254,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     // Dynamic Total Calculation
     const totalMonthlyPrice = selectedCoursesFull.reduce((acc, c) => {
-        const { totalUnits } = calculateMonthlyStats(c);
+        const { totalUnits } = calculateMonthlyStats(c, lang);
         return acc + (totalUnits * c.price);
     }, 0);
 
@@ -271,10 +283,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 <div className="w-20 h-20 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
                     <Check size={40} />
                 </div>
-                <h3 className="text-3xl font-bold mb-4 tracking-tight">Erfolgreich!</h3>
-                <p className="text-gray-400 text-lg mb-12 max-w-md">Deine Anmeldung wurde bestätigt. Rechnung & Details wurden an <strong>{formData?.email}</strong> gesendet.</p>
+                <h3 className="text-3xl font-bold mb-4 tracking-tight">{success?.title || "Success"}</h3>
+                <p className="text-gray-400 text-lg mb-12 max-w-md">{success?.message} <strong>{formData?.email}</strong>.</p>
                 <Link href={`/${lang}`} className="bg-[#FF5C00] text-white px-8 py-4 rounded font-bold uppercase tracking-widest hover:bg-[#FF7A33] transition-colors">
-                    Zurück zur Startseite
+                    {t?.back_home}
                 </Link>
             </div>
         );
@@ -290,7 +302,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 <header className="px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
                     <div className="flex justify-between items-start mb-6">
                         <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
-                            <ChevronLeft size={14} /> {dictionary?.registration?.back_home || "Back"}
+                            <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
                         <Image
                             src="/Bilder/SG_Logo_Lightmode.png"
@@ -324,13 +336,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     </div>
 
                     <h1 className="text-4xl font-bold tracking-tighter text-[#111111]">
-                        {step === 1 && "Kursauswahl"}
-                        {step === 2 && "Persönliche Daten"}
-                        {step === 3 && "Übersicht prüfen"}
+                        {step === 1 && wizard?.step1_title}
+                        {step === 2 && wizard?.step2_title}
+                        {step === 3 && wizard?.step3_title}
                     </h1>
-                    {step === 1 && <p className="text-gray-500 mt-2">Wähle deine Module für den Start im <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
-                    {step === 2 && <p className="text-gray-500 mt-2">Wir benötigen diese Daten für deine Rechnung.</p>}
-                    {step === 3 && <p className="text-gray-500 mt-2">Bitte prüfe deine Angaben vor der verbindlichen Anmeldung.</p>}
+                    {step === 1 && <p className="text-gray-500 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
+                    {step === 2 && <p className="text-gray-500 mt-2">{wizard?.step2_sub}</p>}
+                    {step === 3 && <p className="text-gray-500 mt-2">{wizard?.step3_sub}</p>}
                 </header>
 
                 {/* SCROLLABLE CONTENT AREA */}
@@ -348,9 +360,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     className="space-y-12 py-4"
                                 >
                                     {[
-                                        { title: "01 // PRÄSENZ", courses: presenceCourses },
-                                        { title: "02 // SPRECHTRAINING", courses: speechCourses },
-                                        { title: "03 // ONLINE", courses: onlineCourses }
+                                        { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
+                                        { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
+                                        { title: groupTitles?.online || "03 // ONLINE", courses: onlineCourses }
                                     ].map((group, idx) => (
                                         <section key={idx}>
                                             <div className="flex items-center gap-3 mb-6 opacity-60">
@@ -379,18 +391,18 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     <div className="space-y-12">
 
                                         <div className="grid grid-cols-2 gap-8">
-                                            <TerminalInput label="Vorname" registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label="Nachname" registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
+                                            <TerminalInput label={labels?.firstname || "First Name"} registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
+                                            <TerminalInput label={labels?.lastname || "Last Name"} registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
                                         </div>
 
-                                        <TerminalInput label="E-Mail Adresse" type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                        <TerminalInput label="Telefonnummer" registration={register("personal.phone")} error={errors.personal?.phone?.message} />
+                                        <TerminalInput label={labels?.email || "Email"} type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                        <TerminalInput label={labels?.phone || "Phone"} registration={register("personal.phone")} error={errors.personal?.phone?.message} />
 
                                         <div className="grid grid-cols-[3fr_1fr] gap-8">
-                                            <TerminalInput label="Straße & Hausnr." registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label="PLZ" registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                            <TerminalInput label={labels?.street || "Street"} registration={register("personal.street")} error={errors.personal?.street?.message} />
+                                            <TerminalInput label={labels?.zip || "ZIP"} registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
                                         </div>
-                                        <TerminalInput label="Ort / Stadt" registration={register("personal.city")} error={errors.personal?.city?.message} />
+                                        <TerminalInput label={labels?.city || "City"} registration={register("personal.city")} error={errors.personal?.city?.message} />
 
                                     </div>
                                 </motion.div>
@@ -406,7 +418,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     className="py-8"
                                 >
                                     <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">Deine Daten</h3>
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3>
                                         <div className="grid grid-cols-2 gap-y-4 text-sm">
                                             <div className="text-gray-500">Name</div>
                                             <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
@@ -416,16 +428,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                             <div className="font-medium">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
                                         </div>
                                         <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            Bearbeiten
+                                            {wizard?.edit}
                                         </button>
                                     </div>
 
                                     {/* Summary: Courses */}
                                     <div className="bg-white p-8 border border-black/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">Deine Kurse (Start: {nextMonthName})</h3>
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_courses_title} {nextMonthName})</h3>
                                         <div className="space-y-4">
                                             {selectedCoursesFull.map(c => {
-                                                const { totalUnits, deductions } = calculateMonthlyStats(c);
+                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang);
                                                 const netPrice = c.price * totalUnits;
                                                 return (
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
@@ -443,14 +455,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                             })}
                                         </div>
                                         <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            Kurswahl ändern
+                                            {wizard?.change_selection}
                                         </button>
                                     </div>
 
                                     {/* Moved Legal Text Here */}
                                     <p className="text-[10px] text-gray-500 leading-tight text-center max-w-sm mx-auto mt-8">
-                                        Mit Klick auf "Kostenpflichtig Bestellen" stimmst du den AGB & Datenschutz zu.
-                                        Widerrufsrecht verfällt bei vollständiger Erfüllung.
+                                        {wizard?.legal_note}
                                     </p>
                                 </motion.div>
                             )}
@@ -467,7 +478,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">Live Abrechnung</span>
+                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{t?.receipt?.live_title || "Live Receipt"}</span>
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
@@ -482,11 +493,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     <AnimatePresence>
                         {selectedCoursesFull.length === 0 ? (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
-                                // Warten auf Auswahl...
+                                // {t?.receipt?.waiting || "Waiting..."}
                             </motion.div>
                         ) : (
                             selectedCoursesFull.map(c => {
-                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c);
+                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang);
                                 const netPrice = c.price * totalUnits;
                                 const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
                                 const grossPrice = netPrice + deductionSum;
@@ -527,7 +538,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     {/* TOTAL Display */}
                     <div className="p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
                         <div className="flex justify-between items-end mb-2">
-                            <span className="font-mono text-xs uppercase text-gray-400">Gesamtbetrag</span>
+                            <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
                             <motion.span
                                 key={totalMonthlyPrice}
                                 initial={{ scale: 1.1, color: '#fff' }}
@@ -538,8 +549,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             </motion.span>
                         </div>
                         <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
-                            <span>Fällig nach Rechnungserhalt</span>
-                            <span>Inkl. MwSt.</span>
+                            <span>{wizard?.total_sub_1}</span>
+                            <span>{wizard?.total_sub_2}</span>
                         </div>
                     </div>
 
@@ -556,12 +567,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     >
                         <span className="flex flex-col items-start gap-1">
                             <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
-                                {step === 1 ? "Nächster Schritt" : step === 2 ? "Fast fertig" : "Verbindlich"}
+                                {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : wizard?.btn_binding}
                             </span>
                             <span>
-                                {step === 1 && "Weiter"}
-                                {step === 2 && "Zur Übersicht"}
-                                {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : "Kostenpflichtig Bestellen")}
+                                {step === 1 && wizard?.btn_continue}
+                                {step === 2 && wizard?.btn_overview}
+                                {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : wizard?.btn_order)}
                             </span>
                         </span>
 

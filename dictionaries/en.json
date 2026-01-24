@@ -605,6 +605,33 @@
     "course_card": {
       "online_label": "Online",
       "level_range": "A1 - C1"
+    },
+    "group_titles": {
+      "presence": "01 // IN-PERSON",
+      "speech": "02 // SPEAKING TRAINING",
+      "online": "03 // ONLINE"
+    },
+    "wizard": {
+      "step1_title": "Course Selection",
+      "step1_sub": "Choose your modules starting in",
+      "step2_title": "Personal Data",
+      "step2_sub": "We need this data for your invoice.",
+      "step3_title": "Review Summary",
+      "step3_sub": "Please check your details before binding registration.",
+      "summary_data_title": "Your Data",
+      "summary_courses_title": "Your Courses (Start:",
+      "edit": "Edit",
+      "change_selection": "Change Selection",
+      "legal_note": "By clicking \"Order with Obligation to Pay\" you agree to the Terms & Privacy Policy.",
+      "total_label": "Total Amount",
+      "total_sub_1": "Due upon receipt of invoice",
+      "total_sub_2": "Incl. VAT",
+      "btn_next": "Next Step",
+      "btn_continue": "Continue",
+      "btn_almost": "Almost done",
+      "btn_overview": "To Overview",
+      "btn_binding": "Binding",
+      "btn_order": "Order with Obligation to Pay"
     }
   }
 }
