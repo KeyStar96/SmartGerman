@@ -284,51 +284,79 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
             )}
         >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                {/* Checkbox + Title + Meta */}
-                <div className="flex items-start md:items-center w-full md:w-auto">
-                    {/* 1. Checkbox Visual (Left) */}
-                    <div className={cn(
-                        "w-5 h-5 shrink-0 rounded border mr-4 md:mr-6 flex items-center justify-center transition-all duration-300 mt-1 md:mt-0",
-                        selected
-                            ? "bg-[#FF5C00] border-[#FF5C00]"
-                            : "bg-transparent border-black/20 group-hover:border-black/40"
-                    )}>
-                        {selected && <Check size={12} className="text-white" strokeWidth={3} />}
-                    </div>
+                {/* 1. Top Row: Checkbox + Title (Left) / Price (Right) */}
+                <div className="flex items-start w-full md:w-auto justify-between md:justify-start">
 
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 w-full">
-                        {/* 2. Title (Flexible Width) */}
-                        <span className={cn(
-                            "font-sans text-lg md:text-xl font-bold tracking-tight transition-colors md:w-[280px] break-words md:truncate pr-0 md:pr-4",
-                            selected ? "text-[#FF5C00]" : "text-[#111111]"
+                    {/* Left: Checkbox + Title Group */}
+                    <div className="flex items-start">
+                        {/* Checkbox */}
+                        <div className={cn(
+                            "w-5 h-5 shrink-0 rounded border mr-3 md:mr-6 flex items-center justify-center transition-all duration-300 mt-1 md:mt-0",
+                            selected
+                                ? "bg-[#FF5C00] border-[#FF5C00]"
+                                : "bg-transparent border-black/20 group-hover:border-black/40"
                         )}>
-                            {title}
-                        </span>
+                            {selected && <Check size={12} className="text-white" strokeWidth={3} />}
+                        </div>
 
-                        <div className="flex items-center gap-3">
-                            {/* 3. Badge (Fixed Slot) */}
-                            <div className="w-auto md:w-[60px] flex items-center shrink-0">
+                        {/* Title & Metadata Container */}
+                        <div className="flex flex-col gap-1 md:gap-2">
+                            {/* Title */}
+                            <span className={cn(
+                                "font-sans text-lg md:text-xl font-bold tracking-tight transition-colors md:w-[280px] break-words md:truncate pr-2",
+                                selected ? "text-[#FF5C00]" : "text-[#111111]"
+                            )}>
+                                {title}
+                            </span>
+
+                            {/* Mobile: Metadata Row (Left Aligned under title) */}
+                            <div className="flex items-center gap-2 md:hidden">
                                 {level && (
                                     <span className="text-[10px] font-mono uppercase bg-white border border-black/10 px-1.5 py-0.5 rounded text-gray-500">
                                         {level}
                                     </span>
                                 )}
+                                <span className={cn(
+                                    "font-mono uppercase text-[10px] flex items-center gap-1",
+                                    course.type === 'online' ? "text-blue-600" : "text-gray-500"
+                                )}>
+                                    {course.type === 'online' ? <Monitor size={10} /> : <MapPin size={10} />}
+                                    {course.type === 'online' ? (t?.online_label || "ONLINE").toUpperCase() : (t?.presence_label || "PRÄSENZ")}
+                                </span>
                             </div>
-
-                            {/* 4. Type */}
-                            <span className={cn(
-                                "font-mono uppercase text-[10px] flex items-center gap-2 shrink-0",
-                                course.type === 'online' ? "text-blue-600" : "text-gray-500"
-                            )}>
-                                {course.type === 'online' ? <Monitor size={12} /> : <MapPin size={12} />}
-                                {course.type === 'online' ? (t?.online_label || "ONLINE").toUpperCase() : (t?.presence_label || "PRÄSENZ")}
-                            </span>
                         </div>
+                    </div>
+
+                    {/* Right: Price (Mobile Only - moved up) */}
+                    <div className="text-right shrink-0 md:hidden pl-2">
+                        <div className="font-mono text-sm text-gray-900 font-bold">{priceFormatted}</div>
+                        <div className="text-gray-400 text-[9px] uppercase">{t?.units_suffix || "/ Units"}</div>
                     </div>
                 </div>
 
-                {/* Right Side Info (Price) */}
-                <div className="text-left md:text-right pl-9 md:pl-0 w-full md:w-auto">
+                {/* Desktop: Middle Meta Column (Hidden on Mobile) */}
+                <div className="hidden md:flex items-center gap-4 w-full md:w-auto">
+                    {/* Badge */}
+                    <div className="w-[60px] flex items-center shrink-0">
+                        {level && (
+                            <span className="text-[10px] font-mono uppercase bg-white border border-black/10 px-1.5 py-0.5 rounded text-gray-500">
+                                {level}
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Type */}
+                    <span className={cn(
+                        "font-mono uppercase text-[10px] flex items-center gap-2 shrink-0",
+                        course.type === 'online' ? "text-blue-600" : "text-gray-500"
+                    )}>
+                        {course.type === 'online' ? <Monitor size={12} /> : <MapPin size={12} />}
+                        {course.type === 'online' ? (t?.online_label || "ONLINE").toUpperCase() : (t?.presence_label || "PRÄSENZ")}
+                    </span>
+                </div>
+
+                {/* Desktop: Price (Hidden on Mobile) */}
+                <div className="hidden md:block text-right pl-9 md:pl-0 w-full md:w-auto">
                     <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">{t?.units_suffix || "/ Units"}</span></span>
                 </div>
             </div>
@@ -1023,9 +1051,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                         exit={{ opacity: 0, height: 0 }}
                                         className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
                                     >
-                                        <div className="flex justify-between mb-1">
-                                            <span className="text-gray-200 truncate pr-2 font-bold w-[150px] md:w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
-                                            <span className="text-white">{formatPrice(grossPrice)}</span>
+                                        <div className="flex justify-between items-start mb-1 gap-4">
+                                            <span className="text-gray-200 font-bold flex-1 break-words">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                            <span className="text-white whitespace-nowrap">{formatPrice(grossPrice)}</span>
                                         </div>
 
                                         {deductions.map((d, i) => (
