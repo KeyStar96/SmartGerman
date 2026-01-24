@@ -7,7 +7,7 @@ import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User } from "lucide-react";
+import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
@@ -374,6 +374,65 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
     </div>
 );
 
+const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    // Click outside to close
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const selectedOption = options.find((o: any) => o.value === value);
+
+    return (
+        <div className="relative w-full" ref={containerRef}>
+            <div
+                onClick={() => setIsOpen(!isOpen)}
+                className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 cursor-pointer flex justify-between items-center group-hover:border-[#FF5C00] transition-colors"
+            >
+                <span className={!value ? "text-transparent" : "text-gray-900"}>
+                    {selectedOption ? selectedOption.label : placeholder}
+                </span>
+                <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+            </div>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute left-0 top-full w-full bg-[#F0EFE9] border border-black/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent"
+                    >
+                        {options.map((opt: any) => (
+                            <div
+                                key={opt.value}
+                                onClick={() => {
+                                    onChange(opt.value);
+                                    setIsOpen(false);
+                                }}
+                                className={cn(
+                                    "px-4 py-2 hover:bg-[#FF5C00]/10 cursor-pointer text-sm font-mono transition-colors",
+                                    value === opt.value ? "text-[#FF5C00] font-bold" : "text-gray-600"
+                                )}
+                            >
+                                {opt.label}
+                            </div>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
 const DateDropdowns = ({
     value,
     onChange,
@@ -382,81 +441,66 @@ const DateDropdowns = ({
     required
 }: any) => {
     // Value format: DD.MM.YYYY
-    // Parse initial value
     const [day, month, year] = (value || "..").split(".");
 
     // Generators
-    const days = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
-    const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+    const days = Array.from({ length: 31 }, (_, i) => {
+        const d = String(i + 1).padStart(2, '0');
+        return { value: d, label: d };
+    });
+    const months = Array.from({ length: 12 }, (_, i) => {
+        const m = String(i + 1).padStart(2, '0');
+        return { value: m, label: m };
+    });
     const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => String(currentYear - i));
+    const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
+        const y = String(currentYear - i);
+        return { value: y, label: y };
+    });
 
     const handleUpdate = (type: 'day' | 'month' | 'year', val: string) => {
-        let nD = day || "";
-        let nM = month || "";
-        let nY = year || "";
+        const nD = type === 'day' ? val : (day || "");
+        const nM = type === 'month' ? val : (month || "");
+        const nY = type === 'year' ? val : (year || "");
 
-        if (type === 'day') nD = val;
-        if (type === 'month') nM = val;
-        if (type === 'year') nY = val;
-
-        if (nD && nM && nY) {
-            onChange(`${nD}.${nM}.${nY}`);
-        } else {
-            // If partial, maybe don't update or update partial?
-            // Zod expects string. If partial, it might fail validation, which is fine.
-            // But we need to keep state. 
-            // Better: update parent with partial string if needed or just keep local?
-            // Current EnrollmentForm expects "DD.MM.YYYY".
-            // Let's assume we pass what we have, but validation will fail if not complete.
-            onChange(`${nD || ""}.${nM || ""}.${nY || ""}`);
-        }
+        onChange(`${nD}.${nM}.${nY}`);
     };
 
     return (
-        <div className="relative group">
+        <div className="relative group z-40">
             <span className={cn(
-                "absolute left-0 top-0 text-xs uppercase tracking-widest text-[#FF5C00] font-mono transition-all",
-                // Always show label at top for dropdowns
+                "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 font-mono transition-all",
+                // Keep label distinct (always visible at top for dropdowns)
             )}>
-                {label} {required && <span>*</span>}
+                {label} {required && <span className="text-[#FF5C00]">*</span>}
             </span>
 
             <div className="flex gap-4 pt-6">
-                {/* Day */}
-                <div className="relative w-1/4">
-                    <select
-                        value={day || ""}
-                        onChange={(e) => handleUpdate('day', e.target.value)}
-                        className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors appearance-none rounded-none"
-                    >
-                        <option value="" disabled>DD</option>
-                        {days.map(d => <option key={d} value={d}>{d}</option>)}
-                    </select>
+                <div className="relative w-[80px]">
+                    <CustomSelect
+                        value={day}
+                        onChange={(v: string) => handleUpdate('day', v)}
+                        options={days}
+                        placeholder="DD"
+                    />
                 </div>
 
-                {/* Month */}
-                <div className="relative w-1/4">
-                    <select
-                        value={month || ""}
-                        onChange={(e) => handleUpdate('month', e.target.value)}
-                        className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors appearance-none rounded-none"
-                    >
-                        <option value="" disabled>MM</option>
-                        {months.map(m => <option key={m} value={m}>{m}</option>)}
-                    </select>
+                <div className="relative w-[80px]">
+                    <CustomSelect
+                        value={month}
+                        onChange={(v: string) => handleUpdate('month', v)}
+                        options={months}
+                        placeholder="MM"
+                    />
                 </div>
 
-                {/* Year */}
-                <div className="relative flex-1">
-                    <select
-                        value={year || ""}
-                        onChange={(e) => handleUpdate('year', e.target.value)}
-                        className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors appearance-none rounded-none"
-                    >
-                        <option value="" disabled>YYYY</option>
-                        {years.map(y => <option key={y} value={y}>{y}</option>)}
-                    </select>
+                <div className="relative w-[100px]">
+                    <CustomSelect
+                        value={year}
+                        onChange={(v: string) => handleUpdate('year', v)}
+                        options={years}
+                        placeholder="YYYY"
+                    />
                 </div>
             </div>
             {error && <span className="text-red-500 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
