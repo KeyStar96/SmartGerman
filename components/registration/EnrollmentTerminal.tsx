@@ -340,11 +340,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                             {/* STEP 1: SELECTION */}
                             {step === 1 && (
+                                {/* STEP 1: SELECTION */ }
+                            {step === 1 && (
                                 <motion.div
                                     key="step1"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
+                                    initial={{ opacity: 1 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
                                     className="space-y-12 py-4"
                                 >
                                     {[
