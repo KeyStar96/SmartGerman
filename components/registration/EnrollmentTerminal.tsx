@@ -67,14 +67,6 @@ const CourseRow = ({ course, selected, onToggle, title, desc, priceFormatted, le
                             </span>
                         )}
                     </div>
-                    {/* Collapsible Details */}
-                    <div className="text-xs text-gray-400 font-mono mt-1 flex items-center gap-3">
-                        <span className={course.type === 'online' ? "text-blue-500" : ""}>
-                            {course.type === 'online' ? 'ONLINE' : 'PRÄSENZ'}
-                        </span>
-                        <span className="w-px h-3 bg-gray-200" />
-                        <span className="truncate max-w-[250px]">{desc}</span>
-                    </div>
                 </div>
 
                 {/* Col 2: Schedule (Hidden on super small screens, visible on desktop) */}
@@ -212,7 +204,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
                         <ChevronLeft size={14} /> {dictionary?.registration?.back_home || "Back"}
                     </Link>
-                    <div className="font-bold tracking-tight">Smart<span className="text-[#FF5C00]">German</span></div>
+                    <Image src="/Bilder/SG_Logo_Lightmode.png" alt="SmartGerman Logo" width={100} height={24} className="h-6 w-auto" />
                 </header>
 
                 {/* Scrollable List */}
@@ -227,7 +219,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         {/* SECTION 1: PRÄSENZ */}
                         <section>
                             <div className="flex items-center gap-3 mb-4 opacity-50">
-                                <span className="font-mono text-[10px] uppercase tracking-widest">01 // Präsenz 50+</span>
+                                <span className="font-mono text-[10px] uppercase tracking-widest">01 // Präsenz</span>
                                 <div className="h-px bg-black flex-1 opacity-20" />
                             </div>
                             <div className="bg-white/50 border border-gray-200 rounded-sm overflow-hidden backdrop-blur-sm">
@@ -237,27 +229,27 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             </div>
                         </section>
 
-                        {/* SECTION 2: ONLINE */}
+                        {/* SECTION 2: SPEECH (Moved up) */}
                         <section>
                             <div className="flex items-center gap-3 mb-4 opacity-50">
-                                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF5C00]">02 // Online Campus</span>
-                                <div className="h-px bg-[#FF5C00] flex-1 opacity-20" />
+                                <span className="font-mono text-[10px] uppercase tracking-widest">02 // Sprechtraining</span>
+                                <div className="h-px bg-black flex-1 opacity-20" />
                             </div>
                             <div className="bg-white/50 border border-gray-200 rounded-sm overflow-hidden backdrop-blur-sm">
-                                {onlineCourses.map(c => (
+                                {speechCourses.map(c => (
                                     <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
                                 ))}
                             </div>
                         </section>
 
-                        {/* SECTION 3: SPEECH */}
+                        {/* SECTION 3: ONLINE (Moved down & Renamed) */}
                         <section>
                             <div className="flex items-center gap-3 mb-4 opacity-50">
-                                <span className="font-mono text-[10px] uppercase tracking-widest">03 // Sprechtraining</span>
-                                <div className="h-px bg-black flex-1 opacity-20" />
+                                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF5C00]">03 // Online</span>
+                                <div className="h-px bg-[#FF5C00] flex-1 opacity-20" />
                             </div>
                             <div className="bg-white/50 border border-gray-200 rounded-sm overflow-hidden backdrop-blur-sm">
-                                {speechCourses.map(c => (
+                                {onlineCourses.map(c => (
                                     <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
                                 ))}
                             </div>
@@ -275,7 +267,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                 {/* 1. TOP: RECEIPT / SUMMARY */}
                 <div className="flex-1 p-8 flex flex-col">
                     <div className="flex items-baseline justify-between mb-8 border-b border-white/10 pb-4">
-                        <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">Live Abrechnung</span>
+                        <div className="flex items-center gap-3">
+                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">Live Abrechnung</span>
+                            <div className="relative w-2 h-2">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </div>
+                        </div>
                         <span className="font-mono text-xs text-gray-500">{new Date().toLocaleDateString('de-DE')}</span>
                     </div>
 
@@ -295,7 +293,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                         exit={{ opacity: 0, height: 0 }}
                                         className="flex justify-between items-start font-mono text-sm border-b border-white/5 pb-2 last:border-0"
                                     >
-                                        <span className="text-gray-300 truncate pr-4">{c.translationKey.toUpperCase().replace(/_/g, ' ')}</span>
+                                        <span className="text-gray-300 truncate pr-4">{getCourseData(c).title}</span>
                                         <span className="text-white">{formatPrice(c.price)}</span>
                                     </motion.div>
                                 ))
@@ -333,7 +331,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 <button
                                     onClick={handleProceedToCheckout}
                                     disabled={selectedCourseIds.length === 0}
-                                    className="w-full bg-white text-black h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 hover:bg-[#FF5C00] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                                    className={cn(
+                                        "w-full h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group",
+                                        selectedCourseIds.length > 0
+                                            ? "bg-[#FF5C00] text-white shadow-[0_4px_20px_rgba(255,92,0,0.4)] hover:bg-[#ff7a33] hover:shadow-[0_8px_30px_rgba(255,92,0,0.6)] hover:-translate-y-1"
+                                            : "bg-white text-black hover:bg-gray-100"
+                                    )}
                                 >
                                     <span>Zur Kasse</span>
                                     <ArrowRight className="group-hover:translate-x-1 transition-transform" />
