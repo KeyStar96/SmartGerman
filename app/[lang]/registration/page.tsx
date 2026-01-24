@@ -1,5 +1,5 @@
 import React from "react";
-import EnrollmentWizard from "@/components/registration/EnrollmentWizard";
+import EnrollmentTerminal from "@/components/registration/EnrollmentTerminal";
 import { getDictionary } from "@/lib/dictionary";
 
 export default async function RegistrationPage({
@@ -19,7 +19,7 @@ export default async function RegistrationPage({
                 </div>
             </div>
         }>
-            <EnrollmentWizard dictionary={dictionary} lang={lang} />
+            <EnrollmentTerminal dictionary={dictionary} lang={lang} />
         </React.Suspense>
     );
 }
