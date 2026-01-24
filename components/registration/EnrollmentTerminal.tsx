@@ -7,7 +7,7 @@ import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Check, X, ArrowRight, Loader2 } from "lucide-react";
+import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
@@ -100,7 +100,7 @@ const enrollmentSchema = z.object({
 });
 type EnrollmentFormData = z.infer<typeof enrollmentSchema>;
 
-// --- COMPONENT: ROW (CLEAN VERSION) ---
+// --- COMPONENT: ROW (PAPER OPTIK) ---
 
 const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level }: any) => {
     return (
@@ -108,60 +108,65 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level }:
             onClick={onToggle}
             layout
             className={cn(
-                "group relative w-full cursor-pointer border-b border-gray-100 transition-all duration-200 select-none",
-                selected ? "bg-[#FFF4EC]" : "bg-white hover:bg-gray-50"
+                "group relative w-full cursor-pointer rounded-sm p-6 border transition-all duration-300",
+                selected
+                    ? "bg-[#FFF4EC] border-[#FF5C00] shadow-sm"
+                    : "bg-[#F0EFE9] border-black/10 hover:border-[#FF5C00] hover:shadow-md"
             )}
         >
-            {/* Active Indicator Line (Left) */}
-            <div className={cn(
-                "absolute left-0 top-0 bottom-0 w-1 transition-all duration-300",
-                selected ? "bg-[#FF5C00]" : "bg-transparent"
-            )} />
+            <div className="flex justify-between items-center">
+                {/* Fixed Layout Columns */}
+                <div className="flex items-center">
+                    {/* 1. Checkbox Visual (Left) */}
+                    <div className={cn(
+                        "w-5 h-5 rounded border mr-6 flex items-center justify-center transition-all duration-300",
+                        selected
+                            ? "bg-[#FF5C00] border-[#FF5C00]"
+                            : "bg-transparent border-black/20 group-hover:border-black/40"
+                    )}>
+                        {selected && <Check size={12} className="text-white" strokeWidth={3} />}
+                    </div>
 
-            <div className="py-5 px-6 grid grid-cols-[1fr_auto_auto] gap-6 items-center">
-                {/* Info (OHNE Beschreibung) */}
-                <div>
-                    <div className="flex items-center gap-3">
-                        <span className={cn(
-                            "font-sans text-lg font-bold tracking-tight transition-colors",
-                            selected ? "text-[#FF5C00]" : "text-gray-900"
-                        )}>
-                            {title}
-                        </span>
+                    {/* 2. Title (Fixed Width) */}
+                    <span className={cn(
+                        "font-sans text-xl font-bold tracking-tight transition-colors w-[280px] truncate pr-4",
+                        selected ? "text-[#FF5C00]" : "text-[#111111]"
+                    )}>
+                        {title}
+                    </span>
+
+                    {/* 3. Badge (Fixed Slot) */}
+                    <div className="w-[60px] flex items-center">
                         {level && (
-                            <span className="text-[10px] font-mono uppercase border border-gray-200 bg-white px-1.5 py-0.5 rounded text-gray-400">
+                            <span className="text-[10px] font-mono uppercase bg-white border border-black/10 px-1.5 py-0.5 rounded text-gray-500">
                                 {level}
                             </span>
                         )}
-                        <span className={cn("font-mono uppercase text-[10px] ml-2", course.type === 'online' ? "text-blue-600" : "text-gray-400")}>
-                            {course.type === 'online' ? 'ONLINE' : 'PRÄSENZ'}
-                        </span>
                     </div>
-                </div>
 
-                {/* Schedule & Price Info */}
-                <div className="hidden sm:flex flex-col items-end gap-0.5 text-right">
-                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">/ Einheit</span></span>
-                    <div className="flex gap-1 mt-1">
-                        {course.sessions.map((s: any, i: number) => (
-                            <span key={i} className="text-[9px] font-mono uppercase text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
-                                {s.day} {s.startTime}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Checkbox */}
-                <div className="pl-4">
-                    <div className={cn(
-                        "w-6 h-6 rounded-md border flex items-center justify-center transition-all duration-300 shadow-sm",
-                        selected
-                            ? "bg-[#FF5C00] border-[#FF5C00] shadow-orange-200"
-                            : "bg-white border-gray-300 group-hover:border-gray-400"
+                    {/* 4. Type */}
+                    <span className={cn(
+                        "font-mono uppercase text-[10px] flex items-center gap-2",
+                        course.type === 'online' ? "text-blue-600" : "text-gray-500"
                     )}>
-                        <Check size={14} strokeWidth={3} className={cn("text-white transition-all duration-300", selected ? "scale-100 opacity-100" : "scale-50 opacity-0")} />
-                    </div>
+                        {course.type === 'online' ? <Monitor size={12} /> : <MapPin size={12} />}
+                        {course.type === 'online' ? 'ONLINE' : 'PRÄSENZ'}
+                    </span>
                 </div>
+
+                {/* Right Side Info */}
+                <div className="text-right">
+                    <span className="font-mono text-sm text-gray-900">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">/ Ein.</span></span>
+                </div>
+            </div>
+
+            {/* Expanded Details when selected (optional visual cue) */}
+            <div className="flex gap-1 mt-2 pl-[44px]">
+                {course.sessions.map((s: any, i: number) => (
+                    <span key={i} className="text-[10px] font-mono uppercase text-gray-400">
+                        {s.day} {s.startTime}
+                    </span>
+                ))}
             </div>
         </motion.div>
     );
@@ -175,17 +180,18 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
             {...props}
             placeholder=" "
             className={cn(
-                "block w-full bg-transparent border-b border-gray-200 py-2 pt-4 text-sm font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors peer placeholder-transparent",
+                "block w-full bg-transparent border-b border-gray-400/30 py-4 pt-6 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors peer placeholder-transparent",
                 error && "border-red-500"
             )}
         />
         <label className={cn(
-            "absolute left-0 top-0 text-[10px] uppercase tracking-widest text-gray-400 transition-all pointer-events-none font-mono",
-            "peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-400",
-            "peer-focus:top-0 peer-focus:text-[10px] peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00] peer-focus:font-mono"
+            "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 transition-all pointer-events-none font-mono",
+            "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500",
+            "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00] peer-focus:font-mono"
         )}>
             {label}
         </label>
+        {error && <span className="text-red-500 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
     </div>
 );
 
@@ -195,9 +201,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const searchParams = useSearchParams();
     const initialCourseId = searchParams.get("courseId");
 
-    const [viewState, setViewState] = useState<'SELECTION' | 'CHECKOUT' | 'SUCCESS'>('SELECTION');
+    const [step, setStep] = useState<1 | 2 | 3>(1); // [1] Selection, [2] Data, [3] Summary
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     // Grouping Logic
     const presenceCourses = COURSES.filter(c => c.type === 'presence' && !c.id.includes('speech'));
@@ -209,9 +216,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     const form = useForm<EnrollmentFormData>({
         resolver: zodResolver(enrollmentSchema),
-        mode: "onBlur"
+        mode: "onChange"
     });
-    const { register, handleSubmit, formState: { errors } } = form;
+    const { register, handleSubmit, formState: { errors, isValid }, trigger, watch } = form;
+    const formData = watch("personal");
 
     // Init Logic
     useEffect(() => {
@@ -226,7 +234,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     const getCourseData = (c: CourseConfig) => ({
         title: dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey,
-        // Description removed here
         priceFormatted: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
         level: dictionary?.CourseData?.[c.translationKey]?.level
     });
@@ -236,9 +243,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     // Dynamic Total Calculation
     const totalMonthlyPrice = selectedCoursesFull.reduce((acc, c) => {
         const { totalUnits } = calculateMonthlyStats(c);
-        // Note: The totalUnits returned by calculateMonthlyStats ALREADY excludes the cancelled sessions
-        // because we only increment them in the 'else' block of the exception check.
-        // Therefore, we just multiply by price as normal.
         return acc + (totalUnits * c.price);
     }, 0);
 
@@ -248,75 +252,178 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         setIsSubmitting(true);
         await new Promise(r => setTimeout(r, 1500));
         console.log({ courses: selectedCourseIds, personal: data, total: totalMonthlyPrice });
-        setViewState('SUCCESS');
+        setIsSuccess(true);
         setIsSubmitting(false);
     };
+
+    const handleNextStep = async () => {
+        if (step === 1 && selectedCourseIds.length > 0) {
+            setStep(2);
+        } else if (step === 2) {
+            const valid = await trigger("personal");
+            if (valid) setStep(3);
+        }
+    };
+
+    if (isSuccess) {
+        return (
+            <div className="h-screen w-full bg-[#1A1C1E] text-white flex flex-col items-center justify-center text-center p-8 font-sans">
+                <div className="w-20 h-20 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
+                    <Check size={40} />
+                </div>
+                <h3 className="text-3xl font-bold mb-4 tracking-tight">Erfolgreich!</h3>
+                <p className="text-gray-400 text-lg mb-12 max-w-md">Deine Anmeldung wurde bestätigt. Rechnung & Details wurden an <strong>{formData?.email}</strong> gesendet.</p>
+                <Link href={`/${lang}`} className="bg-[#FF5C00] text-white px-8 py-4 rounded font-bold uppercase tracking-widest hover:bg-[#FF7A33] transition-colors">
+                    Zurück zur Startseite
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className="h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex overflow-hidden font-sans">
 
-            {/* LEFT PANEL: LIST */}
-            {/* Added min-h-0 to ensure inner scrolling works correctly with h-screen parent */}
-            <div className={cn(
-                "flex-1 flex flex-col h-full min-h-0 transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]",
-                viewState === 'CHECKOUT' ? "opacity-30 pointer-events-none scale-[0.98] blur-[2px]" : "opacity-100"
-            )}>
-                {/* Header with LOGO */}
-                <header className="px-8 py-6 flex justify-between items-center border-b border-gray-200 shrink-0 bg-[#F0EFE9]/90 backdrop-blur z-10">
-                    <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
-                        <ChevronLeft size={14} /> {dictionary?.registration?.back_home || "Back"}
-                    </Link>
-                    {/* LOGO RESTORED */}
-                    <div className="relative w-[140px] h-8 flex justify-end">
+            {/* --- LEFT PANEL: WIZARD CONTENT --- */}
+            <div className="flex-1 flex flex-col h-full min-h-0 relative">
+
+                {/* Header with Progress */}
+                <header className="px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
+                    <div className="flex justify-between items-start mb-6">
+                        <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
+                            <ChevronLeft size={14} /> {dictionary?.registration?.back_home || "Back"}
+                        </Link>
                         <Image
                             src="/Bilder/SG_Logo_Lightmode.png"
                             alt="SmartGerman"
-                            width={140}
-                            height={40}
-                            className="object-contain object-right"
+                            width={120}
+                            height={32}
                             priority
+                            className="object-contain"
                         />
                     </div>
+
+                    {/* Progress Bar */}
+                    <div className="flex items-center gap-4 mb-2">
+                        <div className="h-1 bg-gray-200 flex-1 rounded-full overflow-hidden">
+                            <motion.div
+                                className="h-full bg-[#FF5C00]"
+                                initial={{ width: "33%" }}
+                                animate={{ width: step === 1 ? "33%" : step === 2 ? "66%" : "100%" }}
+                                transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+                            />
+                        </div>
+                        <span className="font-mono text-xs text-gray-400">SCHRITT {step} / 3</span>
+                    </div>
+
+                    <h1 className="text-4xl font-bold tracking-tighter text-[#111111]">
+                        {step === 1 && "Kursauswahl"}
+                        {step === 2 && "Persönliche Daten"}
+                        {step === 3 && "Übersicht prüfen"}
+                    </h1>
+                    {step === 1 && <p className="text-gray-500 mt-2">Wähle deine Module für den Start im <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
+                    {step === 2 && <p className="text-gray-500 mt-2">Wir benötigen diese Daten für deine Rechnung.</p>}
+                    {step === 3 && <p className="text-gray-500 mt-2">Bitte prüfe deine Angaben vor der verbindlichen Anmeldung.</p>}
                 </header>
 
-                {/* SCROLLABLE AREA */}
-                {/* min-h-0 is crucial here */}
-                <div data-lenis-prevent className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 p-8 pb-32 min-h-0">
-                    <div className="max-w-4xl mx-auto space-y-12">
-                        <div className="mb-8">
-                            <h1 className="text-4xl font-bold tracking-tighter mb-2">Kursauswahl</h1>
-                            <p className="text-gray-500">Wähle deine Module für den Start im <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>
-                        </div>
+                {/* SCROLLABLE CONTENT AREA */}
+                <div data-lenis-prevent className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-12 pb-32 min-h-0">
+                    <div className="max-w-4xl mx-auto">
+                        <AnimatePresence mode="wait">
 
-                        {/* CORRECTED ORDER: 1. Präsenz, 2. Sprechtraining, 3. Online */}
-                        {[
-                            { title: "01 // PRÄSENZ", courses: presenceCourses, color: "black" },
-                            { title: "02 // SPRECHTRAINING", courses: speechCourses, color: "black" },
-                            { title: "03 // ONLINE", courses: onlineCourses, color: "#FF5C00" }
-                        ].map((group, idx) => (
-                            <section key={idx}>
-                                <div className="flex items-center gap-3 mb-4 opacity-60">
-                                    <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: group.color }}>{group.title}</span>
-                                    <div className="h-px bg-current flex-1 opacity-20" />
-                                </div>
-                                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                                    {group.courses.map(c => (
-                                        <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
+                            {/* STEP 1: SELECTION */}
+                            {step === 1 && (
+                                <motion.div
+                                    key="step1"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="space-y-12 py-4"
+                                >
+                                    {[
+                                        { title: "01 // PRÄSENZ", courses: presenceCourses },
+                                        { title: "02 // SPRECHTRAINING", courses: speechCourses },
+                                        { title: "03 // ONLINE", courses: onlineCourses }
+                                    ].map((group, idx) => (
+                                        <section key={idx}>
+                                            <div className="flex items-center gap-3 mb-6 opacity-60">
+                                                <span className="font-mono text-[10px] uppercase tracking-widest text-black">{group.title}</span>
+                                                <div className="h-px bg-black/20 flex-1" />
+                                            </div>
+                                            <div className="space-y-4">
+                                                {group.courses.map(c => (
+                                                    <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
+                                                ))}
+                                            </div>
+                                        </section>
                                     ))}
-                                </div>
-                            </section>
-                        ))}
+                                </motion.div>
+                            )}
+
+                            {/* STEP 2: PERSONAL DATA */}
+                            {step === 2 && (
+                                <motion.div
+                                    key="step2"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    className="py-8 max-w-2xl"
+                                >
+                                    <div className="space-y-12">
+
+                                        <div className="grid grid-cols-2 gap-8">
+                                            <TerminalInput label="Vorname" registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
+                                            <TerminalInput label="Nachname" registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
+                                        </div>
+
+                                        <TerminalInput label="E-Mail Adresse" type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                        <TerminalInput label="Telefonnummer" registration={register("personal.phone")} error={errors.personal?.phone?.message} />
+
+                                        <div className="grid grid-cols-[3fr_1fr] gap-8">
+                                            <TerminalInput label="Straße & Hausnr." registration={register("personal.street")} error={errors.personal?.street?.message} />
+                                            <TerminalInput label="PLZ" registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                        </div>
+                                        <TerminalInput label="Ort / Stadt" registration={register("personal.city")} error={errors.personal?.city?.message} />
+
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* STEP 3: SUMMARY */}
+                            {step === 3 && (
+                                <motion.div
+                                    key="step3"
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="py-8"
+                                >
+                                    <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">Deine Daten</h3>
+                                        <div className="grid grid-cols-2 gap-y-4 text-sm">
+                                            <div className="text-gray-500">Name</div>
+                                            <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
+                                            <div className="text-gray-500">Kontakt</div>
+                                            <div className="font-medium">{formData?.email}<br />{formData?.phone}</div>
+                                            <div className="text-gray-500">Adresse</div>
+                                            <div className="font-medium">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
+                                        </div>
+                                        <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                            Bearbeiten
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>
 
-            {/* RIGHT PANEL: TERMINAL */}
-            <div className="w-[400px] xl:w-[480px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
+            {/* --- RIGHT PANEL: LIVE TERMINAL --- */}
+            <div className="w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
                 <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
 
-                {/* 1. RECEIPT */}
-                <div className="flex-1 p-8 flex flex-col min-h-0">
-                    <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4 shrink-0">
+                {/* RECEIPT HEADER */}
+                <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10">
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">Live Abrechnung</span>
                             <span className="relative flex h-2 w-2">
@@ -326,53 +433,57 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         </div>
                         <span className="font-mono text-xs text-gray-500">{nextMonthName}</span>
                     </div>
+                </div>
 
-                    <div data-lenis-prevent className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-0 pr-2">
-                        <AnimatePresence>
-                            {selectedCoursesFull.length === 0 ? (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
-                                    // Warten auf Auswahl...
-                                </motion.div>
-                            ) : (
-                                selectedCoursesFull.map(c => {
-                                    const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c);
-                                    const netPrice = c.price * totalUnits;
-                                    const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
-                                    const grossPrice = netPrice + deductionSum;
+                {/* SCROLLABLE RECEIPT LIST */}
+                <div data-lenis-prevent className="flex-1 overflow-y-auto p-8 space-y-4 min-h-0">
+                    <AnimatePresence>
+                        {selectedCoursesFull.length === 0 ? (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
+                                // Warten auf Auswahl...
+                            </motion.div>
+                        ) : (
+                            selectedCoursesFull.map(c => {
+                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c);
+                                const netPrice = c.price * totalUnits;
+                                const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
+                                const grossPrice = netPrice + deductionSum;
 
-                                    return (
-                                        <motion.div
-                                            key={c.id}
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
-                                        >
-                                            <div className="flex justify-between mb-1">
-                                                <span className="text-gray-200 truncate pr-2 font-bold">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
-                                                <span className="text-white">{formatPrice(grossPrice)}</span>
+                                return (
+                                    <motion.div
+                                        key={c.id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
+                                    >
+                                        <div className="flex justify-between mb-1">
+                                            <span className="text-gray-200 truncate pr-2 font-bold w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
+                                            <span className="text-white">{formatPrice(grossPrice)}</span>
+                                        </div>
+
+                                        {deductions.map((d, i) => (
+                                            <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
+                                                <span>{d.date}: {d.reason}</span>
+                                                <span>- {formatPrice(d.amount)}</span>
                                             </div>
+                                        ))}
 
-                                            {deductions.map((d, i) => (
-                                                <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
-                                                    <span>{d.date}: {d.reason}</span>
-                                                    <span>- {formatPrice(d.amount)}</span>
-                                                </div>
-                                            ))}
+                                        <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
+                                            <span>{totalUnits} Einheiten ({sessionCount} Termine)</span>
+                                            <span>Monatlich</span>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })
+                        )}
+                    </AnimatePresence>
+                </div>
 
-                                            <div className="flex justify-between text-[10px] text-gray-500 uppercase">
-                                                <span>{totalUnits} Einheiten ({sessionCount} Termine)</span>
-                                                <span>Monatlich</span>
-                                            </div>
-                                        </motion.div>
-                                    );
-                                })
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Total Area (Fixed at bottom of receipt panel) */}
-                    <div className="pt-6 border-t border-white/20 shrink-0">
+                {/* FOOTER AREA (Total + Action) */}
+                <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0">
+                    {/* TOTAL Display */}
+                    <div className="p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
                         <div className="flex justify-between items-end mb-2">
                             <span className="font-mono text-xs uppercase text-gray-400">Gesamtbetrag</span>
                             <motion.span
@@ -389,96 +500,43 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             <span>Inkl. MwSt.</span>
                         </div>
                     </div>
-                </div>
 
-                {/* 2. ACTION / FORM */}
-                <div className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0">
-                    <AnimatePresence mode="wait">
-                        {/* BUTTON STATE */}
-                        {viewState === 'SELECTION' && (
-                            <motion.div
-                                key="btn"
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: 20, opacity: 0 }}
-                                className="p-8"
-                            >
-                                <button
-                                    onClick={() => selectedCourseIds.length > 0 && setViewState('CHECKOUT')}
-                                    disabled={selectedCourseIds.length === 0}
-                                    className={cn(
-                                        "w-full h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 transition-all duration-300 group",
-                                        selectedCourseIds.length > 0
-                                            ? "bg-[#FF5C00] text-white hover:bg-[#FF7A33] shadow-[0_0_20px_rgba(255,92,0,0.3)] hover:shadow-[0_0_30px_rgba(255,92,0,0.5)]"
-                                            : "bg-white text-gray-400 cursor-not-allowed opacity-80"
-                                    )}
-                                >
-                                    <span>Zur Kasse</span>
-                                    <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-                                </button>
-                            </motion.div>
+                    {/* ACTION BUTTON */}
+                    <button
+                        onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
+                        disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
+                        className={cn(
+                            "w-full h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
+                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid))
+                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
                         )}
+                    >
+                        <span className="flex flex-col items-start gap-1">
+                            <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
+                                {step === 1 ? "Nächster Schritt" : step === 2 ? "Fast fertig" : "Verbindlich"}
+                            </span>
+                            <span>
+                                {step === 1 && "Weiter"}
+                                {step === 2 && "Zur Übersicht"}
+                                {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : "Kostenpflichtig Bestellen")}
+                            </span>
+                        </span>
 
-                        {/* FORM STATE */}
-                        {viewState === 'CHECKOUT' && (
-                            <motion.div
-                                key="form"
-                                initial={{ height: 0 }}
-                                animate={{ height: "auto" }}
-                                exit={{ height: 0 }}
-                                className="bg-white text-[#2D3436]"
-                            >
-                                <div className="p-8 pt-6">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h3 className="font-bold text-lg">Deine Daten</h3>
-                                        <button onClick={() => setViewState('SELECTION')} className="text-gray-400 hover:text-red-500 transition-colors">
-                                            <X size={20} />
-                                        </button>
-                                    </div>
+                        <ArrowRight className={cn("transition-transform duration-300",
+                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid)) ? "opacity-20" : "group-hover:translate-x-2"
+                        )} />
+                    </button>
 
-                                    <div className="space-y-4 mb-8">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <TerminalInput label="Vorname" registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label="Nachname" registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
-                                        </div>
-                                        <TerminalInput label="E-Mail" type="email" registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                        <div className="grid grid-cols-[2fr_1fr] gap-4">
-                                            <TerminalInput label="Straße" registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label="PLZ" registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
-                                        </div>
-                                        <TerminalInput label="Ort" registration={register("personal.city")} error={errors.personal?.city?.message} />
-                                    </div>
+                    {step === 3 && (
+                        <div className="p-4 bg-[#1A1C1E] text-center">
+                            <p className="text-[9px] text-gray-600 leading-tight">
+                                Mit Klick stimmst du den AGB & Datenschutz zu.<br />
+                                Widerrufsrecht verfällt bei vollständiger Erfüllung.
+                            </p>
+                        </div>
+                    )}
 
-                                    <button
-                                        onClick={handleSubmit(onSubmit)}
-                                        disabled={isSubmitting}
-                                        className="w-full bg-[#1A1C1E] text-white h-14 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 hover:bg-[#FF5C00] transition-colors shadow-lg"
-                                    >
-                                        {isSubmitting ? <Loader2 className="animate-spin" /> : "Kostenpflichtig anmelden"}
-                                    </button>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {/* SUCCESS STATE */}
-                        {viewState === 'SUCCESS' && (
-                            <motion.div
-                                key="success"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="bg-[#1A1C1E] text-white p-8 h-[500px] flex flex-col items-center justify-center text-center"
-                            >
-                                <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-4">
-                                    <Check size={32} />
-                                </div>
-                                <h3 className="text-2xl font-bold mb-2">Erfolgreich!</h3>
-                                <p className="text-gray-400 text-sm mb-8">Rechnung & Bestätigung wurden an deine E-Mail gesendet.</p>
-                                <Link href={`/${lang}`} className="text-[#FF5C00] font-mono text-xs uppercase tracking-widest hover:underline">
-                                    Zurück zur Startseite
-                                </Link>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
                 </div>
             </div>
         </div>

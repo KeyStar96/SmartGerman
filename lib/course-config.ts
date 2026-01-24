@@ -33,11 +33,6 @@ export const EXCEPTIONS: CourseException[] = [
         date: "2026-02-02",
         reason: "Kursraum steht noch nicht zur Verfügung",
         // courseIds: [] // Omitted = applies to all. Use ["c_id"] to restrict.
-    },
-    {
-        date: "2026-02-03",
-        reason: "Lehrerfortbildung (Nur A1.1)",
-        courseIds: ["c_a1_1_50plus"] // Applies ONLY to this specific course
     }
 ];
 
