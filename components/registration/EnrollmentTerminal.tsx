@@ -365,7 +365,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 transition={{ type: "spring", bounce: 0, duration: 0.5 }}
                             />
                         </div>
-                        <span className="font-mono text-xs text-gray-400">SCHRITT {step} / 3</span>
+                        <span className="font-mono text-xs text-gray-400">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
                     <h1 className="text-4xl font-bold tracking-tighter text-[#111111]">
@@ -456,13 +456,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
                                         <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3>
                                         <div className="grid grid-cols-2 gap-y-4 text-sm">
-                                            <div className="text-gray-500">Name</div>
+                                            <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
                                             <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
-                                            <div className="text-gray-500">Kontakt</div>
+                                            <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
                                             <div className="font-medium">{formData?.email}<br />{formData?.phone}</div>
-                                            <div className="text-gray-500">Persönlich</div>
+                                            <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
                                             <div className="font-medium">{formData?.birthDate}</div>
-                                            <div className="text-gray-500">Adresse</div>
+                                            <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
                                             <div className="font-medium">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
                                         </div>
                                         <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">

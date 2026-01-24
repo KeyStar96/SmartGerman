@@ -654,7 +654,14 @@
       "btn_almost": "FAST GESCHAFFT",
       "btn_overview": "ZUR ÜBERSICHT",
       "btn_binding": "VERBINDLICH",
-      "btn_order": "KOSTENPFLICHTIG BESTELLEN"
+      "btn_order": "KOSTENPFLICHTIG BESTELLEN",
+      "step_label": "SCHRITT",
+      "summary_labels": {
+        "name": "Name",
+        "contact": "Kontakt",
+        "personal": "Persönlich",
+        "address": "Adresse"
+      }
     }
   }
 }

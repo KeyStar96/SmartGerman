@@ -486,7 +486,14 @@
       "btn_almost": "МАЙЖЕ ГОТОВО",
       "btn_overview": "ДО ОГЛЯДУ",
       "btn_binding": "ОБОВ'ЯЗКОВО",
-      "btn_order": "ЗАМОВИТИ ПЛАТНО"
+      "btn_order": "ЗАМОВИТИ ПЛАТНО",
+      "step_label": "КРОК",
+      "summary_labels": {
+        "name": "Ім'я",
+        "contact": "Контакт",
+        "personal": "Особисті дані",
+        "address": "Адреса"
+      }
     }
   }
 }

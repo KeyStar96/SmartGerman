@@ -652,7 +652,14 @@
       "btn_almost": "ALMOST DONE",
       "btn_overview": "TO OVERVIEW",
       "btn_binding": "BINDING",
-      "btn_order": "ORDER NOW"
+      "btn_order": "ORDER NOW",
+      "step_label": "STEP",
+      "summary_labels": {
+        "name": "Name",
+        "contact": "Contact",
+        "personal": "Personal",
+        "address": "Address"
+      }
     }
   }
 }

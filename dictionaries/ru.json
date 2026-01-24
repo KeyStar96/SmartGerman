@@ -486,7 +486,14 @@
       "btn_almost": "ПОЧТИ ГОТОВО",
       "btn_overview": "К ОБЗОРУ",
       "btn_binding": "ОБЯЗАТЕЛЬНО",
-      "btn_order": "ЗАКАЗАТЬ ПЛАТНО"
+      "btn_order": "ЗАКАЗАТЬ ПЛАТНО",
+      "step_label": "ШАГ",
+      "summary_labels": {
+        "name": "Имя",
+        "contact": "Контакт",
+        "personal": "Личные данные",
+        "address": "Адрес"
+      }
     }
   }
 }

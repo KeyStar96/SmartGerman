@@ -486,7 +486,14 @@
       "btn_almost": "NEREDEYSE BİTTİ",
       "btn_overview": "ÖZETE GİT",
       "btn_binding": "BAĞLAYICI",
-      "btn_order": "ÜCRETLİ SİPARİŞ VER"
+      "btn_order": "ÜCRETLİ SİPARİŞ VER",
+      "step_label": "ADIM",
+      "summary_labels": {
+        "name": "Ad",
+        "contact": "İletişim",
+        "personal": "Kişisel",
+        "address": "Adres"
+      }
     }
   }
 }
