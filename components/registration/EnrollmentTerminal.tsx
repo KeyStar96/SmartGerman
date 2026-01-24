@@ -710,14 +710,36 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const footerRef = React.useRef<HTMLDivElement>(null);
     const [showScrollHint, setShowScrollHint] = useState(false);
 
-    // 1. Scroll to Top on Step Change
+    // Import Lenis hook dynamically or assume context is safe if SmoothScroll wraps app?
+    // Since we don't have imports here, we need to add import { useLenis } from 'lenis/react';
+    // BUT replace_file_content replaces a block. I need to make sure I add the import too.
+    // I can't add import easily in this block.
+    // I will use window.scrollTo with 'auto' for robustness and try to target html/body.
+    // And for Desktop, use the ref.
+
+    // Actually, I can add the import in a separate call or just trust standard scroll if I force it hard enough.
+    // But modifying the import requires changing the top of the file.
+    // I'll stick to robust native hacks first:
+
     useEffect(() => {
-        // Mobile: Scroll Window
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        // Desktop: Scroll Container
-        if (desktopScrollRef.current) {
-            desktopScrollRef.current.scrollTo({ top: 0, behavior: "smooth" });
-        }
+        // Force scroll to top on step change
+        const scrollToTop = () => {
+            // 1. Browser Native
+            window.scrollTo({ top: 0, behavior: "auto" }); // "auto" is instant, often reliable
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+
+            // 2. Desktop Container
+            if (desktopScrollRef.current) {
+                desktopScrollRef.current.scrollTo({ top: 0, behavior: "auto" });
+            }
+        };
+
+        // Small timeout to ensure render frame is complete
+        setTimeout(scrollToTop, 10);
+        // And another safety specific for Lenis if it's hijacking global scroll (Desktop Mode)
+        // Since I can't easily import useLenis here without top-file edit, I'll rely on "auto".
+        // Lenis usually respects window.scrollTo if not blocked.
     }, [step]);
 
     // 2. Scroll Hint Observer
@@ -745,339 +767,338 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         <div className="min-h-screen lg:h-screen w-full bg-[#F0EFE9] text-[#2D3436] flex flex-col lg:flex-row overflow-x-hidden font-sans relative">
 
             {/* SCROLL INDICATOR (Mobile Mostly) */}
-            <AnimatePresence>
-                {showScrollHint && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        onClick={scrollToBottom}
-                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#FF5C00] text-white rounded-full p-3 shadow-lg cursor-pointer lg:hidden"
+            {showScrollHint && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10, x: "-50%" }}
+                    animate={{ opacity: 1, y: 0, x: "-50%" }}
+                    exit={{ opacity: 0, y: 10, x: "-50%" }}
+                    onClick={scrollToBottom}
+                    className="fixed bottom-6 left-1/2 z-40 bg-[#FF5C00] text-white rounded-full p-3 shadow-lg cursor-pointer lg:hidden hover:bg-[#FF7A33] transition-colors"
+                >
+                    <ChevronDown className="animate-bounce" size={24} />
+                </motion.div>
+            )}
+        </AnimatePresence>
+
+            {/* --- LEFT PANEL: WIZARD CONTENT --- */ }
+    <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full">
+
+        {/* Header with Progress */}
+        <header className="px-6 md:px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
+            <div className="flex justify-between items-start mb-6">
+                <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
+                    <ChevronLeft size={14} /> {t?.back_home || "Back"}
+                </Link>
+                <Image
+                    src="/Bilder/SG_Logo_Lightmode.png"
+                    alt="SmartGerman"
+                    width={100}
+                    height={28}
+                    priority
+                    className="object-contain md:w-[120px]"
+                />
+            </div>
+
+            {/* Progress Bar */}
+            <div className="flex items-center gap-4 mb-2">
+                {step > 1 && (
+                    <button
+                        onClick={() => setStep(s => s - 1 as 1 | 2 | 3)}
+                        className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-[#FF5C00] hover:text-white transition-colors text-gray-500"
                     >
-                        <ChevronDown className="animate-bounce" size={24} />
+                        <ChevronLeft size={14} />
+                    </button>
+                )}
+                <div className="h-1 bg-gray-200 flex-1 rounded-full overflow-hidden">
+                    <motion.div
+                        className="h-full bg-[#FF5C00]"
+                        initial={{ width: "33%" }}
+                        animate={{ width: step === 1 ? "33%" : step === 2 ? "66%" : "100%" }}
+                        transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+                    />
+                </div>
+                <span className="font-mono text-xs text-gray-400">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
+            </div>
+
+            <h1 className="text-2xl md:text-4xl font-bold tracking-tighter text-[#111111]">
+                {step === 1 && wizard?.step1_title}
+                {step === 2 && wizard?.step2_title}
+                {step === 3 && wizard?.step3_title}
+            </h1>
+            {step === 1 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
+            {step === 2 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step2_sub}</p>}
+            {step === 3 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step3_sub}</p>}
+        </header>
+
+        {/* SCROLLABLE CONTENT AREA */}
+        {/* On mobile: standard scroll. On Desktop: overflow-y-auto */}
+        <div
+            ref={desktopScrollRef}
+            data-lenis-prevent
+            className="flex-1 lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-4 md:px-12 pb-32 min-h-0"
+        >
+            <div className="max-w-4xl mx-auto">
+                <AnimatePresence mode="wait">
+
+                    {/* STEP 1: SELECTION */}
+                    {step === 1 && (
+                        <motion.div
+                            key="step1"
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="space-y-12 py-4"
+                        >
+                            {[
+                                { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
+                                { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
+                                { title: groupTitles?.online || "03 // ONLINE", courses: onlineCourses }
+                            ].map((group, idx) => (
+                                <section key={idx}>
+                                    <div className="flex items-center gap-3 mb-6 opacity-60">
+                                        <span className="font-mono text-[10px] uppercase tracking-widest text-black">{group.title}</span>
+                                        <div className="h-px bg-black/20 flex-1" />
+                                    </div>
+                                    <div className="space-y-4">
+                                        {group.courses.map(c => (
+                                            <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
+                                        ))}
+                                    </div>
+                                </section>
+                            ))}
+                        </motion.div>
+                    )}
+
+                    {/* STEP 2: PERSONAL DATA */}
+                    {step === 2 && (
+                        <motion.div
+                            key="step2"
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="py-8 max-w-2xl"
+                        >
+                            <div className="space-y-12">
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
+                                    <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                    <DateDropdowns
+                                        label={formLabels?.birthdate || "Birthdate"}
+                                        required
+                                        value={watch("personal.birthDate")}
+                                        onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
+                                        error={errors.personal?.birthDate?.message}
+                                    />
+                                </div>
+                                <PhoneInput
+                                    label={formLabels?.phone || "Phone"}
+                                    value={watch("personal.phone")}
+                                    onChange={(val: string) => form.setValue("personal.phone", val, { shouldValidate: true })}
+                                    error={errors.personal?.phone?.message}
+                                />
+
+                                <div className="grid grid-cols-[3fr_1fr] gap-8">
+                                    <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
+                                    <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                </div>
+                                <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
+
+                                <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
+                                    {formLabels?.required_hint}
+                                </div>
+
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* STEP 3: SUMMARY */}
+                    {step === 3 && (
+                        <motion.div
+                            key="step3"
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="py-8"
+                        >
+                            <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
+                                <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
+                                    <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
+                                    <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
+                                    <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
+                                    <div className="font-medium break-all">{formData?.email}<br />{formData?.phone}</div>
+                                    <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
+                                    <div className="font-medium">{formData?.birthDate}</div>
+                                    <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
+                                    <div className="font-medium">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
+                                </div>
+                                <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                    {wizard?.edit}
+                                </button>
+                            </div>
+
+                            {/* Summary: Courses */}
+                            <div className="bg-white p-8 border border-black/10 rounded-sm space-y-6">
+                                <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_courses_title} {nextMonthName}</h3>
+                                <div className="space-y-4">
+                                    {selectedCoursesFull.map(c => {
+                                        const { totalUnits, deductions } = calculateMonthlyStats(c, lang);
+                                        const netPrice = c.price * totalUnits;
+                                        return (
+                                            <div key={c.id} className="flex justify-between items-center text-sm">
+                                                <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                                <div className="text-right">
+                                                    <span className="font-mono text-gray-900">{formatPrice(netPrice)} / {receipt?.monthly || "Monat"}</span>
+                                                    {deductions.length > 0 && (
+                                                        <div className="text-[10px] text-red-500 text-right">
+                                                            ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                    {wizard?.change_selection}
+                                </button>
+                            </div>
+
+                            {/* Moved Legal Text Here */}
+                            <p className="text-[10px] text-gray-500 leading-tight text-center max-w-sm mx-auto mt-8">
+                                {wizard?.legal_note}
+                            </p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </div>
+    </div>
+
+    {/* --- RIGHT PANEL: LIVE TERMINAL --- */ }
+    {/* Desktop: Fixed width Right Side. Mobile: Full width at bottom (or sticky). Here: stacked at bottom. */ }
+    <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
+        <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
+
+        {/* RECEIPT HEADER (Desktop Only likely? Or simplified for mobile?) */}
+        <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10 hidden lg:block">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
+                    </span>
+                </div>
+                <span className="font-mono text-xs text-gray-500">{nextMonthName}</span>
+            </div>
+        </div>
+
+        {/* SCROLLABLE RECEIPT LIST (Collapsible on mobile?) */}
+        {/* For now, show on mobile too but maybe limit max height? Or keep as is at bottom. */}
+        <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-[200px] lg:min-h-0">
+            <AnimatePresence>
+                {selectedCoursesFull.length === 0 ? (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
+                                // {receipt?.waiting || "Waiting..."}
                     </motion.div>
+                ) : (
+                    selectedCoursesFull.map(c => {
+                        const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang);
+                        const netPrice = c.price * totalUnits;
+                        const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
+                        const grossPrice = netPrice + deductionSum;
+
+                        return (
+                            <motion.div
+                                key={c.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
+                            >
+                                <div className="flex justify-between mb-1">
+                                    <span className="text-gray-200 truncate pr-2 font-bold w-[150px] md:w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                    <span className="text-white">{formatPrice(grossPrice)}</span>
+                                </div>
+
+                                {deductions.map((d, i) => (
+                                    <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
+                                        <span>{d.date}: {d.reason}</span>
+                                        <span>- {formatPrice(d.amount)}</span>
+                                    </div>
+                                ))}
+
+                                <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
+                                    <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
+                                    <span>{receipt?.monthly || "Monatlich"}</span>
+                                </div>
+                            </motion.div>
+                        );
+                    })
                 )}
             </AnimatePresence>
+        </div>
 
-            {/* --- LEFT PANEL: WIZARD CONTENT --- */}
-            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full">
+        {/* FOOTER AREA (Total + Action) */}
+        <div
+            ref={footerRef}
+            className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0 z-50"
+        >
 
-                {/* Header with Progress */}
-                <header className="px-6 md:px-12 py-8 shrink-0 bg-[#F0EFE9] z-10">
-                    <div className="flex justify-between items-start mb-6">
-                        <Link href={`/${lang}`} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-[#FF5C00] transition-colors">
-                            <ChevronLeft size={14} /> {t?.back_home || "Back"}
-                        </Link>
-                        <Image
-                            src="/Bilder/SG_Logo_Lightmode.png"
-                            alt="SmartGerman"
-                            width={100}
-                            height={28}
-                            priority
-                            className="object-contain md:w-[120px]"
-                        />
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="flex items-center gap-4 mb-2">
-                        {step > 1 && (
-                            <button
-                                onClick={() => setStep(s => s - 1 as 1 | 2 | 3)}
-                                className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-[#FF5C00] hover:text-white transition-colors text-gray-500"
-                            >
-                                <ChevronLeft size={14} />
-                            </button>
-                        )}
-                        <div className="h-1 bg-gray-200 flex-1 rounded-full overflow-hidden">
-                            <motion.div
-                                className="h-full bg-[#FF5C00]"
-                                initial={{ width: "33%" }}
-                                animate={{ width: step === 1 ? "33%" : step === 2 ? "66%" : "100%" }}
-                                transition={{ type: "spring", bounce: 0, duration: 0.5 }}
-                            />
-                        </div>
-                        <span className="font-mono text-xs text-gray-400">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
-                    </div>
-
-                    <h1 className="text-2xl md:text-4xl font-bold tracking-tighter text-[#111111]">
-                        {step === 1 && wizard?.step1_title}
-                        {step === 2 && wizard?.step2_title}
-                        {step === 3 && wizard?.step3_title}
-                    </h1>
-                    {step === 1 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
-                    {step === 2 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step2_sub}</p>}
-                    {step === 3 && <p className="text-sm md:text-base text-gray-500 mt-2">{wizard?.step3_sub}</p>}
-                </header>
-
-                {/* SCROLLABLE CONTENT AREA */}
-                {/* On mobile: standard scroll. On Desktop: overflow-y-auto */}
-                <div
-                    ref={desktopScrollRef}
-                    data-lenis-prevent
-                    className="flex-1 lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-4 md:px-12 pb-32 min-h-0"
-                >
-                    <div className="max-w-4xl mx-auto">
-                        <AnimatePresence mode="wait">
-
-                            {/* STEP 1: SELECTION */}
-                            {step === 1 && (
-                                <motion.div
-                                    key="step1"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="space-y-12 py-4"
-                                >
-                                    {[
-                                        { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
-                                        { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
-                                        { title: groupTitles?.online || "03 // ONLINE", courses: onlineCourses }
-                                    ].map((group, idx) => (
-                                        <section key={idx}>
-                                            <div className="flex items-center gap-3 mb-6 opacity-60">
-                                                <span className="font-mono text-[10px] uppercase tracking-widest text-black">{group.title}</span>
-                                                <div className="h-px bg-black/20 flex-1" />
-                                            </div>
-                                            <div className="space-y-4">
-                                                {group.courses.map(c => (
-                                                    <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
-                                                ))}
-                                            </div>
-                                        </section>
-                                    ))}
-                                </motion.div>
-                            )}
-
-                            {/* STEP 2: PERSONAL DATA */}
-                            {step === 2 && (
-                                <motion.div
-                                    key="step2"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="py-8 max-w-2xl"
-                                >
-                                    <div className="space-y-12">
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                            <DateDropdowns
-                                                label={formLabels?.birthdate || "Birthdate"}
-                                                required
-                                                value={watch("personal.birthDate")}
-                                                onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
-                                                error={errors.personal?.birthDate?.message}
-                                            />
-                                        </div>
-                                        <PhoneInput
-                                            label={formLabels?.phone || "Phone"}
-                                            value={watch("personal.phone")}
-                                            onChange={(val: string) => form.setValue("personal.phone", val, { shouldValidate: true })}
-                                            error={errors.personal?.phone?.message}
-                                        />
-
-                                        <div className="grid grid-cols-[3fr_1fr] gap-8">
-                                            <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
-                                        </div>
-                                        <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
-
-                                        <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
-                                            {formLabels?.required_hint}
-                                        </div>
-
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* STEP 3: SUMMARY */}
-                            {step === 3 && (
-                                <motion.div
-                                    key="step3"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="py-8"
-                                >
-                                    <div className="bg-white p-8 border border-black/10 rounded-sm mb-8 space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
-                                            <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
-                                            <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
-                                            <div className="font-medium break-all">{formData?.email}<br />{formData?.phone}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
-                                            <div className="font-medium">{formData?.birthDate}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
-                                            <div className="font-medium">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
-                                        </div>
-                                        <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            {wizard?.edit}
-                                        </button>
-                                    </div>
-
-                                    {/* Summary: Courses */}
-                                    <div className="bg-white p-8 border border-black/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_courses_title} {nextMonthName}</h3>
-                                        <div className="space-y-4">
-                                            {selectedCoursesFull.map(c => {
-                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang);
-                                                const netPrice = c.price * totalUnits;
-                                                return (
-                                                    <div key={c.id} className="flex justify-between items-center text-sm">
-                                                        <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
-                                                        <div className="text-right">
-                                                            <span className="font-mono text-gray-900">{formatPrice(netPrice)} / {receipt?.monthly || "Monat"}</span>
-                                                            {deductions.length > 0 && (
-                                                                <div className="text-[10px] text-red-500 text-right">
-                                                                    ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                        <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            {wizard?.change_selection}
-                                        </button>
-                                    </div>
-
-                                    {/* Moved Legal Text Here */}
-                                    <p className="text-[10px] text-gray-500 leading-tight text-center max-w-sm mx-auto mt-8">
-                                        {wizard?.legal_note}
-                                    </p>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </div>
-            </div>
-
-            {/* --- RIGHT PANEL: LIVE TERMINAL --- */}
-            {/* Desktop: Fixed width Right Side. Mobile: Full width at bottom (or sticky). Here: stacked at bottom. */}
-            <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
-                <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
-
-                {/* RECEIPT HEADER (Desktop Only likely? Or simplified for mobile?) */}
-                <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10 hidden lg:block">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
-                            </span>
-                        </div>
-                        <span className="font-mono text-xs text-gray-500">{nextMonthName}</span>
-                    </div>
-                </div>
-
-                {/* SCROLLABLE RECEIPT LIST (Collapsible on mobile?) */}
-                {/* For now, show on mobile too but maybe limit max height? Or keep as is at bottom. */}
-                <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-[200px] lg:min-h-0">
-                    <AnimatePresence>
-                        {selectedCoursesFull.length === 0 ? (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
-                                // {receipt?.waiting || "Waiting..."}
-                            </motion.div>
-                        ) : (
-                            selectedCoursesFull.map(c => {
-                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang);
-                                const netPrice = c.price * totalUnits;
-                                const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
-                                const grossPrice = netPrice + deductionSum;
-
-                                return (
-                                    <motion.div
-                                        key={c.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
-                                    >
-                                        <div className="flex justify-between mb-1">
-                                            <span className="text-gray-200 truncate pr-2 font-bold w-[150px] md:w-[200px]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
-                                            <span className="text-white">{formatPrice(grossPrice)}</span>
-                                        </div>
-
-                                        {deductions.map((d, i) => (
-                                            <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
-                                                <span>{d.date}: {d.reason}</span>
-                                                <span>- {formatPrice(d.amount)}</span>
-                                            </div>
-                                        ))}
-
-                                        <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
-                                            <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
-                                            <span>{receipt?.monthly || "Monatlich"}</span>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })
-                        )}
-                    </AnimatePresence>
-                </div>
-
-                {/* FOOTER AREA (Total + Action) */}
-                <div
-                    ref={footerRef}
-                    className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0 sticky bottom-0 z-50"
-                >
-
-                    {/* TOTAL Display */}
-                    <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
-                        <div className="flex justify-between items-end mb-2">
-                            <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
-                            <motion.span
-                                key={totalMonthlyPrice}
-                                initial={{ scale: 1.1, color: '#fff' }}
-                                animate={{ scale: 1, color: '#FF5C00' }}
-                                className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums"
-                            >
-                                {formatPrice(totalMonthlyPrice)}
-                            </motion.span>
-                        </div>
-                        <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
-                            <span>{wizard?.total_sub_1}</span>
-                            <span>{wizard?.total_sub_2}</span>
-                        </div>
-                    </div>
-
-                    {/* ACTION BUTTON */}
-                    <button
-                        onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
-                        disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
-                        className={cn(
-                            "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid))
-                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
-                        )}
+            {/* TOTAL Display */}
+            <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
+                <div className="flex justify-between items-end mb-2">
+                    <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
+                    <motion.span
+                        key={totalMonthlyPrice}
+                        initial={{ scale: 1.1, color: '#fff' }}
+                        animate={{ scale: 1, color: '#FF5C00' }}
+                        className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums"
                     >
-                        <span className="flex flex-col items-start gap-1">
-                            <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
-                                {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : wizard?.btn_binding}
-                            </span>
-                            <span>
-                                {step === 1 && wizard?.btn_continue}
-                                {step === 2 && wizard?.btn_overview}
-                                {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : wizard?.btn_order)}
-                            </span>
-                        </span>
-
-                        <ArrowRight className={cn("transition-transform duration-300",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid)) ? "opacity-20" : "group-hover:translate-x-2"
-                        )} />
-                    </button>
-
+                        {formatPrice(totalMonthlyPrice)}
+                    </motion.span>
+                </div>
+                <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
+                    <span>{wizard?.total_sub_1}</span>
+                    <span>{wizard?.total_sub_2}</span>
                 </div>
             </div>
+
+            {/* ACTION BUTTON */}
+            <button
+                onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
+                disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
+                className={cn(
+                    "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
+                    ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid))
+                        ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                        : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
+                )}
+            >
+                <span className="flex flex-col items-start gap-1">
+                    <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
+                        {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : wizard?.btn_binding}
+                    </span>
+                    <span>
+                        {step === 1 && wizard?.btn_continue}
+                        {step === 2 && wizard?.btn_overview}
+                        {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : wizard?.btn_order)}
+                    </span>
+                </span>
+
+                <ArrowRight className={cn("transition-transform duration-300",
+                    ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid)) ? "opacity-20" : "group-hover:translate-x-2"
+                )} />
+            </button>
+
+        </div>
+    </div>
         </div >
     );
 }
