@@ -418,6 +418,22 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                             Bearbeiten
                                         </button>
                                     </div>
+
+                                    {/* Summary: Courses */}
+                                    <div className="bg-white p-8 border border-black/10 rounded-sm space-y-6">
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">Deine Kurse (Start: {nextMonthName})</h3>
+                                        <div className="space-y-4">
+                                            {selectedCoursesFull.map(c => (
+                                                <div key={c.id} className="flex justify-between items-center text-sm">
+                                                    <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || c.translationKey}</span>
+                                                    <span className="font-mono text-gray-500">{formatPrice(c.price)} / Monat</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                            Kurswahl ändern
+                                        </button>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
