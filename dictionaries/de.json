@@ -583,7 +583,8 @@
       "phone": "MOBIL / FESTNETZ",
       "street": "STRASSE & NR.",
       "zip": "PLZ",
-      "city": "ORT"
+      "city": "ORT",
+      "birthdate": "GEBURTSDATUM"
     },
     "errors": {
       "firstname_required": "Vorname ist erforderlich",
@@ -594,6 +595,7 @@
       "zip_length": "PLZ muss 5-stellig sein",
       "zip_numeric": "Nur Zahlen erlaubt",
       "city_required": "Ort ist erforderlich",
+      "birthdate_required": "Geburtsdatum ist erforderlich",
       "selection_required": "Bitte wählen Sie mindestens einen Kurs."
     },
     "buttons": {
@@ -635,7 +637,7 @@
     "group_titles": {
       "presence": "01 // PRÄSENZ",
       "speech": "02 // SPRECHTRAINING",
-      "online": "03 // ONLINE CAMPUS"
+      "online": "03 // ONLINE"
     },
     "wizard": {
       "step1_title": "Wähle deinen Kurs.",

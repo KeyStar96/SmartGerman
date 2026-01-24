@@ -581,7 +581,8 @@
       "phone": "MOBILE / LANDLINE",
       "street": "STREET & NO.",
       "zip": "ZIP",
-      "city": "CITY"
+      "city": "CITY",
+      "birthdate": "DATE OF BIRTH"
     },
     "errors": {
       "firstname_required": "First name is required",
@@ -592,6 +593,7 @@
       "zip_length": "ZIP code must be 5 digits",
       "zip_numeric": "Only numbers allowed",
       "city_required": "City is required",
+      "birthdate_required": "Date of birth is required",
       "selection_required": "Please select at least one course."
     },
     "buttons": {
@@ -633,7 +635,7 @@
     "group_titles": {
       "presence": "01 // IN-PERSON",
       "speech": "02 // SPEAKING TRAINING",
-      "online": "03 // ONLINE CAMPUS"
+      "online": "03 // ONLINE"
     },
     "wizard": {
       "step1_title": "Course Selection",

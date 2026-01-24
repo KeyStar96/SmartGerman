@@ -110,6 +110,7 @@ const createSchema = (t: any) => z.object({
         street: z.string().min(3, t.registration.errors.street_required),
         zip: z.string().length(5, t.registration.errors.zip_length).regex(/^\d+$/, t.registration.errors.zip_numeric),
         city: z.string().min(2, t.registration.errors.city_required),
+        birthDate: z.string().min(1, t.registration.errors.birthdate_required),
     }),
 });
 
@@ -434,7 +435,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                             <TerminalInput label={formLabels?.street || "Street"} registration={register("personal.street")} error={errors.personal?.street?.message} />
                                             <TerminalInput label={formLabels?.zip || "ZIP"} registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
                                         </div>
-                                        <TerminalInput label={formLabels?.city || "City"} registration={register("personal.city")} error={errors.personal?.city?.message} />
+                                        <div className="grid grid-cols-[2fr_1fr] gap-8">
+                                            <TerminalInput label={formLabels?.city || "City"} registration={register("personal.city")} error={errors.personal?.city?.message} />
+                                            <TerminalInput label={formLabels?.birthdate || "Birthdate"} registration={register("personal.birthDate")} error={errors.personal?.birthDate?.message} />
+                                        </div>
 
                                     </div>
                                 </motion.div>
@@ -456,6 +460,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                             <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
                                             <div className="text-gray-500">Kontakt</div>
                                             <div className="font-medium">{formData?.email}<br />{formData?.phone}</div>
+                                            <div className="text-gray-500">Persönlich</div>
+                                            <div className="font-medium">{formData?.birthDate}</div>
                                             <div className="text-gray-500">Adresse</div>
                                             <div className="font-medium">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
                                         </div>

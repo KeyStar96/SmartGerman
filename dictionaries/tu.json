@@ -415,7 +415,8 @@
       "phone": "TELEFON",
       "street": "CADDE & NO",
       "zip": "POSTA KODU",
-      "city": "ŞEHİR"
+      "city": "ŞEHİR",
+      "birthdate": "DOĞUM TARİHİ"
     },
     "errors": {
       "firstname_required": "Adınız gerekli",
@@ -426,6 +427,7 @@
       "zip_length": "Posta kodu 5 haneli olmalı",
       "zip_numeric": "Sadece rakamlar",
       "city_required": "Şehir gerekli",
+      "birthdate_required": "Doğum tarihi gerekli",
       "selection_required": "Lütfen en az bir kurs seçin."
     },
     "buttons": {
@@ -467,7 +469,7 @@
     "group_titles": {
       "presence": "01 // YÜZ YÜZE",
       "speech": "02 // KONUŞMA EĞİTİMİ",
-      "online": "03 // ONLINE KAMPÜS"
+      "online": "03 // ONLINE"
     },
     "wizard": {
       "step1_title": "Kurs Seçimi",
