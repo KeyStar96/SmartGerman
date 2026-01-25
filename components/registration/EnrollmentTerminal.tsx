@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
+import { JetBrains_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown } from "lucide-react";
@@ -12,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
 import { validateEmail } from "@/app/actions/validate-email";
+
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
 // --- CALENDAR LOGIC HELPER ---
 
@@ -397,19 +400,21 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
             className={cn(
                 "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 pt-6 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors peer placeholder-transparent autofill:bg-transparent",
                 // Force transparent background for autofill and adjust text color
-                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
+                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#FCF4E6_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
                 "[&:-webkit-autofill]:[-webkit-text-fill-color:#111827] dark:[&:-webkit-autofill]:[-webkit-text-fill-color:#E2D7CE]",
                 error && "border-red-500 dark:border-red-400"
             )}
         />
         <label className={cn(
-            "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-all pointer-events-none font-mono",
+            "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-all pointer-events-none",
+            jetbrainsMono.className,
             "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-500",
-            "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00] peer-focus:font-mono"
+            "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]",
+            jetbrainsMono.className
         )}>
             {label} {props.required && <span className="text-[#FF5C00]">*</span>}
         </label>
-        {error && <span className="text-red-500 dark:text-red-400 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
+        {error && <span className={cn("text-red-500 dark:text-red-400 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
     </div>
 );
 
@@ -448,7 +453,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute left-0 top-full w-full bg-[#F0EFE9] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent"
+                        className="absolute left-0 top-full w-full bg-[#FCF4E6] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent"
                     >
                         {options.map((opt: any) => (
                             <div
@@ -458,7 +463,8 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
                                     setIsOpen(false);
                                 }}
                                 className={cn(
-                                    "px-4 py-2 hover:bg-[#FF5C00]/10 cursor-pointer text-sm font-mono transition-colors",
+                                    "px-4 py-2 hover:bg-[#FF5C00]/10 cursor-pointer text-sm transition-colors",
+                                    jetbrainsMono.className,
                                     value === opt.value ? "text-[#FF5C00] font-bold" : "text-gray-600 dark:text-gray-300"
                                 )}
                             >
@@ -508,7 +514,8 @@ const DateDropdowns = ({
     return (
         <div className="relative group z-40">
             <span className={cn(
-                "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 font-mono transition-all",
+                "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 transition-all",
+                jetbrainsMono.className
                 // Keep label distinct (always visible at top for dropdowns)
             )}>
                 {label} {required && <span className="text-[#FF5C00]">*</span>}
@@ -542,7 +549,7 @@ const DateDropdowns = ({
                     />
                 </div>
             </div>
-            {error && <span className="text-red-500 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
+            {error && <span className={cn("text-red-500 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
         </div>
     );
 };
@@ -606,7 +613,8 @@ const PhoneInput = ({
     return (
         <div className="relative group z-30">
             <span className={cn(
-                "absolute left-0 top-0 text-xs uppercase tracking-widest text-[#FF5C00] font-mono transition-all",
+                "absolute left-0 top-0 text-xs uppercase tracking-widest text-[#FF5C00] transition-all",
+                jetbrainsMono.className,
                 // Always visible label
             )}>
                 {label} {required && <span>*</span>}
@@ -629,13 +637,13 @@ const PhoneInput = ({
                         placeholder="123 456 7890"
                         className={cn(
                             "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors placeholder-gray-300 autofill:bg-transparent",
-                            "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
+                            "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#FCF4E6_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
                             "[&:-webkit-autofill]:-webkit-text-fill-color-[#111827] dark:[&:-webkit-autofill]:-webkit-text-fill-color-[#E2D7CE]"
                         )}
                     />
                 </div>
             </div>
-            {error && <span className="text-red-500 text-[10px] font-mono absolute right-0 top-2">{error}</span>}
+            {error && <span className={cn("text-red-500 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
         </div>
     );
 };
@@ -819,7 +827,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     }, []);
 
     return (
-        <div className="min-h-screen lg:h-screen w-full bg-[#F0EFE9] dark:bg-[#1A1C1E] text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
+        <div className="min-h-screen lg:h-screen w-full bg-background text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
 
             {/* SCROLL INDICATOR (Mobile Mostly) */}
             <AnimatePresence>
@@ -841,9 +849,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                 {/* Header with Progress */}
                 {/* Header with Progress */}
-                <header className="px-6 md:px-12 py-8 shrink-0 bg-[#F0EFE9] dark:bg-[#1A1C1E] z-10 transition-colors duration-500">
+                <header className="px-6 md:px-12 py-8 shrink-0 bg-background z-10 transition-colors duration-500">
                     <div className="flex justify-between items-start mb-6">
-                        <Link href={`/${lang}`} className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2">
+                        <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", jetbrainsMono.className)}>
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
                         <Image
@@ -874,7 +882,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 transition={{ type: "spring", bounce: 0, duration: 0.5 }}
                             />
                         </div>
-                        <span className="font-mono text-xs text-gray-400 dark:text-gray-500">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
+                        <span className={cn("text-xs text-gray-400 dark:text-gray-500", jetbrainsMono.className)}>{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
                     <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-[#111111] dark:text-[#E2D7CE] mb-2 transition-colors duration-300">
