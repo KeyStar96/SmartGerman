@@ -840,7 +840,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     }, []);
 
     return (
-        <div className="min-h-screen lg:h-screen w-full bg-background text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
+        <div className="min-h-screen lg:h-screen w-full bg-transparent text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
 
             {/* SCROLL INDICATOR (Mobile Mostly) */}
             <AnimatePresence>
