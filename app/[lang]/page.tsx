@@ -7,7 +7,7 @@ import TimetableSection from "@/components/sections/Timetable/TimetableSection";
 import { LocationSection } from "@/components/sections/Location/LocationSection";
 import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
-import ArchitecturalBackground from "@/components/effects/ArchitecturalBackground";
+import AppBackground from "@/components/effects/AppBackground";
 import BackgroundPinner from "@/components/effects/BackgroundPinner";
 
 export default async function HomePage({
@@ -34,7 +34,7 @@ export default async function HomePage({
           - Much more robust than position: sticky
         */}
         <BackgroundPinner>
-          <ArchitecturalBackground />
+          <AppBackground />
         </BackgroundPinner>
 
         {/* 
