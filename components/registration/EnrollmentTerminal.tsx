@@ -835,8 +835,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
             <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full">
 
                 {/* Header with Progress */}
-                <nav className="w-full h-[80px] flex items-center justify-between px-6 bg-[#F0EFE9] dark:bg-[#1A1C1E] shrink-0 sticky top-0 z-50">
-                    <div className="flex items-center gap-4">
+                {/* Header with Progress */}
+                <header className="px-6 md:px-12 py-8 shrink-0 bg-[#F0EFE9] dark:bg-[#1A1C1E] z-10 transition-colors duration-500">
+                    <div className="flex justify-between items-start mb-6">
                         <Link href={`/${lang}`} className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2">
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
@@ -851,16 +852,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="flex items-center gap-4 mb-2">
+                    <div className="flex items-center gap-4 mb-8">
                         {step > 1 && (
                             <button
                                 onClick={() => setStep(s => s - 1 as 1 | 2 | 3)}
-                                className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-[#FF5C00] hover:text-white transition-colors text-gray-500"
+                                className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 dark:bg-white/10 hover:bg-[#FF5C00] dark:hover:bg-[#FF5C00] hover:text-white transition-colors text-gray-500 dark:text-gray-400"
                             >
                                 <ChevronLeft size={14} />
                             </button>
                         )}
-                        <div className="h-1 bg-gray-200 flex-1 rounded-full overflow-hidden">
+                        <div className="h-1 bg-gray-200 dark:bg-white/10 flex-1 rounded-full overflow-hidden">
                             <motion.div
                                 className="h-full bg-[#FF5C00]"
                                 initial={{ width: "33%" }}
@@ -868,18 +869,18 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 transition={{ type: "spring", bounce: 0, duration: 0.5 }}
                             />
                         </div>
-                        <span className="font-mono text-xs text-gray-400">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
+                        <span className="font-mono text-xs text-gray-400 dark:text-gray-500">{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
-                    <h1 className="text-2xl md:text-4xl font-bold tracking-tighter text-[#111111] dark:text-[#E2D7CE]">
+                    <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-[#111111] dark:text-[#E2D7CE] mb-2 transition-colors duration-300">
                         {step === 1 && wizard?.step1_title}
                         {step === 2 && wizard?.step2_title}
                         {step === 3 && wizard?.step3_title}
                     </h1>
-                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
-                    {step === 2 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">{wizard?.step2_sub}</p>}
-                    {step === 3 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">{wizard?.step3_sub}</p>}
-                </nav>
+                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
+                    {step === 2 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step2_sub}</p>}
+                    {step === 3 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step3_sub}</p>}
+                </header>
 
                 {/* SCROLLABLE CONTENT AREA */}
                 {/* On mobile: standard scroll. On Desktop: overflow-y-auto */}
