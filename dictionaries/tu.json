@@ -456,6 +456,7 @@
       "zip_numeric": "Sadece rakamlar",
       "city_required": "Şehir gerekli",
       "birthdate_required": "Doğum tarihi gerekli",
+      "birthdate_incomplete": "Tam Tarih Gerekli",
       "selection_required": "Lütfen en az bir kurs seçin."
     },
     "buttons": {

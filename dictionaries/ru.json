@@ -450,6 +450,7 @@
       "zip_numeric": "Разрешены только цифры",
       "city_required": "Город обязателен",
       "birthdate_required": "Дата рождения обязательна",
+      "birthdate_incomplete": "Требуется полная дата",
       "selection_required": "Пожалуйста, выберите хотя бы один курс."
     },
     "buttons": {

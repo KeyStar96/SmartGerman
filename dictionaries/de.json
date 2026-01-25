@@ -604,6 +604,7 @@
       "zip_numeric": "Nur Zahlen erlaubt",
       "city_required": "Ort ist erforderlich",
       "birthdate_required": "Geburtsdatum ist erforderlich",
+      "birthdate_incomplete": "Vollständiges Datum erforderlich",
       "selection_required": "Bitte wählen Sie mindestens einen Kurs."
     },
     "buttons": {

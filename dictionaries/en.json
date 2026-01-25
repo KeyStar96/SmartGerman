@@ -602,6 +602,7 @@
       "zip_numeric": "Only numbers allowed",
       "city_required": "City is required",
       "birthdate_required": "Date of birth is required",
+      "birthdate_incomplete": "Complete Date Required",
       "selection_required": "Please select at least one course."
     },
     "buttons": {
