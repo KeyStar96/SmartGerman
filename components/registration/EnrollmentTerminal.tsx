@@ -858,11 +858,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
             </AnimatePresence>
 
             {/* --- LEFT PANEL: WIZARD CONTENT --- */}
-            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full bg-background transition-colors duration-500">
+            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full bg-background">
 
                 {/* Header with Progress */}
                 {/* Header with Progress */}
-                <header className="px-6 md:px-12 py-8 shrink-0 bg-background z-10 transition-colors duration-500">
+                <header className="px-6 md:px-12 py-8 shrink-0 bg-background z-10">
                     <div className="flex justify-between items-start mb-6">
                         <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", jetbrainsMono.className)}>
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
