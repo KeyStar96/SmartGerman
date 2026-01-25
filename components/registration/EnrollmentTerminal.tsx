@@ -858,7 +858,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
             </AnimatePresence>
 
             {/* --- LEFT PANEL: WIZARD CONTENT --- */}
-            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full">
+            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full bg-background transition-colors duration-500">
 
                 {/* Header with Progress */}
                 {/* Header with Progress */}
