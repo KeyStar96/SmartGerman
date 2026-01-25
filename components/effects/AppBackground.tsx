@@ -5,10 +5,10 @@ import Image from "next/image";
 
 export default function AppBackground({ className }: { className?: string }) {
     // Images:
-    // Desktop Light: /Bilder/SG_Background_Light.png
-    // Desktop Dark:  /Bilder/SG_Background_Dark.png
-    // Mobile Light:  /Bilder/SG_Background_Light_Mobile.png
-    // Mobile Dark:   /Bilder/SG_Background_Dark_Mobile.png
+    // Desktop Light: /Bilder/SG_Background_Light.webp
+    // Desktop Dark:  /Bilder/SG_Background_Dark.webp
+    // Mobile Light:  /Bilder/SG_Background_Light_Mobile.webp
+    // Mobile Dark:   /Bilder/SG_Background_Dark_Mobile.webp
 
     return (
         <div
@@ -24,7 +24,7 @@ export default function AppBackground({ className }: { className?: string }) {
                 {/* Desktop Light */}
                 <div className="hidden md:block absolute inset-0 w-full h-full">
                     <Image
-                        src="/Bilder/SG_Background_Light.png"
+                        src="/Bilder/SG_Background_Light.webp"
                         alt="Smart German Background Light"
                         fill
                         priority={true}
@@ -37,7 +37,7 @@ export default function AppBackground({ className }: { className?: string }) {
                 {/* Mobile Light */}
                 <div className="block md:hidden absolute inset-0 w-full h-full">
                     <Image
-                        src="/Bilder/SG_Background_Light_Mobile.png"
+                        src="/Bilder/SG_Background_Light_Mobile.webp"
                         alt="Smart German Background Light Mobile"
                         fill
                         priority={true}
@@ -54,7 +54,7 @@ export default function AppBackground({ className }: { className?: string }) {
                 {/* Desktop Dark */}
                 <div className="hidden md:block absolute inset-0 w-full h-full">
                     <Image
-                        src="/Bilder/SG_Background_Dark.png"
+                        src="/Bilder/SG_Background_Dark.webp"
                         alt="Smart German Background Dark"
                         fill
                         priority={true}
@@ -67,7 +67,7 @@ export default function AppBackground({ className }: { className?: string }) {
                 {/* Mobile Dark */}
                 <div className="block md:hidden absolute inset-0 w-full h-full">
                     <Image
-                        src="/Bilder/SG_Background_Dark_Mobile.png"
+                        src="/Bilder/SG_Background_Dark_Mobile.webp"
                         alt="Smart German Background Dark Mobile"
                         fill
                         priority={true}
