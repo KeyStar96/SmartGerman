@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
-import Header from "@/components/layout/Header";
+// Header moved to individual pages to prevent layout shifts
+// import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -67,7 +68,7 @@ export default async function RootLayout({
         */}
 
         {/* 3. Die oberste Ebene: Header (z-index: 50 für sticky) */}
-        <Header lang={lang} dictionary={dictionary} />
+        {/* Header moved to page.tsx */}
 
         {/* 4. Main Content: KEIN z-index damit backdrop-filter funktioniert! */}
         <SmoothScroll>

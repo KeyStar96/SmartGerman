@@ -9,6 +9,7 @@ import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
 import AppBackground from "@/components/effects/AppBackground";
 import BackgroundPinner from "@/components/effects/BackgroundPinner";
+import Header from "@/components/layout/Header";
 
 export default async function HomePage({
   params,
@@ -20,6 +21,7 @@ export default async function HomePage({
 
   return (
     <>
+      <Header lang={lang} dictionary={dictionary} />
       {/* 
         MAIN CONTENT WRAPPER 
         - Creates the scrollable document flow
