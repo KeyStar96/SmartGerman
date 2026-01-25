@@ -397,7 +397,8 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => (
             className={cn(
                 "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 pt-6 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors peer placeholder-transparent autofill:bg-transparent",
                 // Force transparent background for autofill and adjust text color
-                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset] [&:-webkit-autofill]:text-gray-900 dark:[&:-webkit-autofill]:text-[#E2D7CE]",
+                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
+                "[&:-webkit-autofill]:-webkit-text-fill-color-[#111827] dark:[&:-webkit-autofill]:-webkit-text-fill-color-[#E2D7CE]",
                 error && "border-red-500 dark:border-red-400"
             )}
         />
@@ -622,11 +623,14 @@ const PhoneInput = ({
                 </div>
 
                 <div className="relative flex-1">
-                    <input
-                        value={number}
-                        onChange={(e) => updateValue(code, e.target.value)}
-                        placeholder="123 456 7890"
-                        className="block w-full bg-transparent border-b border-gray-400/30 py-4 text-lg font-sans text-gray-900 focus:outline-none focus:border-[#FF5C00] transition-colors placeholder-gray-300 autofill:bg-transparent [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] [&:-webkit-autofill]:text-gray-900"
+                    value={number}
+                    onChange={(e) => updateValue(code, e.target.value)}
+                    placeholder="123 456 7890"
+                    className={cn(
+                        "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors placeholder-gray-300 autofill:bg-transparent",
+                        "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
+                        "[&:-webkit-autofill]:-webkit-text-fill-color-[#111827] dark:[&:-webkit-autofill]:-webkit-text-fill-color-[#E2D7CE]"
+                    )}
                     />
                 </div>
             </div>
@@ -908,8 +912,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     ].map((group, idx) => (
                                         <section key={idx}>
                                             <div className="flex items-center gap-3 mb-6 opacity-60">
-                                                <span className="font-mono text-[10px] uppercase tracking-widest text-black">{group.title}</span>
-                                                <div className="h-px bg-black/20 flex-1" />
+                                                <span className="font-mono text-[10px] uppercase tracking-widest text-black dark:text-[#FF5C00]">{group.title}</span>
+                                                <div className="h-px bg-black/20 dark:bg-white/20 flex-1" />
                                             </div>
                                             <div className="space-y-4">
                                                 {group.courses.map(c => (
@@ -995,17 +999,17 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     </div>
 
                                     {/* Summary: Courses */}
-                                    <div className="bg-white p-8 border border-black/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_courses_title} {nextMonthName}</h3>
+                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {nextMonthName}</h3>
                                         <div className="space-y-4">
                                             {selectedCoursesFull.map(c => {
                                                 const { totalUnits, deductions } = calculateMonthlyStats(c, lang);
                                                 const netPrice = c.price * totalUnits;
                                                 return (
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
-                                                        <span className="font-bold text-gray-900">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                                        <span className="font-bold text-gray-900 dark:text-[#E2D7CE]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
                                                         <div className="text-right">
-                                                            <span className="font-mono text-gray-900">{formatPrice(netPrice)} / {receipt?.monthly || "Monat"}</span>
+                                                            <span className="font-mono text-gray-900 dark:text-[#E2D7CE]">{formatPrice(netPrice)} / {receipt?.monthly || "Monat"}</span>
                                                             {deductions.length > 0 && (
                                                                 <div className="text-[10px] text-red-500 text-right">
                                                                     ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
