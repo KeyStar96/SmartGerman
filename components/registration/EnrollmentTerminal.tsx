@@ -623,14 +623,15 @@ const PhoneInput = ({
                 </div>
 
                 <div className="relative flex-1">
-                    value={number}
-                    onChange={(e) => updateValue(code, e.target.value)}
-                    placeholder="123 456 7890"
-                    className={cn(
-                        "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors placeholder-gray-300 autofill:bg-transparent",
-                        "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
-                        "[&:-webkit-autofill]:-webkit-text-fill-color-[#111827] dark:[&:-webkit-autofill]:-webkit-text-fill-color-[#E2D7CE]"
-                    )}
+                    <input
+                        value={number}
+                        onChange={(e) => updateValue(code, e.target.value)}
+                        placeholder="123 456 7890"
+                        className={cn(
+                            "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors placeholder-gray-300 autofill:bg-transparent",
+                            "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#F0EFE9_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
+                            "[&:-webkit-autofill]:-webkit-text-fill-color-[#111827] dark:[&:-webkit-autofill]:-webkit-text-fill-color-[#E2D7CE]"
+                        )}
                     />
                 </div>
             </div>
