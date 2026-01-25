@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -12,96 +12,14 @@ import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, Chev
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
-import { validateEmail } from "@/app/actions/validate-email";
+import { calculateMonthlyStats, getDurationMinutes, DAY_MAP } from "@/lib/course-calculations";
+import { createSchema, EnrollmentFormData } from "@/lib/registration-schema";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
-// --- CALENDAR LOGIC HELPER ---
 
-const DAY_MAP: Record<Day, number> = {
-    "So": 0, "Mo": 1, "Di": 2, "Mi": 3, "Do": 4, "Fr": 5, "Sa": 6
-};
 
-// Helper: Minuten berechnen
-const getDurationMinutes = (start: string, end: string) => {
-    const [sh, sm] = start.split(':').map(Number);
-    const [eh, em] = end.split(':').map(Number);
-    return (eh * 60 + em) - (sh * 60 + sm);
-};
 
-// Berechnet Termine & Einheiten im NÄCHSTEN Monat
-const calculateMonthlyStats = (course: CourseConfig, lang: string) => {
-    const now = new Date();
-    // Wenn heute Jan 2026 -> Ziel: Feb 2026
-    const targetYear = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear();
-    const targetMonth = now.getMonth() === 11 ? 0 : now.getMonth() + 1;
-
-    const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
-
-    let sessionCount = 0;
-    let totalUnits = 0;
-    let deductions: { amount: number, reason: string, date: string }[] = [];
-
-    // Map sessions map for easy lookup
-    const sessionsByDay = new Map<number, typeof course.sessions>();
-    course.sessions.forEach(s => {
-        const dIndex = DAY_MAP[s.day];
-        const existing = sessionsByDay.get(dIndex) || [];
-        sessionsByDay.set(dIndex, [...existing, s]);
-    });
-
-    const localeMap: Record<string, string> = {
-        'de': 'de-DE',
-        'en': 'en-US',
-        'ru': 'ru-RU',
-        'uk': 'uk-UA',
-        'tu': 'tr-TR'
-    };
-    const locale = localeMap[lang] || 'de-DE';
-
-    for (let d = 1; d <= daysInMonth; d++) {
-        const date = new Date(targetYear, targetMonth, d);
-        const dateStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const dayOfWeek = date.getDay();
-
-        const sessionsToday = sessionsByDay.get(dayOfWeek);
-        if (sessionsToday) {
-            sessionsToday.forEach(s => {
-                const mins = getDurationMinutes(s.startTime, s.endTime);
-                const units = mins / (course.unitDuration || 45);
-                const cost = units * course.price;
-
-                // Check for exception
-                const exception = EXCEPTIONS.find(e =>
-                    e.date === dateStr && (!e.courseIds || e.courseIds.includes(course.id))
-                );
-
-                if (exception) {
-                    deductions.push({
-                        amount: cost,
-                        reason: exception.reason,
-                        date: date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' })
-                    });
-                } else {
-                    sessionCount++;
-                    totalUnits += units;
-                }
-            });
-        }
-    }
-
-    let monthName = new Date(targetYear, targetMonth, 1).toLocaleString(locale, { month: 'long', year: 'numeric' });
-    if (['ru', 'uk'].includes(lang)) {
-        monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-    }
-
-    return {
-        sessionCount,
-        totalUnits,
-        deductions,
-        monthName
-    };
-};
 
 const MaskedDateInput = ({
     value,
@@ -249,25 +167,7 @@ const MaskedDateInput = ({
 };
 
 // --- ZOD SCHEMA ---
-const phoneRegex = /^[\d\s\+\-\(\)\/]{8,}$/;
-const createSchema = (t: any) => z.object({
-    personal: z.object({
-        firstName: z.string().min(2, t.registration.errors.firstname_required),
-        lastName: z.string().min(2, t.registration.errors.lastname_required),
-        email: z.string().email(t.registration.errors.email_invalid)
-            .refine(async (email) => {
-                const { isValid } = await validateEmail(email);
-                return isValid;
-            }, t.registration.errors.email_domain_invalid || "Invalid Domain"),
-        phone: z.string().trim().refine((val) => val === "" || phoneRegex.test(val), t.registration.errors.phone_invalid).optional(),
-        street: z.string().min(3, t.registration.errors.street_required),
-        zip: z.string().length(5, t.registration.errors.zip_length).regex(/^\d+$/, t.registration.errors.zip_numeric),
-        city: z.string().min(2, t.registration.errors.city_required),
-        birthDate: z.string().min(1, t.registration.errors.birthdate_required).regex(/^\d{2}\.\d{2}\.\d{4}$/, t.registration.errors.birthdate_incomplete || "Complete Date Required"),
-    }),
-});
 
-type EnrollmentFormData = z.infer<ReturnType<typeof createSchema>>;
 
 // --- COMPONENT: ROW (PAPER OPTIK) ---
 
@@ -398,32 +298,39 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
     );
 });
 
-const TerminalInput = ({ label, error, registration, ...props }: any) => (
-    <div className="relative group">
-        <input
-            {...registration}
-            {...props}
-            placeholder=" "
-            className={cn(
-                "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 pt-6 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors peer placeholder-transparent autofill:bg-transparent",
-                // Force transparent background for autofill and adjust text color
-                "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#FCF4E6_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
-                "[&:-webkit-autofill]:[-webkit-text-fill-color:#111827] dark:[&:-webkit-autofill]:[-webkit-text-fill-color:#E2D7CE]",
-                error && "border-red-500 dark:border-red-400"
-            )}
-        />
-        <label className={cn(
-            "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-all pointer-events-none",
-            jetbrainsMono.className,
-            "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-500",
-            "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]",
-            jetbrainsMono.className
-        )}>
-            {label} {props.required && <span className="text-[#FF5C00]">*</span>}
-        </label>
-        {error && <span className={cn("text-red-500 dark:text-red-400 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
-    </div>
-);
+const TerminalInput = ({ label, error, registration, ...props }: any) => {
+    const defaultId = React.useId ? React.useId() : Math.random().toString(36).substr(2, 9);
+    const id = props.id || registration?.name || defaultId;
+    return (
+        <div className="relative group">
+            <input
+                id={id}
+                {...registration}
+                {...props}
+                placeholder=" "
+                className={cn(
+                    "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 pt-6 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors peer placeholder-transparent autofill:bg-transparent",
+                    // Force transparent background for autofill and adjust text color
+                    "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#FCF4E6_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
+                    "[&:-webkit-autofill]:[-webkit-text-fill-color:#111827] dark:[&:-webkit-autofill]:[-webkit-text-fill-color:#E2D7CE]",
+                    error && "border-red-500 dark:border-red-400"
+                )}
+            />
+            <label
+                htmlFor={id}
+                className={cn(
+                    "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-all pointer-events-none",
+                    jetbrainsMono.className,
+                    "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-500",
+                    "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]",
+                    jetbrainsMono.className
+                )}>
+                {label} {props.required && <span className="text-[#FF5C00]">*</span>}
+            </label>
+            {error && <span className={cn("text-red-500 dark:text-red-400 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
+        </div>
+    );
+};
 
 const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => {
     const [isOpen, setIsOpen] = useState(false);
