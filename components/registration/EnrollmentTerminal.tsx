@@ -983,7 +983,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     className="flex flex-col gap-8 h-full"
                                 >
                                     <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
-                                        <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b pb-4">{wizard?.summary_data_title}</h3></div>
+                                        <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
                                             <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
                                             <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
