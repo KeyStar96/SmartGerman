@@ -179,7 +179,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             {claimWords.map((word, wordIndex) => (
               <span key={wordIndex} className="inline-block whitespace-nowrap mr-[0.5em] last:mr-0">
                 {word.split("").map((char, charIndex) => (
-                  <span key={`${wordIndex}-${charIndex}`} className="char inline-block opacity-0 w-auto">
+                  <span key={`${wordIndex}-${charIndex}`} className="char inline-block opacity-0 w-auto will-change-opacity">
                     {char}
                   </span>
                 ))}
@@ -188,7 +188,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             {/* Absolute Cursor */}
             <span
               ref={cursorRef}
-              className="cursor-blink absolute top-0 left-0 text-[#FF5C00] font-bold pointer-events-none"
+              className="cursor-blink absolute top-0 left-0 text-[#FF5C00] font-bold pointer-events-none will-change-transform"
               style={{ opacity: 0 }} // Hidden initially, shown by GSAP
             >
               _

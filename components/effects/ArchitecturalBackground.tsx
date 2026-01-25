@@ -17,7 +17,7 @@ export default function ArchitecturalBackground({ className }: { className?: str
                 className
             )}
         >
-            <div className="absolute inset-0 w-full h-full opacity-100 dark:opacity-0 transition-opacity duration-[1500ms]">
+            <div className="absolute inset-0 w-full h-full opacity-100 dark:opacity-0 transition-opacity duration-[1500ms] will-change-opacity">
                 <Img
                     src="/Bilder/SG_BG_Light.png"
                     alt="Architectural Background Light"
@@ -29,7 +29,7 @@ export default function ArchitecturalBackground({ className }: { className?: str
                 />
             </div>
 
-            <div className="absolute inset-0 w-full h-full opacity-0 dark:opacity-100 transition-opacity duration-[1500ms]">
+            <div className="absolute inset-0 w-full h-full opacity-0 dark:opacity-100 transition-opacity duration-[1500ms] will-change-opacity">
                 <Img
                     src="/Bilder/SG_BG_Dark.JPG"
                     alt="Architectural Background Dark"

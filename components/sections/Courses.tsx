@@ -76,13 +76,13 @@ export default function Courses({ dictionary }: CoursesProps) {
   const t_days = dictionary?.timetable?.days;
   const t_instructors = dictionary?.timetable?.instructors;
 
-  if (!sectionData || !courseTexts) return null;
+  // Memoize displayed courses
+  const displayedCourses = React.useMemo(() => {
+    return COURSES.filter((c) => c.type === filter);
+  }, [filter]);
 
-  // Filter courses based on active tab
-  const displayedCourses = COURSES.filter((c) => c.type === filter);
-
-  // Helper to format schedule string
-  const formatSchedule = (sessions: CourseConfig["sessions"]) => {
+  // Helper to format schedule string - MEMOIZED
+  const formatSchedule = React.useCallback((sessions: CourseConfig["sessions"]) => {
     return sessions.map((s) => {
       // Map "Mo" -> "Montag" (or localized logic? dictionary has "mo": "Mo")
       // Use dictionary.timetable.days[s.day.toLowerCase()]
@@ -90,12 +90,14 @@ export default function Courses({ dictionary }: CoursesProps) {
       const localizedDay = t_days?.[dayKey] || s.day; // Fallback to "Mo"
       return `${localizedDay} ${s.startTime}-${s.endTime}`;
     });
-  };
+  }, [t_days]);
 
-  // Helper to format price
-  const formatPrice = (price: number) => {
+  // Helper to format price - MEMOIZED
+  const formatPrice = React.useCallback((price: number) => {
     return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(price);
-  };
+  }, []);
+
+  if (!sectionData || !courseTexts) return null;
 
   return (
     <section
@@ -210,7 +212,7 @@ interface CourseCardProps {
   educatorName: string;
 }
 
-function CourseCard({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) {
+const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) => {
   // Infer unit based on price/duration or fallback
   // Strictly use config duration
   const unit = `/ ${config.unitDuration} min`;
@@ -358,4 +360,4 @@ function CourseCard({ config, text, formattedSchedule, formattedPrice, educatorN
       </div>
     </motion.div>
   );
-}
+});

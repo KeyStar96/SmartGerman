@@ -271,7 +271,7 @@ type EnrollmentFormData = z.infer<ReturnType<typeof createSchema>>;
 
 // --- COMPONENT: ROW (PAPER OPTIK) ---
 
-const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, dictionary }: any) => {
+const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatted, level, dictionary }: any) => {
     const t = dictionary?.registration?.course_card;
     const daysDict = dictionary?.timetable?.days;
 
@@ -367,7 +367,6 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
             {/* Expanded Details when selected */}
             <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pl-9 md:pl-[44px]">
                 {course.sessions.map((s: any, i: number) => {
-                    const daysDict = dictionary?.timetable?.days;
                     // Properly access day properties
                     const shortWeekdays: Record<string, string> = {
                         "mo": daysDict?.mo || "Mo",
@@ -389,7 +388,15 @@ const CourseRow = ({ course, selected, onToggle, title, priceFormatted, level, d
             </div>
         </motion.div>
     );
-};
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.selected === nextProps.selected &&
+        prevProps.title === nextProps.title &&
+        prevProps.priceFormatted === nextProps.priceFormatted &&
+        prevProps.level === nextProps.level &&
+        prevProps.course.id === nextProps.course.id
+    );
+});
 
 const TerminalInput = ({ label, error, registration, ...props }: any) => (
     <div className="relative group">
@@ -667,10 +674,14 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    // Grouping Logic
-    const presenceCourses = COURSES.filter(c => c.type === 'presence' && !c.id.includes('speech'));
-    const onlineCourses = COURSES.filter(c => c.type === 'online');
-    const speechCourses = COURSES.filter(c => c.id.includes('speech'));
+    // Grouping Logic - MEMOIZED
+    const { presenceCourses, onlineCourses, speechCourses } = React.useMemo(() => {
+        return {
+            presenceCourses: COURSES.filter(c => c.type === 'presence' && !c.id.includes('speech')),
+            onlineCourses: COURSES.filter(c => c.type === 'online'),
+            speechCourses: COURSES.filter(c => c.id.includes('speech'))
+        };
+    }, []);
 
     // Calc Next Month for UI Display
     const nextMonthName = calculateMonthlyStats(COURSES[0], lang).monthName;
@@ -689,11 +700,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         }
     }, [initialCourseId]);
 
-    const toggleCourse = (id: string) => {
+    const toggleCourse = React.useCallback((id: string) => {
         setSelectedCourseIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-    };
+    }, []);
 
-    const getCourseData = (c: CourseConfig) => ({
+    const getCourseData = React.useCallback((c: CourseConfig) => ({
         // Fix lookup logic: keys in course-config ('a1_1_50plus') vs keys in dictionary ('de50_a1_1' in RU/UK/TU vs 'a1_1_50plus' in DE/EN).
         // To be safe, we should align course-config or dictionaries.
         // Assuming dictionaries are the source of truth for CONTENT, and course-config for LOGIC.
@@ -702,17 +713,19 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
         level: dictionary?.CourseData?.[c.translationKey]?.level,
         dictionary // Pass dictionary down
-    });
+    }), [dictionary, lang]);
 
     const selectedCoursesFull = COURSES.filter(c => selectedCourseIds.includes(c.id));
 
-    // Dynamic Total Calculation
-    const totalMonthlyPrice = selectedCoursesFull.reduce((acc, c) => {
-        const { totalUnits } = calculateMonthlyStats(c, lang);
-        return acc + (totalUnits * c.price);
-    }, 0);
+    // Dynamic Total Calculation - MEMOIZED
+    const totalMonthlyPrice = React.useMemo(() => {
+        return selectedCoursesFull.reduce((acc, c) => {
+            const { totalUnits } = calculateMonthlyStats(c, lang);
+            return acc + (totalUnits * c.price);
+        }, 0);
+    }, [selectedCoursesFull, lang]);
 
-    const formatPrice = (p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p);
+    const formatPrice = React.useCallback((p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p), []);
 
     const onSubmit = async (data: EnrollmentFormData) => {
         setIsSubmitting(true);
