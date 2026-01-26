@@ -451,7 +451,13 @@
       "city_required": "Місто обов'язкове",
       "birthdate_required": "Дата народження обов'язкова",
       "birthdate_incomplete": "Потрібна повна дата",
-      "selection_required": "Будь ласка, оберіть хоча б один курс."
+      "selection_required": "Будь ласка, виберіть принаймні один курс.",
+      "invalid_date": "Невірна дата",
+      "future_date": "Дата в майбутньому",
+      "underage": "Вам має бути 18+",
+      "invalid_chars_name": "Без цифр і спецсимволів",
+      "max_length": "Занадто довго",
+      "invalid_chars_generic": "Недопустимі символи"
     },
     "buttons": {
       "next": "Далі",

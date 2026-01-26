@@ -451,7 +451,13 @@
       "city_required": "Город обязателен",
       "birthdate_required": "Дата рождения обязательна",
       "birthdate_incomplete": "Требуется полная дата",
-      "selection_required": "Пожалуйста, выберите хотя бы один курс."
+      "selection_required": "Пожалуйста, выберите хотя бы один курс.",
+      "invalid_date": "Неверная дата",
+      "future_date": "Дата в будущем",
+      "underage": "Вам должно быть 18+",
+      "invalid_chars_name": "Без цифр и спецсимволов",
+      "max_length": "Слишком длинно",
+      "invalid_chars_generic": "Недопустимые символы"
     },
     "buttons": {
       "next": "Далее",

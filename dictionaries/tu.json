@@ -457,7 +457,13 @@
       "city_required": "Şehir gerekli",
       "birthdate_required": "Doğum tarihi gerekli",
       "birthdate_incomplete": "Tam Tarih Gerekli",
-      "selection_required": "Lütfen en az bir kurs seçin."
+      "selection_required": "Lütfen en az bir kurs seçin.",
+      "invalid_date": "Geçersiz tarih",
+      "future_date": "Tarih gelecekte olamaz",
+      "underage": "18 yaşından büyük olmalısınız",
+      "invalid_chars_name": "Sayı veya özel karakter yok",
+      "max_length": "Çok uzun",
+      "invalid_chars_generic": "Geçersiz karakterler"
     },
     "buttons": {
       "next": "Devam",

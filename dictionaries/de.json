@@ -605,7 +605,13 @@
       "city_required": "Ort ist erforderlich",
       "birthdate_required": "Geburtsdatum ist erforderlich",
       "birthdate_incomplete": "Vollständiges Datum erforderlich",
-      "selection_required": "Bitte wählen Sie mindestens einen Kurs."
+      "selection_required": "Bitte wählen Sie mindestens einen Kurs.",
+      "invalid_date": "Ungültiges Datum",
+      "future_date": "Datum in Zukunft",
+      "underage": "Mindestalter 18 Jahre",
+      "invalid_chars_name": "Keine Zahlen/Sonderzeichen",
+      "max_length": "Eingabe zu lang",
+      "invalid_chars_generic": "Ungültige Zeichen"
     },
     "buttons": {
       "next": "Fortfahren",

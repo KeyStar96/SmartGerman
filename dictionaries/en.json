@@ -603,7 +603,13 @@
       "city_required": "City is required",
       "birthdate_required": "Date of birth is required",
       "birthdate_incomplete": "Complete Date Required",
-      "selection_required": "Please select at least one course."
+      "selection_required": "Please select at least one course.",
+      "invalid_date": "Invalid date",
+      "future_date": "Date is in the future",
+      "underage": "Must be 18+",
+      "invalid_chars_name": "No numbers/special chars",
+      "max_length": "Too long",
+      "invalid_chars_generic": "Invalid characters"
     },
     "buttons": {
       "next": "Continue",
