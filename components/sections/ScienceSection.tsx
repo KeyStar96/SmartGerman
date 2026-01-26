@@ -12,6 +12,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
 
     return (
         <section
+            id="science"
             ref={containerRef}
             className="relative min-h-screen py-32 overflow-hidden bg-transparent"
         >

@@ -133,6 +133,14 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
   }, { scope: container, dependencies: [isLoaded] });
 
+  // Scroll Helper
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section
       ref={container}
@@ -213,6 +221,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
             {/* Primary Button: Orange (Brand Match), Square, Mono, Small */}
             <button
+              onClick={() => scrollToSection('science')}
               className="bg-[#FF5C00] text-white hover:bg-[#E05200] px-8 py-4 rounded-none font-mono text-xs uppercase tracking-widest transition-all duration-300 shadow-sm hover:shadow-md"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
@@ -221,6 +230,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
             {/* Secondary Button: Mono Link */}
             <button
+              onClick={() => scrollToSection('courses')}
               className="group flex items-center gap-3 text-[#2D3436] dark:text-[#E2D7CE] hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors duration-300 font-mono text-xs uppercase tracking-widest border-b border-transparent hover:border-current py-2"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
