@@ -13,7 +13,7 @@
       "online_courses": "Online courses"
     },
     "nav": {
-      "home": "Home",
+      "home": "Home Page",
       "courses": "Courses",
       "prices": "Prices",
       "enroll": "Enroll"
@@ -34,8 +34,7 @@
     "claim": "Language Acquisition through Science.",
     "subline": "Learning languages is not a question of age, but a question of method.",
     "cta_primary": "Discover the Method",
-    "cta_secondary": "Course Schedule 2026",
-    "scroll_label": "SCROLL"
+    "cta_secondary": "Course Schedule 2026"
   },
   "sections": {
     "quality_success": {
@@ -69,7 +68,7 @@
       "intro": "Choose the format that suits your goals. In-person classes for direct exchange or flexible online courses for maximum comfort.",
       "switch": {
         "presence": "In-Person",
-        "online": "Online"
+        "online": "Online Mode"
       },
       "categories": {
         "presence": [
@@ -85,7 +84,7 @@
             "price_unit": "/ 45 Min",
             "price_note": "(Social Rate)",
             "description": "Specially designed for learners 50+. Slow pace, relaxed atmosphere.",
-            "max_participants": "Max: 20 Pers.",
+            "max_participants": "Max: 20 People",
             "badge": "In-Person"
           },
           {
@@ -100,7 +99,7 @@
             "price_unit": "/ 45 Min",
             "price_note": "",
             "description": "Advanced beginners. Deepening the basics.",
-            "max_participants": "Max: 20 Pers.",
+            "max_participants": "Max: 20 People",
             "badge": "In-Person"
           },
           {
@@ -115,7 +114,7 @@
             "price_unit": "/ 45 Min",
             "price_note": "",
             "description": "Independent communication (doctors, authorities).",
-            "max_participants": "Max: 20 Pers.",
+            "max_participants": "Max: 20 People",
             "badge": "In-Person"
           },
           {
@@ -162,7 +161,9 @@
             "description": "Confident speaking in everyday situations.",
             "max_participants": "",
             "badge": "In-Person"
-          },
+          }
+        ],
+        "online": [
           {
             "id": "online_a1_1",
             "group": "Group 3: Online (Start March 2026)",
@@ -175,8 +176,8 @@
             "price_unit": "/ 90 Min",
             "price_note": "",
             "description": "Comfortably from home. Incl. Telegram support.",
-            "max_participants": "Max: 10 Pers.",
-            "badge": "Online"
+            "max_participants": "Max: 10 People",
+            "badge": "Online Course"
           },
           {
             "id": "online_b1",
@@ -191,7 +192,7 @@
             "price_note": "",
             "description": "Intermediate level for advanced learners.",
             "max_participants": "",
-            "badge": "Online"
+            "badge": "Online Course"
           },
           {
             "id": "online_b2",
@@ -206,7 +207,7 @@
             "price_note": "",
             "description": "For Career & Studies.",
             "max_participants": "",
-            "badge": "Online"
+            "badge": "Online Course"
           }
         ]
       },
@@ -236,15 +237,15 @@
     "title": "Our Courses",
     "subtitle": "From beginner to pro – we have the right course for you.",
     "price_label": "Price",
-    "flip_hint": "DETAILS",
-    "back_hint": "BACK",
+    "flip_hint": "VIEW DETAILS",
+    "back_hint": "GO BACK",
     "backface_labels": {
       "unit": "UNIT",
       "appointments": "APPOINTMENTS",
       "group": "GROUP",
       "instructor": "INSTRUCTOR",
       "location": "LOCATION",
-      "extras": "EXTRAS",
+      "extras": "EXTRAS:",
       "contract": "CONTRACT",
       "monthly_cancellable": "Monthly cancellable",
       "monthly_cancellable_short": "Monthly cancellable",
@@ -297,7 +298,7 @@
     },
     "course_types": {
       "presence": "In-Person",
-      "online": "Online"
+      "online": "Online Class"
     },
     "locations": {
       "presence": "Königstraße 20",
@@ -462,7 +463,7 @@
       "mission": "Tailored German courses for newcomers in Germany. Making language and culture accessible."
     },
     "Nav": {
-      "home": "Home",
+      "home": "Home Page",
       "courses": "Courses",
       "prices": "Prices",
       "about": "About Me",
@@ -511,7 +512,7 @@
     },
     "tabs": {
       "presence": "IN-PERSON",
-      "online": "ONLINE"
+      "online": "ONLINE CLASS"
     },
     "footer_note": "All courses are monthly cancellable. Telegram support included. All prices incl. VAT."
   },
@@ -620,7 +621,7 @@
       "order_binding": "Order with Obligation to Pay"
     },
     "course_card": {
-      "online_label": "Online",
+      "online_label": "Online Course",
       "presence_label": "IN-PERSON",
       "level_range": "A1 - C1",
       "units_suffix": "/ Units"
@@ -628,7 +629,7 @@
     "receipt": {
       "title": "ESTIMATED FEES",
       "tuition": "Tuition Fee",
-      "total": "Total / EUR",
+      "total": "Total Amount / EUR",
       "note": "* Incl. VAT / Payable upon receipt of invoice",
       "waiting": "[ Waiting for selection ]",
       "live_title": "Live Receipt",
@@ -650,7 +651,7 @@
     "group_titles": {
       "presence": "01 // IN-PERSON",
       "speech": "02 // SPEAKING TRAINING",
-      "online": "03 // ONLINE"
+      "online": "03 // ONLINE CLASS"
     },
     "wizard": {
       "step1_title": "Course Selection",
@@ -670,7 +671,7 @@
       "btn_order": "ORDER NOW",
       "step_label": "STEP",
       "summary_labels": {
-        "name": "Name",
+        "name": "Full Name",
         "contact": "Contact",
         "personal": "Personal",
         "address": "Address"

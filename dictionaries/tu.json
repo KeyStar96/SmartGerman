@@ -34,8 +34,7 @@
     "claim": "Bilim Yoluyla Dil Edinimi.",
     "subline": "Dil öğrenmek yaş meselesi değil, yöntem meselesidir.",
     "cta_primary": "Yöntemi Keşfet",
-    "cta_secondary": "2026 Kurs Programı",
-    "scroll_label": "KAYDIR"
+    "cta_secondary": "2026 Kurs Programı"
   },
   "sections": {
     "quality_success": {
@@ -71,7 +70,147 @@
         "presence": "Yüz yüze",
         "online": "Çevrimiçi"
       },
-      "categories": {},
+      "categories": {
+        "presence": [
+          {
+            "id": "de50_a1_1",
+            "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
+            "title": "Almanca 50+ A1.1",
+            "level": "A1.1",
+            "instructor": "Anastasia Sitov",
+            "time": "Pzt 9:00-10:30 & Sal 10:30-12:00",
+            "freq": "2x 90 dk",
+            "price": "2,50€",
+            "price_unit": "/ 45 Dk",
+            "price_note": "(Sosyal Tarife)",
+            "description": "Özellikle 50 yaş üstü kişiler için. Yavaş tempo, rahat atmosfer.",
+            "max_participants": "Maks: 20 Kişi",
+            "badge": "Yüz Yüze"
+          },
+          {
+            "id": "de50_a1_2",
+            "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
+            "title": "Almanca 50+ A1.2",
+            "level": "A1.2",
+            "instructor": "Anastasia Sitov",
+            "time": "Sal 9:00-10:30 & Çar 10:30-12:00",
+            "freq": "2x 90 dk",
+            "price": "2,50€",
+            "price_unit": "/ 45 Dk",
+            "price_note": "",
+            "description": "İleri başlangıç seviyesi. Temelleri derinleştirme.",
+            "max_participants": "Maks: 20 Kişi",
+            "badge": "Yüz Yüze"
+          },
+          {
+            "id": "de50_a2",
+            "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
+            "title": "Almanca 50+ A2",
+            "level": "A2",
+            "instructor": "Anastasia Sitov",
+            "time": "Pzt 10:30-12:00 & Çar 9:00-10:30",
+            "freq": "2x 90 dk",
+            "price": "2,50€",
+            "price_unit": "/ 45 Dk",
+            "price_note": "",
+            "description": "Bağımsız iletişim (doktorlar, yetkililer).",
+            "max_participants": "Maks: 20 Kişi",
+            "badge": "Yüz Yüze"
+          },
+          {
+            "id": "speech_a1_1",
+            "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
+            "title": "Konuşma Eğitimi A1.1",
+            "level": "A1.1",
+            "instructor": "Anastasia Sitov",
+            "time": "Sal 12:00-13:00",
+            "freq": "1x 60 dk",
+            "price": "3,50€",
+            "price_unit": "/ 60 Dk",
+            "price_note": "",
+            "description": "Çekingenliği yenin, güven kazanın.",
+            "max_participants": "",
+            "badge": "Yüz Yüze"
+          },
+          {
+            "id": "speech_a1_2",
+            "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
+            "title": "Konuşma Eğitimi A1.2",
+            "level": "A1.2",
+            "instructor": "Anastasia Sitov",
+            "time": "Çar 12:00-13:00",
+            "freq": "1x 60 dk",
+            "price": "3,50€",
+            "price_unit": "/ 60 Dk",
+            "price_note": "",
+            "description": "Konuşma becerilerini derinleştirme.",
+            "max_participants": "",
+            "badge": "Yüz Yüze"
+          },
+          {
+            "id": "speech_a2",
+            "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
+            "title": "Konuşma Eğitimi A2",
+            "level": "A2",
+            "instructor": "Anastasia Sitov",
+            "time": "Pzt 12:00-13:00",
+            "freq": "1x 60 dk",
+            "price": "3,50€",
+            "price_unit": "/ 60 Dk",
+            "price_note": "",
+            "description": "Günlük durumlarda kendinden emin konuşma.",
+            "max_participants": "",
+            "badge": "Yüz Yüze"
+          }
+        ],
+        "online": [
+          {
+            "id": "online_a1_1",
+            "group": "Grup 3: Çevrimiçi (Başlangıç Mart 2026)",
+            "title": "Temeller A1.1 (Çevrimiçi)",
+            "level": "A1.1",
+            "instructor": "Anastasia Sitov",
+            "time": "Per & Cum 19:00-20:30",
+            "freq": "",
+            "price": "15€",
+            "price_unit": "/ 90 Dk",
+            "price_note": "",
+            "description": "Evden rahatça. Telegram desteği dahil.",
+            "max_participants": "Maks: 10 Kişi",
+            "badge": "Çevrimiçi"
+          },
+          {
+            "id": "online_b1",
+            "group": "Grup 3: Çevrimiçi (Başlangıç Mart 2026)",
+            "title": "Almanca B1 (Çevrimiçi)",
+            "level": "B1",
+            "instructor": "Anastasia Sitov",
+            "time": "Pzt & Sal 14:30-16:00",
+            "freq": "",
+            "price": "15€",
+            "price_unit": "/ 90 Dk",
+            "price_note": "",
+            "description": "İleri düzey öğrenciler için orta seviye.",
+            "max_participants": "",
+            "badge": "Çevrimiçi"
+          },
+          {
+            "id": "online_b2",
+            "group": "Grup 3: Çevrimiçi (Başlangıç Mart 2026)",
+            "title": "Almanca B2 (Çevrimiçi)",
+            "level": "B2",
+            "instructor": "Lisa Kahl",
+            "time": "Pzt & Çar 16:00-17:30",
+            "freq": "",
+            "price": "15€",
+            "price_unit": "/ 90 Dk",
+            "price_note": "",
+            "description": "Kariyer ve Eğitim İçin.",
+            "max_participants": "",
+            "badge": "Çevrimiçi"
+          }
+        ]
+      },
       "usp": {
         "telegram_title": "Telegram Grubu & Materyaller",
         "telegram_desc": "7/24 erişim, öğretmenle doğrudan hat, kaçırılan dersleri kolayca telafi etme.",
@@ -98,15 +237,15 @@
     "title": "Kurslarımız",
     "subtitle": "Başlangıçtan profesyonele – sizin için doğru kursa sahibiz.",
     "price_label": "Fiyat",
-    "flip_hint": "DETAY",
+    "flip_hint": "DETAYLAR",
     "back_hint": "GERİ",
     "backface_labels": {
-      "unit": "BİRİM",
+      "unit": "ÜNİTE",
       "appointments": "RANDEVULAR",
       "group": "GRUP",
       "instructor": "EĞİTMEN",
       "location": "KONUM",
-      "extras": "EKSTRALAR",
+      "extras": "EKSTRALAR:",
       "contract": "SÖZLEŞME",
       "monthly_cancellable": "Aylık iptal edilebilir",
       "monthly_cancellable_short": "Aylık iptal edilebilir",
@@ -216,23 +355,37 @@
     "friday": "Cuma"
   },
   "timetable": {
+    "title_line1": "GÜNCEL",
+    "title_line2": "DERS PROGRAMI",
+    "subtitle": "TÜM KURSLAR BİR BAKIŞTA",
     "days": {
+      "monday": "Pazartesi",
+      "tuesday": "Salı",
+      "wednesday": "Çarşamba",
+      "thursday": "Perşembe",
+      "friday": "Cuma",
       "mo": "Pzt",
       "di": "Sal",
       "mi": "Çar",
       "do": "Per",
       "fr": "Cum"
     },
+    "course_types": {
+      "presence": "Yüz Yüze",
+      "online": "Çevrimiçi"
+    },
+    "locations": {
+      "presence": "Königstraße 20",
+      "online": "Microsoft Teams"
+    },
     "instructors": {
       "standard": "Anastasia Sitov",
-      "lisa": "Lisa Kahl"
+      "special": "Lisa Kahl"
     },
-    "subtitle": "BİR BAKIŞTA TÜM KURSLAR",
-    "title_line1": "GÜNCEL",
-    "title_line2": "DERS PROGRAMI",
-    "locations": {
-      "presence": "Yüz yüze",
-      "online": "Çevrimiçi"
+    "labels": {
+      "time": "Saat",
+      "course": "Ders",
+      "room": "Oda"
     }
   },
   "location": {
@@ -427,8 +580,8 @@
   },
   "registration": {
     "back_home": "ANA SAYFAYA DÖN",
-    "step_course": "KURS",
-    "step_personal": "KİŞİSEL",
+    "step_course": "DERS",
+    "step_personal": "KİŞİSEL VERİLER",
     "headline": "Akademik yolculuğunuza başlayın.",
     "subline": "Lütfen formu doldurun. Verileriniz SSL ile şifrelenir ve gizli tutulur.",
     "course_selection": "Modülünüzü seçin.",
@@ -481,50 +634,50 @@
     },
     "receipt": {
       "title": "TAHMİNİ ÜCRETLER",
-      "tuition": "Eğitim Ücreti",
-      "total": "Toplam / EUR",
-      "note": "* KDV Dahil / Fatura alındıktan sonra ödenir",
+      "tuition": "Öğrenim Ücreti",
+      "total": "Tutar / EUR",
+      "note": "* KDV Dahil / Fatura alındıktan sonra ödenecek",
       "waiting": "[ Seçim bekleniyor ]",
-      "live_title": "Canlı Özet",
-      "units": "Birim",
-      "sessions": "Ders",
+      "live_title": "Canlı Makbuz",
+      "units": "Birimler",
+      "sessions": "Oturumlar",
       "monthly": "Aylık",
       "total_sum": "Toplam Tutar",
       "no_selection": "// Henüz seçim yok",
       "cancellation_s": "İptal",
-      "cancellation_p": "İptal",
+      "cancellation_p": "İptaller",
       "incl": "dahil"
     },
     "success": {
       "title": "Kayıt Onaylandı",
-      "message": "Belgelerinizi aldık. Kısa süre içinde kurs katılımı ile ilgili detayları içeren bir e-posta alacaksınız.",
-      "ref": "REFERANS NO",
+      "message": "Belgelerinizi aldık. Kısa süre içinde kurssa katılım detaylarını içeren bir e-posta alacaksınız.",
+      "ref": "REFERANS-ID",
       "back_button": "Ana Sayfaya Dön"
     },
     "group_titles": {
       "presence": "01 // YÜZ YÜZE",
       "speech": "02 // KONUŞMA EĞİTİMİ",
-      "online": "03 // ÇEVRİMİÇİ"
+      "online": "03 // ÇEVRİMİÇİ SINIF"
     },
     "wizard": {
       "step1_title": "Kurs Seçimi",
-      "step1_sub": "Başlangıç için modüllerinizi seçin:",
-      "step2_title": "Kişisel Bilgiler",
-      "step2_sub": "Fatura için bu bilgilere ihtiyacımız var.",
+      "step1_sub": "Maksimum verimlilik için düzenlendi.",
+      "step2_title": "Kimliğiniz.",
+      "step2_sub": "Bu verilere resmi kaydınız için ihtiyacımız var.",
       "step3_title": "Kayıt Protokolü",
       "step3_sub": "Lütfen bilgilerinizi kontrol edin.",
       "progress_course": "Kurs Seçimi",
-      "progress_personal": "Kişisel",
-      "progress_review": "Özet",
+      "progress_personal": "Kişisel Veriler",
+      "progress_review": "İnceleme",
       "btn_next": "SONRAKİ ADIM",
       "btn_continue": "DEVAM ET",
       "btn_almost": "NEREDEYSE BİTTİ",
-      "btn_overview": "ÖZETE GİT",
+      "btn_overview": "GENEL BAKIŞA",
       "btn_binding": "BAĞLAYICI",
-      "btn_order": "ÜCRETLİ SİPARİŞ VER",
+      "btn_order": "ŞİMDİ SİPARİŞ VER",
       "step_label": "ADIM",
       "summary_labels": {
-        "name": "Ad",
+        "name": "Tam İsim",
         "contact": "İletişim",
         "personal": "Kişisel",
         "address": "Adres"
