@@ -106,7 +106,7 @@ describe('Registration Schema Validation (Exhaustive Permutations)', () => {
         ["abcde", "Zip Numeric"],  // Letters
         ["12.45", "Zip Numeric"],  // Dots
         ["12-45", "Zip Numeric"],  // Dashes
-        [" 2345", "Zip Numeric"],  // Leading space
+        // [" 2345", "Zip Numeric"],  // Leading space -> THIS IS NOW VALID AFTER TRIMMING
     ];
 
     test.each(invalidZips)('Invalid Zip: %s expect error %s', async (zip, expectedError) => {
@@ -187,6 +187,35 @@ describe('Registration Schema Validation (Exhaustive Permutations)', () => {
         expect(result.success).toBe(false);
         if (!result.success) {
             expect(result.error.format().personal?.email?._errors).toContain("Domain Invalid");
+        }
+    });
+
+    // --- 7. WHITESPACE TRIMMING ---
+    test('Trims whitespace from input fields', async () => {
+        const dataWithWhitespace = {
+            personal: {
+                firstName: "  John  ",
+                lastName: "  Doe  ",
+                email: "  john@example.com  ",
+                phone: "  +49 12345678  ",
+                street: "  Main Street 1  ",
+                zip: "  12345  ",
+                city: "  Berlin  ",
+                birthDate: "  01.01.1990  "
+            }
+        };
+
+        const result = await schema.safeParseAsync(dataWithWhitespace);
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.personal.firstName).toBe("John");
+            expect(result.data.personal.lastName).toBe("Doe");
+            expect(result.data.personal.email).toBe("john@example.com");
+            expect(result.data.personal.phone).toBe("+49 12345678");
+            expect(result.data.personal.street).toBe("Main Street 1");
+            expect(result.data.personal.zip).toBe("12345");
+            expect(result.data.personal.city).toBe("Berlin");
+            expect(result.data.personal.birthDate).toBe("01.01.1990");
         }
     });
 });
