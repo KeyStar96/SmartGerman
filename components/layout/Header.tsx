@@ -174,14 +174,19 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
         href={`/${lang}`}
         className={cn(
           "block flex items-center justify-center", // layout
-          "px-6 py-2 rounded-full border", // shape
-          "backdrop-blur-[50px] bg-white/80 dark:bg-black/80", // Fat blur & high opacity
-          "border-white/20 dark:border-white/10", // border
+          "relative px-6 py-2 rounded-full overflow-hidden", // shape & clipping
+          "border border-white/20 dark:border-white/10", // border
           "shadow-lg shadow-black/5 dark:shadow-black/20", // shadow
-          "transition-transform duration-300 hover:scale-105" // hover
+          "transition-transform duration-300 hover:scale-105 group" // hover transform on parent
         )}
       >
-        <LogoImage />
+        {/* Background Layer - Isolated from Transform */}
+        <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0" />
+
+        {/* Content Layer */}
+        <div className="relative z-10">
+          <LogoImage />
+        </div>
       </Link>
     </motion.div>
   );
@@ -221,39 +226,45 @@ function FloatingNav({ links, activeSection, isHidden, onNavClick }: { links: an
       }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       className={cn(
-        "flex items-center gap-1 p-1.5 rounded-full border",
-        "backdrop-blur-[50px] bg-white/80 dark:bg-black/80", // Fat blur & high opacity
-        "border-white/20 dark:border-white/10",
-        "shadow-lg shadow-black/5 dark:shadow-black/20"
+        "relative flex items-center gap-1 p-1.5 rounded-full",
+        "border border-white/20 dark:border-white/10",
+        "shadow-lg shadow-black/5 dark:shadow-black/20",
+        "overflow-hidden" // Ensure background is clipped
       )}
     >
-      {links.map((link) => {
-        const isActive = activeSection === link.id;
-        return (
-          <a
-            key={link.id}
-            href={`#${link.id}`}
-            onClick={(e) => {
-              e.preventDefault();
-              onNavClick(link.id);
-            }}
-            className={cn(
-              "relative px-4 py-2 rounded-full text-xs font-medium tracking-wide upperscaled transition-colors duration-300",
-              isActive ? "text-black dark:text-white" : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
-            )}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="activeNav"
-                className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-full shadow-sm"
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                style={{ zIndex: -1 }}
-              />
-            )}
-            {link.label}
-          </a>
-        );
-      })}
+      {/* Background Layer - Isolated from Transform */}
+      <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0 pointer-events-none" />
+
+      {/* Content Layer */}
+      <div className="relative z-10 flex items-center gap-1">
+        {links.map((link) => {
+          const isActive = activeSection === link.id;
+          return (
+            <a
+              key={link.id}
+              href={`#${link.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavClick(link.id);
+              }}
+              className={cn(
+                "relative px-4 py-2 rounded-full text-xs font-medium tracking-wide upperscaled transition-colors duration-300",
+                isActive ? "text-black dark:text-white" : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+              )}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-full shadow-sm"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  style={{ zIndex: -1 }}
+                />
+              )}
+              {link.label}
+            </a>
+          );
+        })}
+      </div>
     </motion.nav>
   );
 }
@@ -285,19 +296,25 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
       {/* Theme Toggle */}
       <button
         onClick={toggleTheme}
-        className="p-2.5 rounded-full bg-white/80 dark:bg-black/80 hover:bg-white/90 dark:hover:bg-black/90 backdrop-blur-[50px] border border-white/20 dark:border-white/10 transition-colors shadow-sm"
+        className="relative p-2.5 rounded-full border border-white/20 dark:border-white/10 transition-colors shadow-sm overflow-hidden hover:bg-white/10" // added hover effect
       >
-        {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
+        <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0" />
+        <div className="relative z-10">
+          {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
+        </div>
       </button>
 
       {/* Language */}
       <div className="relative">
         <button
           onClick={() => setIsLangOpen(!isLangOpen)}
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-[50px] border border-white/20 dark:border-white/10 text-xs font-bold hover:bg-white/90 dark:hover:bg-black/90 transition-colors shadow-sm"
+          className="relative flex items-center gap-2 px-3 py-2 rounded-full border border-white/20 dark:border-white/10 text-xs font-bold transition-colors shadow-sm overflow-hidden hover:bg-white/10"
         >
-          <Globe className="w-3.5 h-3.5" />
-          <span>{currentLangLabel}</span>
+          <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0" />
+          <div className="relative z-10 flex items-center gap-2">
+            <Globe className="w-3.5 h-3.5" />
+            <span>{currentLangLabel}</span>
+          </div>
         </button>
         {/* Dropdown */}
         <AnimatePresence>
@@ -339,9 +356,12 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
       {/* Mobile Hamburger */}
       <button
         onClick={toggleMobileMenu}
-        className="md:hidden p-2.5 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md border border-white/10 text-black dark:text-white"
+        className="md:hidden relative p-2.5 rounded-full border border-white/10 text-black dark:text-white overflow-hidden"
       >
-        <MenuIcon className="w-5 h-5" />
+        <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-0" />
+        <div className="relative z-10">
+          <MenuIcon className="w-5 h-5" />
+        </div>
       </button>
     </div>
   );
