@@ -148,10 +148,17 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
       style={{ scale, opacity }}
       className="origin-top-left pointer-events-auto relative z-[101]" // Higher z-index to stay clickable
     >
-      <Link href={`/${lang}`} className="block">
-        {/* Dynamic Logo based on Theme is handled nicely by just rendering both and toggling via CSS or state if we had access to Theme context here easily. 
-            Since Header is client, we can use useTheme or simple class checks. 
-            The parent checks theme. Let's make this simple and robust. */}
+      <Link
+        href={`/${lang}`}
+        className={cn(
+          "block flex items-center justify-center", // layout
+          "px-6 py-2 rounded-full border", // shape
+          "backdrop-blur-xl bg-white/70 dark:bg-black/60", // glass
+          "border-white/20 dark:border-white/10", // border
+          "shadow-lg shadow-black/5 dark:shadow-black/20", // shadow
+          "transition-transform duration-300 hover:scale-105" // hover
+        )}
+      >
         <LogoImage />
       </Link>
     </motion.div>
@@ -176,7 +183,7 @@ function LogoImage() {
       alt="SmartGerman Logo"
       width={192}
       height={40}
-      className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
+      className="h-8 w-auto object-contain"
       priority
     />
   );
