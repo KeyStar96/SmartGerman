@@ -181,7 +181,7 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
         )}
       >
         {/* Background Layer - Isolated from Transform */}
-        <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0" />
+        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0" />
 
         {/* Content Layer */}
         <div className="relative z-10">
@@ -233,7 +233,7 @@ function FloatingNav({ links, activeSection, isHidden, onNavClick }: { links: an
       )}
     >
       {/* Background Layer - Isolated from Transform */}
-      <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0 pointer-events-none" />
 
       {/* Content Layer */}
       <div className="relative z-10 flex items-center gap-1">
@@ -298,7 +298,7 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
         onClick={toggleTheme}
         className="relative p-2.5 rounded-full border border-white/20 dark:border-white/10 transition-colors shadow-sm overflow-hidden hover:bg-white/10" // added hover effect
       >
-        <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0" />
+        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0" />
         <div className="relative z-10">
           {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
         </div>
@@ -310,7 +310,7 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
           onClick={() => setIsLangOpen(!isLangOpen)}
           className="relative flex items-center gap-2 px-3 py-2 rounded-full border border-white/20 dark:border-white/10 text-xs font-bold transition-colors shadow-sm overflow-hidden hover:bg-white/10"
         >
-          <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-[50px] z-0" />
+          <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0" />
           <div className="relative z-10 flex items-center gap-2">
             <Globe className="w-3.5 h-3.5" />
             <span>{currentLangLabel}</span>
@@ -358,7 +358,7 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
         onClick={toggleMobileMenu}
         className="md:hidden relative p-2.5 rounded-full border border-white/10 text-black dark:text-white overflow-hidden"
       >
-        <div className="absolute inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-md z-0" />
+        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0" />
         <div className="relative z-10">
           <MenuIcon className="w-5 h-5" />
         </div>
