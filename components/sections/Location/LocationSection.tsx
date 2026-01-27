@@ -73,6 +73,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
 
     return (
         <section
+            id="location"
             ref={containerRef}
             className="relative w-full py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500"
         >

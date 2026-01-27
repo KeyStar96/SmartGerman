@@ -143,6 +143,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
   return (
     <section
+      id="hero"
       ref={container}
       className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-24 pb-20 w-full"
     >

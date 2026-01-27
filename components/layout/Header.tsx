@@ -38,9 +38,12 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
   const lastScrollY = useRef(0);
+  const isLockedRef = useRef(false); // Lock for smooth scrolling
 
   // --- Scroll Logic (Smart Hide) ---
   useMotionValueEvent(scrollY, "change", (latest) => {
+    if (isLockedRef.current) return; // Ignore scroll events while locked
+
     const diff = latest - lastScrollY.current;
 
     if (latest < 50) {
@@ -85,6 +88,24 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     return null;
   }
 
+  // --- Smooth Scroll Handler ---
+  const handleScroll = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      // 1. Lock visibility & Show Header
+      isLockedRef.current = true;
+      setIsHidden(false);
+
+      // 2. Smooth Scroll
+      element.scrollIntoView({ behavior: "smooth" });
+
+      // 3. Unlock after delay (1s scroll + 2s wait = 3000ms)
+      setTimeout(() => {
+        isLockedRef.current = false;
+      }, 3000);
+    }
+  };
+
   // Links Data
   const navLinks = [
     { id: "hero", label: dictionary.header.nav.home },
@@ -108,6 +129,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
               links={navLinks}
               activeSection={activeSection}
               isHidden={isHidden}
+              onNavClick={handleScroll}
             />
           </div>
 
@@ -153,7 +175,7 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
         className={cn(
           "block flex items-center justify-center", // layout
           "px-6 py-2 rounded-full border", // shape
-          "backdrop-blur-2xl bg-white/40 dark:bg-black/40", // glass
+          "backdrop-blur-[50px] bg-white/80 dark:bg-black/80", // Fat blur & high opacity
           "border-white/20 dark:border-white/10", // border
           "shadow-lg shadow-black/5 dark:shadow-black/20", // shadow
           "transition-transform duration-300 hover:scale-105" // hover
@@ -189,7 +211,7 @@ function LogoImage() {
   );
 }
 
-function FloatingNav({ links, activeSection, isHidden }: { links: any[], activeSection: string, isHidden: boolean }) {
+function FloatingNav({ links, activeSection, isHidden, onNavClick }: { links: any[], activeSection: string, isHidden: boolean, onNavClick: (id: string) => void }) {
   return (
     <motion.nav
       initial={{ y: 0, opacity: 1 }}
@@ -200,7 +222,7 @@ function FloatingNav({ links, activeSection, isHidden }: { links: any[], activeS
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       className={cn(
         "flex items-center gap-1 p-1.5 rounded-full border",
-        "backdrop-blur-2xl bg-white/40 dark:bg-black/40", // Stronger glass effect
+        "backdrop-blur-[50px] bg-white/80 dark:bg-black/80", // Fat blur & high opacity
         "border-white/20 dark:border-white/10",
         "shadow-lg shadow-black/5 dark:shadow-black/20"
       )}
@@ -208,9 +230,13 @@ function FloatingNav({ links, activeSection, isHidden }: { links: any[], activeS
       {links.map((link) => {
         const isActive = activeSection === link.id;
         return (
-          <Link
+          <a
             key={link.id}
             href={`#${link.id}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavClick(link.id);
+            }}
             className={cn(
               "relative px-4 py-2 rounded-full text-xs font-medium tracking-wide upperscaled transition-colors duration-300",
               isActive ? "text-black dark:text-white" : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
@@ -225,7 +251,7 @@ function FloatingNav({ links, activeSection, isHidden }: { links: any[], activeS
               />
             )}
             {link.label}
-          </Link>
+          </a>
         );
       })}
     </motion.nav>
@@ -259,7 +285,7 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
       {/* Theme Toggle */}
       <button
         onClick={toggleTheme}
-        className="p-2.5 rounded-full bg-white/40 dark:bg-black/40 hover:bg-white/60 dark:hover:bg-black/60 backdrop-blur-2xl border border-white/20 dark:border-white/10 transition-colors shadow-sm"
+        className="p-2.5 rounded-full bg-white/80 dark:bg-black/80 hover:bg-white/90 dark:hover:bg-black/90 backdrop-blur-[50px] border border-white/20 dark:border-white/10 transition-colors shadow-sm"
       >
         {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
       </button>
@@ -268,7 +294,7 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
       <div className="relative">
         <button
           onClick={() => setIsLangOpen(!isLangOpen)}
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 text-xs font-bold hover:bg-white/60 dark:hover:bg-black/60 transition-colors shadow-sm"
+          className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-[50px] border border-white/20 dark:border-white/10 text-xs font-bold hover:bg-white/90 dark:hover:bg-black/90 transition-colors shadow-sm"
         >
           <Globe className="w-3.5 h-3.5" />
           <span>{currentLangLabel}</span>
