@@ -584,6 +584,7 @@
     "step_personal": "KİŞİSEL VERİLER",
     "headline": "Akademik yolculuğunuza başlayın.",
     "subline": "Lütfen formu doldurun. Verileriniz SSL ile şifrelenir ve gizli tutulur.",
+    "start_month_label": "KURS BAŞLANGICI",
     "course_selection": "Modülünüzü seçin.",
     "personal_data": "Kişisel Veriler.",
     "form": {

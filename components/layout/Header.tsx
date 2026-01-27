@@ -1,10 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Globe, Sun, Moon, ChevronDown } from "lucide-react";
+import { Globe, Sun, Moon, ChevronDown, Menu as MenuIcon, X } from "lucide-react";
+import {
+  motion,
+  useScroll,
+  useMotionValueEvent,
+  AnimatePresence,
+  useSpring,
+  useTransform
+} from "framer-motion";
+import { cn } from "@/lib/utils"; // Assuming cn is available here or I'll implement a simple one if needed. Actually user mentioned `cn()` is available.
+
+// Mock cn if not available - but user said "Nutze cn()". I will assume it's imported correctly.
+// If it fails, I'll fix it.
 
 interface HeaderProps {
   lang: string;
@@ -20,188 +32,356 @@ const languages = [
 ];
 
 export default function Header({ lang, dictionary }: HeaderProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
+  const [activeSection, setActiveSection] = useState("hero");
+  const [isHidden, setIsHidden] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { scrollY } = useScroll();
+  const lastScrollY = useRef(0);
 
+  // --- Scroll Logic (Smart Hide) ---
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const diff = latest - lastScrollY.current;
+
+    if (latest < 50) {
+      setIsHidden(false); // Always show at top
+    } else if (diff > 10) {
+      setIsHidden(true); // Hide on scroll down
+    } else if (diff < -10) {
+      setIsHidden(false); // Show on scroll up
+    }
+
+    lastScrollY.current = latest;
+  });
+
+  // --- Intersection Observer (Scroll Spy) ---
   useEffect(() => {
-    // Initialisierung des Themes
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    const isDark = savedTheme === "dark";
-    setIsDarkMode(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
+    const sections = ["hero", "courses", "science", "about", "location"];
 
-    // PERFORMANCE: Throttle Scroll-Event mit requestAnimationFrame + Hysteresis
-    let scrollRafId: number | null = null;
-    const handleScroll = () => {
-      if (scrollRafId !== null) return;
-
-      scrollRafId = requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        // Hysteresis: Buffer to prevent rapid toggling
-        setIsScrolled((prev) => {
-          if (!prev && currentScrollY > 50) return true;
-          if (prev && currentScrollY < 40) return false;
-          return prev;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
         });
-        scrollRafId = null;
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Check initial scroll position
-    handleScroll();
-
-    return () => {
-      if (scrollRafId !== null) {
-        cancelAnimationFrame(scrollRafId);
+      },
+      {
+        rootMargin: "-20% 0px -20% 0px", // Detect when section is largely in view
+        threshold: 0.1
       }
-      window.removeEventListener("scroll", handleScroll);
-    };
+    );
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
-  // Konstante für transparenten Lightmode-Header
-  const isTransparentLight = !isScrolled && !isDarkMode;
-
-  // PERFORMANCE: Memoize Textfarbe und Logo-Klassen
-  const textColor = useMemo(() => {
-    if (isTransparentLight) {
-      return "text-[#1A1A1A]"; // Anthracite im transparenten Lightmode
-    }
-    if (isScrolled && !isDarkMode) {
-      return "text-[#1A1A1A]"; // Anthracite bei gescrolltem Lightmode-Header
-    }
-    return "text-foreground"; // Standard (weiß im Dark, Anthracite im Light bei gescrollt)
-  }, [isTransparentLight, isScrolled, isDarkMode]);
-
-
-
-  const toggleTheme = () => {
-    const newTheme = !isDarkMode;
-    setIsDarkMode(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme);
-    localStorage.setItem("theme", newTheme ? "dark" : "light");
-  };
-
-  const [isPending, startTransition] = React.useTransition();
-
-  const switchLanguage = (newLang: string) => {
-    setIsLanguageDropdownOpen(false);
-    // Ersetze die Sprache im aktuellen Pfad
-    const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
-
-    startTransition(() => {
-      router.push(newPath, { scroll: false });
-    });
-  };
-
-  const currentLanguage = languages.find((l) => l.code === lang) || languages[0];
-
+  // --- Disable header on registration ---
   if (pathname.includes("/registration")) {
     return null;
   }
 
+  // Links Data
+  const navLinks = [
+    { id: "hero", label: dictionary.header.nav.home },
+    { id: "courses", label: dictionary.header.nav.courses },
+    { id: "science", label: dictionary.science?.title_part1 || "Wissenschaft" },
+    { id: "about", label: dictionary.Footer?.Nav?.about || "Über uns" },
+    { id: "location", label: dictionary.Footer?.Nav?.location || "Standort" },
+  ];
+
   return (
-    // OPTIMIZATION: Removed transition-all, added transform-gpu backface-hidden for layer promotion
-    <header className="fixed top-0 left-0 w-full z-50 transition-colors duration-300 transform-gpu backface-hidden will-change-transform">
+    <>
+      <header className="fixed top-0 left-0 w-full z-[100] pointer-events-none p-6 mix-blend-normal">
+        <div className="max-w-7xl mx-auto relative flex justify-between items-start">
 
+          {/* ZONE 1: LOGO (Left) */}
+          <LogoSection lang={lang} scrollY={scrollY} />
 
-      {/* 2. Navigation mit Glassmorphismus */}
-      <nav className={`w-full transition-all duration-500 ${isScrolled
-        ? "py-2 bg-background shadow-md border-none"
-        : "py-2 bg-transparent border-none"
-        }`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-
-          {/* Logo Section - Logo-Farbe gekoppelt an Header-Hintergrund */}
-          <Link href={`/${lang}`} className="group block">
-            <Image
-              src={isDarkMode ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
-              alt="SmartGerman Logo"
-              width={192}
-              height={40}
-              className={`h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105`}
-              priority={true}
+          {/* ZONE 2: FLOATING NAV PILL (Center - Desktop Only) */}
+          <div className="hidden md:block absolute left-1/2 -translate-x-1/2 pointer-events-auto">
+            <FloatingNav
+              links={navLinks}
+              activeSection={activeSection}
+              isHidden={isHidden}
             />
+          </div>
+
+          {/* ZONE 3: ACTIONS (Right) */}
+          <div className="flex items-center gap-4 pointer-events-auto">
+            <ActionButtons
+              lang={lang}
+              dictionary={dictionary}
+              isHidden={isHidden}
+              toggleMobileMenu={() => setIsMobileMenuOpen(true)}
+            />
+          </div>
+
+        </div>
+      </header>
+
+      {/* MOBILE MENU OVERLAY */}
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        links={navLinks}
+        lang={lang}
+        dictionary={dictionary}
+      />
+    </>
+  );
+}
+
+// --- SUB-COMPONENTS ---
+
+function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
+  // Precision Scaling
+  const scale = useTransform(scrollY, [0, 100], [1, 0.9]);
+  const opacity = useTransform(scrollY, [0, 200], [1, 0.8]);
+
+  return (
+    <motion.div
+      style={{ scale, opacity }}
+      className="origin-top-left pointer-events-auto relative z-[101]" // Higher z-index to stay clickable
+    >
+      <Link href={`/${lang}`} className="block">
+        {/* Dynamic Logo based on Theme is handled nicely by just rendering both and toggling via CSS or state if we had access to Theme context here easily. 
+            Since Header is client, we can use useTheme or simple class checks. 
+            The parent checks theme. Let's make this simple and robust. */}
+        <LogoImage />
+      </Link>
+    </motion.div>
+  );
+}
+
+function LogoImage() {
+  const [mounted, setMounted] = useState(false);
+  // Need to detect theme to show correct logo.
+  // Using a simple mutation observer or local storage check since next-themes might not be available directly or requires hook.
+  // Actually, standard Tailwind 'dark' class on html is used.
+
+  // We can just render the image that adapts via CSS variables or simple CSS hiding if we want instant 'no-flicker'.
+  // Or simpler: The user's original code used `isDarkMode` state. I'll re-implement that for the logo.
+  const isDark = useIsDarkMode();
+
+  if (!isDark && typeof isDark !== 'boolean') return <div className="h-9 w-32" />; // Skeleton
+
+  return (
+    <Image
+      src={isDark ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
+      alt="SmartGerman Logo"
+      width={192}
+      height={40}
+      className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
+      priority
+    />
+  );
+}
+
+function FloatingNav({ links, activeSection, isHidden }: { links: any[], activeSection: string, isHidden: boolean }) {
+  return (
+    <motion.nav
+      initial={{ y: 0, opacity: 1 }}
+      animate={{
+        y: isHidden ? -120 : 0,
+        opacity: isHidden ? 0 : 1
+      }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+      className={cn(
+        "flex items-center gap-1 p-1.5 rounded-full border",
+        "backdrop-blur-xl bg-white/70 dark:bg-black/60", // More transparent for "Airy" feel
+        "border-white/20 dark:border-white/10",
+        "shadow-lg shadow-black/5 dark:shadow-black/20"
+      )}
+    >
+      {links.map((link) => {
+        const isActive = activeSection === link.id;
+        return (
+          <Link
+            key={link.id}
+            href={`#${link.id}`}
+            className={cn(
+              "relative px-4 py-2 rounded-full text-xs font-medium tracking-wide upperscaled transition-colors duration-300",
+              isActive ? "text-black dark:text-white" : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+            )}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeNav"
+                className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-full shadow-sm"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                style={{ zIndex: -1 }}
+              />
+            )}
+            {link.label}
           </Link>
+        );
+      })}
+    </motion.nav>
+  );
+}
 
-          {/* Menu & Actions */}
-          <div className="flex items-center gap-4 md:gap-8">
-            <div className="hidden md:flex items-center gap-8 mr-4">
-              <Link href="#home"
-                className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
-                {dictionary.header.nav.home}
-              </Link>
-              <Link href="#courses"
-                className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
-                {dictionary.header.nav.courses}
-              </Link>
-              <Link href="#prices"
-                className={`text-sm font-light hover:text-primary-orange transition-colors ${textColor}`}>
-                {dictionary.header.nav.prices}
-              </Link>
-            </div>
+function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
+  const isDark = useIsDarkMode();
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = React.useTransition();
 
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors ${textColor}`}
-              aria-label="Toggle Theme"
-            >
-              {isDarkMode ? (
-                <Sun className="w-5 h-5 text-white" />
-              ) : (
-                <Moon className="w-5 h-5 text-[#1A1A1A]" />
-              )}
-            </button>
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    document.documentElement.classList.toggle("dark", newTheme);
+    localStorage.setItem("theme", newTheme ? "dark" : "light");
+    window.dispatchEvent(new Event("storage")); // Trigger updates if needed
+  };
 
-            {/* Language Switcher */}
-            <div className="relative">
-              <button
-                onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                className={`flex items-center gap-1 text-xs font-medium uppercase tracking-widest ${textColor}`}
+  const switchLanguage = (code: string) => {
+    setIsLangOpen(false);
+    const newPath = pathname.replace(`/${lang}`, `/${code}`);
+    startTransition(() => router.push(newPath, { scroll: false }));
+  };
+
+  const currentLangLabel = languages.find(l => l.code === lang)?.label || "DE";
+
+  return (
+    <div className="flex items-center gap-3">
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="p-2.5 rounded-full bg-white/10 dark:bg-black/10 hover:bg-black/5 dark:hover:bg-white/10 backdrop-blur-md border border-white/10 transition-colors"
+      >
+        {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
+      </button>
+
+      {/* Language */}
+      <div className="relative">
+        <button
+          onClick={() => setIsLangOpen(!isLangOpen)}
+          className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/10 text-xs font-bold hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+        >
+          <Globe className="w-3.5 h-3.5" />
+          <span>{currentLangLabel}</span>
+        </button>
+        {/* Dropdown */}
+        <AnimatePresence>
+          {isLangOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setIsLangOpen(false)} />
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="absolute right-0 top-full mt-2 w-24 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-black/5 dark:border-white/10 overflow-hidden z-50 py-1"
               >
-                <Globe className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`} />
-                <span>{currentLanguage.label}</span>
-                <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
+                {languages.map(l => (
+                  <button
+                    key={l.code}
+                    onClick={() => switchLanguage(l.code)}
+                    className={cn(
+                      "w-full px-4 py-2 text-left text-xs font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
+                      lang === l.code ? "text-primary-orange" : "text-gray-600 dark:text-gray-300"
+                    )}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
 
-              {isLanguageDropdownOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsLanguageDropdownOpen(false)}
-                  />
-                  <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-dm-surface-teal rounded-lg border border-black/10 dark:border-dm-border-slate z-50 overflow-hidden shadow-lg animate-in fade-in zoom-in-95 duration-200">
-                    {languages.map((language) => (
-                      <button
-                        key={language.code}
-                        onClick={() => switchLanguage(language.code)}
-                        className={`w-full px-4 py-2 text-left text-xs font-medium uppercase tracking-widest transition-colors border-b border-black/5 dark:border-dm-border-slate/30 last:border-b-0 ${lang === language.code
-                          ? "bg-primary-orange/20 text-primary-orange dark:bg-primary-orange/10"
-                          : "text-foreground hover:bg-black/5 dark:hover:bg-dm-surface-teal"
-                          }`}
-                      >
-                        {language.label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+      {/* CTA */}
+      <Link
+        href={`/${lang}/registration`}
+        className="hidden md:flex bg-primary-orange hover:bg-primary-orange/90 text-white px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-transform hover:scale-105"
+      >
+        {dictionary.header.nav.enroll}
+      </Link>
 
+      {/* Mobile Hamburger */}
+      <button
+        onClick={toggleMobileMenu}
+        className="md:hidden p-2.5 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-md border border-white/10 text-black dark:text-white"
+      >
+        <MenuIcon className="w-5 h-5" />
+      </button>
+    </div>
+  );
+}
+
+function MobileMenu({ isOpen, onClose, links, lang, dictionary }: any) {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-[200] bg-background/95 backdrop-blur-2xl flex flex-col justify-center items-center"
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 p-4 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          >
+            <X className="w-8 h-8" />
+          </button>
+
+          <div className="flex flex-col items-center gap-8">
+            {links.map((link: any, i: number) => (
+              <motion.div
+                key={link.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.1 }}
+              >
+                <Link
+                  href={`#${link.id}`}
+                  onClick={onClose}
+                  className="text-4xl md:text-6xl font-black tracking-tighter hover:text-primary-orange transition-colors"
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-12"
+          >
             <Link
               href={`/${lang}/registration`}
-              className="btn-primary px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform"
+              onClick={onClose}
+              className="bg-primary-orange text-white px-8 py-4 rounded-full text-lg font-bold tracking-widest uppercase hover:scale-105 transition-transform block"
             >
               {dictionary.header.nav.enroll}
             </Link>
-          </div>
-        </div>
-      </nav>
-    </header>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
+
+// Helper for Dark Mode - simple implementation
+function useIsDarkMode() {
+  const [isDark, setIsDark] = useState(true); // Default to dark to match initial SSR
+  useEffect(() => {
+    // Observer for class change on html element
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
