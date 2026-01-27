@@ -12,11 +12,10 @@ import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, Chev
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
-import { calculateMonthlyStats, getDurationMinutes, DAY_MAP } from "@/lib/course-calculations";
+import { calculateMonthlyStats, getDurationMinutes, DAY_MAP, getNext6Months } from "@/lib/course-calculations";
 import { createSchema, EnrollmentFormData } from "@/lib/registration-schema";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
-
 
 
 
@@ -29,6 +28,7 @@ const MaskedDateInput = ({
     error,
     required
 }: any) => {
+    // ... existing MaskedDateInput code ...
     const defaultPlaceholder = placeholder;
 
     // Internal state to manage cursor and display
@@ -351,6 +351,14 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
 
     return (
         <div className="relative w-full" ref={containerRef}>
+            {label && (
+                <span className={cn(
+                    "absolute left-0 -top-3 text-xs uppercase tracking-widest text-[#FF5C00] transition-all",
+                    jetbrainsMono.className
+                )}>
+                    {label}
+                </span>
+            )}
             <div
                 onClick={() => setIsOpen(!isOpen)}
                 className="block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] cursor-pointer flex justify-between items-center group-hover:border-[#FF5C00] dark:group-hover:border-[#FF5C00] transition-colors"
@@ -367,7 +375,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute left-0 top-full w-full bg-[#FCF4E6] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent"
+                        className="absolute left-0 top-full w-full bg-[#FCF4E6] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent divide-y divide-black/5 dark:divide-white/5"
                     >
                         {options.map((opt: any) => (
                             <div
@@ -377,7 +385,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, label }: any) => 
                                     setIsOpen(false);
                                 }}
                                 className={cn(
-                                    "px-4 py-2 hover:bg-[#FF5C00]/10 cursor-pointer text-sm transition-colors",
+                                    "px-4 py-3 hover:bg-[#FF5C00]/10 cursor-pointer text-sm transition-colors",
                                     jetbrainsMono.className,
                                     value === opt.value ? "text-[#FF5C00] font-bold" : "text-gray-600 dark:text-gray-300"
                                 )}
@@ -581,6 +589,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
+    // Dynamic Start Month Options
+    const startMonths = React.useMemo(() => getNext6Months(lang), [lang]);
+    // Default to first available month (Next Month)
+    const [selectedStartMonth, setSelectedStartMonth] = useState(startMonths[0].value);
+
     // Grouping Logic - MEMOIZED
     const { presenceCourses, onlineCourses, speechCourses } = React.useMemo(() => {
         return {
@@ -591,7 +604,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     }, []);
 
     // Calc Next Month for UI Display
-    const nextMonthName = calculateMonthlyStats(COURSES[0], lang).monthName;
+    // const nextMonthName = calculateMonthlyStats(COURSES[0], lang).monthName; // OLD
+    // Use selected month's label or full object
+    const currentMonthObj = startMonths.find(m => m.value === selectedStartMonth) || startMonths[0];
 
     const enrollmentSchema = React.useMemo(() => createSchema(dictionary), [dictionary]);
     const form = useForm<EnrollmentFormData>({
@@ -611,33 +626,46 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         setSelectedCourseIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
     }, []);
 
-    const getCourseData = React.useCallback((c: CourseConfig) => ({
-        // Fix lookup logic: keys in course-config ('a1_1_50plus') vs keys in dictionary ('de50_a1_1' in RU/UK/TU vs 'a1_1_50plus' in DE/EN).
-        // To be safe, we should align course-config or dictionaries.
-        // Assuming dictionaries are the source of truth for CONTENT, and course-config for LOGIC.
-        // For now, let's try to lookup by translationKey.
-        title: dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
-        priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
-        level: dictionary?.CourseData?.[c.translationKey]?.level,
-        dictionary // Pass dictionary down
-    }), [dictionary, lang]);
+    const getCourseData = React.useCallback((c: CourseConfig) => {
+        // Calculate price based on selected month
+        const mParts = selectedStartMonth.split('-');
+        const month = parseInt(mParts[0]);
+        const year = parseInt(mParts[1]);
+        const stats = calculateMonthlyStats(c, lang, month, year);
+
+        return {
+            title: dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
+            priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(stats.totalUnits * c.price),
+            level: dictionary?.CourseData?.[c.translationKey]?.level,
+            dictionary // Pass dictionary down
+        };
+    }, [dictionary, lang, selectedStartMonth]);
 
     const selectedCoursesFull = COURSES.filter(c => selectedCourseIds.includes(c.id));
 
     // Dynamic Total Calculation - MEMOIZED
     const totalMonthlyPrice = React.useMemo(() => {
+        const mParts = selectedStartMonth.split('-');
+        const month = parseInt(mParts[0]);
+        const year = parseInt(mParts[1]);
+
         return selectedCoursesFull.reduce((acc, c) => {
-            const { totalUnits } = calculateMonthlyStats(c, lang);
+            const { totalUnits } = calculateMonthlyStats(c, lang, month, year);
             return acc + (totalUnits * c.price);
         }, 0);
-    }, [selectedCoursesFull, lang]);
+    }, [selectedCoursesFull, lang, selectedStartMonth]);
 
     const formatPrice = React.useCallback((p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p), []);
 
     const onSubmit = async (data: EnrollmentFormData) => {
         setIsSubmitting(true);
         await new Promise(r => setTimeout(r, 1500));
-        console.log({ courses: selectedCourseIds, personal: data, total: totalMonthlyPrice });
+        console.log({
+            courses: selectedCourseIds,
+            startMonth: selectedStartMonth,
+            personal: data,
+            total: totalMonthlyPrice
+        });
         setIsSuccess(true);
         setIsSubmitting(false);
     };
@@ -810,7 +838,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         {step === 2 && wizard?.step2_title}
                         {step === 3 && wizard?.step3_title}
                     </h1>
-                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{nextMonthName}</span>.</p>}
+                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{currentMonthObj.label}</span>.</p>}
                     {step === 2 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step2_sub}</p>}
                     {step === 3 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step3_sub}</p>}
                 </header>
@@ -834,6 +862,17 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                     exit={{ opacity: 0 }}
                                     className="space-y-12 py-4"
                                 >
+                                    {/* --- START MONTH SELECTOR --- */}
+                                    <div className="max-w-xs mb-8">
+                                        <CustomSelect
+                                            value={selectedStartMonth}
+                                            onChange={setSelectedStartMonth}
+                                            options={startMonths}
+                                            placeholder="Start"
+                                            label={t?.start_month_label || "START"}
+                                        />
+                                    </div>
+
                                     {[
                                         { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
                                         { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
@@ -929,10 +968,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
                                     {/* Summary: Courses */}
                                     <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {nextMonthName}</h3>
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthObj.label}</h3>
                                         <div className="space-y-4">
                                             {selectedCoursesFull.map(c => {
-                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang);
+                                                const mParts = selectedStartMonth.split('-');
+                                                const month = parseInt(mParts[0]);
+                                                const year = parseInt(mParts[1]);
+                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year);
                                                 const netPrice = c.price * totalUnits;
                                                 return (
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
@@ -980,7 +1022,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
                             </span>
                         </div>
-                        <span className="font-mono text-xs text-gray-500">{nextMonthName}</span>
+                        <span className="font-mono text-xs text-gray-500">{currentMonthObj.label}</span>
                     </div>
                 </div>
 
@@ -994,7 +1036,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                             </motion.div>
                         ) : (
                             selectedCoursesFull.map(c => {
-                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang);
+                                const mParts = selectedStartMonth.split('-');
+                                const month = parseInt(mParts[0]);
+                                const year = parseInt(mParts[1]);
+                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year);
                                 const netPrice = c.price * totalUnits;
                                 const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
                                 const grossPrice = netPrice + deductionSum;

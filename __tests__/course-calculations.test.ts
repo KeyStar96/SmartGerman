@@ -50,12 +50,15 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
             describe(`Course: ${course.id} (${course.unitDuration}min / ${course.price}€)`, () => {
 
                 testMonths.forEach(baseDate => {
-                    // Calculate target month from baseDate
+                    // Calculate target month from baseDate (Old logic was baseDate -> Next Month)
+                    // So if baseDate is Jan, target is Feb.
                     const targetDate = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1);
                     const monthName = targetDate.toLocaleString('de-DE', { month: 'long', year: 'numeric' });
+                    const targetMonth = targetDate.getMonth();
+                    const targetYear = targetDate.getFullYear();
 
                     test(`Calculation for ${monthName}`, () => {
-                        const stats = calculateMonthlyStats(course, 'de', baseDate);
+                        const stats = calculateMonthlyStats(course, 'de', targetMonth, targetYear);
 
                         // 1. Basic sanity checks
                         expect(stats.sessionCount).toBeGreaterThanOrEqual(0);
@@ -119,13 +122,18 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
     describe('3. Edge Cases & Exception Permutations', () => {
         // Test SPECIFIC edge case dates manually constructed
         const baseDate = new Date("2026-04-15T12:00:00Z"); // Target: May 2026
+        // Target: May 2026
+        const targetDate = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1);
 
         test('Multiple Exceptions Overlap', () => {
             const jan26 = new Date("2026-01-15T10:00:00Z");
+            // Next Month: Feb 2026
+            const tDate = new Date(jan26.getFullYear(), jan26.getMonth() + 1, 1);
+
             const mondayCourse = COURSES.find(c => c.sessions.some(s => s.day === "Mo"));
             if (!mondayCourse) return;
 
-            const stats = calculateMonthlyStats(mondayCourse, 'de', jan26);
+            const stats = calculateMonthlyStats(mondayCourse, 'de', tDate.getMonth(), tDate.getFullYear());
             // Feb 2 should be in deductions
             const feb2Deduction = stats.deductions.find(d => d.date.includes("02.02"));
 
@@ -215,7 +223,7 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
                         const selectedCourses = COURSES.filter(c => scenario.ids.includes(c.id));
                         let appTotal = 0;
                         selectedCourses.forEach(course => {
-                            const stats = calculateMonthlyStats(course, 'de', baseDate);
+                            const stats = calculateMonthlyStats(course, 'de', targetDate.getMonth(), targetDate.getFullYear());
                             appTotal += stats.totalUnits * course.price;
                         });
 
@@ -283,7 +291,7 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
                     let appTotal = 0;
                     let totalUnits = 0;
                     selectedCourses.forEach(course => {
-                        const stats = calculateMonthlyStats(course, 'de', baseDate);
+                        const stats = calculateMonthlyStats(course, 'de', targetDate.getMonth(), targetDate.getFullYear());
                         appTotal += stats.totalUnits * course.price;
                         totalUnits += stats.totalUnits;
                     });

@@ -20,16 +20,13 @@ export interface MonthlyStats {
     targetMonth: number;
 }
 
-// Berechnet Termine & Einheiten im NÄCHSTEN Monat (oder für ein spezifisches Datum)
+// Berechnet Termine & Einheiten für einen SPEZIFISCHEN Monat
 export const calculateMonthlyStats = (
     course: CourseConfig,
     lang: string,
-    baseDate: Date = new Date() // Dependency Injection for testing
+    targetMonth: number, // 0-11
+    targetYear: number
 ): MonthlyStats => {
-    // Wenn heute Jan 2026 -> Ziel: Feb 2026
-    const targetYear = baseDate.getMonth() === 11 ? baseDate.getFullYear() + 1 : baseDate.getFullYear();
-    const targetMonth = baseDate.getMonth() === 11 ? 0 : baseDate.getMonth() + 1;
-
     const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
 
     let sessionCount = 0;
@@ -101,4 +98,43 @@ export const calculateMonthlyStats = (
         targetYear,
         targetMonth
     };
+};
+
+// Generates the next 6 months starting from next month
+export const getNext6Months = (lang: string) => {
+    const months = [];
+    const today = new Date();
+    // Start from next month
+    let currentMonth = today.getMonth() + 1;
+    let currentYear = today.getFullYear();
+
+    const localeMap: Record<string, string> = {
+        'de': 'de-DE',
+        'en': 'en-US',
+        'ru': 'ru-RU',
+        'uk': 'uk-UA',
+        'tu': 'tr-TR'
+    };
+    const locale = localeMap[lang] || 'de-DE';
+
+    for (let i = 0; i < 6; i++) {
+        // Handle year rollover
+        const y = currentMonth > 11 ? currentYear + Math.floor(currentMonth / 12) : currentYear;
+        const m = currentMonth % 12;
+
+        let label = new Date(y, m, 1).toLocaleString(locale, { month: 'long', year: 'numeric' });
+        if (['ru', 'uk'].includes(lang)) {
+            label = label.charAt(0).toUpperCase() + label.slice(1);
+        }
+
+        months.push({
+            value: `${m}-${y}`, // Format: "0-2026" (Jan 2026)
+            label: label,
+            month: m,
+            year: y
+        });
+
+        currentMonth++;
+    }
+    return months;
 };

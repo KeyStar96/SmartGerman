@@ -578,6 +578,7 @@
     "step_personal": "PERSONAL",
     "headline": "Start your academic journey.",
     "subline": "Please complete the following protocol. Your data will be transmitted via SSL encryption and treated confidentially.",
+    "start_month_label": "START MONTH",
     "course_selection": "Select your module.",
     "personal_data": "Personal Data.",
     "form": {

@@ -578,6 +578,7 @@
     "step_personal": "PERSÖNLICHES",
     "headline": "Starten Sie Ihre akademische Reise.",
     "subline": "Bitte füllen Sie das folgende Protokoll vollständig aus. Ihre Daten werden SSL-verschlüsselt übertragen und vertraulich behandelt.",
+    "start_month_label": "KURSSTART",
     "course_selection": "Wählen Sie Ihr Modul.",
     "personal_data": "Persönliche Daten.",
     "form": {
