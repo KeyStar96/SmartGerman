@@ -613,8 +613,35 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
         resolver: zodResolver(enrollmentSchema),
         mode: "onChange"
     });
-    const { register, handleSubmit, formState: { errors, isValid }, trigger, watch } = form;
+    const { register, handleSubmit, formState: { errors, isValid }, trigger, watch, setValue } = form; // Added setValue
     const formData = watch("personal");
+    const zipCode = watch("personal.zip");
+
+    // --- ZIP CODE AUTO-FILL ---
+    useEffect(() => {
+        // Only trigger if we have exactly 5 digits
+        if (zipCode && zipCode.length === 5 && /^\d+$/.test(zipCode)) {
+            const fetchCity = async () => {
+                try {
+                    const response = await fetch(`https://api.zippopotam.us/de/${zipCode}`);
+                    if (!response.ok) return; // Silent fail
+                    const data = await response.json();
+                    if (data && data.places && data.places.length > 0) {
+                        const city_name = data.places[0]["place name"];
+                        // If user hasn't typed a city yet (or we just want to help), fill it.
+                        // Standard UX: If it's empty, fill it. If it's different, maybe don't overwrite?
+                        // User request: "Fill it... user can edit if wrong". Overwriting is often expected behavior for ZIP autofill.
+                        // Let's check if the current city is empty or different.
+                        // Ideally, we just set it. The user sees it change.
+                        setValue("personal.city", city_name, { shouldValidate: true });
+                    }
+                } catch (e) {
+                    // Ignore network errors, silent fail
+                }
+            };
+            fetchCity();
+        }
+    }, [zipCode, setValue]);
 
     useEffect(() => {
         if (initialCourseId && !selectedCourseIds.includes(initialCourseId) && COURSES.some(c => c.id === initialCourseId)) {
