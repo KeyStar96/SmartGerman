@@ -153,7 +153,7 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
         className={cn(
           "block flex items-center justify-center", // layout
           "px-6 py-2 rounded-full border", // shape
-          "backdrop-blur-xl bg-white/70 dark:bg-black/60", // glass
+          "backdrop-blur-2xl bg-white/40 dark:bg-black/40", // glass
           "border-white/20 dark:border-white/10", // border
           "shadow-lg shadow-black/5 dark:shadow-black/20", // shadow
           "transition-transform duration-300 hover:scale-105" // hover
@@ -200,7 +200,7 @@ function FloatingNav({ links, activeSection, isHidden }: { links: any[], activeS
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       className={cn(
         "flex items-center gap-1 p-1.5 rounded-full border",
-        "backdrop-blur-xl bg-white/70 dark:bg-black/60", // More transparent for "Airy" feel
+        "backdrop-blur-2xl bg-white/40 dark:bg-black/40", // Stronger glass effect
         "border-white/20 dark:border-white/10",
         "shadow-lg shadow-black/5 dark:shadow-black/20"
       )}
@@ -259,7 +259,7 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
       {/* Theme Toggle */}
       <button
         onClick={toggleTheme}
-        className="p-2.5 rounded-full bg-white/10 dark:bg-black/10 hover:bg-black/5 dark:hover:bg-white/10 backdrop-blur-md border border-white/10 transition-colors"
+        className="p-2.5 rounded-full bg-white/40 dark:bg-black/40 hover:bg-white/60 dark:hover:bg-black/60 backdrop-blur-2xl border border-white/20 dark:border-white/10 transition-colors shadow-sm"
       >
         {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
       </button>
@@ -268,7 +268,7 @@ function ActionButtons({ lang, dictionary, isHidden, toggleMobileMenu }: any) {
       <div className="relative">
         <button
           onClick={() => setIsLangOpen(!isLangOpen)}
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/10 text-xs font-bold hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/40 dark:bg-black/40 backdrop-blur-2xl border border-white/20 dark:border-white/10 text-xs font-bold hover:bg-white/60 dark:hover:bg-black/60 transition-colors shadow-sm"
         >
           <Globe className="w-3.5 h-3.5" />
           <span>{currentLangLabel}</span>
