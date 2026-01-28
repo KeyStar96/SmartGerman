@@ -248,11 +248,10 @@ function LanguageSelector({ lang, compact = false }: { lang: string, compact?: b
 // --- DESKTOP: Logo Section ---
 function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
   const scale = useTransform(scrollY, [0, 100], [1, 0.9]);
-  const opacity = useTransform(scrollY, [0, 200], [1, 0.8]);
 
   return (
     <motion.div
-      style={{ scale, opacity }}
+      style={{ scale }}
       className="origin-top-left pointer-events-auto relative z-[101]"
     >
       <Link
@@ -374,12 +373,11 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu }: { lang: 
         "relative mx-auto max-w-[95%] pointer-events-auto",
         "h-16 rounded-2xl",
         "border border-black/5 dark:border-white/10",
-        "shadow-xl shadow-black/10 dark:shadow-black/30",
-        "overflow-hidden"
+        "shadow-xl shadow-black/10 dark:shadow-black/30"
       )}
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900 z-0" />
+      <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900 z-0 rounded-2xl overflow-hidden" />
 
       {/* Content */}
       <div className="relative z-10 flex items-center justify-between px-4 h-full">
