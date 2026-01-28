@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Globe, Sun, Moon, X, Menu as MenuIcon, Brain } from "lucide-react";
+import { Globe, Sun, Moon, X, Menu as MenuIcon } from "lucide-react";
 import {
   motion,
   useScroll,
@@ -125,7 +125,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
           <ActionButtons
             lang={lang}
             dictionary={dictionary}
-            isHidden={isHidden} // Not strictly used for desktop hide but kept for API consistency
+            isHidden={isHidden}
           />
         </div>
       </header>
@@ -133,6 +133,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
       {/* --- MOBILE: "The Floating Deck" --- */}
       <div className="md:hidden fixed top-0 left-0 w-full z-[100] pointer-events-none px-4 pt-4">
         <MobileFloatingDeck
+          lang={lang}
           isHidden={isHidden}
           isMenuOpen={isMobileMenuOpen}
           toggleMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -156,9 +157,96 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 // SUB-COMPONENTS
 // ============================================================================
 
+// --- SHARED: Theme Toggle ---
+function ThemeToggle() {
+  const isDark = useIsDarkMode();
+
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    document.documentElement.classList.toggle("dark", newTheme);
+    localStorage.setItem("theme", newTheme ? "dark" : "light");
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  if (typeof isDark !== 'boolean') return <div className="w-9 h-9" />; // Hydration fallback
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className="relative p-2.5 rounded-full border border-black/5 dark:border-white/10 transition-colors shadow-sm overflow-hidden hover:bg-black/5 dark:hover:bg-white/5 group bg-zinc-100 dark:bg-zinc-900"
+    >
+      {/* Note: Blurred background is now intrinsic to the button for better mobile reuse */}
+      <div className="relative z-10">
+        {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
+      </div>
+    </button>
+  );
+}
+
+// --- SHARED: Language Selector ---
+function LanguageSelector({ lang, compact = false }: { lang: string, compact?: boolean }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = React.useTransition();
+
+  const switchLanguage = (code: string) => {
+    setIsOpen(false);
+    const newPath = pathname.replace(`/${lang}`, `/${code}`);
+    startTransition(() => router.push(newPath, { scroll: false }));
+  };
+
+  const currentLangLabel = languages.find(l => l.code === lang)?.label || "DE";
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "relative flex items-center gap-2 rounded-full border border-black/5 dark:border-white/10 transition-colors shadow-sm overflow-hidden hover:bg-black/5 dark:hover:bg-white/5 bg-zinc-100 dark:bg-zinc-900",
+          compact ? "p-2.5" : "px-3 py-2"
+        )}
+      >
+        <div className="relative z-10 flex items-center gap-2">
+          <Globe className={cn("w-3.5 h-3.5", compact ? "w-4 h-4" : "")} />
+          {!compact && <span className="text-xs font-bold">{currentLangLabel}</span>}
+          {compact && <span className="sr-only">{currentLangLabel}</span>}
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="absolute right-0 top-full mt-2 w-24 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-black/5 dark:border-white/10 overflow-hidden z-50 py-1"
+            >
+              {languages.map(l => (
+                <button
+                  key={l.code}
+                  onClick={() => switchLanguage(l.code)}
+                  className={cn(
+                    "w-full px-4 py-2 text-left text-xs font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
+                    lang === l.code ? "text-primary-orange" : "text-gray-600 dark:text-gray-300"
+                  )}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+
 // --- DESKTOP: Logo Section ---
 function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
-  // Precision Scaling
   const scale = useTransform(scrollY, [0, 100], [1, 0.9]);
   const opacity = useTransform(scrollY, [0, 200], [1, 0.8]);
 
@@ -172,12 +260,12 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
         className={cn(
           "block flex items-center justify-center",
           "relative px-6 py-2 rounded-full overflow-hidden",
-          "border border-white/20 dark:border-white/10",
+          "border border-black/5 dark:border-white/10",
           "shadow-lg shadow-black/5 dark:shadow-black/20",
           "transition-transform duration-300 hover:scale-105 group"
         )}
       >
-        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0" />
+        <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900 z-0" />
         <div className="relative z-10">
           <LogoImage />
         </div>
@@ -194,8 +282,8 @@ function LogoImage() {
     <Image
       src={isDark ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
       alt="SmartGerman Logo"
-      width={192}
-      height={40}
+      width={140}
+      height={32}
       className="h-8 w-auto object-contain"
       priority
     />
@@ -214,12 +302,12 @@ function FloatingNav({ links, activeSection, isHidden, onNavClick }: { links: an
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       className={cn(
         "relative flex items-center gap-1 p-1.5 rounded-full",
-        "border border-white/20 dark:border-white/10",
+        "border border-black/5 dark:border-white/10",
         "shadow-lg shadow-black/5 dark:shadow-black/20",
         "overflow-hidden"
       )}
     >
-      <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900 z-0 pointer-events-none" />
       <div className="relative z-10 flex items-center gap-1">
         {links.map((link) => {
           const isActive = activeSection === link.id;
@@ -252,83 +340,14 @@ function FloatingNav({ links, activeSection, isHidden, onNavClick }: { links: an
 
 // --- DESKTOP: Action Buttons ---
 function ActionButtons({ lang, dictionary, isHidden }: any) {
-  const isDark = useIsDarkMode();
-  const [isLangOpen, setIsLangOpen] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isPending, startTransition] = React.useTransition();
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    document.documentElement.classList.toggle("dark", newTheme);
-    localStorage.setItem("theme", newTheme ? "dark" : "light");
-    window.dispatchEvent(new Event("storage"));
-  };
-
-  const switchLanguage = (code: string) => {
-    setIsLangOpen(false);
-    const newPath = pathname.replace(`/${lang}`, `/${code}`);
-    startTransition(() => router.push(newPath, { scroll: false }));
-  };
-
-  const currentLangLabel = languages.find(l => l.code === lang)?.label || "DE";
-
   return (
     <motion.div
       className="flex items-center gap-3"
       animate={{ y: isHidden ? -100 : 0, opacity: isHidden ? 0 : 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
     >
-      {/* Theme Toggle */}
-      <button
-        onClick={toggleTheme}
-        className="relative p-2.5 rounded-full border border-white/20 dark:border-white/10 transition-colors shadow-sm overflow-hidden hover:bg-white/10"
-      >
-        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0" />
-        <div className="relative z-10">
-          {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
-        </div>
-      </button>
-
-      {/* Language */}
-      <div className="relative">
-        <button
-          onClick={() => setIsLangOpen(!isLangOpen)}
-          className="relative flex items-center gap-2 px-3 py-2 rounded-full border border-white/20 dark:border-white/10 text-xs font-bold transition-colors shadow-sm overflow-hidden hover:bg-white/10"
-        >
-          <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[50px] backdrop-saturate-150 z-0" />
-          <div className="relative z-10 flex items-center gap-2">
-            <Globe className="w-3.5 h-3.5" />
-            <span>{currentLangLabel}</span>
-          </div>
-        </button>
-        <AnimatePresence>
-          {isLangOpen && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setIsLangOpen(false)} />
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="absolute right-0 top-full mt-2 w-24 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-black/5 dark:border-white/10 overflow-hidden z-50 py-1"
-              >
-                {languages.map(l => (
-                  <button
-                    key={l.code}
-                    onClick={() => switchLanguage(l.code)}
-                    className={cn(
-                      "w-full px-4 py-2 text-left text-xs font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-colors",
-                      lang === l.code ? "text-primary-orange" : "text-gray-600 dark:text-gray-300"
-                    )}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </div>
+      <ThemeToggle />
+      <LanguageSelector lang={lang} />
 
       {/* CTA */}
       <Link
@@ -342,7 +361,7 @@ function ActionButtons({ lang, dictionary, isHidden }: any) {
 }
 
 // --- MOBILE: "The Floating Deck" ---
-function MobileFloatingDeck({ isHidden, isMenuOpen, toggleMenu }: { isHidden: boolean, isMenuOpen: boolean, toggleMenu: () => void }) {
+function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu }: { lang: string, isHidden: boolean, isMenuOpen: boolean, toggleMenu: () => void }) {
   return (
     <motion.div
       initial={{ y: 0, opacity: 1 }}
@@ -354,53 +373,58 @@ function MobileFloatingDeck({ isHidden, isMenuOpen, toggleMenu }: { isHidden: bo
       className={cn(
         "relative mx-auto max-w-[95%] pointer-events-auto",
         "h-16 rounded-2xl",
-        "border border-white/20 dark:border-white/10",
+        "border border-black/5 dark:border-white/10",
         "shadow-xl shadow-black/10 dark:shadow-black/30",
         "overflow-hidden"
       )}
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-white/70 dark:bg-black/70 backdrop-blur-xl backdrop-saturate-150 z-0" />
+      <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900 z-0" />
 
       {/* Content */}
-      <div className="relative z-10 flex items-center justify-between px-5 h-full">
-        {/* Left: Brain Icon */}
-        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-orange/10 border border-primary-orange/20">
-          <Brain className="w-6 h-6 text-primary-orange" />
-        </div>
+      <div className="relative z-10 flex items-center justify-between px-4 h-full">
+        {/* Left: Full Logo */}
+        <Link href={`/${lang}`} className="relative block h-8 w-auto">
+          <LogoImage />
+        </Link>
 
-        {/* Right: Hamburger */}
-        <button
-          onClick={toggleMenu}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 active:scale-95 transition-transform"
-        >
-          <MotionConfig transition={{ duration: 0.3, ease: "easeInOut" }}>
-            <motion.div
-              animate={isMenuOpen ? "open" : "closed"}
-              className="relative w-6 h-6 flex items-center justify-center"
-            >
-              {/* Simple cross-fade or rotation */}
-              <motion.span
-                variants={{
-                  closed: { rotate: 0, opacity: 1 },
-                  open: { rotate: 90, opacity: 0 }
-                }}
-                className="absolute"
+        {/* Right: Actions Row */}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <LanguageSelector lang={lang} compact />
+
+          {/* Hamburger */}
+          <button
+            onClick={toggleMenu}
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 active:scale-95 transition-transform"
+          >
+            <MotionConfig transition={{ duration: 0.3, ease: "easeInOut" }}>
+              <motion.div
+                animate={isMenuOpen ? "open" : "closed"}
+                className="relative w-6 h-6 flex items-center justify-center"
               >
-                <MenuIcon className="w-6 h-6" />
-              </motion.span>
-              <motion.span
-                variants={{
-                  closed: { rotate: -90, opacity: 0 },
-                  open: { rotate: 0, opacity: 1 }
-                }}
-                className="absolute"
-              >
-                <X className="w-6 h-6" />
-              </motion.span>
-            </motion.div>
-          </MotionConfig>
-        </button>
+                <motion.span
+                  variants={{
+                    closed: { rotate: 0, opacity: 1 },
+                    open: { rotate: 90, opacity: 0 }
+                  }}
+                  className="absolute"
+                >
+                  <MenuIcon className="w-6 h-6" />
+                </motion.span>
+                <motion.span
+                  variants={{
+                    closed: { rotate: -90, opacity: 0 },
+                    open: { rotate: 0, opacity: 1 }
+                  }}
+                  className="absolute"
+                >
+                  <X className="w-6 h-6" />
+                </motion.span>
+              </motion.div>
+            </MotionConfig>
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -408,21 +432,6 @@ function MobileFloatingDeck({ isHidden, isMenuOpen, toggleMenu }: { isHidden: bo
 
 // --- MOBILE: Full Screen Menu (Swiss Style) ---
 function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: any) {
-  const isDark = useIsDarkMode();
-  const router = useRouter();
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    document.documentElement.classList.toggle("dark", newTheme);
-    localStorage.setItem("theme", newTheme ? "dark" : "light");
-    window.dispatchEvent(new Event("storage"));
-  };
-
-  const switchLanguage = (code: string) => {
-    const path = window.location.pathname.replace(`/${lang}`, `/${code}`);
-    router.push(path);
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -430,7 +439,7 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
           initial={{ opacity: 0, y: "-100%" }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: "-100%" }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} // Bezier for smooth drop
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[90] bg-background/95 backdrop-blur-3xl pt-28 pb-10 px-6 flex flex-col pointer-events-auto overflow-hidden"
         >
           {/* Navigation Links */}
@@ -463,28 +472,7 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
             transition={{ delay: 0.6 }}
             className="flex flex-col items-center gap-6"
           >
-            <div className="flex items-center gap-4">
-              {/* Theme Toggle */}
-              <button onClick={toggleTheme} className="p-4 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-                {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-              </button>
-
-              {/* Language Switcher (Simple Row) */}
-              <div className="flex gap-2 p-1 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-                {languages.map(l => (
-                  <button
-                    key={l.code}
-                    onClick={() => switchLanguage(l.code)}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-sm font-bold transition-colors",
-                      lang === l.code ? "bg-white dark:bg-zinc-800 shadow-sm" : "text-gray-500"
-                    )}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Note: Theme and Language controls moved to header bar as requested */}
 
             <Link
               href={`/${lang}/registration`}
@@ -502,8 +490,9 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
 
 // --- Helper ---
 function useIsDarkMode() {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState<boolean | null>(null); // Initial null to prevent hydration mismatch
   useEffect(() => {
+    // Client-side detection
     const check = () => setIsDark(document.documentElement.classList.contains("dark"));
     check();
     const observer = new MutationObserver(check);
