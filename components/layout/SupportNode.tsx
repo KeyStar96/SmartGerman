@@ -2,20 +2,37 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence, Transition } from "framer-motion";
-import { MessageCircle, Mail, X, HelpCircle, ArrowUpRight } from "lucide-react";
+import { MessageCircle, Mail, X, HelpCircle, ArrowUpRight, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 interface SupportNodeProps {
-    // Optional: Dictionary props passing if needed later
+    dictionary: any;
 }
 
-export default function SupportNode() {
+export default function SupportNode({ dictionary }: SupportNodeProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
+
+    // Hide on any route containing "registration"
+    if (pathname?.includes("registration")) {
+        return null;
+    }
 
     const toggleOpen = () => setIsOpen(!isOpen);
 
     // Animation Config (Swiss Smoothness)
     const spring: Transition = { type: "spring", stiffness: 400, damping: 30 };
+
+    // Fallback dictionary text
+    const t = {
+        telegram: dictionary?.support_node?.telegram || "Telegram",
+        telegram_sub: dictionary?.support_node?.telegram_sub || "Direct Chat",
+        email: dictionary?.support_node?.email || "Email",
+        email_sub: dictionary?.support_node?.email_sub || "Beratung",
+        whatsapp: dictionary?.support_node?.whatsapp || "WhatsApp",
+        whatsapp_sub: dictionary?.support_node?.whatsapp_sub || "Business Chat"
+    };
 
     return (
         <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 pointer-events-none">
@@ -30,7 +47,24 @@ export default function SupportNode() {
                         transition={spring}
                         className="flex flex-col gap-2 pointer-events-auto min-w-[200px]"
                     >
-                        {/* Option 1: Telegram */}
+                        {/* Option 1: WhatsApp (NEW) */}
+                        <a
+                            href="https://wa.me/491714758620"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#25D366] transition-colors duration-300"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Phone size={18} className="text-white group-hover:scale-110 transition-transform" />
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-white uppercase tracking-wider">{t.whatsapp}</span>
+                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">{t.whatsapp_sub}</span>
+                                </div>
+                            </div>
+                            <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
+                        </a>
+
+                        {/* Option 2: Telegram */}
                         <a
                             href="https://t.me/smartgerman"
                             target="_blank"
@@ -40,14 +74,14 @@ export default function SupportNode() {
                             <div className="flex items-center gap-3">
                                 <MessageCircle size={18} className="text-white group-hover:scale-110 transition-transform" />
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-white uppercase tracking-wider">Telegram</span>
-                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">Direct Chat</span>
+                                    <span className="text-xs font-bold text-white uppercase tracking-wider">{t.telegram}</span>
+                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">{t.telegram_sub}</span>
                                 </div>
                             </div>
                             <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
                         </a>
 
-                        {/* Option 2: Email */}
+                        {/* Option 3: Email */}
                         <a
                             href="mailto:info@smart-german.com"
                             className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#FF5C00] transition-colors duration-300"
@@ -55,8 +89,8 @@ export default function SupportNode() {
                             <div className="flex items-center gap-3">
                                 <Mail size={18} className="text-white group-hover:scale-110 transition-transform" />
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-bold text-white uppercase tracking-wider">Email</span>
-                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">Beratung</span>
+                                    <span className="text-xs font-bold text-white uppercase tracking-wider">{t.email}</span>
+                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">{t.email_sub}</span>
                                 </div>
                             </div>
                             <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
@@ -101,11 +135,7 @@ export default function SupportNode() {
                                 className="relative"
                             >
                                 <HelpCircle size={28} strokeWidth={2} />
-                                {/* Status Dot indicating "Online" */}
-                                <span className="absolute top-0 right-0 flex h-2.5 w-2.5 translate-x-1 -translate-y-1">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-400 border border-[#FF5C00]"></span>
-                                </span>
+                                {/* REMOVED: Status Dot indicating "Online" */}
                             </motion.div>
                         )}
                     </AnimatePresence>

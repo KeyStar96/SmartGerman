@@ -77,7 +77,7 @@ export default async function RootLayout({
             {children}
           </main>
         </SmoothScroll>
-        <SupportNode />
+        <SupportNode dictionary={dictionary} />
       </body>
     </html>
   );

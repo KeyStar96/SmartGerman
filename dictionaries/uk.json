@@ -677,6 +677,14 @@
         "personal": "Особисте",
         "address": "Адреса"
       }
+    },
+    "support_node": {
+      "telegram": "Telegram",
+      "telegram_sub": "Прямий чат",
+      "email": "Email",
+      "email_sub": "Консультація",
+      "whatsapp": "WhatsApp",
+      "whatsapp_sub": "Бізнес-чат"
     }
   }
 }

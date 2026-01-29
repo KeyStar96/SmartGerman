@@ -677,6 +677,14 @@
         "personal": "Persönlich",
         "address": "Adresse"
       }
+    },
+    "support_node": {
+      "telegram": "Telegram",
+      "telegram_sub": "Direct Chat",
+      "email": "Email",
+      "email_sub": "Beratung",
+      "whatsapp": "WhatsApp",
+      "whatsapp_sub": "Business Chat"
     }
   }
 }

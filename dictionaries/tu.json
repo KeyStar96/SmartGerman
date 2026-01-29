@@ -683,6 +683,14 @@
         "personal": "Kişisel",
         "address": "Adres"
       }
+    },
+    "support_node": {
+      "telegram": "Telegram",
+      "telegram_sub": "Doğrudan Sohbet",
+      "email": "E-posta",
+      "email_sub": "Danışmanlık",
+      "whatsapp": "WhatsApp",
+      "whatsapp_sub": "İşletme Sohbeti"
     }
   }
 }
