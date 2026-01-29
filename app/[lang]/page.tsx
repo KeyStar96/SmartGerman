@@ -51,6 +51,7 @@ export default async function HomePage({
           <WhyUsBento dictionary={dictionary} />
           <Courses dictionary={dictionary} />
           <TimetableSection dictionary={dictionary} />
+          <ContactCta dictionary={dictionary} />
           <LocationSection dictionary={dictionary} />
 
 
