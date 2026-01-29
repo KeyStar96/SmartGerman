@@ -1042,8 +1042,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                         <div className="flex items-center gap-2">
                             <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF5C00] opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF5C00]"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
                         </div>
                         <span className="font-mono text-xs text-gray-500">{currentMonthObj.label}</span>
