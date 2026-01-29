@@ -27,11 +27,8 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
     // Fallback dictionary text
     const t = {
         telegram: dictionary?.support_node?.telegram || "Telegram",
-        telegram_sub: dictionary?.support_node?.telegram_sub || "Direct Chat",
         email: dictionary?.support_node?.email || "Email",
-        email_sub: dictionary?.support_node?.email_sub || "Beratung",
         whatsapp: dictionary?.support_node?.whatsapp || "WhatsApp",
-        whatsapp_sub: dictionary?.support_node?.whatsapp_sub || "Business Chat"
     };
 
     return (
@@ -58,7 +55,6 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                                 <Phone size={18} className="text-white group-hover:scale-110 transition-transform" />
                                 <div className="flex flex-col">
                                     <span className="text-xs font-bold text-white uppercase tracking-wider">{t.whatsapp}</span>
-                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">{t.whatsapp_sub}</span>
                                 </div>
                             </div>
                             <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
@@ -75,7 +71,6 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                                 <MessageCircle size={18} className="text-white group-hover:scale-110 transition-transform" />
                                 <div className="flex flex-col">
                                     <span className="text-xs font-bold text-white uppercase tracking-wider">{t.telegram}</span>
-                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">{t.telegram_sub}</span>
                                 </div>
                             </div>
                             <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
@@ -90,7 +85,6 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                                 <Mail size={18} className="text-white group-hover:scale-110 transition-transform" />
                                 <div className="flex flex-col">
                                     <span className="text-xs font-bold text-white uppercase tracking-wider">{t.email}</span>
-                                    <span className="text-[9px] font-mono text-white/50 group-hover:text-white/80">{t.email_sub}</span>
                                 </div>
                             </div>
                             <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />

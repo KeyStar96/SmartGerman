@@ -680,11 +680,8 @@
     },
     "support_node": {
       "telegram": "Telegram",
-      "telegram_sub": "Прямой чат",
       "email": "Email",
-      "email_sub": "Консультация",
       "whatsapp": "WhatsApp",
-      "whatsapp_sub": "Бизнес-чат"
     }
   }
 }
