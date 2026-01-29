@@ -64,7 +64,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
   // --- Scroll Spy ---
   useEffect(() => {
-    const sections = ["hero", "courses", "science", "about", "location"];
+    const sections = ["hero", "science", "about", "courses", "location"];
     const observer = new IntersectionObserver(
       (entries) => {
         // If we are currently auto-scrolling to a section, ignore observer updates
@@ -114,9 +114,9 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
   const navLinks = [
     { id: "hero", label: dictionary.header.nav.home },
-    { id: "courses", label: dictionary.header.nav.courses },
     { id: "science", label: dictionary.science?.title_part1 || "Wissenschaft" },
     { id: "about", label: dictionary.Footer?.Nav?.about || "Über uns" },
+    { id: "courses", label: dictionary.header.nav.courses },
     { id: "location", label: dictionary.Footer?.Nav?.location || "Standort" },
   ];
 
