@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Transition } from "framer-motion";
 import { MessageCircle, Mail, X, HelpCircle, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,7 @@ export default function SupportNode() {
     const toggleOpen = () => setIsOpen(!isOpen);
 
     // Animation Config (Swiss Smoothness)
-    const spring = { type: "spring", stiffness: 400, damping: 30 };
+    const spring: Transition = { type: "spring", stiffness: 400, damping: 30 };
 
     return (
         <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 pointer-events-none">
