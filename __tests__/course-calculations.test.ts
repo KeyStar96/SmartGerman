@@ -306,4 +306,56 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
             console.log(tableRows.join('\n'));
         });
     });
+
+    describe('6. Data Integrity & Display Logic Verification', () => {
+        // User Requirement: "Im Kursauswahlfenster soll der Preis pro Einheit stehen"
+        // This test ensures our "Master Data" (course-config) actually contains Unit Prices,
+        // preventing accidental entry of full monthly prices.
+
+        test('All courses have valid Unit Prices (< 50€) distinct from Monthly Totals', () => {
+            const warnings: string[] = [];
+
+            COURSES.forEach(c => {
+                // 1. Sanity Check: Unit Price should be "small"
+                // If someone enters 120.00 here, it's likely a mistake.
+                if (c.price > 50) {
+                    warnings.push(`WARNING: Course ${c.id} has a high unit price of ${c.price}€. Is this a monthly total?`);
+                }
+                expect(c.price).toBeLessThan(50); // Enforce strict limit for "Unit Price"
+
+                // 2. Distinction Check
+                // Calculate a typical month (e.g., March with ~4 weeks)
+                // The Total Price should be significantly higher than the Unit Price
+                // (unless it's a 1-session-per-month course, which is rare)
+                const stats = calculateMonthlyStats(c, 'de', 2, 2026); // March 2026
+                const monthlyTotal = stats.totalUnits * c.price;
+
+                if (stats.totalUnits > 1) {
+                    expect(monthlyTotal).toBeGreaterThan(c.price);
+                }
+            });
+
+            if (warnings.length > 0) {
+                console.warn(warnings.join('\n'));
+            }
+        });
+
+        test('Report: Unit Price (Display) vs Monthly Total (Live Calc)', () => {
+            // Generates a report specifically to verify the User's "Display vs Calculation" distinction
+            console.log("\n### DISPLAY PRICE INTEGRITY CHECK");
+            console.log("| Course ID | Display Price (Per Unit) | Monthly Total (Example: March '26) | Check |");
+            console.log("| :--- | :--- | :--- | :--- |");
+
+            COURSES.forEach(c => {
+                const stats = calculateMonthlyStats(c, 'de', 2, 2026); // March 2026
+                const monthlyTotal = stats.totalUnits * c.price;
+                const check = monthlyTotal >= c.price ? "✅" : "⚠️";
+
+                const displayStr = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(c.price);
+                const totalStr = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(monthlyTotal);
+
+                console.log(`| ${c.id} | **${displayStr}** | ${totalStr} | ${check} |`);
+            });
+        });
+    });
 });

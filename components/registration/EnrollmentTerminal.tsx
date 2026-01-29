@@ -655,18 +655,15 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
 
     const getCourseData = React.useCallback((c: CourseConfig) => {
         // Calculate price based on selected month
-        const mParts = selectedStartMonth.split('-');
-        const month = parseInt(mParts[0]);
-        const year = parseInt(mParts[1]);
-        const stats = calculateMonthlyStats(c, lang, month, year);
-
+        // Note: For the CARD DISPLAY, user wants "Price per Unit".
+        // The Monthly Total is calculated separately in `totalMonthlyPrice`.
         return {
             title: dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
-            priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(stats.totalUnits * c.price),
+            priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
             level: dictionary?.CourseData?.[c.translationKey]?.level,
             dictionary // Pass dictionary down
         };
-    }, [dictionary, lang, selectedStartMonth]);
+    }, [dictionary, lang]);
 
     const selectedCoursesFull = COURSES.filter(c => selectedCourseIds.includes(c.id));
 
