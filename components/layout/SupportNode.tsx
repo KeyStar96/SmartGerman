@@ -34,6 +34,15 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
     return (
         <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 pointer-events-none">
 
+            {/* --- BACKDROP (Click outside to close) --- */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 z-[-1] pointer-events-auto"
+                    onClick={() => setIsOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
+
             {/* --- EXPANDED MENU (The Options) --- */}
             <AnimatePresence>
                 {isOpen && (
