@@ -88,6 +88,8 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                         {/* Option 3: Email */}
                         <a
                             href="mailto:info@smart-german.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#FF5C00] transition-colors duration-300"
                         >
                             <div className="flex items-center gap-3">
