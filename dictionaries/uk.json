@@ -681,7 +681,7 @@
     "support_node": {
       "telegram": "Telegram",
       "email": "Email",
-      "whatsapp": "WhatsApp",
+      "whatsapp": "WhatsApp"
     }
   }
 }
