@@ -40,6 +40,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
   // --- Scroll Logic (Smart Hide) ---
   useMotionValueEvent(scrollY, "change", (latest) => {
+    // Only block hiding if locked for smooth scroll
     if (isLockedRef.current) return;
 
     const diff = latest - lastScrollY.current;
@@ -66,8 +67,14 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     const sections = ["hero", "courses", "science", "about", "location"];
     const observer = new IntersectionObserver(
       (entries) => {
+        // If we are currently auto-scrolling to a section, ignore observer updates
+        // to prevent flickering or wrong active state during the scroll animation.
+        if (isLockedRef.current) return;
+
         entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
         });
       },
       { rootMargin: "-20% 0px -20% 0px", threshold: 0.1 }
@@ -86,12 +93,22 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   // --- Smooth Scroll ---
   const handleScroll = (id: string) => {
     setIsMobileMenuOpen(false); // Close mobile menu if open
+
+    // 1. Immediately update active state
+    setActiveSection(id);
+
+    // 2. Lock observer interactions
+    isLockedRef.current = true;
+
     const element = document.getElementById(id);
     if (element) {
-      isLockedRef.current = true;
       setIsHidden(false);
       element.scrollIntoView({ behavior: "smooth" });
-      setTimeout(() => { isLockedRef.current = false; }, 1000);
+
+      // 3. Unlock after animation (approx 1s)
+      setTimeout(() => {
+        isLockedRef.current = false;
+      }, 1000);
     }
   };
 
