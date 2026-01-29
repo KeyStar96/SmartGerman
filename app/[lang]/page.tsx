@@ -10,7 +10,6 @@ import { getDictionary } from "@/lib/dictionary";
 import AppBackground from "@/components/effects/AppBackground";
 import BackgroundPinner from "@/components/effects/BackgroundPinner";
 import Header from "@/components/layout/Header";
-import ContactCta from "@/components/sections/ContactCta";
 
 export default async function HomePage({
   params,
@@ -52,7 +51,6 @@ export default async function HomePage({
           <WhyUsBento dictionary={dictionary} />
           <Courses dictionary={dictionary} />
           <TimetableSection dictionary={dictionary} />
-          <ContactCta dictionary={dictionary} />
           <LocationSection dictionary={dictionary} />
 
 

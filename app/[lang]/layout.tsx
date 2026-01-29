@@ -5,6 +5,7 @@ import SmoothScroll from "@/components/effects/SmoothScroll";
 // Header moved to individual pages to prevent layout shifts
 // import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
+import SupportNode from "@/components/layout/SupportNode";
 
 const inter = Inter({ subsets: ["latin"] });
 const jetbrainsMono = JetBrains_Mono({
@@ -76,6 +77,7 @@ export default async function RootLayout({
             {children}
           </main>
         </SmoothScroll>
+        <SupportNode />
       </body>
     </html>
   );
