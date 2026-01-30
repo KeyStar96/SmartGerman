@@ -11,6 +11,9 @@ export default async function RegistrationPage({
     const { lang } = await params;
     const dictionary = await getDictionary(lang);
 
+    const now = new Date();
+    const serverTime = now.getTime(); // Pass as number to avoid serialization issues
+
     return (
         <div className="relative w-full min-h-screen">
             {/* Background Layer - Fixed to prevent layout shift of background */}
@@ -29,7 +32,7 @@ export default async function RegistrationPage({
                         </div>
                     </div>
                 }>
-                    <EnrollmentTerminal dictionary={dictionary} lang={lang} />
+                    <EnrollmentTerminal dictionary={dictionary} lang={lang} serverTime={serverTime} />
                 </React.Suspense>
             </div>
         </div>

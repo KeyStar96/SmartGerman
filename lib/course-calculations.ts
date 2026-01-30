@@ -101,9 +101,9 @@ export const calculateMonthlyStats = (
 };
 
 // Generates the next 6 months starting from next month
-export const getNext6Months = (lang: string) => {
+export const getNext6Months = (lang: string, referenceDate?: Date) => {
     const months = [];
-    const today = new Date();
+    const today = referenceDate || new Date();
     // Start from next month
     let currentMonth = today.getMonth() + 1;
     let currentYear = today.getFullYear();

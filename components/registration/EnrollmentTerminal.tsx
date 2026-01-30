@@ -26,7 +26,8 @@ const MaskedDateInput = ({
     placeholder = "DD.MM.YYYY",
     label,
     error,
-    required
+    required,
+    referenceDate
 }: any) => {
     // ... existing MaskedDateInput code ...
     const defaultPlaceholder = placeholder;
@@ -112,7 +113,7 @@ const MaskedDateInput = ({
 
         if (year.length === 4) {
             const y = parseInt(year);
-            const currentYear = new Date().getFullYear();
+            const currentYear = new Date(referenceDate || new Date()).getFullYear();
             if (y < 1900 || y > currentYear) {
                 year = year.slice(0, 3);
             }
@@ -299,7 +300,7 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
 });
 
 const TerminalInput = ({ label, error, registration, ...props }: any) => {
-    const defaultId = React.useId ? React.useId() : Math.random().toString(36).substr(2, 9);
+    const defaultId = React.useId();
     const id = props.id || registration?.name || defaultId;
     return (
         <div className="relative group">
@@ -405,7 +406,8 @@ const DateDropdowns = ({
     onChange,
     label,
     error,
-    required
+    required,
+    referenceDate
 }: any) => {
     // Value format: DD.MM.YYYY
     const [day, month, year] = (value || "..").split(".");
@@ -419,7 +421,7 @@ const DateDropdowns = ({
         const m = String(i + 1).padStart(2, '0');
         return { value: m, label: m };
     });
-    const currentYear = new Date().getFullYear();
+    const currentYear = new Date(referenceDate || new Date()).getFullYear();
     const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
         const y = String(currentYear - i);
         return { value: y, label: y };
@@ -572,7 +574,7 @@ const PhoneInput = ({
 
 // --- MAIN TERMINAL ---
 
-export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictionary: any, lang: string }) {
+export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime }: { dictionary: any, lang: string, serverTime?: number }) {
     const searchParams = useSearchParams();
     const initialCourseId = searchParams.get("courseId");
 
@@ -590,7 +592,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
     const [isSuccess, setIsSuccess] = useState(false);
 
     // Dynamic Start Month Options
-    const startMonths = React.useMemo(() => getNext6Months(lang), [lang]);
+    const startMonths = React.useMemo(() => {
+        const dateRef = serverTime ? new Date(serverTime) : new Date();
+        return getNext6Months(lang, dateRef);
+    }, [lang, serverTime]);
     // Default to first available month (Next Month)
     const [selectedStartMonth, setSelectedStartMonth] = useState(startMonths[0].value);
 
@@ -941,6 +946,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de" }: { dictio
                                                 value={watch("personal.birthDate")}
                                                 onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
                                                 error={errors.personal?.birthDate?.message}
+                                                referenceDate={startMonths[0].year && new Date(startMonths[0].year, startMonths[0].month, 1)}
                                             />
                                         </div>
                                         <PhoneInput
