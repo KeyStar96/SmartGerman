@@ -27,7 +27,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
         <div className="w-full h-full px-6 md:px-12 pt-12 pb-24 md:py-12 flex flex-col justify-end gap-12 md:justify-between md:gap-0">
 
             {/* TOP ROW */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 h-full items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 lg:h-full items-start">
 
                 {/* 1. Brand / Mission (Left Column) */}
                 <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-4 lg:space-y-8">
