@@ -59,6 +59,9 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.className} ${jetbrainsMono.variable} text-foreground antialiased font-sans`}>
+        {/* GLOBAL FIXED BACKGROUND */}
+        <div className="global-gradient-bg" />
+
         {/* 
           CHROME FIX für backdrop-filter:
           - Hintergründe mit z-index: 0/1 statt negativen Werten
