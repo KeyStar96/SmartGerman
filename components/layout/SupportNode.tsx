@@ -31,6 +31,31 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
         whatsapp: dictionary?.support_node?.whatsapp || "WhatsApp",
     };
 
+    // Observer for mobile menu to hide support node
+    const [isHidden, setIsHidden] = useState(false);
+    useEffect(() => {
+        const checkBody = () => {
+            // Check if body has 'mobile-menu-open' class (toggled by Header)
+            if (document.body.classList.contains("mobile-menu-open")) {
+                setIsHidden(true);
+            } else {
+                setIsHidden(false);
+            }
+        };
+
+        // Check initially
+        checkBody();
+
+        // Observe changes
+        const observer = new MutationObserver(checkBody);
+        observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+        return () => observer.disconnect();
+    }, []);
+
+    // Also hide if hidden by menu
+    if (isHidden) return null;
+
     return (
         <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 pointer-events-none">
 

@@ -62,6 +62,21 @@ export default function Header({ lang, dictionary }: HeaderProps) {
     lastScrollY.current = latest;
   });
 
+  // --- Scroll Lock & Body Class for Mobile Menu ---
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.classList.add("mobile-menu-open");
+    } else {
+      document.body.style.overflow = "";
+      document.body.classList.remove("mobile-menu-open");
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.classList.remove("mobile-menu-open");
+    };
+  }, [isMobileMenuOpen]);
+
   // --- Scroll Spy ---
   useEffect(() => {
     const sections = ["hero", "science", "about", "courses", "location"];
@@ -202,7 +217,7 @@ function ThemeToggle() {
 }
 
 // --- SHARED: Language Selector ---
-function LanguageSelector({ lang, compact = false }: { lang: string, compact?: boolean }) {
+function LanguageSelector({ lang, compact = false, upwards = false }: { lang: string, compact?: boolean, upwards?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -240,7 +255,10 @@ function LanguageSelector({ lang, compact = false }: { lang: string, compact?: b
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute right-0 top-full mt-2 w-24 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-black/5 dark:border-white/10 overflow-hidden z-50 py-1"
+              className={cn(
+                "absolute right-0 w-24 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-black/5 dark:border-white/10 overflow-hidden z-50 py-1",
+                upwards ? "bottom-full mb-2" : "top-full mt-2"
+              )}
             >
               {languages.map(l => (
                 <button
@@ -390,7 +408,7 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
         }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         className={cn(
-          "relative h-14 w-14 flex items-center justify-center rounded-2xl",
+          "relative h-14 min-w-[80px] px-4 w-auto flex items-center justify-center rounded-2xl",
           "border border-black/5 dark:border-white/10",
           "shadow-xl shadow-black/10 dark:shadow-black/30",
           "overflow-hidden"
@@ -536,7 +554,7 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase text-gray-500">Lang</span>
                 {/* Inline Simple Selector or compacted */}
-                <LanguageSelector lang={lang} />
+                <LanguageSelector lang={lang} upwards />
               </div>
             </div>
 
