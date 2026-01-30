@@ -14,10 +14,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
 
-    // Hide on any route containing "registration"
-    if (pathname?.includes("registration")) {
-        return null;
-    }
+
 
     const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -53,8 +50,8 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
         return () => observer.disconnect();
     }, []);
 
-    // Also hide if hidden by menu
-    if (isHidden) return null;
+    // Also hide if hidden by menu or on registration page
+    if (isHidden || pathname?.includes("registration")) return null;
 
     return (
         <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 pointer-events-none">
