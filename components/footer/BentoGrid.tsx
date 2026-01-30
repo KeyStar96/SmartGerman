@@ -27,10 +27,10 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
         <div className="w-full h-full px-6 md:px-12 py-12 flex flex-col justify-between">
 
             {/* TOP ROW */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 h-full items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 h-full items-start">
 
                 {/* 1. Brand / Mission (Left Column) */}
-                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-8">
+                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-4 lg:space-y-8">
                     <div>
                         {/* OPTIMIERUNG 1: Brand Colors wie im Hero 
                            "Smart" = Weiß (auf Dark Background)
@@ -91,8 +91,8 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                     </nav>
                 </div>
 
-                {/* 3. Contact & Actions (Right Column) */}
-                <div className="lg:col-span-3 flex flex-col gap-6 lg:items-end">
+                {/* 3. Contact & Actions (Right Column) - HIDDEN ON MOBILE (SWISS COMPACT) */}
+                <div className="hidden lg:flex lg:col-span-3 flex-col gap-6 lg:items-end">
 
                     {/* Magnetic Buttons */}
                     <div className="flex flex-col gap-3 w-full sm:w-auto">
@@ -138,7 +138,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
             </div>
 
             {/* BOTTOM ROW: Footer Meta */}
-            <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
+            <div className="mt-8 lg:mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
                 <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
 
                 <div className="flex gap-8">
