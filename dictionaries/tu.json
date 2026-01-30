@@ -24,6 +24,10 @@
       "uk": "UK",
       "ru": "RU",
       "tu": "TU"
+    },
+    "menu": {
+      "theme": "Tema",
+      "language": "Dil"
     }
   },
   "hero": {

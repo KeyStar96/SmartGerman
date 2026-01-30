@@ -25,6 +25,11 @@ export async function generateStaticParams() {
   ];
 }
 
+export const viewport = {
+  viewportFit: 'cover',
+  themeColor: '#FCF4E6', // Setting a default theme color can also help
+};
+
 // Wir machen die Funktion 'async'
 export default async function RootLayout({
   children,

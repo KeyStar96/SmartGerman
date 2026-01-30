@@ -24,6 +24,10 @@
       "uk": "UK",
       "ru": "RU",
       "tu": "TU"
+    },
+    "menu": {
+      "theme": "Thema",
+      "language": "Sprache"
     }
   },
   "hero": {

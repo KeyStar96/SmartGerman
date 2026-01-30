@@ -66,13 +66,16 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden"; // Stricter lock
       document.body.classList.add("mobile-menu-open");
     } else {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
       document.body.classList.remove("mobile-menu-open");
     }
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
       document.body.classList.remove("mobile-menu-open");
     };
   }, [isMobileMenuOpen]);
@@ -408,7 +411,7 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
         }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         className={cn(
-          "relative h-14 min-w-[80px] px-4 w-auto flex items-center justify-center rounded-2xl",
+          "relative h-11 min-w-[80px] px-4 w-auto flex items-center justify-center rounded-full",
           "border border-black/5 dark:border-white/10",
           "shadow-xl shadow-black/10 dark:shadow-black/30",
           "overflow-hidden"
@@ -436,13 +439,15 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
         }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
         className={cn(
-          "relative flex items-center gap-2 p-2 rounded-2xl",
-          "border border-black/5 dark:border-white/10",
-          "shadow-xl shadow-black/10 dark:shadow-black/30",
-          "overflow-hidden"
+          "relative flex items-center gap-2 rounded-2xl",
+          // Removed container styling (pills) as requested
+          // "border border-black/5 dark:border-white/10",
+          // "shadow-xl shadow-black/10 dark:shadow-black/30",
+          // "overflow-hidden"
         )}
       >
-        <div className="absolute inset-0 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-md z-0" />
+        {/* Removed background div for "pill" look */}
+        {/* <div className="absolute inset-0 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-md z-0" /> */}
 
         <div className="relative z-10 flex items-center gap-2">
           {/* Mobile Enroll Button */}
@@ -453,8 +458,8 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
             {dictionary?.header?.nav?.enroll || "Anmelden"}
           </Link>
 
-          {/* Separator */}
-          <div className="w-px h-6 bg-black/10 dark:bg-white/10" />
+          {/* Separator removed as buttons stand alone */}
+          {/* <div className="w-px h-6 bg-black/10 dark:bg-white/10" /> */}
 
           {/* Hamburger */}
           <button
@@ -547,12 +552,12 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
             {/* Settings Zone in Menu */}
             <div className="flex items-center justify-center gap-4 mt-6 p-4 rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-sm">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase text-gray-500">Theme</span>
+                <span className="text-xs font-bold uppercase text-gray-500">{dictionary?.header?.menu?.theme || "Theme"}</span>
                 <ThemeToggle />
               </div>
               <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase text-gray-500">Lang</span>
+                <span className="text-xs font-bold uppercase text-gray-500">{dictionary?.header?.menu?.language || "Lang"}</span>
                 {/* Inline Simple Selector or compacted */}
                 <LanguageSelector lang={lang} upwards />
               </div>
