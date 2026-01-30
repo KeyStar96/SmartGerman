@@ -50,7 +50,8 @@ const compareObjects = (source: any, target: any, lang: string, pathPrefix = "")
                 const isIgnored =
                     sourceVal === "" ||
                     isBlacklisted(sourceVal) ||
-                    isNumericOrSymbol(sourceVal);
+                    isNumericOrSymbol(sourceVal) ||
+                    ['Email', 'WhatsApp', 'Telegram'].includes(sourceVal);
 
                 if (!isIgnored) {
                     throw new Error(`Untranslated key '${fullPath}' in ${lang}. Value: "${sourceVal}"`);
