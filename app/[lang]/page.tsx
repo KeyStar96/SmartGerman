@@ -28,7 +28,7 @@ export default async function HomePage({
         - Margin bottom reserves space for the fixed footer
         - z-index: 10 ensures it sits on top of the footer initially
       */}
-      <main className="relative z-10 mb-[500px] md:mb-[500px] bg-transparent w-full">
+      <main className="relative z-10 mb-[850px] md:mb-[500px] bg-transparent w-full">
 
         {/* 
           GSAP PINNED BACKGROUND
