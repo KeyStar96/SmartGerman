@@ -686,58 +686,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     const formatPrice = React.useCallback((p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p), []);
 
-    const onSubmit = async (data: EnrollmentFormData) => {
-        setIsSubmitting(true);
-        await new Promise(r => setTimeout(r, 1500));
-        console.log({
-            courses: selectedCourseIds,
-            startMonth: selectedStartMonth,
-            personal: data,
-            total: totalMonthlyPrice
-        });
-        setIsSuccess(true);
-        setIsSubmitting(false);
-    };
-
-    const handleNextStep = async () => {
-        if (step === 1 && selectedCourseIds.length > 0) {
-            setStep(2);
-        } else if (step === 2) {
-            const valid = await trigger("personal");
-            if (valid) setStep(3);
-        }
-    };
-
-    if (isSuccess) {
-        return (
-            <div className="h-screen w-full bg-[#1A1C1E] text-white flex flex-col items-center justify-center text-center p-8 font-sans">
-                <div className="w-20 h-20 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
-                    <Check size={40} />
-                </div>
-                <h3 className="text-3xl font-bold mb-4 tracking-tight">{success?.title || "Success"}</h3>
-                <p className="text-gray-400 text-lg mb-12 max-w-md">{success?.message} <strong>{formData?.email}</strong>.</p>
-                <Link href={`/${lang}`} className="bg-[#FF5C00] text-white px-8 py-4 rounded font-bold uppercase tracking-widest hover:bg-[#FF7A33] transition-colors">
-                    {t?.back_home}
-                </Link>
-            </div>
-        );
-    }
-
     // --- SCROLL & UX LOGIC ---
     const desktopScrollRef = React.useRef<HTMLDivElement>(null);
     const footerRef = React.useRef<HTMLDivElement>(null);
     const [showScrollHint, setShowScrollHint] = useState(false);
-
-    // Import Lenis hook dynamically or assume context is safe if SmoothScroll wraps app?
-    // Since we don't have imports here, we need to add import { useLenis } from 'lenis/react';
-    // BUT replace_file_content replaces a block. I need to make sure I add the import too.
-    // I can't add import easily in this block.
-    // I will use window.scrollTo with 'auto' for robustness and try to target html/body.
-    // And for Desktop, use the ref.
-
-    // Actually, I can add the import in a separate call or just trust standard scroll if I force it hard enough.
-    // But modifying the import requires changing the top of the file.
-    // I'll stick to robust native hacks first:
 
     useEffect(() => {
         // Force scroll to top on step change
@@ -755,9 +707,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
         // Small timeout to ensure render frame is complete
         setTimeout(scrollToTop, 10);
-        // And another safety specific for Lenis if it's hijacking global scroll (Desktop Mode)
-        // Since I can't easily import useLenis here without top-file edit, I'll rely on "auto".
-        // Lenis usually respects window.scrollTo if not blocked.
     }, [step]);
 
     // 2. Scroll Hint Observer
@@ -802,6 +751,45 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         observer.observe(document.documentElement, { attributes: true });
         return () => observer.disconnect();
     }, []);
+
+    const onSubmit = async (data: EnrollmentFormData) => {
+        setIsSubmitting(true);
+        await new Promise(r => setTimeout(r, 1500));
+        console.log({
+            courses: selectedCourseIds,
+            startMonth: selectedStartMonth,
+            personal: data,
+            total: totalMonthlyPrice
+        });
+        setIsSuccess(true);
+        setIsSubmitting(false);
+    };
+
+    const handleNextStep = async () => {
+        if (step === 1 && selectedCourseIds.length > 0) {
+            setStep(2);
+        } else if (step === 2) {
+            const valid = await trigger("personal");
+            if (valid) setStep(3);
+        }
+    };
+
+    if (isSuccess) {
+        return (
+            <div className="h-screen w-full bg-[#1A1C1E] text-white flex flex-col items-center justify-center text-center p-8 font-sans">
+                <div className="w-20 h-20 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
+                    <Check size={40} />
+                </div>
+                <h3 className="text-3xl font-bold mb-4 tracking-tight">{success?.title || "Success"}</h3>
+                <p className="text-gray-400 text-lg mb-12 max-w-md">{success?.message} <strong>{formData?.email}</strong>.</p>
+                <Link href={`/${lang}`} className="bg-[#FF5C00] text-white px-8 py-4 rounded font-bold uppercase tracking-widest hover:bg-[#FF7A33] transition-colors">
+                    {t?.back_home}
+                </Link>
+            </div>
+        );
+    }
+
+
 
     return (
         <div className="min-h-screen lg:h-screen w-full bg-transparent text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
