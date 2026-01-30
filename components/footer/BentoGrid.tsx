@@ -27,21 +27,21 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
         <div className="w-full h-full px-6 md:px-12 pt-12 pb-24 md:py-12 flex flex-col justify-end gap-12 md:justify-between md:gap-0">
 
             {/* TOP ROW */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 lg:h-full items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 lg:h-full items-start">
 
                 {/* 1. Brand / Mission (Left Column) */}
-                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-4 lg:space-y-8">
+                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-2 lg:space-y-8">
                     <div>
                         {/* OPTIMIERUNG 1: Brand Colors wie im Hero 
                            "Smart" = Weiß (auf Dark Background)
                            "German" = Orange (#FF5C00)
                            Punkt = Weiß (oder Orange, je nach Geschmack - hier Weiß als Abschluss)
                         */}
-                        <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter mb-6">
+                        <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter mb-4 lg:mb-6">
                             <span className="text-white block">Smart</span>
                             <span className="text-[#FF5C00] block">German</span>
                         </h2>
-                        <p className="text-white/50 max-w-sm text-sm font-mono uppercase tracking-wide leading-relaxed">
+                        <p className="hidden md:block text-white/50 max-w-sm text-sm font-mono uppercase tracking-wide leading-relaxed">
                             {t.Hero?.mission || "Language acquisition based on science."}
                         </p>
                     </div>
