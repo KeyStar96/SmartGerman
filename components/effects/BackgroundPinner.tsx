@@ -25,7 +25,8 @@ export default function BackgroundPinner({ children }: { children: ReactNode }) 
 
     return (
         <div ref={container} className="absolute inset-0 w-full h-full -z-10 bg-transparent">
-            <div ref={pinContent} className="h-screen w-full relative overflow-hidden">
+            {/* Changed from h-screen to h-[100dvh] to correctly handle mobile address bars */}
+            <div ref={pinContent} className="h-[100dvh] w-full relative overflow-hidden">
                 {children}
             </div>
         </div>

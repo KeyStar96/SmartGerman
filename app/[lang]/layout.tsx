@@ -27,7 +27,10 @@ export async function generateStaticParams() {
 
 export const viewport = {
   viewportFit: 'cover',
-  themeColor: '#FCF4E6', // Setting a default theme color can also help
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#FCF4E6' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
 };
 
 // Wir machen die Funktion 'async'

@@ -15,6 +15,8 @@ export default function AppBackground({ className }: { className?: string }) {
             className={cn(
                 "relative w-full h-full overflow-hidden pointer-events-none select-none z-0 backface-hidden",
                 "bg-background transition-colors duration-[1500ms]",
+                // Added slight scale to ensure coverage during bounce/scroll
+                "scale-[1.02]",
                 className
             )}
         >
