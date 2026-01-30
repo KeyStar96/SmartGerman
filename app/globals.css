@@ -54,27 +54,17 @@ body {
 html {
   overflow-y: scroll;
   scroll-behavior: smooth;
-  background-color: transparent;
-  /* Changed from var(--background) to allow fixed bg to show */
-  /* Prevents layout shift when scrollbar appears */
+  /* MOBILE OVERSCROLL FIX */
+  background-color: var(--background);
+  /* Default: Theme Color (Beige) */
 }
 
-/* GLOBAL FIXED BACKGROUND */
-.global-gradient-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -50;
-  pointer-events: none;
-  background: linear-gradient(to bottom,
-      var(--background) 0%,
-      var(--background) 35vh,
-      #050505 35vh,
-      #050505 100%);
-  transition: background 0.2s ease;
+.dark html {
+  background-color: #000000;
+  /* Dark Mode: Black */
 }
+
+/* GLOBAL GRADIENT REMOVED - User requested uniform colors */
 
 /* Sicherstellen, dass der Hintergrund-Container die CSS-Variable nutzt */
 .bg-background {
