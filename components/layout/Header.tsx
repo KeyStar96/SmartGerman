@@ -154,6 +154,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
           isHidden={isHidden}
           isMenuOpen={isMobileMenuOpen}
           toggleMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          dictionary={dictionary}
         />
       </div>
 
@@ -377,41 +378,70 @@ function ActionButtons({ lang, dictionary, isHidden }: any) {
 }
 
 // --- MOBILE: "The Floating Deck" ---
-function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu }: { lang: string, isHidden: boolean, isMenuOpen: boolean, toggleMenu: () => void }) {
+function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary }: { lang: string, isHidden: boolean, isMenuOpen: boolean, toggleMenu: () => void, dictionary: any }) {
   return (
-    <motion.div
-      initial={{ y: 0, opacity: 1 }}
-      animate={{
-        y: isHidden && !isMenuOpen ? -150 : 0,
-        opacity: isHidden && !isMenuOpen ? 0 : 1
-      }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      className={cn(
-        "relative mx-auto max-w-[95%] pointer-events-auto",
-        "h-16 rounded-2xl",
-        "border border-black/5 dark:border-white/10",
-        "shadow-xl shadow-black/10 dark:shadow-black/30"
-      )}
-    >
-      {/* Background */}
-      <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900 z-0 rounded-2xl overflow-hidden" />
-
-      {/* Content */}
-      <div className="relative z-10 flex items-center justify-between px-4 h-full">
-        {/* Left: Full Logo */}
-        <Link href={`/${lang}`} className="relative block h-8 w-auto">
-          <LogoImage />
+    <div className="flex justify-between items-center w-full max-w-[95%] mx-auto pointer-events-auto">
+      {/* Left Pill: Logo */}
+      <motion.div
+        initial={{ y: 0, opacity: 1 }}
+        animate={{
+          y: isHidden && !isMenuOpen ? -150 : 0,
+          opacity: isHidden && !isMenuOpen ? 0 : 1
+        }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className={cn(
+          "relative h-14 w-14 flex items-center justify-center rounded-2xl",
+          "border border-black/5 dark:border-white/10",
+          "shadow-xl shadow-black/10 dark:shadow-black/30",
+          "overflow-hidden"
+        )}
+      >
+        <div className="absolute inset-0 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-md z-0" />
+        <Link href={`/${lang}`} className="relative z-10 block h-8 w-auto">
+          {/* Small Logo Icon for Mobile - utilizing LogoImage but maybe we want just the icon? 
+                 LogoImage is full text. Let's use LogoImage for now, might be small. 
+                 Actually user requested "SmartGerman-Logo". 
+                 Let's stick to LogoImage but constrained. 
+             */}
+          <div className="scale-75 origin-center">
+            <LogoImage />
+          </div>
         </Link>
+      </motion.div>
 
-        {/* Right: Actions Row */}
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <LanguageSelector lang={lang} compact />
+      {/* Right Pill: Actions */}
+      <motion.div
+        initial={{ y: 0, opacity: 1 }}
+        animate={{
+          y: isHidden && !isMenuOpen ? -150 : 0,
+          opacity: isHidden && !isMenuOpen ? 0 : 1
+        }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className={cn(
+          "relative flex items-center gap-2 p-2 rounded-2xl",
+          "border border-black/5 dark:border-white/10",
+          "shadow-xl shadow-black/10 dark:shadow-black/30",
+          "overflow-hidden"
+        )}
+      >
+        <div className="absolute inset-0 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-md z-0" />
+
+        <div className="relative z-10 flex items-center gap-2">
+          {/* Mobile Enroll Button */}
+          <Link
+            href={`/${lang}/registration`}
+            className="bg-primary-orange text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider"
+          >
+            {dictionary?.header?.nav?.enroll || "Anmelden"}
+          </Link>
+
+          {/* Separator */}
+          <div className="w-px h-6 bg-black/10 dark:bg-white/10" />
 
           {/* Hamburger */}
           <button
             onClick={toggleMenu}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 active:scale-95 transition-transform"
+            className="flex items-center justify-center w-10 h-10 rounded-xl bg-black/5 dark:bg-white/10 active:scale-95 transition-transform"
           >
             <MotionConfig transition={{ duration: 0.3, ease: "easeInOut" }}>
               <motion.div
@@ -440,8 +470,8 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu }: { lang: 
             </MotionConfig>
           </button>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
@@ -495,6 +525,21 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
             >
               {dictionary.header.nav.enroll}
             </Link>
+
+            {/* Settings Zone in Menu */}
+            <div className="flex items-center justify-center gap-4 mt-6 p-4 rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase text-gray-500">Theme</span>
+                <ThemeToggle />
+              </div>
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase text-gray-500">Lang</span>
+                {/* Inline Simple Selector or compacted */}
+                <LanguageSelector lang={lang} />
+              </div>
+            </div>
+
           </motion.div>
 
         </motion.div>
