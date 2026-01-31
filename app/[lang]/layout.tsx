@@ -6,6 +6,7 @@ import SmoothScroll from "@/components/effects/SmoothScroll";
 // import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 import SupportNode from "@/components/layout/SupportNode";
+import AppBackground from "@/components/effects/AppBackground";
 
 const inter = Inter({ subsets: ["latin"] });
 const jetbrainsMono = JetBrains_Mono({
@@ -70,11 +71,14 @@ export default async function RootLayout({
         */}
 
         {/* 
-          CHROME FIX für backdrop-filter:
-          - Hintergründe mit z-index: 0/1 statt negativen Werten
-          - Main Content OHNE z-index, damit kein isolierter Stacking-Context entsteht
-          - Das erlaubt backdrop-filter, die Hintergründe zu bluren
+           LCP OPTIMIZATION:
+           - Background decoupled from Client Components (SmoothScroll/Pinner) is critical!
+           - Position fixed keeps it in view without JS simulation
+           - Z-Index -1 ensures it acts as background
         */}
+        <div className="fixed inset-0 z-[-1] w-full h-full">
+          <AppBackground />
+        </div>
 
         {/* 3. Die oberste Ebene: Header (z-index: 50 für sticky) */}
         {/* Header moved to page.tsx */}

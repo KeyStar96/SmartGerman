@@ -7,8 +7,6 @@ import TimetableSection from "@/components/sections/Timetable/TimetableSection";
 import { LocationSection } from "@/components/sections/Location/LocationSection";
 import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
-import AppBackground from "@/components/effects/AppBackground";
-import BackgroundPinner from "@/components/effects/BackgroundPinner";
 import Header from "@/components/layout/Header";
 
 export default async function HomePage({
@@ -30,14 +28,12 @@ export default async function HomePage({
       */}
       <main className="relative z-10 mb-[1250px] md:mb-[500px] bg-transparent w-full">
 
+
         {/* 
-          GSAP PINNED BACKGROUND
-          - Uses ScrollTrigger to Force-Pin the background
-          - Much more robust than position: sticky
+          GSAP PINNED BACKGROUND - REMOVED FOR LCP OPTIMIZATION
+          Background is now global and fixed in layout.tsx
         */}
-        <BackgroundPinner>
-          <AppBackground />
-        </BackgroundPinner>
+
 
         {/* 
           CONTENT SECTIONS 
