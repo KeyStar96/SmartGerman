@@ -26,7 +26,8 @@ export default async function HomePage({
         - Margin bottom reserves space for the fixed footer
         - z-index: 10 ensures it sits on top of the footer initially
       */}
-      <main className="relative z-10 mb-[1250px] md:mb-[500px] bg-transparent w-full">
+      {/* FOOTER DISABLED FOR PERF TESTING: mb-[1250px] md:mb-[500px] removed */}
+      <main className="relative z-10 bg-transparent w-full">
 
 
         {/* 
@@ -59,7 +60,7 @@ export default async function HomePage({
         - z-0 (or -1) puts it underneath the Main Wrapper
         - Revealed when Main Wrapper scrolls away (due to margin-bottom)
       */}
-      <FooterLayout dictionary={dictionary} />
+      {/* <FooterLayout dictionary={dictionary} /> */}
     </>
   );
 }
