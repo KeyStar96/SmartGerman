@@ -5,7 +5,7 @@ import AboutContainer from "@/components/sections/About/AboutContainer";
 import Courses from "@/components/sections/Courses";
 import TimetableSection from "@/components/sections/Timetable/TimetableSection";
 import { LocationSection } from "@/components/sections/Location/LocationSection";
-import FooterLayout from "@/components/footer/FooterLayout";
+// import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
 import Header from "@/components/layout/Header";
 
