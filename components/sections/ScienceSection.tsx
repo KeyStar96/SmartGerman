@@ -1,7 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import NeuralBrain from "../effects/NeuralBrain";
+import dynamic from "next/dynamic";
+
+const NeuralBrain = dynamic(() => import("../effects/NeuralBrain"), {
+    ssr: false,
+    loading: () => <div className="w-full h-full bg-transparent" />,
+});
 
 interface ScienceSectionProps {
     dictionary: any;
