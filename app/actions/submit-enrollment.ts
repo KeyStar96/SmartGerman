@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { EnrollmentFormData } from '@/lib/registration-schema';
 
 interface SubmitEnrollmentResult {
@@ -15,7 +15,7 @@ export async function submitEnrollment(
     startMonth: string, // Format: "M-YYYY" (e.g. "0-2026")
     totalPrice: number
 ): Promise<SubmitEnrollmentResult> {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     if (!selectedCourseIds || selectedCourseIds.length === 0) {
         return { success: false, message: "No courses selected" };
