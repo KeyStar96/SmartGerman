@@ -36,15 +36,22 @@ const isMobileOS = (): boolean => {
   return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
 };
 
+// macOS Detection (MacBook Trackpads / Magic Mouse already have perfect inertia)
+const isMacOS = (): boolean => {
+  if (typeof window === "undefined") return false;
+  return navigator.platform.toUpperCase().indexOf('MAC') >= 0 || /macintosh|mac os x/i.test(navigator.userAgent);
+};
+
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [useNativeScroll, setUseNativeScroll] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    
-    // Touch-Geräte oder Mobile OS → Natives Scrolling
-    if (isTouchDevice() || isMobileOS()) {
+
+    // Touch-Geräte, Mobile OS oder macOS → Natives Scrolling
+    // macOS User nutzen meist Trackpads oder Magic Mouse mit eigener Physik
+    if (isTouchDevice() || isMobileOS() || isMacOS()) {
       setUseNativeScroll(true);
     }
   }, []);
@@ -54,42 +61,42 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     // Kurze Duration für direktes Feedback
     duration: 0.8,
     easing: smoothEasing,
-    
+
     // Nur Wheel smoothen, kein Touch
     smoothWheel: true,
     smoothTouch: false, // Natives Touch-Scrolling
-    
+
     // KEINE Multiplikatoren über 1.0
     wheelMultiplier: 1.0,
     touchMultiplier: 1.0,
-    
+
     // Kein Infinite Scroll
     infinite: false,
-    
+
     // Vertikales Scrolling
     gestureOrientation: "vertical" as const,
-    
+
     // Lenis managed den RAF
     autoRaf: true,
-    
+
     // Niedriger Lerp für sanftere Bewegung ohne Ruckeln
     lerp: 0.1,
   }), []);
-  
+
   // SSR: Render children direkt
   if (!mounted) {
     return <>{children}</>;
   }
-  
+
   // Touch/Mobile: Natives Scrolling - kein Lenis
   if (useNativeScroll) {
     return <>{children}</>;
   }
-  
+
   // Desktop: Lenis für Mausrad-Glättung
   return (
-    <ReactLenis 
-      root 
+    <ReactLenis
+      root
       options={options}
     >
       {children}
