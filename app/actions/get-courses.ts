@@ -14,7 +14,7 @@ export async function getCourses(): Promise<CourseConfig[]> {
     // Using a hypothetical utility for now. If this file doesn't exist, create it or use process.env directly cautiously.
     // Ideally: import { createClient } from '@/utils/supabase/server';
     // Fallback for demonstration if you use direct envs (not recommended for prod without proper util):
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // 2. Fetch Data
     const { data: courses, error } = await supabase

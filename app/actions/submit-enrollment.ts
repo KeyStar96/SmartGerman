@@ -13,7 +13,7 @@ export async function submitEnrollment(
     formData: EnrollmentFormData,
     selectedCourseIds: string[]
 ): Promise<SubmitEnrollmentResult> {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     if (!selectedCourseIds || selectedCourseIds.length === 0) {
         return { success: false, message: "No courses selected" };
