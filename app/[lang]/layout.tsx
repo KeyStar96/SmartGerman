@@ -9,10 +9,16 @@ import SupportNode from "@/components/layout/SupportNode";
 import AppBackground from "@/components/effects/AppBackground";
 import { ThemeInit } from "@/components/effects/ThemeInit";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+});
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: '--font-mono',
+  display: 'swap',
+  preload: true,
 });
 
 // STATIC GENERATION (SSG)

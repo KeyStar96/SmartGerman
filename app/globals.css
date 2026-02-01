@@ -49,6 +49,8 @@ body {
   font-size: 18px;
   /* Swiss Scientific Base Size */
   /* overscroll-behavior-y: none;  <-- REMOVED to allow natural bounce against fixed bg */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 html {
