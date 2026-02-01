@@ -11,6 +11,15 @@ export const getDurationMinutes = (start: string, end: string) => {
     return (eh * 60 + em) - (sh * 60 + sm);
 };
 
+// Module-level constant - shared across all function calls
+const LOCALE_MAP: Readonly<Record<string, string>> = {
+    'de': 'de-DE',
+    'en': 'en-US',
+    'ru': 'ru-RU',
+    'uk': 'uk-UA',
+    'tu': 'tr-TR'
+} as const;
+
 export interface MonthlyStats {
     sessionCount: number;
     totalUnits: number;
@@ -42,14 +51,7 @@ export const calculateMonthlyStats = (
         sessionsByDay.set(dIndex, [...existing, s]);
     });
 
-    const localeMap: Record<string, string> = {
-        'de': 'de-DE',
-        'en': 'en-US',
-        'ru': 'ru-RU',
-        'uk': 'uk-UA',
-        'tu': 'tr-TR'
-    };
-    const locale = localeMap[lang] || 'de-DE';
+    const locale = LOCALE_MAP[lang] || 'de-DE';
 
     for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(targetYear, targetMonth, d);
@@ -109,14 +111,7 @@ export const getNext6Months = (lang: string, referenceDate?: Date) => {
     let currentMonth = today.getMonth() + 1;
     let currentYear = today.getFullYear();
 
-    const localeMap: Record<string, string> = {
-        'de': 'de-DE',
-        'en': 'en-US',
-        'ru': 'ru-RU',
-        'uk': 'uk-UA',
-        'tu': 'tr-TR'
-    };
-    const locale = localeMap[lang] || 'de-DE';
+    const locale = LOCALE_MAP[lang] || 'de-DE';
 
     for (let i = 0; i < 6; i++) {
         // Handle year rollover

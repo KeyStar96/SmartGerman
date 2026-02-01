@@ -376,3 +376,4 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
     </MotionLink>
   );
 });
+CourseCard.displayName = 'CourseCard';

@@ -4,8 +4,18 @@ import { useRef, useState, useEffect } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { ArrowRight } from "lucide-react";
 
+// Type-safe dictionary interface
+interface HeroDictionary {
+  hero: {
+    claim: string;
+    subline: string;
+    cta_primary: string;
+    cta_secondary: string;
+  };
+}
+
 interface HeroProps {
-  dictionary: any;
+  dictionary: HeroDictionary;
   lang?: string;
 }
 

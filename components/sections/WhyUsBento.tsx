@@ -5,21 +5,29 @@ import { motion, useInView } from "framer-motion";
 import { GraduationCap, Brain, Users, Globe2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Type-safe dictionary interface
+interface WhyUsDictionary {
+    WhyUs: {
+        header: { label: string; title_Line1: string; title_Line2: string };
+        card1: { category: string; title: string; text: string; specialization: string };
+        card2: { category: string; title: string; items: Array<{ name: string; desc: string }> };
+        card3: { category: string; title: string; text: string };
+        card4: { category: string; title: string; text: string };
+    };
+}
+
 // --- TACTILE PAPER CARD COMPONENT ---
 // Removed "Tilt" 3D logic for a flatter, more solid print aesthetic
 // --- TACTILE CARDBOARD COMPONENT ---
-// Replaces previous PaperCard with a physically accurate, heavy cardboard feel
-function PaperCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
-    // Paper Texture: Uses the rougher noise texture for more haptics
-    // Light Cards: #F0EFE9 (slightly darker/warmer than #F2EFE9) with reduced noise opacity
-    // Orange Card: #FF5C00 with aggressive noise blend mode (multiply/hard-light) and shadow
+// Memoized to prevent re-renders when parent state changes
+const PaperCard = React.memo(function PaperCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
     return (
         <div
             className={cn(
                 "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card",
                 isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9] dark:bg-[#1E2024]",
                 "border-[0.5px] border-black/10 dark:border-white/5",
-                "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]", // Slight tilt on hover
+                "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]",
                 className
             )}
         >
@@ -29,8 +37,8 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
                     "absolute inset-0 pointer-events-none z-0",
                     "bg-noise-paper",
                     isOrange
-                        ? "opacity-50 mix-blend-overlay brightness-110" // High opacity for visible texture on orange
-                        : "opacity-20 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5" // Subtle shadow simulation for light paper (Onyx Paper logic)
+                        ? "opacity-50 mix-blend-overlay brightness-110"
+                        : "opacity-20 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5"
                 )}
             />
 
@@ -40,7 +48,8 @@ function PaperCard({ children, className, isOrange = false }: { children: React.
             </div>
         </div>
     );
-}
+});
+PaperCard.displayName = 'PaperCard';
 
 const itemVariants = {
     hidden: { opacity: 0, scale: 1.02 },
@@ -54,7 +63,7 @@ const itemVariants = {
     }
 };
 
-export default function WhyUsBento({ dictionary }: { dictionary: any }) {
+export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary }) {
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
