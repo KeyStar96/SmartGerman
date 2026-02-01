@@ -19,8 +19,8 @@ export default function AppBackground({ className }: { className?: string }) {
                 className
             )}
         >
-            {/* LIGHT MODE SLOT */}
-            <div className="absolute inset-0 w-full h-full opacity-100 dark:opacity-0 transition-opacity duration-[1500ms] will-change-opacity">
+            {/* LIGHT MODE SLOT - Only visible in Light Mode */}
+            <div className="absolute inset-0 w-full h-full block dark:hidden">
 
                 {/* Desktop Light */}
                 <div className="hidden md:block absolute inset-0 w-full h-full">
@@ -28,7 +28,7 @@ export default function AppBackground({ className }: { className?: string }) {
                         src="/Bilder/SG_Background_Light.webp"
                         alt="Smart German Background Light"
                         fill
-                        priority={true}
+                        priority={false}
                         sizes="100vw"
                         className="object-cover object-center"
                         quality={90}
@@ -41,7 +41,7 @@ export default function AppBackground({ className }: { className?: string }) {
                         src="/Bilder/SG_Background_Light_Mobile.webp"
                         alt="Smart German Background Light Mobile"
                         fill
-                        priority={true}
+                        priority={false}
                         sizes="100vw"
                         className="object-cover object-center"
                         quality={90}
@@ -49,8 +49,8 @@ export default function AppBackground({ className }: { className?: string }) {
                 </div>
             </div>
 
-            {/* DARK MODE SLOT */}
-            <div className="absolute inset-0 w-full h-full opacity-0 dark:opacity-100 transition-opacity duration-[1500ms] will-change-opacity">
+            {/* DARK MODE SLOT - Only visible in Dark Mode */}
+            <div className="absolute inset-0 w-full h-full hidden dark:block">
 
                 {/* Desktop Dark */}
                 <div className="hidden md:block absolute inset-0 w-full h-full">
@@ -58,10 +58,10 @@ export default function AppBackground({ className }: { className?: string }) {
                         src="/Bilder/SG_Background_Dark.webp"
                         alt="Smart German Background Dark"
                         fill
-                        priority={false}
+                        priority={true}
                         sizes="100vw"
                         className="object-cover object-center"
-                        loading="lazy"
+                        // loading="lazy" Removed lazy, priority is true now
                         quality={90}
                     />
                 </div>
