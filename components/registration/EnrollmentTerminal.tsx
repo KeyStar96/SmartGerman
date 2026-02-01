@@ -11,7 +11,7 @@ import Link from "next/link";
 import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
+import { CourseConfig, Day, CourseException } from "@/lib/course-config";
 import { calculateMonthlyStats, getDurationMinutes, DAY_MAP, getNext6Months } from "@/lib/course-calculations";
 import { createSchema, EnrollmentFormData } from "@/lib/registration-schema";
 
@@ -576,7 +576,13 @@ import { submitEnrollment } from "@/app/actions/submit-enrollment";
 
 // --- MAIN TERMINAL ---
 
-export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime, courses }: { dictionary: any, lang: string, serverTime?: number, courses: CourseConfig[] }) {
+export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime, courses, exceptions = [] }: {
+    dictionary: any,
+    lang: string,
+    serverTime?: number,
+    courses: CourseConfig[],
+    exceptions?: CourseException[]
+}) {
     const searchParams = useSearchParams();
     const initialCourseId = searchParams.get("courseId");
 
@@ -682,10 +688,19 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         const year = parseInt(mParts[1]);
 
         return selectedCoursesFull.reduce((acc, c) => {
-            const { totalUnits } = calculateMonthlyStats(c, lang, month, year);
+            const stats = calculateMonthlyStats(c, lang, month, year, exceptions);
+            const units = stats.totalUnits;
+            // Subtract deductions from price calculation if logic requires it
+            // Current Price Model: Price per Unit * Units. 
+            // If exception reduces units, totalUnits is already lower? 
+            // - calculateMonthlyStats logic:
+            //   if (exception) { deductions.push... } else { sessionCount++; totalUnits += units; }
+            // So totalUnits ONLY counts non-exception days.
+            // deductions array contains the "lost cost" but we don't need to double subtract.
+            // Just use (totalUnits * c.price).
             return acc + (totalUnits * c.price);
         }, 0);
-    }, [selectedCoursesFull, lang, selectedStartMonth]);
+    }, [selectedCoursesFull, lang, selectedStartMonth, exceptions]);
 
     const formatPrice = React.useCallback((p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p), []);
 

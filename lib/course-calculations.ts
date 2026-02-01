@@ -1,4 +1,4 @@
-import { CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
+import { CourseConfig, Day, CourseException } from "@/lib/course-config";
 
 export const DAY_MAP: Record<Day, number> = {
     "So": 0, "Mo": 1, "Di": 2, "Mi": 3, "Do": 4, "Fr": 5, "Sa": 6
@@ -25,7 +25,8 @@ export const calculateMonthlyStats = (
     course: CourseConfig,
     lang: string,
     targetMonth: number, // 0-11
-    targetYear: number
+    targetYear: number,
+    exceptions: CourseException[] = [] // Default to empty if not provided for now
 ): MonthlyStats => {
     const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
 
@@ -67,7 +68,7 @@ export const calculateMonthlyStats = (
                 const cost = units * course.price;
 
                 // Check for exception
-                const exception = EXCEPTIONS.find(e =>
+                const exception = exceptions.find(e =>
                     e.date === dateStr && (!e.courseIds || e.courseIds.includes(course.id))
                 );
 
