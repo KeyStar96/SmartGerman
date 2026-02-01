@@ -70,81 +70,82 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
     if (pathname?.includes("registration")) return null;
 
     return (
-        <AnimatePresence>
-            {!isHidden && (
-                <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 pointer-events-none">
 
-                    {/* --- BACKDROP (Click outside to close) --- */}
-                    {isOpen && (
-                        <div
-                            className="fixed inset-0 z-[-1] pointer-events-auto"
-                            onClick={() => setIsOpen(false)}
-                            aria-hidden="true"
-                        />
-                    )}
+        <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 pointer-events-none">
 
-                    {/* --- EXPANDED MENU (The Options) --- */}
-                    <AnimatePresence>
-                        {isOpen && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                                transition={spring}
-                                className="flex flex-col gap-2 pointer-events-auto min-w-[200px]"
-                            >
-                                {/* Option 1: WhatsApp (NEW) */}
-                                <a
-                                    href="https://wa.me/491714758620"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#25D366] transition-colors duration-300"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <Phone size={18} className="text-white group-hover:scale-110 transition-transform" />
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-white uppercase tracking-wider">{t.whatsapp}</span>
-                                        </div>
-                                    </div>
-                                    <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
-                                </a>
+            {/* --- BACKDROP (Click outside to close) --- */}
+            {isOpen && !isHidden && (
+                <div
+                    className="fixed inset-0 z-[-1] pointer-events-auto"
+                    onClick={() => setIsOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
 
-                                {/* Option 2: Telegram */}
-                                <a
-                                    href="https://t.me/smartgerman"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#229ED9] transition-colors duration-300"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <MessageCircle size={18} className="text-white group-hover:scale-110 transition-transform" />
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-white uppercase tracking-wider">{t.telegram}</span>
-                                        </div>
-                                    </div>
-                                    <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
-                                </a>
+            {/* --- EXPANDED MENU (The Options) --- */}
+            <AnimatePresence>
+                {isOpen && !isHidden && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                        transition={spring}
+                        className="flex flex-col gap-2 pointer-events-auto min-w-[200px]"
+                    >
+                        {/* Option 1: WhatsApp (NEW) */}
+                        <a
+                            href="https://wa.me/491714758620"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#25D366] transition-colors duration-300"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Phone size={18} className="text-white group-hover:scale-110 transition-transform" />
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-white uppercase tracking-wider">{t.whatsapp}</span>
+                                </div>
+                            </div>
+                            <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
+                        </a>
 
-                                {/* Option 3: Email */}
-                                <a
-                                    href="mailto:info@smart-german.com"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#FF5C00] transition-colors duration-300"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <Mail size={18} className="text-white group-hover:scale-110 transition-transform" />
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-white uppercase tracking-wider">{t.email}</span>
-                                        </div>
-                                    </div>
-                                    <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
-                                </a>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                        {/* Option 2: Telegram */}
+                        <a
+                            href="https://t.me/smartgerman"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#229ED9] transition-colors duration-300"
+                        >
+                            <div className="flex items-center gap-3">
+                                <MessageCircle size={18} className="text-white group-hover:scale-110 transition-transform" />
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-white uppercase tracking-wider">{t.telegram}</span>
+                                </div>
+                            </div>
+                            <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
+                        </a>
 
-                    {/* --- THE TRIGGER (The Floating Orb) --- */}
+                        {/* Option 3: Email */}
+                        <a
+                            href="mailto:info@smart-german.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center justify-between p-4 bg-[#1E2024]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl hover:bg-[#FF5C00] transition-colors duration-300"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Mail size={18} className="text-white group-hover:scale-110 transition-transform" />
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-bold text-white uppercase tracking-wider">{t.email}</span>
+                                </div>
+                            </div>
+                            <ArrowUpRight size={14} className="text-white/30 group-hover:text-white" />
+                        </a>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* --- THE TRIGGER (The Floating Orb) --- */}
+            <AnimatePresence>
+                {!isHidden && (
                     <motion.button
                         layout
                         initial={{ scale: 0, opacity: 0 }}
@@ -190,9 +191,9 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                             </AnimatePresence>
                         </div>
                     </motion.button>
+                )}
+            </AnimatePresence>
 
-                </div>
-            )}
-        </AnimatePresence>
+        </div>
     );
 }
