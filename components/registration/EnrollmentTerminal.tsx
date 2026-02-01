@@ -698,7 +698,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             // So totalUnits ONLY counts non-exception days.
             // deductions array contains the "lost cost" but we don't need to double subtract.
             // Just use (totalUnits * c.price).
-            return acc + (totalUnits * c.price);
+            return acc + (units * c.price);
         }, 0);
     }, [selectedCoursesFull, lang, selectedStartMonth, exceptions]);
 
