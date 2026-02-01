@@ -781,8 +781,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     // Helper for rendering legal checkboxes
     const LegalCheckbox = ({ id, label, checked, onChange }: { id: string, label: string, checked: boolean, onChange: (v: boolean) => void }) => (
-        <label className="flex items-start gap-3 cursor-pointer group mt-4">
-            <div className="relative mt-1 shrink-0">
+        <label className="flex items-start gap-4 cursor-pointer group mt-4">
+            <div className="relative mt-0.5 shrink-0">
                 <input
                     type="checkbox"
                     checked={checked}
@@ -791,7 +791,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 />
                 {checked && <Check size={12} className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" strokeWidth={3} />}
             </div>
-            <span className={cn("text-[10px] text-gray-500 leading-snug select-none group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors", jetbrainsMono.className)}>
+            <span className="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200 leading-normal select-none group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                 {label}
             </span>
         </label>
@@ -1056,8 +1056,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
                                             />
                                         </div>
-                                        <p className={cn("text-[10px] text-gray-400 leading-tight mt-4", jetbrainsMono.className)}>
-                                            {wizard?.legal_note}
+                                        <p className="text-xs md:text-sm font-medium text-gray-400 dark:text-gray-400 text-right mt-6">
+                                            {formLabels?.required_hint}
                                         </p>
                                     </div>
                                     <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
