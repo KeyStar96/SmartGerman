@@ -1064,13 +1064,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
                                             <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
-                                            <div className="font-medium">{formData?.firstName} {formData?.lastName}</div>
+                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.firstName} {formData?.lastName}</div>
                                             <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
-                                            <div className="font-medium break-all">{formData?.email}<br />{formData?.phone}</div>
+                                            <div className="font-medium break-all text-gray-900 dark:text-white">{formData?.email}<br />{formData?.phone}</div>
                                             <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
-                                            <div className="font-medium">{formData?.birthDate}</div>
+                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.birthDate}</div>
                                             <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
-                                            <div className="font-medium">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
+                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
                                         </div>
                                         <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
                                             {wizard?.edit}
@@ -1089,9 +1089,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 const netPrice = c.price * totalUnits;
                                                 return (
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
-                                                        <span className="font-bold text-gray-900 dark:text-[#E2D7CE]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                                        <span className="font-bold text-gray-900 dark:text-white">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
                                                         <div className="text-right">
-                                                            <span className="font-mono text-gray-900 dark:text-[#E2D7CE]">{formatPrice(netPrice)}</span>
+                                                            <span className="font-mono text-gray-900 dark:text-white">{formatPrice(netPrice)}</span>
                                                             {deductions.length > 0 && (
                                                                 <div className="text-[10px] text-red-500 text-right">
                                                                     ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
