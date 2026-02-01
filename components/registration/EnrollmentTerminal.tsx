@@ -791,7 +791,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 />
                 {checked && <Check size={12} className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" strokeWidth={3} />}
             </div>
-            <span className="text-[10px] text-gray-500 leading-snug select-none group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors">
+            <span className={cn("text-[10px] text-gray-500 leading-snug select-none group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors", jetbrainsMono.className)}>
                 {label}
             </span>
         </label>
@@ -1033,6 +1033,33 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     exit={{ opacity: 0, x: -20 }}
                                     className="flex flex-col gap-8 h-full"
                                 >
+                                    {/* LEGAL CONSENTS (Moved to Top) */}
+                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
+                                        <div className="space-y-4 pt-2">
+                                            <LegalCheckbox
+                                                id="privacy"
+                                                label={t?.legal?.privacy || "Privacy Policy"}
+                                                checked={consents.privacy}
+                                                onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
+                                            />
+                                            <LegalCheckbox
+                                                id="agb"
+                                                label={t?.legal?.agb || "AGB"}
+                                                checked={consents.agb}
+                                                onChange={(v) => setConsents(prev => ({ ...prev, agb: v }))}
+                                            />
+                                            <LegalCheckbox
+                                                id="revocation"
+                                                label={t?.legal?.revocation || "Revocation"}
+                                                checked={consents.revocation}
+                                                onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
+                                            />
+                                        </div>
+                                        <p className={cn("text-[10px] text-gray-400 leading-tight mt-4", jetbrainsMono.className)}>
+                                            {wizard?.legal_note}
+                                        </p>
+                                    </div>
                                     <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
                                         <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
@@ -1080,35 +1107,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </button>
                                     </div>
 
-                                    {/* LEGAL CONSENTS */}
-                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
-                                        <div className="space-y-4 pt-2">
-                                            <LegalCheckbox
-                                                id="privacy"
-                                                label={dictionary?.legal?.privacy || "Privacy Policy"}
-                                                checked={consents.privacy}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
-                                            />
-                                            <LegalCheckbox
-                                                id="agb"
-                                                label={dictionary?.legal?.agb || "AGB"}
-                                                checked={consents.agb}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, agb: v }))}
-                                            />
-                                            <LegalCheckbox
-                                                id="revocation"
-                                                label={dictionary?.legal?.revocation || "Revocation"}
-                                                checked={consents.revocation}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
-                                            />
-                                        </div>
-                                    </div>
 
-                                    {/* Moved Legal Text Here */}
-                                    <p className="text-[10px] text-gray-500 leading-tight text-center max-w-sm mx-auto mt-8">
-                                        {wizard?.legal_note}
-                                    </p>
                                 </motion.div>
                             )}
                         </AnimatePresence>
