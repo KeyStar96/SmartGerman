@@ -678,7 +678,7 @@
       "summary_labels": {
         "name": "Имя пользователя",
         "contact": "Контакт",
-        "personal": "Личное",
+        "personal": "Дата рождения",
         "address": "Адрес"
       }
     },

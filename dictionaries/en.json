@@ -678,7 +678,7 @@
       "summary_labels": {
         "name": "Full Name",
         "contact": "Contact",
-        "personal": "Personal",
+        "personal": "Date of Birth",
         "address": "Address"
       }
     },
