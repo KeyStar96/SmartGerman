@@ -6,6 +6,7 @@ import { JetBrains_Mono } from "next/font/google";
 import { User, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { COURSES, CourseConfig, Day } from "@/lib/course-config";
+import { useRouter, useParams } from "next/navigation";
 
 // --- Fonts ---
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
@@ -213,16 +214,26 @@ interface CourseCardProps {
 }
 
 const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) => {
+  const router = useRouter();
+  const params = useParams();
+  const lang = (params?.lang as string) || "de";
+
   // Infer unit based on price/duration or fallback
   // Strictly use config duration
   const unit = `/ ${config.unitDuration} min`;
 
+  const handleCardClick = () => {
+    router.push(`/${lang}/registration?courseId=${config.id}`);
+  };
+
   return (
     <motion.div
+      onClick={handleCardClick}
       variants={cardVariants}
       className={`
         group relative w-full h-full min-h-[380px] 
         bg-[#F9F8F6] dark:bg-[#1E2024]
+        cursor-pointer
         
         /* Border Collapsing Trick: Negative Margins */
         -ml-px -mt-px
