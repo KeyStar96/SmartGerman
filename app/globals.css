@@ -37,12 +37,10 @@
 }
 
 body {
-  /* BACKGROUND MOVED TO FIXED DIV IN LAYOUT.TSX */
-  /* This ensures the background stays fixed during overscroll on mobile */
-  background-color: transparent;
+  /* iOS SAFARI: Hardcoded dark fallback prevents white flash */
+  background-color: #050505;
   color: var(--foreground);
-  /* Sanfter Übergang für das gesamte Layout beim Theme-Wechsel */
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease;
   /* iOS SAFARI FIX: dvh units handle dynamic toolbar height changes */
   min-height: 100dvh;
   min-height: 100vh;
@@ -50,9 +48,9 @@ body {
   overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 18px;
-  /* Swiss Scientific Base Size */
   /* iOS SAFARI FIX: Prevent rubber-band revealing browser canvas */
   overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -61,22 +59,27 @@ html {
   overflow-y: scroll;
   scroll-behavior: smooth;
   /* iOS SAFARI EDGE-TO-EDGE FIX:
-   * Background must be transparent so the fixed AppBackground
-   * is visible during overscroll/rubber-banding.
-   * The #000 fallback ensures any visible flash is dark.
+   * CRITICAL: Hardcoded dark background prevents white bar!
+   * Transparent reveals browser's white canvas on iOS.
    */
-  background-color: transparent;
+  background-color: #050505;
   /* iOS SAFARI FIX: Prevent rubber-band on html too */
   overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
   /* Dynamic viewport height for iOS Safari toolbar changes */
   min-height: 100dvh;
   min-height: 100vh;
   /* Fallback */
 }
 
-.dark html {
-  /* Keep transparent - the fixed AppBackground handles the visual */
-  background-color: transparent;
+/* Light mode: use light background on html */
+html:not(.dark) {
+  background-color: #FCF4E6;
+}
+
+.dark html,
+html.dark {
+  background-color: #050505;
 }
 
 /* GLOBAL GRADIENT REMOVED - User requested uniform colors */

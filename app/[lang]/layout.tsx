@@ -39,13 +39,12 @@ export const viewport = {
   maximumScale: 5,
   viewportFit: 'cover',
   /* iOS SAFARI EDGE-TO-EDGE:
-   * Using dark colors that match the background edges.
-   * This prevents jarring color flashes when the status bar renders.
-   * The actual background image bleeds through via the fixed AppBackground.
+   * themeColor set to exact footer dark color #050505
+   * This blends the bottom bar area seamlessly
    */
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#FCF4E6' },
-    { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
+    { media: '(prefers-color-scheme: dark)', color: '#050505' },
   ],
 };
 
@@ -64,6 +63,12 @@ export default async function RootLayout({
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
+        {/* iOS SAFARI IMMERSIVE MODE - "Native App" Hack */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* Force dark color for areas behind safe area on iOS */}
+        <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#FCF4E6" media="(prefers-color-scheme: light)" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

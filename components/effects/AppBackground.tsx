@@ -13,9 +13,10 @@ export default function AppBackground({ className }: { className?: string }) {
     return (
         <div
             className={cn(
-                "relative w-full h-full overflow-hidden pointer-events-none select-none z-0 backface-hidden",
-                "bg-background transition-colors duration-[1500ms]",
-                // Added slight scale to ensure coverage during bounce/scroll
+                // iOS SAFARI FIX: min-h-[100dvh] for dynamic viewport + scale-[1.02] for edge coverage
+                "relative w-full min-h-[100dvh] overflow-hidden pointer-events-none select-none z-0 backface-hidden",
+                "bg-[#050505] scale-[1.02] origin-center",
+                // bg-background removed - using hardcoded dark for iOS
                 className
             )}
         >
