@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { COURSES } from '../lib/course-config';
+// import { COURSES } from '../lib/course-config';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -57,4 +57,5 @@ async function seedCourses() {
     }
 }
 
-seedCourses();
+// seedCourses();
+console.log("Seeding disabled: Static COURSES data has been removed from lib/course-config.ts. Use database management tools.");

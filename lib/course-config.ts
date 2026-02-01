@@ -28,6 +28,4 @@ export interface CourseException {
     courseIds?: string[]; // Optional: Specific Course IDs. If omitted, applies to ALL courses.
 }
 
-export const EXCEPTIONS: CourseException[] = [];
-
-export const COURSES: CourseConfig[] = []; // Migrated to Supabase
+// Constants removed - Data is now in Supabase

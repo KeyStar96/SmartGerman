@@ -1,5 +1,130 @@
+import { CourseConfig, CourseException } from "../lib/course-config";
 import { calculateMonthlyStats, getDurationMinutes } from "../lib/course-calculations";
-import { CourseConfig, COURSES, EXCEPTIONS } from "../lib/course-config";
+
+const TEST_EXCEPTIONS: CourseException[] = [
+    {
+        date: "2026-02-02",
+        reason: "Kursraum steht noch nicht zur Verfügung",
+        courseIds: ["c_a1_1_50plus"] // Specific for test
+    },
+    {
+        date: "2026-03-09",
+        reason: "Krank",
+        courseIds: undefined // Global exception
+    }
+];
+
+const TEST_COURSES: CourseConfig[] = [
+    // Präsenz-Kurse (Senioren / 50+)
+    {
+        id: "c_a1_1_50plus",
+        translationKey: "de50_a1_1",
+        type: "presence",
+        price: 2.50,
+        unitDuration: 45,
+        instructor: "standard",
+        sessions: [
+            { day: "Mo", startTime: "09:00", endTime: "10:30" },
+            { day: "Di", startTime: "10:30", endTime: "12:00" }
+        ]
+    },
+    {
+        id: "c_a1_2_50plus",
+        translationKey: "de50_a1_2",
+        type: "presence",
+        price: 2.50,
+        unitDuration: 45,
+        instructor: "standard",
+        sessions: [
+            { day: "Di", startTime: "09:00", endTime: "10:30" },
+            { day: "Mi", startTime: "10:30", endTime: "12:00" }
+        ]
+    },
+    {
+        id: "c_a2_50plus",
+        translationKey: "de50_a2",
+        type: "presence",
+        price: 2.50,
+        unitDuration: 45,
+        instructor: "standard",
+        sessions: [
+            { day: "Mo", startTime: "10:30", endTime: "12:00" },
+            { day: "Mi", startTime: "09:00", endTime: "10:30" }
+        ]
+    },
+    // Sprechtraining
+    {
+        id: "c_speech_a1_1",
+        translationKey: "speech_a1_1",
+        type: "presence",
+        price: 3.50,
+        unitDuration: 60,
+        instructor: "standard",
+        sessions: [
+            { day: "Di", startTime: "12:00", endTime: "13:00" }
+        ]
+    },
+    {
+        id: "c_speech_a1_2",
+        translationKey: "speech_a1_2",
+        type: "presence",
+        price: 3.50,
+        unitDuration: 60,
+        instructor: "standard",
+        sessions: [
+            { day: "Mi", startTime: "12:00", endTime: "13:00" }
+        ]
+    },
+    {
+        id: "c_speech_a2",
+        translationKey: "speech_a2",
+        type: "presence",
+        price: 3.50,
+        unitDuration: 60,
+        instructor: "standard",
+        sessions: [
+            { day: "Mo", startTime: "12:00", endTime: "13:00" }
+        ]
+    },
+
+    // Online-Kurse
+    {
+        id: "c_online_a1_1",
+        translationKey: "online_a1_1",
+        type: "online",
+        price: 7.50,
+        unitDuration: 45,
+        instructor: "standard",
+        sessions: [
+            { day: "Do", startTime: "19:00", endTime: "20:30" },
+            { day: "Fr", startTime: "19:00", endTime: "20:30" }
+        ]
+    },
+    {
+        id: "c_online_b1",
+        translationKey: "online_b1",
+        type: "online",
+        price: 7.50,
+        unitDuration: 45,
+        instructor: "standard",
+        sessions: [
+            { day: "Mo", startTime: "14:30", endTime: "16:00" },
+            { day: "Di", startTime: "14:30", endTime: "16:00" }
+        ]
+    },
+    {
+        id: "c_online_b2",
+        translationKey: "online_b2",
+        type: "online",
+        price: 7.50,
+        unitDuration: 45,
+        instructor: "special",
+        sessions: [
+            { day: "Mo", startTime: "16:00", endTime: "17:30" },
+            { day: "Mi", startTime: "16:00", endTime: "17:30" }
+        ]
+    }
+];
 
 // --- HELPERS FOR COMPLEX TESTING ---
 
@@ -17,11 +142,11 @@ function generateNext12Months() {
 
 // Check if a specific date string (YYYY-MM-DD) is in our EXCEPTIONS
 function isGlobalException(dateStr: string) {
-    return EXCEPTIONS.some(e => e.date === dateStr && !e.courseIds);
+    return TEST_EXCEPTIONS.some(e => e.date === dateStr && !e.courseIds);
 }
 
 function isCourseException(dateStr: string, courseId: string) {
-    return EXCEPTIONS.some(e => e.date === dateStr && e.courseIds?.includes(courseId));
+    return TEST_EXCEPTIONS.some(e => e.date === dateStr && e.courseIds?.includes(courseId));
 }
 
 describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
@@ -46,7 +171,7 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
         // We will test EVERY course in the config against the next 12 months.
         const testMonths = generateNext12Months();
 
-        COURSES.forEach(course => {
+        TEST_COURSES.forEach(course => {
             describe(`Course: ${course.id} (${course.unitDuration}min / ${course.price}€)`, () => {
 
                 testMonths.forEach(baseDate => {
@@ -58,7 +183,7 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
                     const targetYear = targetDate.getFullYear();
 
                     test(`Calculation for ${monthName}`, () => {
-                        const stats = calculateMonthlyStats(course, 'de', targetMonth, targetYear);
+                        const stats = calculateMonthlyStats(course, 'de', targetMonth, targetYear, TEST_EXCEPTIONS);
 
                         // 1. Basic sanity checks
                         expect(stats.sessionCount).toBeGreaterThanOrEqual(0);
@@ -130,10 +255,10 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
             // Next Month: Feb 2026
             const tDate = new Date(jan26.getFullYear(), jan26.getMonth() + 1, 1);
 
-            const mondayCourse = COURSES.find(c => c.sessions.some(s => s.day === "Mo"));
+            const mondayCourse = TEST_COURSES.find(c => c.sessions.some(s => s.day === "Mo"));
             if (!mondayCourse) return;
 
-            const stats = calculateMonthlyStats(mondayCourse, 'de', tDate.getMonth(), tDate.getFullYear());
+            const stats = calculateMonthlyStats(mondayCourse, 'de', tDate.getMonth(), tDate.getFullYear(), TEST_EXCEPTIONS);
             // Feb 2 should be in deductions
             const feb2Deduction = stats.deductions.find(d => d.date.includes("02.02"));
 
@@ -146,7 +271,7 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
     // This function mimics the cart calculation completely independently to verify the app's logic
     function calculateExpectedCartTotal(courseIds: string[], baseDate: Date) {
         let expectedTotal = 0;
-        const courses = COURSES.filter(c => courseIds.includes(c.id));
+        const courses = TEST_COURSES.filter(c => courseIds.includes(c.id));
 
         // Calculate Target Month
         const targetYear = baseDate.getMonth() === 11 ? baseDate.getFullYear() + 1 : baseDate.getFullYear();
@@ -204,11 +329,11 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
             },
             {
                 name: "Monday Madness (All Monday Courses)",
-                ids: COURSES.filter(c => c.sessions.some(s => s.day === 'Mo')).map(c => c.id)
+                ids: TEST_COURSES.filter(c => c.sessions.some(s => s.day === 'Mo')).map(c => c.id)
             },
             {
                 name: "Full Curriculum (Everything)",
-                ids: COURSES.map(c => c.id)
+                ids: TEST_COURSES.map(c => c.id)
             }
         ];
 
@@ -220,10 +345,10 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
 
                     test(`Total Price Check: ${monthName}`, () => {
                         // 1. Calculate using APP Logic
-                        const selectedCourses = COURSES.filter(c => scenario.ids.includes(c.id));
+                        const selectedCourses = TEST_COURSES.filter(c => scenario.ids.includes(c.id));
                         let appTotal = 0;
                         selectedCourses.forEach(course => {
-                            const stats = calculateMonthlyStats(course, 'de', targetDate.getMonth(), targetDate.getFullYear());
+                            const stats = calculateMonthlyStats(course, 'de', targetDate.getMonth(), targetDate.getFullYear(), TEST_EXCEPTIONS);
                             appTotal += stats.totalUnits * course.price;
                         });
 
@@ -265,16 +390,16 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
                 },
                 {
                     name: "**Monday Madness** (All Mondays)",
-                    ids: COURSES.filter(c => c.sessions.some(s => s.day === 'Mo')).map(c => c.id)
+                    ids: TEST_COURSES.filter(c => c.sessions.some(s => s.day === 'Mo')).map(c => c.id)
                 },
                 {
                     name: "**Full Curriculum** (ALL)",
-                    ids: COURSES.map(c => c.id)
+                    ids: TEST_COURSES.map(c => c.id)
                 }
             ];
 
             // 2. Define Single Courses
-            const SINGLES = COURSES.map(c => ({
+            const SINGLES = TEST_COURSES.map(c => ({
                 name: `*${c.id}*`,
                 ids: [c.id]
             }));
@@ -287,11 +412,11 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
                     const targetDate = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1);
                     const monthName = targetDate.toLocaleString('de-DE', { month: 'long', year: 'numeric' });
 
-                    const selectedCourses = COURSES.filter(c => scenario.ids.includes(c.id));
+                    const selectedCourses = TEST_COURSES.filter(c => scenario.ids.includes(c.id));
                     let appTotal = 0;
                     let totalUnits = 0;
                     selectedCourses.forEach(course => {
-                        const stats = calculateMonthlyStats(course, 'de', targetDate.getMonth(), targetDate.getFullYear());
+                        const stats = calculateMonthlyStats(course, 'de', targetDate.getMonth(), targetDate.getFullYear(), TEST_EXCEPTIONS);
                         appTotal += stats.totalUnits * course.price;
                         totalUnits += stats.totalUnits;
                     });
@@ -315,7 +440,7 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
         test('All courses have valid Unit Prices (< 50€) distinct from Monthly Totals', () => {
             const warnings: string[] = [];
 
-            COURSES.forEach(c => {
+            TEST_COURSES.forEach(c => {
                 // 1. Sanity Check: Unit Price should be "small"
                 // If someone enters 120.00 here, it's likely a mistake.
                 if (c.price > 50) {
@@ -327,7 +452,7 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
                 // Calculate a typical month (e.g., March with ~4 weeks)
                 // The Total Price should be significantly higher than the Unit Price
                 // (unless it's a 1-session-per-month course, which is rare)
-                const stats = calculateMonthlyStats(c, 'de', 2, 2026); // March 2026
+                const stats = calculateMonthlyStats(c, 'de', 2, 2026, TEST_EXCEPTIONS); // March 2026
                 const monthlyTotal = stats.totalUnits * c.price;
 
                 if (stats.totalUnits > 1) {
@@ -346,8 +471,8 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
             console.log("| Course ID | Display Price (Per Unit) | Monthly Total (Example: March '26) | Check |");
             console.log("| :--- | :--- | :--- | :--- |");
 
-            COURSES.forEach(c => {
-                const stats = calculateMonthlyStats(c, 'de', 2, 2026); // March 2026
+            TEST_COURSES.forEach(c => {
+                const stats = calculateMonthlyStats(c, 'de', 2, 2026, TEST_EXCEPTIONS); // March 2026
                 const monthlyTotal = stats.totalUnits * c.price;
                 const check = monthlyTotal >= c.price ? "✅" : "⚠️";
 
