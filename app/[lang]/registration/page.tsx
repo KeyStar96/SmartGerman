@@ -3,7 +3,7 @@ import EnrollmentTerminal from "@/components/registration/EnrollmentTerminal";
 import { getDictionary } from "@/lib/dictionary";
 import { getCourses } from "@/app/actions/get-courses";
 import { getExceptions } from "@/app/actions/get-exceptions";
-import AppBackground from "@/components/effects/AppBackground";
+// AppBackground removed - using global layout's background
 
 export default async function RegistrationPage({
     params,
@@ -21,23 +21,8 @@ export default async function RegistrationPage({
     const serverTime = now.getTime(); // Pass as number to avoid serialization issues
 
     return (
+        // Background handled by global layout - no duplicate needed
         <div className="relative w-full min-h-screen">
-            {/* Background Layer - Extended beyond safe areas for iOS edge-to-edge */}
-            <div
-                className="fixed z-0 w-full h-full"
-                style={{
-                    /* iOS SAFARI: Extend beyond safe areas for full coverage */
-                    top: 'calc(-1 * env(safe-area-inset-top, 0px))',
-                    left: 'calc(-1 * env(safe-area-inset-left, 0px))',
-                    right: 'calc(-1 * env(safe-area-inset-right, 0px))',
-                    bottom: 'calc(-1 * env(safe-area-inset-bottom, 0px))',
-                    width: 'calc(100% + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px))',
-                    height: 'calc(100% + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))',
-                }}
-            >
-                <AppBackground />
-            </div>
-
             {/* Content Layer */}
             <div className="relative z-10">
                 <React.Suspense fallback={
@@ -55,3 +40,4 @@ export default async function RegistrationPage({
         </div>
     );
 }
+

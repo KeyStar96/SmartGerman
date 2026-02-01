@@ -842,7 +842,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     if (isSuccess) {
         return (
-            <div className="h-screen w-full bg-[#1A1C1E] text-white flex flex-col items-center justify-center text-center p-8 font-sans">
+            <div className="min-h-screen w-full text-white flex flex-col items-center justify-center text-center p-8 font-sans">
                 <div className="w-20 h-20 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
                     <Check size={40} />
                 </div>
@@ -876,11 +876,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             </AnimatePresence>
 
             {/* --- LEFT PANEL: WIZARD CONTENT --- */}
-            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full bg-background">
+            <div className="flex-1 flex flex-col min-h-0 relative w-full lg:h-full">
 
                 {/* Header with Progress */}
                 {/* Header with Progress */}
-                <header className="px-6 md:px-12 py-8 shrink-0 bg-background z-10">
+                <header className="px-6 md:px-12 py-8 shrink-0 z-10">
                     <div className="flex justify-between items-start mb-6">
                         <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", jetbrainsMono.className)}>
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
