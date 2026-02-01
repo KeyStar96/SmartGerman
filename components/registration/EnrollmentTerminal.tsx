@@ -828,64 +828,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
 
 
-    // RENDER: STEP 3 OVERRIDES (We need to insert legal inside the summary view)
-    // Actually, we can just render it below the courses list or in a dedicated box.
-    // Let's modify the JSX in Step 3 block.
 
-    return (
-        <div className="flex flex-col lg:flex-row h-full w-full bg-[#F0EFE9] dark:bg-[#111315] relative overflow-hidden font-sans">
-            {/* ... (Previous Left Panel Code) ... */}
-
-            <div className="flex-1 relative flex flex-col h-full overflow-hidden z-10">
-                <div className="flex-1 overflow-y-auto overflow-x-hidden relative" ref={desktopScrollRef}>
-                    <div className="max-w-3xl mx-auto px-6 md:px-12 py-8 md:py-12 pb-32">
-                        {/* HEADER & STEPS (Lines 878-999 simplified) */}
-                        <div className="mb-8 md:mb-12">
-                            <Link href={`/${lang}`} className="group flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-gray-400 hover:text-[#FF5C00] transition-colors mb-6">
-                                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                                {t?.back_home}
-                            </Link>
-                            <div className="flex items-center gap-3 mb-6">
-                                <span className="h-8 w-8 rounded-full bg-[#FF5C00] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#FF5C00]/30">
-                                    {step}
-                                </span>
-                                <div className="h-[1px] w-12 bg-gray-300 dark:bg-white/10" />
-                                <span className="font-mono text-xs text-gray-400 uppercase tracking-widest">
-                                    {wizard?.step_label} {step} / 3
-                                </span>
-                            </div>
-                            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
-                                {step === 1 ? wizard?.step1_title : step === 2 ? wizard?.step2_title : wizard?.step3_title}
-                            </h2>
-                            <p className="text-gray-500 text-sm md:text-base max-w-lg">
-                                {step === 1 ? wizard?.step1_sub : step === 2 ? wizard?.step2_sub : wizard?.step3_sub}
-                            </p>
-                        </div>
-
-                        <AnimatePresence mode="wait">
-                            {/* STEP 1 & 2 OMITTED FOR BREVITY in this replace block, handled by surrounding logic? 
-                               NO, replacing large block. Must fetch full content or implement smartly.
-                               Wait, I am replacing lines 751 (Dark Mode) down to 1185 (End).
-                               I need to replicate Step 1 and 2 JSX or carefuly target only Step 3.
-                               
-                               Strategy: Use the fact that Step 3 is inside `step === 3` block. 
-                               But the tool replaces lines. 
-                               Let's try to target specific blocks. 
-                               
-                               Block 1: State & Helper Functions (Lines 751-800)
-                               Block 2: Step 3 JSX (Lines 1000+)
-                               Block 3: Footer Button (Lines 1155+)
-                            */}
-
-                            {/* This is risky with big replaces. Let's do multiple smaller replaces. */}
-                        </AnimatePresence>
-                    </div>
-                </div>
-            </div>
-            {/* Right Panel and Footer... */}
-        </div>
-    );
-    // ABORTING BIG REPLACE. Switching to Multi-Step strategy.
 
 
     const handleNextStep = async () => {
