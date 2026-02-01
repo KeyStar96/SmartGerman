@@ -36,10 +36,16 @@ export async function generateStaticParams() {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 5,
   viewportFit: 'cover',
+  /* iOS SAFARI EDGE-TO-EDGE:
+   * Using dark colors that match the background edges.
+   * This prevents jarring color flashes when the status bar renders.
+   * The actual background image bleeds through via the fixed AppBackground.
+   */
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#FCF4E6' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+    { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
   ],
 };
 
@@ -80,12 +86,26 @@ export default async function RootLayout({
         */}
 
         {/* 
-           LCP OPTIMIZATION:
+           LCP OPTIMIZATION + iOS SAFARI EDGE-TO-EDGE:
            - Background decoupled from Client Components (SmoothScroll/Pinner) is critical!
            - Position fixed keeps it in view without JS simulation
            - Z-Index -1 ensures it acts as background
+           - Extended beyond safe areas for full physical screen coverage
+           - Uses env() to extend into notch/Dynamic Island and home indicator areas
         */}
-        <div className="fixed inset-0 z-[-1] w-full h-full">
+        <div
+          className="fixed z-[-1] w-full h-full"
+          style={{
+            /* Extend beyond safe areas for full edge-to-edge coverage */
+            top: 'calc(-1 * env(safe-area-inset-top, 0px))',
+            left: 'calc(-1 * env(safe-area-inset-left, 0px))',
+            right: 'calc(-1 * env(safe-area-inset-right, 0px))',
+            bottom: 'calc(-1 * env(safe-area-inset-bottom, 0px))',
+            /* Ensure full coverage including the extended areas */
+            width: 'calc(100% + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px))',
+            height: 'calc(100% + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))',
+          }}
+        >
           <AppBackground />
         </div>
 

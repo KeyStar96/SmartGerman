@@ -43,12 +43,16 @@ body {
   color: var(--foreground);
   /* Sanfter Übergang für das gesamte Layout beim Theme-Wechsel */
   transition: background-color 0.2s ease, color 0.2s ease;
+  /* iOS SAFARI FIX: dvh units handle dynamic toolbar height changes */
+  min-height: 100dvh;
   min-height: 100vh;
+  /* Fallback for older browsers */
   overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 18px;
   /* Swiss Scientific Base Size */
-  /* overscroll-behavior-y: none;  <-- REMOVED to allow natural bounce against fixed bg */
+  /* iOS SAFARI FIX: Prevent rubber-band revealing browser canvas */
+  overscroll-behavior-y: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -56,14 +60,23 @@ body {
 html {
   overflow-y: scroll;
   scroll-behavior: smooth;
-  /* MOBILE OVERSCROLL FIX */
-  background-color: var(--background);
-  /* Default: Theme Color (Beige) */
+  /* iOS SAFARI EDGE-TO-EDGE FIX:
+   * Background must be transparent so the fixed AppBackground
+   * is visible during overscroll/rubber-banding.
+   * The #000 fallback ensures any visible flash is dark.
+   */
+  background-color: transparent;
+  /* iOS SAFARI FIX: Prevent rubber-band on html too */
+  overscroll-behavior-y: none;
+  /* Dynamic viewport height for iOS Safari toolbar changes */
+  min-height: 100dvh;
+  min-height: 100vh;
+  /* Fallback */
 }
 
 .dark html {
-  background-color: #000000;
-  /* Dark Mode: Black */
+  /* Keep transparent - the fixed AppBackground handles the visual */
+  background-color: transparent;
 }
 
 /* GLOBAL GRADIENT REMOVED - User requested uniform colors */
