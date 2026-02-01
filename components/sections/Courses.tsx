@@ -159,14 +159,14 @@ export default function Courses({ dictionary }: CoursesProps) {
 
         {/* --- Syllabus Grid (Butter Smooth Performance) --- */}
         <div className="relative w-full">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             <motion.div
               key={filter}
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pl-px pt-px"
+              className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pl-px pt-px"
             >
               {displayedCourses.map((courseConfig) => {
                 const textData = courseTexts[courseConfig.translationKey];

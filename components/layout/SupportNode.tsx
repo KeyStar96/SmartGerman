@@ -147,7 +147,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
             <AnimatePresence>
                 {!isHidden && (
                     <motion.button
-                        layout
+                        key="support-trigger"
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
@@ -156,7 +156,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className={cn(
-                            "pointer-events-auto relative flex items-center justify-center h-14 w-14 rounded-full shadow-2xl transition-all duration-500",
+                            "pointer-events-auto relative flex items-center justify-center h-14 w-14 rounded-full shadow-2xl transition-colors duration-300",
                             isOpen
                                 ? "bg-[#1E2024] rotate-90"
                                 : "bg-[#FF5C00] hover:bg-[#E05200]" // Orange brand color
