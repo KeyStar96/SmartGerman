@@ -791,7 +791,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 />
                 {checked && <Check size={12} className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" strokeWidth={3} />}
             </div>
-            <span className="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200 leading-normal select-none group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+            <span className="text-xs md:text-sm font-medium text-gray-900 dark:text-white leading-normal select-none transition-colors">
                 {label}
             </span>
         </label>
