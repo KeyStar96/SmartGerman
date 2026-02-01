@@ -136,7 +136,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
             <div className="mt-8 lg:mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
                 <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
 
-                <div className="flex gap-8">
+                <div className="flex gap-8 md:mr-24">
                     <a href="/imprint" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</a>
                     <a href="/privacy" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</a>
                     <a href="/terms" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</a>
