@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback } from 'react';
 import { ArrowUpRight, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
-import Magnetic from '@/components/ui/Magnetic';
 import TimeStatus from './TimeStatus';
 
 interface BentoGridProps {
@@ -94,35 +93,31 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                 {/* 3. Contact & Actions (Right Column) - HIDDEN ON MOBILE (SWISS COMPACT) */}
                 <div className="hidden lg:flex lg:col-span-3 flex-col gap-6 lg:items-end">
 
-                    {/* Magnetic Buttons */}
+                    {/* Standard Buttons (No Magnetic) */}
                     <div className="flex flex-col gap-3 w-full sm:w-auto">
-                        <Magnetic>
-                            <button
-                                onClick={handleCopyEmail}
-                                className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 lg:hover:bg-white/10 text-white flex items-center justify-between px-6 transition-all group"
-                            >
-                                <span className="font-mono text-xs uppercase tracking-widest relative z-10">
-                                    {isCopied ? (t.Contact?.copied || "Copied!") : (t.Contact?.email_button || "Email Me")}
-                                </span>
-                                <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center lg:group-hover:scale-110 transition-transform relative z-10">
-                                    {isCopied ? <Check size={14} /> : <ArrowUpRight size={14} />}
-                                </div>
-                                {/* Subtle Hover Gradient Background */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] lg:group-hover:translate-x-[100%] transition-transform duration-700" />
-                            </button>
-                        </Magnetic>
+                        <button
+                            onClick={handleCopyEmail}
+                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 lg:hover:bg-white/10 text-white flex items-center justify-between px-6 transition-all group"
+                        >
+                            <span className="font-mono text-xs uppercase tracking-widest relative z-10">
+                                {isCopied ? (t.Contact?.copied || "Copied!") : (t.Contact?.email_button || "Email Me")}
+                            </span>
+                            <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center lg:group-hover:scale-110 transition-transform relative z-10">
+                                {isCopied ? <Check size={14} /> : <ArrowUpRight size={14} />}
+                            </div>
+                            {/* Subtle Hover Gradient Background */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] lg:group-hover:translate-x-[100%] transition-transform duration-700" />
+                        </button>
 
-                        <Magnetic>
-                            <a
-                                href="https://t.me/SmartGerman_CleverLernen"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 lg:hover:bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-between px-6 transition-all group"
-                            >
-                                <span className="font-mono text-xs uppercase tracking-widest relative z-10">{t.Contact?.telegram_button || "Telegram"}</span>
-                                <MessageCircle size={20} className="lg:group-hover:rotate-12 transition-transform relative z-10" />
-                            </a>
-                        </Magnetic>
+                        <a
+                            href="https://t.me/SmartGerman_CleverLernen"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 lg:hover:bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-between px-6 transition-all group"
+                        >
+                            <span className="font-mono text-xs uppercase tracking-widest relative z-10">{t.Contact?.telegram_button || "Telegram"}</span>
+                            <MessageCircle size={20} className="lg:group-hover:rotate-12 transition-transform relative z-10" />
+                        </a>
                     </div>
 
                     {/* Socials Minimal */}
