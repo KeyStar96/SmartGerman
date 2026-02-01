@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { COURSES, CourseConfig, Day } from "@/lib/course-config";
 import { useRouter, useParams } from "next/navigation";
 
+import Link from "next/link";
+
 // --- Fonts ---
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
@@ -68,6 +70,9 @@ const cardVariants = {
     },
   },
 };
+
+// Create a motion component for Link
+const MotionLink = motion(Link);
 
 export default function Courses({ dictionary }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
@@ -214,7 +219,6 @@ interface CourseCardProps {
 }
 
 const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) => {
-  const router = useRouter();
   const params = useParams();
   const lang = (params?.lang as string) || "de";
 
@@ -222,18 +226,15 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
   // Strictly use config duration
   const unit = `/ ${config.unitDuration} min`;
 
-  const handleCardClick = () => {
-    router.push(`/${lang}/registration?courseId=${config.id}`);
-  };
-
   return (
-    <motion.div
-      onClick={handleCardClick}
+    <MotionLink
+      href={`/${lang}/registration?courseId=${config.id}`}
       variants={cardVariants}
       className={`
         group relative w-full h-full min-h-[380px] 
         bg-[#F9F8F6] dark:bg-[#1E2024]
         cursor-pointer
+        block /* Ensure block display for Link */
         
         /* Border Collapsing Trick: Negative Margins */
         -ml-px -mt-px
@@ -369,6 +370,6 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
           </div>
         </div>
       </div>
-    </motion.div>
+    </MotionLink>
   );
 });
