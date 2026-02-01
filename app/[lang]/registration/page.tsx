@@ -22,8 +22,19 @@ export default async function RegistrationPage({
 
     return (
         <div className="relative w-full min-h-screen">
-            {/* Background Layer - Fixed to prevent layout shift of background */}
-            <div className="fixed inset-0 z-0">
+            {/* Background Layer - Extended beyond safe areas for iOS edge-to-edge */}
+            <div
+                className="fixed z-0 w-full h-full"
+                style={{
+                    /* iOS SAFARI: Extend beyond safe areas for full coverage */
+                    top: 'calc(-1 * env(safe-area-inset-top, 0px))',
+                    left: 'calc(-1 * env(safe-area-inset-left, 0px))',
+                    right: 'calc(-1 * env(safe-area-inset-right, 0px))',
+                    bottom: 'calc(-1 * env(safe-area-inset-bottom, 0px))',
+                    width: 'calc(100% + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px))',
+                    height: 'calc(100% + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px))',
+                }}
+            >
                 <AppBackground />
             </div>
 
