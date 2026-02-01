@@ -110,7 +110,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                         </button>
 
                         <a
-                            href="https://t.me/SmartGerman_CleverLernen"
+                            href="https://t.me/Sprachschule_Anastasia"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 lg:hover:bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-between px-6 transition-all group"
