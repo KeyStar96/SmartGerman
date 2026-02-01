@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { JetBrains_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown } from "lucide-react";
+import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { CourseConfig, Day, CourseException } from "@/lib/course-config";
@@ -826,23 +826,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         }
     };
 
-    // Helper for rendering legal checkboxes
-    const LegalCheckbox = ({ id, label, checked, onChange }: { id: string, label: string, checked: boolean, onChange: (v: boolean) => void }) => (
-        <label className="flex items-start gap-3 cursor-pointer group mt-4">
-            <div className="relative mt-1">
-                <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) => onChange(e.target.checked)}
-                    className="appearance-none h-4 w-4 bg-transparent border border-gray-400 dark:border-white/30 rounded-sm checked:bg-[#FF5C00] checked:border-[#FF5C00] transition-colors"
-                />
-                {checked && <Check size={12} className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" strokeWidth={3} />}
-            </div>
-            <span className="text-[11px] text-gray-500 leading-snug select-none group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors">
-                {label}
-            </span>
-        </label>
-    );
+
 
     // RENDER: STEP 3 OVERRIDES (We need to insert legal inside the summary view)
     // Actually, we can just render it below the courses list or in a dedicated box.
@@ -857,10 +841,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                     <div className="max-w-3xl mx-auto px-6 md:px-12 py-8 md:py-12 pb-32">
                         {/* HEADER & STEPS (Lines 878-999 simplified) */}
                         <div className="mb-8 md:mb-12">
-                            <button onClick={onClose} className="group flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-gray-400 hover:text-[#FF5C00] transition-colors mb-6">
+                            <Link href={`/${lang}`} className="group flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-gray-400 hover:text-[#FF5C00] transition-colors mb-6">
                                 <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
                                 {t?.back_home}
-                            </button>
+                            </Link>
                             <div className="flex items-center gap-3 mb-6">
                                 <span className="h-8 w-8 rounded-full bg-[#FF5C00] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#FF5C00]/30">
                                     {step}
