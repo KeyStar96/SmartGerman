@@ -41,10 +41,9 @@ export default function AppBackground({ className }: { className?: string }) {
                         src="/Bilder/SG_Background_Light_Mobile.webp"
                         alt="Smart German Background Light Mobile"
                         fill
-                        priority={false}
+                        priority={true}
                         sizes="100vw"
                         className="object-cover object-center"
-                        loading="lazy"
                         quality={90}
                     />
                 </div>
@@ -73,10 +72,9 @@ export default function AppBackground({ className }: { className?: string }) {
                         src="/Bilder/SG_Background_Dark_Mobile.webp"
                         alt="Smart German Background Dark Mobile"
                         fill
-                        priority={false}
+                        priority={true}
                         sizes="100vw"
                         className="object-cover object-center"
-                        loading="lazy"
                         quality={90}
                     />
                 </div>

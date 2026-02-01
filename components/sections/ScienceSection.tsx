@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 
 const NeuralBrain = dynamic(() => import("../effects/NeuralBrain"), {
     ssr: false,
@@ -58,10 +59,14 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     <div className="relative w-full max-w-[420px] mx-auto">
 
                         {/* Layer 2 (Top): Head Image with Transparency */}
-                        <img
+                        <Image
                             src="/Bilder/SG_Brain-Compressed.webp"
                             alt="Human Head Structure"
+                            width={2838}
+                            height={3162}
+                            sizes="(max-width: 420px) 100vw, 420px"
                             className="relative z-20 w-full h-auto pointer-events-none select-none scale-x-[-1]"
+                            priority={false} // Lazy load by default
                         />
 
                         {/* Layer 1 (Bottom): Neural Brain Container */}
