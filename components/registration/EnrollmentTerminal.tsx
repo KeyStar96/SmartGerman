@@ -1031,7 +1031,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
                                                         <span className="font-bold text-gray-900 dark:text-[#E2D7CE]">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
                                                         <div className="text-right">
-                                                            <span className="font-mono text-gray-900 dark:text-[#E2D7CE]">{formatPrice(netPrice)} / {receipt?.monthly || "Monat"}</span>
+                                                            <span className="font-mono text-gray-900 dark:text-[#E2D7CE]">{formatPrice(netPrice)}</span>
                                                             {deductions.length > 0 && (
                                                                 <div className="text-[10px] text-red-500 text-right">
                                                                     ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
