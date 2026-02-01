@@ -7,6 +7,7 @@ import SmoothScroll from "@/components/effects/SmoothScroll";
 import { getDictionary } from "@/lib/dictionary";
 import SupportNode from "@/components/layout/SupportNode";
 import AppBackground from "@/components/effects/AppBackground";
+import { ThemeInit } from "@/components/effects/ThemeInit";
 
 const inter = Inter({ subsets: ["latin"] });
 const jetbrainsMono = JetBrains_Mono({
@@ -79,6 +80,8 @@ export default async function RootLayout({
         <div className="fixed inset-0 z-[-1] w-full h-full">
           <AppBackground />
         </div>
+
+        <ThemeInit />
 
         {/* 3. Die oberste Ebene: Header (z-index: 50 für sticky) */}
         {/* Header moved to page.tsx */}
