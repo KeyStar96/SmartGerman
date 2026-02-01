@@ -30,45 +30,89 @@ export async function submitEnrollment(
     const [mStr, yStr] = startMonth.split('-');
     const monthIndex = parseInt(mStr);
     const year = parseInt(yStr);
-    // Construct Date object manually to avoid timezone shifts, set to 12:00 noon UTC just in case, or string YYYY-MM-DD
-    // PostgreSQL DATE type accepts 'YYYY-MM-DD'.
+    // Construct Date object manually to avoid timezone shifts
     const startDateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-01`;
 
     try {
-        // 1. Insert Registration (Flat Columns)
+        // 1. Check for existing User (IDENTIFIER: First Name + Last Name + Birth Date)
+        // We use this combination as the "Unique Key" for a person.
+        const { data: existingUsers, error: fetchError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('first_name', formData.personal.firstName)
+            .eq('last_name', formData.personal.lastName)
+            .eq('birth_date', formData.personal.birthDate)
+            .limit(1);
+
+        if (fetchError) {
+            console.error("Error checking existing user:", fetchError);
+            return { success: false, message: "User check failed", error: fetchError };
+        }
+
+        let userId: string;
+
+        if (existingUsers && existingUsers.length > 0) {
+            // A) User Exists: Update contact details (Mutable fields)
+            userId = existingUsers[0].id;
+            const { error: updateError } = await supabase
+                .from('users')
+                .update({
+                    email: formData.personal.email, // Update email in case of typo fix or change
+                    phone: formData.personal.phone || null,
+                    street: formData.personal.street,
+                    zip: formData.personal.zip,
+                    city: formData.personal.city
+                })
+                .eq('id', userId);
+
+            if (updateError) {
+                console.error("Error updating user:", updateError);
+                // We don't fail here, but we log it.
+            }
+        } else {
+            // B) New User: Insert
+            const { data: newUser, error: createError } = await supabase
+                .from('users')
+                .insert({
+                    first_name: formData.personal.firstName,
+                    last_name: formData.personal.lastName,
+                    birth_date: formData.personal.birthDate,
+                    email: formData.personal.email,
+                    phone: formData.personal.phone || null,
+                    street: formData.personal.street,
+                    zip: formData.personal.zip,
+                    city: formData.personal.city
+                })
+                .select('id')
+                .single();
+
+            if (createError || !newUser) {
+                console.error("Error creating new user:", createError);
+                return { success: false, message: `User creation failed: ${createError?.message || 'Unknown error'}`, error: createError };
+            }
+            userId = newUser.id;
+        }
+
+        // 2. Insert Registration (Linked to User)
         const { data: registration, error: regError } = await supabase
             .from('registrations')
             .insert({
-                // Map hierarchy to flat columns
-                first_name: formData.personal.firstName,
-                last_name: formData.personal.lastName,
-                email: formData.personal.email,
-                phone: formData.personal.phone || null,
-
-                street: formData.personal.street,
-                zip: formData.personal.zip,
-                city: formData.personal.city,
-
-                birth_date: formData.personal.birthDate, // "DD.MM.YYYY" as text
+                user_id: userId, // Link to the user
 
                 start_date: startDateStr,
                 total_price: totalPrice,
-
-                // Defaulting these for now, or add to form if needed
-                salutation: null,
-                title: null,
 
                 privacy_accepted: consents.privacy,
                 agb_accepted: consents.agb,
                 revocation_waiver_accepted: consents.revocation,
                 status: 'pending'
             })
-            .select('id') // We need the ID for enrollments
+            .select('id')
             .single();
 
         if (regError) {
             console.error("Supabase Registration Error:", regError);
-            return { success: false, message: "Registration failed", error: regError };
+            return { success: false, message: `Registration failed: ${regError.message}`, error: regError };
         }
 
         if (!registration) {
@@ -77,7 +121,7 @@ export async function submitEnrollment(
 
         const registrationId = registration.id;
 
-        // 2. Create Enrollments (Link Courses)
+        // 3. Create Enrollments (Link Courses)
         const enrollmentData = selectedCourseIds.map(courseId => ({
             registration_id: registrationId,
             course_id: courseId
@@ -89,9 +133,7 @@ export async function submitEnrollment(
 
         if (enrollError) {
             console.error("Supabase Enrollment Error:", enrollError);
-            // Optional: Cleanup registration if enrollment fails? 
-            // For now, keep it simple. Manual cleanup or admin awareness.
-            return { success: false, message: "Enrollment details failed", error: enrollError };
+            return { success: false, message: `Enrollment details failed: ${enrollError.message}`, error: enrollError };
         }
 
         return { success: true, message: "registration_success" };

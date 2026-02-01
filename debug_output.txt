@@ -1,0 +1,70 @@
+  console.log
+    [dotenv@17.2.3] injecting env (3) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:142:11)
+
+  console.log
+    Attempting submission to Real DB...
+
+      at Object.<anonymous> (__tests__/manual-debug.test.ts:41:17)
+
+  console.error
+    Error checking existing user: {
+      message: 'ReferenceError: fetch is not defined',
+      details: 'ReferenceError: fetch is not defined\n' +
+        '    at /Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/node_modules/@supabase/supabase-js/src/lib/fetch.ts:7:42\n' +
+        '    at fetch (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/node_modules/@supabase/supabase-js/src/lib/fetch.ts:34:12)\n' +
+        '    at submitEnrollment (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/app/actions/submit-enrollment.ts:39:60)\n' +
+        '    at Object.<anonymous> (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/__tests__/manual-debug.test.ts:42:24)',
+      hint: '',
+      code: ''
+    }
+
+      46 |
+      47 |         if (fetchError) {
+    > 48 |             console.error("Error checking existing user:", fetchError);
+         |                     ^
+      49 |             return { success: false, message: "User check failed", error: fetchError };
+      50 |         }
+      51 |
+
+      at submitEnrollment (app/actions/submit-enrollment.ts:48:21)
+      at Object.<anonymous> (__tests__/manual-debug.test.ts:42:24)
+
+  console.log
+    Real DB Submission Result: {
+      "success": false,
+      "message": "User check failed",
+      "error": {
+        "message": "ReferenceError: fetch is not defined",
+        "details": "ReferenceError: fetch is not defined\n    at /Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/node_modules/@supabase/supabase-js/src/lib/fetch.ts:7:42\n    at fetch (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/node_modules/@supabase/supabase-js/src/lib/fetch.ts:34:12)\n    at submitEnrollment (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/app/actions/submit-enrollment.ts:39:60)\n    at Object.<anonymous> (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/__tests__/manual-debug.test.ts:42:24)",
+        "hint": "",
+        "code": ""
+      }
+    }
+
+      at Object.<anonymous> (__tests__/manual-debug.test.ts:50:17)
+
+FAIL __tests__/manual-debug.test.ts
+  Manual Debug Integration
+    ✕ submits enrollment to real database (34 ms)
+
+  ● Manual Debug Integration › submits enrollment to real database
+
+    Registration Failed: User check failed - {"message":"ReferenceError: fetch is not defined","details":"ReferenceError: fetch is not defined\n    at /Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/node_modules/@supabase/supabase-js/src/lib/fetch.ts:7:42\n    at fetch (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/node_modules/@supabase/supabase-js/src/lib/fetch.ts:34:12)\n    at submitEnrollment (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/app/actions/submit-enrollment.ts:39:60)\n    at Object.<anonymous> (/Users/denniskostjuk/Desktop/NextJS_SmartGerman_Redesign/__tests__/manual-debug.test.ts:42:24)","hint":"","code":""}
+
+      51 |
+      52 |         if (!result.success) {
+    > 53 |             throw new Error(`Registration Failed: ${result.message} - ${JSON.stringify(result.error)}`);
+         |                   ^
+      54 |         }
+      55 |
+      56 |         expect(result.success).toBe(true);
+
+      at Object.<anonymous> (__tests__/manual-debug.test.ts:53:19)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        2.696 s
+Ran all test suites matching /__tests__\/manual-debug.test.ts/i.
