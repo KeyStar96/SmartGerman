@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { COURSES, Day } from "@/lib/course-config";
+import { CourseConfig, Day } from "@/lib/course-config";
 import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
 import { getCurrentDayName, isCourseLive } from "@/lib/time-utils";
@@ -11,9 +11,10 @@ const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr"];
 
 interface MobileTabsProps {
     dictionary: any;
+    courses: CourseConfig[];
 }
 
-export default function MobileTabs({ dictionary }: MobileTabsProps) {
+export default function MobileTabs({ dictionary, courses }: MobileTabsProps) {
     const t = dictionary?.timetable || {};
     const dayNames = t.days || {};
     const courseTexts = dictionary?.CourseData || {};
@@ -41,7 +42,9 @@ export default function MobileTabs({ dictionary }: MobileTabsProps) {
 
     const getDayCourses = (day: Day): TimetableCourse[] => {
         const dayCourses: TimetableCourse[] = [];
-        COURSES.forEach(course => {
+        const sourceData = courses || [];
+
+        sourceData.forEach(course => {
             course.sessions.forEach(session => {
                 if (session.day === day) {
                     dayCourses.push({

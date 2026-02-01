@@ -4,7 +4,7 @@ import Hero from "@/components/sections/Hero";
 import ScienceSection from "@/components/sections/ScienceSection";
 import { getDictionary } from "@/lib/dictionary";
 import Header from "@/components/layout/Header";
-import { COURSES } from "@/lib/course-config";
+import { getCourses } from "@/app/actions/get-courses"; // Use Server Action
 
 const WhyUsBento = dynamic(() => import("@/components/sections/WhyUsBento"));
 const AboutContainer = dynamic(() => import("@/components/sections/About/AboutContainer"));
@@ -55,6 +55,8 @@ export default async function HomePage({
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
+  const courses = await getCourses();
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LanguageSchool",
@@ -68,7 +70,7 @@ export default async function HomePage({
     },
     "openingHours": "Mo-Fr 09:00-18:00",
     "priceRange": "FROM 2.50€",
-    "offers": COURSES.map(course => ({
+    "offers": courses.map(course => ({
       "@type": "Offer",
       "name": course.id,
       "price": course.price,
@@ -92,8 +94,8 @@ export default async function HomePage({
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
           <WhyUsBento dictionary={dictionary} />
-          <Courses dictionary={dictionary} />
-          <TimetableSection dictionary={dictionary} />
+          <Courses dictionary={dictionary} courses={courses} />
+          <TimetableSection dictionary={dictionary} courses={courses} />
           <LocationSection dictionary={dictionary} />
         </div>
       </main>

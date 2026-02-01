@@ -1,6 +1,7 @@
 import React from "react";
 import EnrollmentTerminal from "@/components/registration/EnrollmentTerminal";
 import { getDictionary } from "@/lib/dictionary";
+import { getCourses } from "@/app/actions/get-courses";
 import AppBackground from "@/components/effects/AppBackground";
 
 export default async function RegistrationPage({
@@ -10,6 +11,9 @@ export default async function RegistrationPage({
 }) {
     const { lang } = await params;
     const dictionary = await getDictionary(lang);
+
+    // Fetch courses form Supabase
+    const courses = await getCourses();
 
     const now = new Date();
     const serverTime = now.getTime(); // Pass as number to avoid serialization issues
@@ -32,7 +36,7 @@ export default async function RegistrationPage({
                         </div>
                     </div>
                 }>
-                    <EnrollmentTerminal dictionary={dictionary} lang={lang} serverTime={serverTime} />
+                    <EnrollmentTerminal dictionary={dictionary} lang={lang} serverTime={serverTime} courses={courses} />
                 </React.Suspense>
             </div>
         </div>

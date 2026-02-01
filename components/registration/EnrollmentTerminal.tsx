@@ -11,7 +11,7 @@ import Link from "next/link";
 import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { COURSES, CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
+import { CourseConfig, Day, EXCEPTIONS } from "@/lib/course-config";
 import { calculateMonthlyStats, getDurationMinutes, DAY_MAP, getNext6Months } from "@/lib/course-calculations";
 import { createSchema, EnrollmentFormData } from "@/lib/registration-schema";
 
@@ -572,9 +572,11 @@ const PhoneInput = ({
     );
 };
 
+import { submitEnrollment } from "@/app/actions/submit-enrollment";
+
 // --- MAIN TERMINAL ---
 
-export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime }: { dictionary: any, lang: string, serverTime?: number }) {
+export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime, courses }: { dictionary: any, lang: string, serverTime?: number, courses: CourseConfig[] }) {
     const searchParams = useSearchParams();
     const initialCourseId = searchParams.get("courseId");
 
@@ -601,12 +603,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     // Grouping Logic - MEMOIZED
     const { presenceCourses, onlineCourses, speechCourses } = React.useMemo(() => {
+        const sourceData = courses || [];
         return {
-            presenceCourses: COURSES.filter(c => c.type === 'presence' && !c.id.includes('speech')),
-            onlineCourses: COURSES.filter(c => c.type === 'online'),
-            speechCourses: COURSES.filter(c => c.id.includes('speech'))
+            presenceCourses: sourceData.filter(c => c.type === 'presence' && !c.id.includes('speech')),
+            onlineCourses: sourceData.filter(c => c.type === 'online'),
+            speechCourses: sourceData.filter(c => c.id.includes('speech'))
         };
-    }, []);
+    }, [courses]);
 
     // Calc Next Month for UI Display
     // const nextMonthName = calculateMonthlyStats(COURSES[0], lang).monthName; // OLD
@@ -649,10 +652,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     }, [zipCode, setValue]);
 
     useEffect(() => {
-        if (initialCourseId && !selectedCourseIds.includes(initialCourseId) && COURSES.some(c => c.id === initialCourseId)) {
+        if (initialCourseId && !selectedCourseIds.includes(initialCourseId) && courses?.some(c => c.id === initialCourseId)) {
             setSelectedCourseIds([initialCourseId]);
         }
-    }, [initialCourseId]);
+    }, [initialCourseId, courses]);
 
     const toggleCourse = React.useCallback((id: string) => {
         setSelectedCourseIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -670,7 +673,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         };
     }, [dictionary, lang]);
 
-    const selectedCoursesFull = COURSES.filter(c => selectedCourseIds.includes(c.id));
+    const selectedCoursesFull = (courses || []).filter(c => selectedCourseIds.includes(c.id));
 
     // Dynamic Total Calculation - MEMOIZED
     const totalMonthlyPrice = React.useMemo(() => {
@@ -754,15 +757,30 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     const onSubmit = async (data: EnrollmentFormData) => {
         setIsSubmitting(true);
-        await new Promise(r => setTimeout(r, 1500));
-        console.log({
+        // await new Promise(r => setTimeout(r, 1500)); // Remove fake delay
+
+        console.log("Submitting to Supabase...", {
             courses: selectedCourseIds,
-            startMonth: selectedStartMonth,
-            personal: data,
-            total: totalMonthlyPrice
+            personal: data
         });
-        setIsSuccess(true);
-        setIsSubmitting(false);
+
+        try {
+            const result = await submitEnrollment(data, selectedCourseIds);
+
+            if (result.success) {
+                console.log("Enrollment success:", result);
+                setIsSuccess(true);
+            } else {
+                console.error("Enrollment failed:", result.message);
+                // Handle error (show toast/alert - for now simple alert or fallback)
+                alert(result.message || "Something went wrong. Please try again.");
+            }
+        } catch (error) {
+            console.error("Submission error:", error);
+            alert("Network error. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleNextStep = async () => {

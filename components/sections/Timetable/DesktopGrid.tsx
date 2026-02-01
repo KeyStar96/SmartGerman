@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
-import { COURSES, Day } from "@/lib/course-config";
+import { CourseConfig, Day } from "@/lib/course-config";
 import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
 import { isCourseLive } from "@/lib/time-utils";
@@ -11,9 +11,10 @@ const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr"];
 
 interface DesktopGridProps {
     dictionary: any;
+    courses: CourseConfig[];
 }
 
-export default function DesktopGrid({ dictionary }: DesktopGridProps) {
+export default function DesktopGrid({ dictionary, courses }: DesktopGridProps) {
     const t = dictionary?.timetable || {};
     const dayNames = t.days || {};
     const courseTexts = dictionary?.CourseData || {};
@@ -56,8 +57,9 @@ export default function DesktopGrid({ dictionary }: DesktopGridProps) {
 
     const getDayCourses = (day: Day): TimetableCourse[] => {
         const dayCourses: TimetableCourse[] = [];
+        const sourceData = courses || [];
 
-        COURSES.forEach(course => {
+        sourceData.forEach(course => {
             course.sessions.forEach(session => {
                 if (session.day === day) {
                     dayCourses.push({

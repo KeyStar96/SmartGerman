@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { JetBrains_Mono } from "next/font/google";
 import { User, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { COURSES, CourseConfig, Day } from "@/lib/course-config";
+import { CourseConfig, Day } from "@/lib/course-config";
 import { useRouter, useParams } from "next/navigation";
 
 import Link from "next/link";
@@ -41,6 +41,7 @@ interface Dictionary {
 
 interface CoursesProps {
   dictionary: Dictionary;
+  courses: CourseConfig[];
 }
 
 // --- Animation Variants ---
@@ -74,7 +75,7 @@ const cardVariants = {
 // Create a motion component for Link
 const MotionLink = motion(Link);
 
-export default function Courses({ dictionary }: CoursesProps) {
+export default function Courses({ dictionary, courses }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
 
   const sectionData = dictionary?.courses_v2;
@@ -84,7 +85,9 @@ export default function Courses({ dictionary }: CoursesProps) {
 
   // Memoize displayed courses AND their formatted data to ensure stable props for children
   const displayedCourses = React.useMemo(() => {
-    return COURSES.filter((c) => c.type === filter).map(course => {
+    // Fallback to empty array if courses not passed yet
+    const sourceData = courses || [];
+    return sourceData.filter((c) => c.type === filter).map(course => {
       // Pre-calculate derived data here to keep props stable
       const sessions = course.sessions;
       const formattedSchedule = sessions.map((s) => {

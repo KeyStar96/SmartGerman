@@ -9,11 +9,14 @@ const MobileTabs = dynamic(() => import("./MobileTabs"), { ssr: false });
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
+import { CourseConfig } from '@/lib/course-config';
+
 interface TimetableSectionProps {
     dictionary: any;
+    courses: CourseConfig[];
 }
 
-export default function TimetableSection({ dictionary }: TimetableSectionProps) {
+export default function TimetableSection({ dictionary, courses }: TimetableSectionProps) {
     const t = dictionary?.timetable || {};
 
     // Optimization: Only render the specific grid needed for the viewport
@@ -52,8 +55,8 @@ export default function TimetableSection({ dictionary }: TimetableSectionProps) 
 
                 {/* Content */}
                 <div className="w-full min-h-[400px]">
-                    {isDesktop === true && <DesktopGrid dictionary={dictionary} />}
-                    {isDesktop === false && <MobileTabs dictionary={dictionary} />}
+                    {isDesktop === true && <DesktopGrid dictionary={dictionary} courses={courses} />}
+                    {isDesktop === false && <MobileTabs dictionary={dictionary} courses={courses} />}
                     {/* While null (mounting), render nothing or a tiny placeholder to avoid jumping if possible. 
                         Given strict "Performance" goal, rendering nothing is fastest, 
                         layout shift is minimal if min-h is set. */}
