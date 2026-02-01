@@ -1,3 +1,5 @@
+"use client";
+
 import dynamic from 'next/dynamic';
 import React, { useState, useEffect } from "react";
 import { JetBrains_Mono } from "next/font/google";
