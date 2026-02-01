@@ -780,7 +780,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         });
 
         try {
-            const result = await submitEnrollment(data, selectedCourseIds);
+            const result = await submitEnrollment(data, selectedCourseIds, selectedStartMonth, totalMonthlyPrice);
 
             if (result.success) {
                 console.log("Enrollment success:", result);

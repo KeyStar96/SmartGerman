@@ -11,13 +11,23 @@ interface SubmitEnrollmentResult {
 
 export async function submitEnrollment(
     formData: EnrollmentFormData,
-    selectedCourseIds: string[]
+    selectedCourseIds: string[],
+    startMonth: string, // Format: "M-YYYY" (e.g. "0-2026")
+    totalPrice: number
 ): Promise<SubmitEnrollmentResult> {
     const supabase = await createClient();
 
     if (!selectedCourseIds || selectedCourseIds.length === 0) {
         return { success: false, message: "No courses selected" };
     }
+
+    // Parse Start Date: "0-2026" -> 2026-01-01
+    const [mStr, yStr] = startMonth.split('-');
+    const monthIndex = parseInt(mStr);
+    const year = parseInt(yStr);
+    // Construct Date object manually to avoid timezone shifts, set to 12:00 noon UTC just in case, or string YYYY-MM-DD
+    // PostgreSQL DATE type accepts 'YYYY-MM-DD'.
+    const startDateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-01`;
 
     try {
         // 1. Insert Registration (Flat Columns)
@@ -35,6 +45,9 @@ export async function submitEnrollment(
                 city: formData.personal.city,
 
                 birth_date: formData.personal.birthDate, // "DD.MM.YYYY" as text
+
+                start_date: startDateStr,
+                total_price: totalPrice,
 
                 // Defaulting these for now, or add to form if needed
                 salutation: null,

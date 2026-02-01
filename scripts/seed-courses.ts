@@ -31,6 +31,7 @@ if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('YOUR_')) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+/*
 async function seedCourses() {
     console.log(`Starting seed for ${COURSES.length} courses...`);
 
@@ -56,6 +57,6 @@ async function seedCourses() {
         console.log('Successfully seeded/updated courses:', data?.length);
     }
 }
-
+*/
 // seedCourses();
 console.log("Seeding disabled: Static COURSES data has been removed from lib/course-config.ts. Use database management tools.");
