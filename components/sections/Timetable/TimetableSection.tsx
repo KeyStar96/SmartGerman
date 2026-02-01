@@ -1,9 +1,9 @@
-"use client";
-
-import React from "react";
-import DesktopGrid from "./DesktopGrid";
-import MobileTabs from "./MobileTabs";
+import dynamic from 'next/dynamic';
+import React, { useState, useEffect } from "react";
 import { JetBrains_Mono } from "next/font/google";
+
+const DesktopGrid = dynamic(() => import("./DesktopGrid"), { ssr: false });
+const MobileTabs = dynamic(() => import("./MobileTabs"), { ssr: false });
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
@@ -13,6 +13,24 @@ interface TimetableSectionProps {
 
 export default function TimetableSection({ dictionary }: TimetableSectionProps) {
     const t = dictionary?.timetable || {};
+
+    // Optimization: Only render the specific grid needed for the viewport
+    // This saves downloading the bundle and running the tickers of the hidden component.
+    const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        const checkIsDesktop = () => window.innerWidth >= 768;
+
+        // Initial check
+        setIsDesktop(checkIsDesktop());
+
+        const handleResize = () => {
+            setIsDesktop(checkIsDesktop());
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     return (
         <section className="relative w-full py-24 md:py-32 bg-transparent" id="timetable">
@@ -31,9 +49,12 @@ export default function TimetableSection({ dictionary }: TimetableSectionProps) 
                 </div>
 
                 {/* Content */}
-                <div className="w-full">
-                    <DesktopGrid dictionary={dictionary} />
-                    <MobileTabs dictionary={dictionary} />
+                <div className="w-full min-h-[400px]">
+                    {isDesktop === true && <DesktopGrid dictionary={dictionary} />}
+                    {isDesktop === false && <MobileTabs dictionary={dictionary} />}
+                    {/* While null (mounting), render nothing or a tiny placeholder to avoid jumping if possible. 
+                        Given strict "Performance" goal, rendering nothing is fastest, 
+                        layout shift is minimal if min-h is set. */}
                 </div>
 
             </div>

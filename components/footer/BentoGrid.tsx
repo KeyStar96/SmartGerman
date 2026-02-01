@@ -10,17 +10,51 @@ interface BentoGridProps {
 
 export default function BentoGrid({ dictionary }: BentoGridProps) {
     const t = dictionary?.Footer || {};
+    // Extract navItems to stable value (or outside component if truly static, but inside is fine if used in memo)
+    // Actually better to keep it here so it's close to usage, referenced in useMemo dep array.
     const navItems = ['home', 'courses', 'prices', 'about', 'location'];
 
     // Copy Email
     const [isCopied, setIsCopied] = useState(false);
 
-    // OPTIMIZATION: Memoized handler to prevent re-creation on every render (if parent renders)
+    // OPTIMIZATION: Memoized handler
     const handleCopyEmail = useCallback(() => {
         navigator.clipboard.writeText("info@smart-german.com");
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
     }, []);
+
+    const navList = React.useMemo(() => (
+        <nav className="flex flex-col space-y-2 group/nav">
+            {navItems.map((key) => {
+                // Map Footer keys to actual Section IDs
+                let targetId = key;
+                if (key === 'home') targetId = 'hero';
+                if (key === 'prices') targetId = 'courses'; // Prices are inside Courses section
+
+                return (
+                    <a
+                        key={key}
+                        href={`#${targetId}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            const element = document.getElementById(targetId);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }}
+                        className="group/item flex items-center justify-between py-2 border-b border-white/10 lg:hover:border-white/40 cursor-pointer transition-all duration-300
+                                   lg:group-hover/nav:opacity-30 lg:hover:!opacity-100"
+                    >
+                        <span className="text-2xl md:text-3xl font-light text-white lg:group-hover/item:translate-x-4 transition-transform duration-300 ease-out">
+                            {t.Nav?.[key] || key}
+                        </span>
+                        <ArrowUpRight className="w-5 h-5 text-[#FF5C00] opacity-0 -translate-x-4 lg:group-hover/item:opacity-100 lg:group-hover/item:translate-x-0 transition-all duration-300" />
+                    </a>
+                );
+            })}
+        </nav>
+    ), [navItems, t.Nav]);
 
     return (
         <div className="w-full h-full px-6 md:px-12 pt-12 pb-24 md:py-12 flex flex-col justify-end gap-12 md:justify-between md:gap-0">
@@ -59,35 +93,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                         Beim Hovern des Containers werden ALLE Kinder gedimmt (opacity-30).
                         Das gehoverte Kind (:hover) bekommt wieder volle Power (opacity-100).
                     */}
-                    <nav className="flex flex-col space-y-2 group/nav">
-                        {navItems.map((key) => {
-                            // Map Footer keys to actual Section IDs
-                            let targetId = key;
-                            if (key === 'home') targetId = 'hero';
-                            if (key === 'prices') targetId = 'courses'; // Prices are inside Courses section
-
-                            return (
-                                <a
-                                    key={key}
-                                    href={`#${targetId}`}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        const element = document.getElementById(targetId);
-                                        if (element) {
-                                            element.scrollIntoView({ behavior: 'smooth' });
-                                        }
-                                    }}
-                                    className="group/item flex items-center justify-between py-2 border-b border-white/10 lg:hover:border-white/40 cursor-pointer transition-all duration-300
-                                               lg:group-hover/nav:opacity-30 lg:hover:!opacity-100"
-                                >
-                                    <span className="text-2xl md:text-3xl font-light text-white lg:group-hover/item:translate-x-4 transition-transform duration-300 ease-out">
-                                        {t.Nav?.[key] || key}
-                                    </span>
-                                    <ArrowUpRight className="w-5 h-5 text-[#FF5C00] opacity-0 -translate-x-4 lg:group-hover/item:opacity-100 lg:group-hover/item:translate-x-0 transition-all duration-300" />
-                                </a>
-                            );
-                        })}
-                    </nav>
+                    {navList}
                 </div>
 
                 {/* 3. Contact & Actions (Right Column) - HIDDEN ON MOBILE (SWISS COMPACT) */}

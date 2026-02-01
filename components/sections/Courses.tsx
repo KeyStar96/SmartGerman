@@ -77,26 +77,26 @@ export default function Courses({ dictionary }: CoursesProps) {
   const t_days = dictionary?.timetable?.days;
   const t_instructors = dictionary?.timetable?.instructors;
 
-  // Memoize displayed courses
+  // Memoize displayed courses AND their formatted data to ensure stable props for children
   const displayedCourses = React.useMemo(() => {
-    return COURSES.filter((c) => c.type === filter);
-  }, [filter]);
+    return COURSES.filter((c) => c.type === filter).map(course => {
+      // Pre-calculate derived data here to keep props stable
+      const sessions = course.sessions;
+      const formattedSchedule = sessions.map((s) => {
+        const dayKey = s.day.toLowerCase();
+        const localizedDay = t_days?.[dayKey] || s.day;
+        return `${localizedDay} ${s.startTime}-${s.endTime}`;
+      });
 
-  // Helper to format schedule string - MEMOIZED
-  const formatSchedule = React.useCallback((sessions: CourseConfig["sessions"]) => {
-    return sessions.map((s) => {
-      // Map "Mo" -> "Montag" (or localized logic? dictionary has "mo": "Mo")
-      // Use dictionary.timetable.days[s.day.toLowerCase()]
-      const dayKey = s.day.toLowerCase();
-      const localizedDay = t_days?.[dayKey] || s.day; // Fallback to "Mo"
-      return `${localizedDay} ${s.startTime}-${s.endTime}`;
+      const formattedPrice = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(course.price);
+
+      return {
+        ...course,
+        formattedSchedule,
+        formattedPrice
+      };
     });
-  }, [t_days]);
-
-  // Helper to format price - MEMOIZED
-  const formatPrice = React.useCallback((price: number) => {
-    return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(price);
-  }, []);
+  }, [filter, t_days]);
 
   if (!sectionData || !courseTexts) return null;
 
@@ -178,8 +178,8 @@ export default function Courses({ dictionary }: CoursesProps) {
                     key={courseConfig.id}
                     config={courseConfig}
                     text={textData}
-                    formattedSchedule={formatSchedule(courseConfig.sessions)}
-                    formattedPrice={formatPrice(courseConfig.price)}
+                    formattedSchedule={courseConfig.formattedSchedule}
+                    formattedPrice={courseConfig.formattedPrice}
                     educatorName={t_instructors?.[courseConfig.instructor] || courseConfig.instructor}
                   />
                 );

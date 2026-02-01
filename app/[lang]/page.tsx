@@ -1,10 +1,12 @@
+import dynamic from "next/dynamic";
 import Hero from "@/components/sections/Hero";
 import ScienceSection from "@/components/sections/ScienceSection";
-import WhyUsBento from "@/components/sections/WhyUsBento";
-import AboutContainer from "@/components/sections/About/AboutContainer";
-import Courses from "@/components/sections/Courses";
-import TimetableSection from "@/components/sections/Timetable/TimetableSection";
-import { LocationSection } from "@/components/sections/Location/LocationSection";
+
+const WhyUsBento = dynamic(() => import("@/components/sections/WhyUsBento"));
+const AboutContainer = dynamic(() => import("@/components/sections/About/AboutContainer"));
+const Courses = dynamic(() => import("@/components/sections/Courses"));
+const TimetableSection = dynamic(() => import("@/components/sections/Timetable/TimetableSection"), { ssr: false });
+const LocationSection = dynamic(() => import("@/components/sections/Location/LocationSection").then(mod => mod.LocationSection), { ssr: false });
 import FooterLayout from "@/components/footer/FooterLayout";
 import { getDictionary } from "@/lib/dictionary";
 import Header from "@/components/layout/Header";
