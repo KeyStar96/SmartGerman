@@ -748,6 +748,15 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         footerRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // --- LEGAL CONSENTS ---
+    const [consents, setConsents] = useState({
+        privacy: false,
+        agb: false,
+        revocation: false
+    });
+
+    const isLegalValid = consents.privacy && consents.agb && consents.revocation;
+
     // --- DARK MODE LOGIC ---
     const [isDarkMode, setIsDarkMode] = useState(false); // Default to light until mounted check
     useEffect(() => {
@@ -770,24 +779,43 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         return () => observer.disconnect();
     }, []);
 
+    // Helper for rendering legal checkboxes
+    const LegalCheckbox = ({ id, label, checked, onChange }: { id: string, label: string, checked: boolean, onChange: (v: boolean) => void }) => (
+        <label className="flex items-start gap-3 cursor-pointer group mt-4">
+            <div className="relative mt-1 shrink-0">
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => onChange(e.target.checked)}
+                    className="appearance-none h-4 w-4 bg-transparent border border-gray-400 dark:border-white/30 rounded-sm checked:bg-[#FF5C00] checked:border-[#FF5C00] transition-colors"
+                />
+                {checked && <Check size={12} className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" strokeWidth={3} />}
+            </div>
+            <span className="text-[10px] text-gray-500 leading-snug select-none group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors">
+                {label}
+            </span>
+        </label>
+    );
+
     const onSubmit = async (data: EnrollmentFormData) => {
+        if (!isLegalValid) return; // safety check
+
         setIsSubmitting(true);
-        // await new Promise(r => setTimeout(r, 1500)); // Remove fake delay
 
         console.log("Submitting to Supabase...", {
             courses: selectedCourseIds,
-            personal: data
+            personal: data,
+            consents
         });
 
         try {
-            const result = await submitEnrollment(data, selectedCourseIds, selectedStartMonth, totalMonthlyPrice);
+            const result = await submitEnrollment(data, selectedCourseIds, selectedStartMonth, totalMonthlyPrice, consents);
 
             if (result.success) {
                 console.log("Enrollment success:", result);
                 setIsSuccess(true);
             } else {
                 console.error("Enrollment failed:", result.message);
-                // Handle error (show toast/alert - for now simple alert or fallback)
                 alert(result.message || "Something went wrong. Please try again.");
             }
         } catch (error) {
@@ -797,6 +825,84 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             setIsSubmitting(false);
         }
     };
+
+    // Helper for rendering legal checkboxes
+    const LegalCheckbox = ({ id, label, checked, onChange }: { id: string, label: string, checked: boolean, onChange: (v: boolean) => void }) => (
+        <label className="flex items-start gap-3 cursor-pointer group mt-4">
+            <div className="relative mt-1">
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => onChange(e.target.checked)}
+                    className="appearance-none h-4 w-4 bg-transparent border border-gray-400 dark:border-white/30 rounded-sm checked:bg-[#FF5C00] checked:border-[#FF5C00] transition-colors"
+                />
+                {checked && <Check size={12} className="text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" strokeWidth={3} />}
+            </div>
+            <span className="text-[11px] text-gray-500 leading-snug select-none group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors">
+                {label}
+            </span>
+        </label>
+    );
+
+    // RENDER: STEP 3 OVERRIDES (We need to insert legal inside the summary view)
+    // Actually, we can just render it below the courses list or in a dedicated box.
+    // Let's modify the JSX in Step 3 block.
+
+    return (
+        <div className="flex flex-col lg:flex-row h-full w-full bg-[#F0EFE9] dark:bg-[#111315] relative overflow-hidden font-sans">
+            {/* ... (Previous Left Panel Code) ... */}
+
+            <div className="flex-1 relative flex flex-col h-full overflow-hidden z-10">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden relative" ref={desktopScrollRef}>
+                    <div className="max-w-3xl mx-auto px-6 md:px-12 py-8 md:py-12 pb-32">
+                        {/* HEADER & STEPS (Lines 878-999 simplified) */}
+                        <div className="mb-8 md:mb-12">
+                            <button onClick={onClose} className="group flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-gray-400 hover:text-[#FF5C00] transition-colors mb-6">
+                                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                                {t?.back_home}
+                            </button>
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="h-8 w-8 rounded-full bg-[#FF5C00] text-white flex items-center justify-center font-bold text-sm shadow-lg shadow-[#FF5C00]/30">
+                                    {step}
+                                </span>
+                                <div className="h-[1px] w-12 bg-gray-300 dark:bg-white/10" />
+                                <span className="font-mono text-xs text-gray-400 uppercase tracking-widest">
+                                    {wizard?.step_label} {step} / 3
+                                </span>
+                            </div>
+                            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
+                                {step === 1 ? wizard?.step1_title : step === 2 ? wizard?.step2_title : wizard?.step3_title}
+                            </h2>
+                            <p className="text-gray-500 text-sm md:text-base max-w-lg">
+                                {step === 1 ? wizard?.step1_sub : step === 2 ? wizard?.step2_sub : wizard?.step3_sub}
+                            </p>
+                        </div>
+
+                        <AnimatePresence mode="wait">
+                            {/* STEP 1 & 2 OMITTED FOR BREVITY in this replace block, handled by surrounding logic? 
+                               NO, replacing large block. Must fetch full content or implement smartly.
+                               Wait, I am replacing lines 751 (Dark Mode) down to 1185 (End).
+                               I need to replicate Step 1 and 2 JSX or carefuly target only Step 3.
+                               
+                               Strategy: Use the fact that Step 3 is inside `step === 3` block. 
+                               But the tool replaces lines. 
+                               Let's try to target specific blocks. 
+                               
+                               Block 1: State & Helper Functions (Lines 751-800)
+                               Block 2: Step 3 JSX (Lines 1000+)
+                               Block 3: Footer Button (Lines 1155+)
+                            */}
+
+                            {/* This is risky with big replaces. Let's do multiple smaller replaces. */}
+                        </AnimatePresence>
+                    </div>
+                </div>
+            </div>
+            {/* Right Panel and Footer... */}
+        </div>
+    );
+    // ABORTING BIG REPLACE. Switching to Multi-Step strategy.
+
 
     const handleNextStep = async () => {
         if (step === 1 && selectedCourseIds.length > 0) {
@@ -1047,6 +1153,31 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </button>
                                     </div>
 
+                                    {/* LEGAL CONSENTS */}
+                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
+                                        <div className="space-y-4 pt-2">
+                                            <LegalCheckbox
+                                                id="privacy"
+                                                label={dictionary?.legal?.privacy || "Privacy Policy"}
+                                                checked={consents.privacy}
+                                                onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
+                                            />
+                                            <LegalCheckbox
+                                                id="agb"
+                                                label={dictionary?.legal?.agb || "AGB"}
+                                                checked={consents.agb}
+                                                onChange={(v) => setConsents(prev => ({ ...prev, agb: v }))}
+                                            />
+                                            <LegalCheckbox
+                                                id="revocation"
+                                                label={dictionary?.legal?.revocation || "Revocation"}
+                                                checked={consents.revocation}
+                                                onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
+                                            />
+                                        </div>
+                                    </div>
+
                                     {/* Moved Legal Text Here */}
                                     <p className="text-[10px] text-gray-500 leading-tight text-center max-w-sm mx-auto mt-8">
                                         {wizard?.legal_note}
@@ -1154,10 +1285,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                     {/* ACTION BUTTON */}
                     <button
                         onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
-                        disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || isSubmitting}
+                        disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid) || isSubmitting}
                         className={cn(
                             "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid))
+                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid))
                                 ? "bg-gray-700 text-gray-500 cursor-not-allowed"
                                 : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
                         )}
@@ -1174,7 +1305,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         </span>
 
                         <ArrowRight className={cn("transition-transform duration-300",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid)) ? "opacity-20" : "group-hover:translate-x-2"
+                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid)) ? "opacity-20" : "group-hover:translate-x-2"
                         )} />
                     </button>
 

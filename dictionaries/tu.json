@@ -692,6 +692,11 @@
       "telegram": "Telegram",
       "email": "E-posta",
       "whatsapp": "WhatsApp"
+    },
+    "legal": {
+      "privacy": "Verilerimin Gizlilik Politikasına uygun olarak talebimi işleme koymak amacıyla saklanacağını ve kullanılacağını kabul ediyorum. Veriler, AB hizmet sağlayıcımız Supabase (Frankfurt) nezdinde saklanmaktadır.*",
+      "agb": "Genel İşletme Şartlarını (AGB) okudum ve kabul ediyorum.*",
+      "revocation": "Hizmetin ifasına (kurs başlangıcı) cayma süresi dolmadan önce başlamanızı açıkça talep ediyor ve kabul ediyorum. Sözleşmenin tam olarak ifa edilmesiyle cayma hakkımı kaybedeceğimi ve kurs başladıktan sonra cayma durumunda, halihazırda sunulan hizmetler için tazminat ödemem gerektiğini biliyorum.*"
     }
   }
 }

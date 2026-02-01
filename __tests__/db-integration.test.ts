@@ -2,10 +2,14 @@
 import { getCourses } from "../app/actions/get-courses";
 import { submitEnrollment } from "../app/actions/submit-enrollment";
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 
 // Mock the Supabase client creator
 jest.mock("@/utils/supabase/server", () => ({
     createClient: jest.fn(),
+}));
+jest.mock("@/utils/supabase/admin", () => ({
+    createAdminClient: jest.fn(),
 }));
 
 describe("Database Integration Tests (Mocked)", () => {
@@ -27,9 +31,12 @@ describe("Database Integration Tests (Mocked)", () => {
         from: mockFrom,
     };
 
+    // ... (inside describe) ...
+
     beforeEach(() => {
         jest.clearAllMocks();
         (createClient as jest.Mock).mockResolvedValue(mockSupabase);
+        (createAdminClient as jest.Mock).mockReturnValue(mockSupabase);
 
         // SETUP DEFAULT BEHAVIOR
         mockFrom.mockImplementation((table) => {
@@ -111,7 +118,8 @@ describe("Database Integration Tests (Mocked)", () => {
                 mockFormData as any,
                 ["c_1", "c_2"],
                 "0-2026", // Jan 2026
-                500
+                500,
+                { privacy: true, agb: true, revocation: true }
             );
 
             expect(result.success).toBe(true);
@@ -122,7 +130,10 @@ describe("Database Integration Tests (Mocked)", () => {
                 first_name: "Max",
                 last_name: "Mustermann",
                 start_date: "2026-01-01", // Derived from "0-2026"
-                total_price: 500
+                total_price: 500,
+                privacy_accepted: true,
+                agb_accepted: true,
+                revocation_waiver_accepted: true
             }));
 
             // 2. Verify Enrollment Insert
@@ -136,7 +147,7 @@ describe("Database Integration Tests (Mocked)", () => {
         it("should handle Registration Table failure", async () => {
             mockRegSingle.mockResolvedValue({ data: null, error: { message: "Reg failed" } });
 
-            const result = await submitEnrollment(mockFormData as any, ["c_1"], "0-2026", 100);
+            const result = await submitEnrollment(mockFormData as any, ["c_1"], "0-2026", 100, { privacy: true, agb: true, revocation: true });
 
             expect(result.success).toBe(false);
             expect(result.message).toContain("Registration failed");
@@ -149,7 +160,7 @@ describe("Database Integration Tests (Mocked)", () => {
             // Enrollment fails
             mockEnrollInsert.mockResolvedValue({ error: { message: "Enroll fail" } });
 
-            const result = await submitEnrollment(mockFormData as any, ["c_1"], "0-2026", 100);
+            const result = await submitEnrollment(mockFormData as any, ["c_1"], "0-2026", 100, { privacy: true, agb: true, revocation: true });
 
             expect(result.success).toBe(false);
             expect(result.message).toContain("Enrollment details failed");

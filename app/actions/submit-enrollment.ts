@@ -13,7 +13,12 @@ export async function submitEnrollment(
     formData: EnrollmentFormData,
     selectedCourseIds: string[],
     startMonth: string, // Format: "M-YYYY" (e.g. "0-2026")
-    totalPrice: number
+    totalPrice: number,
+    consents: {
+        privacy: boolean;
+        agb: boolean;
+        revocation: boolean;
+    }
 ): Promise<SubmitEnrollmentResult> {
     const supabase = createAdminClient();
 
@@ -53,7 +58,9 @@ export async function submitEnrollment(
                 salutation: null,
                 title: null,
 
-                privacy_accepted: true, // Assuming validation checked this
+                privacy_accepted: consents.privacy,
+                agb_accepted: consents.agb,
+                revocation_waiver_accepted: consents.revocation,
                 status: 'pending'
             })
             .select('id') // We need the ID for enrollments
