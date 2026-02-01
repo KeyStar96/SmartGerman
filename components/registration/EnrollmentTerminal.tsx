@@ -1174,7 +1174,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
                                         <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
                                             <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
-                                            <span>{receipt?.monthly || "Monatlich"}</span>
                                         </div>
                                     </motion.div>
                                 );
