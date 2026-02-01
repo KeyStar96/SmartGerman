@@ -40,8 +40,11 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
             let isFooterVisible = false;
 
             if (footer) {
+                // Check footer intersection with Hysteresis/Buffer
+                // We use a buffer (e.g., 50px) so it doesn't flicker at the exact edge
                 const rect = footer.getBoundingClientRect();
-                isFooterVisible = rect.top < window.innerHeight;
+                // Visible only if footer is significantly up in the viewport (more than 50px)
+                isFooterVisible = rect.top < window.innerHeight - 50;
             }
 
             setIsHidden(isMenuOpen || isFooterVisible);
