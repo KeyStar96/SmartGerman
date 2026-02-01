@@ -1025,7 +1025,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 const mParts = selectedStartMonth.split('-');
                                                 const month = parseInt(mParts[0]);
                                                 const year = parseInt(mParts[1]);
-                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year);
+                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year, exceptions);
                                                 const netPrice = c.price * totalUnits;
                                                 return (
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
@@ -1090,7 +1090,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 const mParts = selectedStartMonth.split('-');
                                 const month = parseInt(mParts[0]);
                                 const year = parseInt(mParts[1]);
-                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year);
+                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year, exceptions);
                                 const netPrice = c.price * totalUnits;
                                 const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
                                 const grossPrice = netPrice + deductionSum;
