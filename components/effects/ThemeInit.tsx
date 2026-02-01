@@ -10,7 +10,8 @@ export function ThemeInit() {
     useEffect(() => {
         try {
             const theme = localStorage.getItem("theme");
-            if (theme === "dark") {
+            // If explicit dark OR null (default), set dark
+            if (theme === "dark" || theme === null) {
                 document.documentElement.classList.add("dark");
             } else if (theme === "light") {
                 document.documentElement.classList.remove("dark");
