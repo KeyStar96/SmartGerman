@@ -17,4 +17,4 @@ const FooterBackground = memo(function FooterBackground() {
     );
 });
 
-export default FooterBackground;
+export default FooterBackground; 
