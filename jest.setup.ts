@@ -109,21 +109,6 @@ jest.mock('gsap/ScrollTrigger', () => ({
     },
 }));
 
-// Mock matchMedia
-Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: jest.fn().mockImplementation(query => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: jest.fn(), // deprecated
-        removeListener: jest.fn(), // deprecated
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
-    })),
-});
-
 // Mock MutationObserver (if missing)
 global.MutationObserver = class {
     constructor(callback: any) { }
@@ -154,6 +139,24 @@ jest.mock('lucide-react', () => ({
     ChevronDown: (props: any) => React.createElement('svg', props),
 }));
 
-// ScrollTo Mock
-window.scrollTo = jest.fn();
-HTMLElement.prototype.scrollTo = jest.fn();
+// Browser-specific mocks (only for jsdom environment)
+if (typeof window !== 'undefined') {
+    // Mock matchMedia
+    Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: jest.fn().mockImplementation(query => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: jest.fn(), // deprecated
+            removeListener: jest.fn(), // deprecated
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            dispatchEvent: jest.fn(),
+        })),
+    });
+
+    // ScrollTo Mock
+    window.scrollTo = jest.fn();
+    HTMLElement.prototype.scrollTo = jest.fn();
+}

@@ -815,11 +815,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 console.log("Enrollment success:", result);
                 setIsSuccess(true);
             } else {
-                console.error("Enrollment failed:", result.message);
+                console.error("Enrollment failed:", result); // Log full result for debugging
                 alert(result.message || "Something went wrong. Please try again.");
             }
         } catch (error) {
-            console.error("Submission error:", error);
+            console.error("Submission error details:", error);
             alert("Network error. Please try again.");
         } finally {
             setIsSubmitting(false);
