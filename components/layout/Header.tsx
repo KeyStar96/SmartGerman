@@ -141,7 +141,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   return (
     <>
       {/* --- DESKTOP: "The Command Center" --- */}
-      <header className="hidden md:flex fixed top-0 left-0 w-full z-[100] pointer-events-none p-6 mix-blend-normal justify-between items-start">
+      <header className="hidden lg:flex fixed top-0 left-0 w-full z-[100] pointer-events-none p-6 mix-blend-normal justify-between items-start">
         {/* Zone 1: Logo */}
         <LogoSection lang={lang} scrollY={scrollY} />
 
@@ -166,7 +166,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
       </header>
 
       {/* --- MOBILE: "The Floating Deck" --- */}
-      <div className="md:hidden fixed top-0 left-0 w-full z-[100] pointer-events-none px-4 pt-4">
+      <div className="lg:hidden fixed top-0 left-0 w-full z-[100] pointer-events-none px-4 pt-4">
         <MobileFloatingDeck
           lang={lang}
           isHidden={isHidden}
