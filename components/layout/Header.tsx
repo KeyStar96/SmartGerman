@@ -38,7 +38,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
   const lastScrollY = useRef(0);
   const isLockedRef = useRef(false);
 
-  // --- Scroll Logic (Smart Hide) ---
+  // --- Scroll Logic (Smart Hide ) ---
   useMotionValueEvent(scrollY, "change", (latest) => {
     // Only block hiding if locked for smooth scroll
     if (isLockedRef.current) return;
