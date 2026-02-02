@@ -50,7 +50,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 18px;
   /* iOS SAFARI FIX: Prevent rubber-band revealing browser canvas */
-  overscroll-behavior-y: none;
+  /* overscroll-behavior-y: none; removed to prevent Chrome scroll lock */
   -webkit-overflow-scrolling: touch;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
