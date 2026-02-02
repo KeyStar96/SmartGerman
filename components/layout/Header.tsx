@@ -508,7 +508,8 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: "-100%" }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[90] bg-background/95 backdrop-blur-3xl pt-28 pb-10 px-6 flex flex-col pointer-events-auto overflow-hidden"
+          className="fixed inset-0 z-[90] bg-background/70 backdrop-blur-3xl pt-28 pb-10 px-6 flex flex-col pointer-events-auto overflow-hidden"
+          style={{ WebkitBackdropFilter: "blur(40px)" }}
         >
           {/* Navigation Links */}
           <div className="flex-1 flex flex-col justify-center items-center gap-6">
