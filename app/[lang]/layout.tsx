@@ -99,7 +99,7 @@ export default async function RootLayout({
            - Uses env() to extend into notch/Dynamic Island and home indicator areas
         */}
         <div
-          className="fixed z-[-1] w-full h-full"
+          className="fixed z-0 w-full h-full"
           style={{
             /* Extend beyond safe areas for full edge-to-edge coverage */
             top: 'calc(-1 * env(safe-area-inset-top, 0px))',
