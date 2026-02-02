@@ -38,8 +38,8 @@
 
 body {
   /* iOS SAFARI: Use theme-appropriate background - prevents bars in both modes */
-  background-color: #FCF4E6;
-  /* Light mode default */
+  background-color: #C4C4BD;
+  /* Light mode default - matches background image */
   color: var(--foreground);
   transition: color 0.2s ease;
   /* iOS SAFARI FIX: dvh units handle dynamic toolbar height changes */
@@ -68,8 +68,8 @@ html {
   /* iOS SAFARI EDGE-TO-EDGE FIX:
    * Use theme-appropriate background color for both modes
    */
-  background-color: #FCF4E6;
-  /* Light mode default */
+  background-color: #C4C4BD;
+  /* Light mode default - matches background image */
   /* iOS SAFARI FIX: Prevent rubber-band on html too */
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
