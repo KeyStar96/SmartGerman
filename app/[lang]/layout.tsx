@@ -63,7 +63,8 @@ export default async function RootLayout({
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
-        {/* iOS SAFARI IMMERSIVE MODE - "Native App" Hack */}
+        {/* Standardized PWA - "Native App" Hack */}
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         {/* Force dark color for areas behind safe area on iOS */}
