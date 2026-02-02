@@ -49,11 +49,22 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true);
 
-    // Touch-Geräte, Mobile OS oder macOS → Natives Scrolling
-    // macOS User nutzen meist Trackpads oder Magic Mouse mit eigener Physik
-    if (isTouchDevice() || isMobileOS() || isMacOS()) {
-      setUseNativeScroll(true);
-    }
+    const checkScrollMode = () => {
+      // Touch-Geräte, Mobile OS, macOS oder kleine Screens (< 1024px) → Natives Scrolling
+      // Kleine Screens müssen natives Scrolling nutzen, da das Layout auf Mobile umschaltet
+      const isSmallScreen = window.innerWidth < 1024;
+
+      if (isTouchDevice() || isMobileOS() || isMacOS() || isSmallScreen) {
+        setUseNativeScroll(true);
+      } else {
+        setUseNativeScroll(false);
+      }
+    };
+
+    checkScrollMode();
+
+    window.addEventListener('resize', checkScrollMode);
+    return () => window.removeEventListener('resize', checkScrollMode);
   }, []);
 
   // Lenis-Optionen: Minimal & Performant
