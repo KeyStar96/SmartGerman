@@ -15,8 +15,8 @@ export default function AppBackground({ className }: { className?: string }) {
             className={cn(
                 // iOS SAFARI FIX: min-h-[100dvh] for dynamic viewport + scale-[1.02] for edge coverage
                 "relative w-full min-h-[100dvh] overflow-hidden pointer-events-none select-none z-0 backface-hidden",
-                "bg-[#050505] scale-[1.02] origin-center",
-                // bg-background removed - using hardcoded dark for iOS
+                // Theme-aware fallback: Light mode beige, Dark mode dark
+                "bg-[#FCF4E6] dark:bg-[#050505] scale-[1.02] origin-center",
                 className
             )}
         >

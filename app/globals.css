@@ -37,8 +37,9 @@
 }
 
 body {
-  /* iOS SAFARI: Hardcoded dark fallback prevents white flash */
-  background-color: #050505;
+  /* iOS SAFARI: Use theme-appropriate background - prevents bars in both modes */
+  background-color: #FCF4E6;
+  /* Light mode default */
   color: var(--foreground);
   transition: color 0.2s ease;
   /* iOS SAFARI FIX: dvh units handle dynamic toolbar height changes */
@@ -55,14 +56,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Dark mode body background */
+.dark body,
+body.dark {
+  background-color: #050505;
+}
+
 html {
   overflow-y: scroll;
   scroll-behavior: smooth;
   /* iOS SAFARI EDGE-TO-EDGE FIX:
-   * CRITICAL: Hardcoded dark background prevents white bar!
-   * Transparent reveals browser's white canvas on iOS.
+   * Use theme-appropriate background color for both modes
    */
-  background-color: #050505;
+  background-color: #FCF4E6;
+  /* Light mode default */
   /* iOS SAFARI FIX: Prevent rubber-band on html too */
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
@@ -72,12 +79,8 @@ html {
   /* Fallback */
 }
 
-/* Light mode: use light background on html */
-html:not(.dark) {
-  background-color: #FCF4E6;
-}
-
-.dark html,
+/* Dark mode: use dark background on html */
+.dark,
 html.dark {
   background-color: #050505;
 }
