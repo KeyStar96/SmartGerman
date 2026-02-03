@@ -1035,22 +1035,24 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                     data-lenis-prevent
                     className="flex-1 lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 px-4 md:px-12 pb-32 min-h-0"
                 >
-                    <div className="max-w-4xl mx-auto">
-                        <AnimatePresence mode="wait">
+                    {/* Grid Layout: Desktop = 2 columns, Mobile = single column */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
 
-                            {/* STEP 1: SELECTION */}
-                            {step === 1 && (
-                                <motion.div
-                                    key="step1"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="space-y-12 py-4"
-                                >
-                                    {/* --- START DATE + PRICING ROADMAP ROW --- */}
-                                    <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8 mb-8">
-                                        {/* Left: Start Date Selector */}
-                                        <div className="max-w-xs flex-shrink-0">
+                        {/* LEFT COLUMN: Main Content (Forms, Course List) */}
+                        <div className="lg:col-span-8">
+                            <AnimatePresence mode="wait">
+
+                                {/* STEP 1: SELECTION */}
+                                {step === 1 && (
+                                    <motion.div
+                                        key="step1"
+                                        initial={{ opacity: 1 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="space-y-12 py-4"
+                                    >
+                                        {/* --- START DATE SELECTOR --- */}
+                                        <div className="max-w-xs mb-8">
                                             {/* Calculate Constraints for Props */}
                                             {(() => {
                                                 const now = serverTime ? new Date(serverTime) : new Date();
@@ -1101,8 +1103,26 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                             </p>
                                         </div>
 
-                                        {/* Right: Pricing Roadmap - appears when courses selected */}
-                                        <div className="flex-1 lg:max-w-md mt-6 lg:mt-0">
+                                        {[
+                                            { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
+                                            { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
+                                            { title: groupTitles?.online || "03 // ONLINE", courses: onlineCourses }
+                                        ].map((group, idx) => (
+                                            <section key={idx}>
+                                                <div className="flex items-center gap-3 mb-6 opacity-60">
+                                                    <span className="font-mono text-[10px] uppercase tracking-widest text-black dark:text-[#FF5C00]">{group.title}</span>
+                                                    <div className="h-px bg-black/20 dark:bg-white/20 flex-1" />
+                                                </div>
+                                                <div className="space-y-4">
+                                                    {group.courses.map(c => (
+                                                        <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
+                                                    ))}
+                                                </div>
+                                            </section>
+                                        ))}
+
+                                        {/* Mobile: PricingRoadmap BELOW course list to avoid CLS */}
+                                        <div className="lg:hidden mt-8">
                                             <PricingRoadmap
                                                 dictionary={dictionary}
                                                 lang={lang}
@@ -1112,161 +1132,173 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 exceptions={exceptions}
                                             />
                                         </div>
-                                    </div>
+                                    </motion.div>
+                                )}
 
-                                    {[
-                                        { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
-                                        { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
-                                        { title: groupTitles?.online || "03 // ONLINE", courses: onlineCourses }
-                                    ].map((group, idx) => (
-                                        <section key={idx}>
-                                            <div className="flex items-center gap-3 mb-6 opacity-60">
-                                                <span className="font-mono text-[10px] uppercase tracking-widest text-black dark:text-[#FF5C00]">{group.title}</span>
-                                                <div className="h-px bg-black/20 dark:bg-white/20 flex-1" />
+                                {/* STEP 2: PERSONAL DATA */}
+                                {step === 2 && (
+                                    <motion.div
+                                        key="step2"
+                                        initial={{ opacity: 1 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="py-8 max-w-2xl"
+                                    >
+                                        <div className="space-y-12">
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
+                                                <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
                                             </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                                <DateDropdowns
+                                                    label={formLabels?.birthdate || "Birthdate"}
+                                                    required
+                                                    value={watch("personal.birthDate")}
+                                                    onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
+                                                    error={errors.personal?.birthDate?.message}
+                                                    referenceDate={new Date()}
+                                                />
+                                            </div>
+                                            <PhoneInput
+                                                label={formLabels?.phone || "Phone"}
+                                                value={watch("personal.phone")}
+                                                onChange={(val: string) => form.setValue("personal.phone", val, { shouldValidate: true })}
+                                                error={errors.personal?.phone?.message}
+                                            />
+
+                                            <div className="grid grid-cols-[3fr_1fr] gap-8">
+                                                <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
+                                                <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                            </div>
+                                            <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
+
+                                            <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
+                                                {formLabels?.required_hint}
+                                            </div>
+
+                                        </div>
+                                    </motion.div>
+                                )}
+
+                                {/* STEP 3: SUMMARY */}
+                                {/* --- SUMMARY (STEP 3) --- */}
+                                {step === 3 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        className="flex flex-col gap-8 h-full"
+                                    >
+                                        {/* LEGAL CONSENTS (Moved to Top) */}
+                                        <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
+                                            <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
+                                            <div className="space-y-4 pt-2">
+                                                <LegalCheckbox
+                                                    id="privacy"
+                                                    label={t?.legal?.privacy || "Privacy Policy"}
+                                                    checked={consents.privacy}
+                                                    onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
+                                                />
+                                                <LegalCheckbox
+                                                    id="agb"
+                                                    label={t?.legal?.agb || "AGB"}
+                                                    checked={consents.agb}
+                                                    onChange={(v) => setConsents(prev => ({ ...prev, agb: v }))}
+                                                />
+                                                <LegalCheckbox
+                                                    id="revocation"
+                                                    label={t?.legal?.revocation || "Revocation"}
+                                                    checked={consents.revocation}
+                                                    onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
+                                                />
+                                            </div>
+                                            <p className="text-xs md:text-sm font-medium text-gray-400 dark:text-gray-400 text-right mt-6">
+                                                {formLabels?.required_hint}
+                                            </p>
+                                        </div>
+                                        <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
+                                            <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
+                                                <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
+                                                <div className="font-medium text-gray-900 dark:text-white">{formData?.firstName} {formData?.lastName}</div>
+                                                <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
+                                                <div className="font-medium break-all text-gray-900 dark:text-white">{formData?.email}<br />{formData?.phone}</div>
+                                                <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
+                                                <div className="font-medium text-gray-900 dark:text-white">{formData?.birthDate}</div>
+                                                <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
+                                                <div className="font-medium text-gray-900 dark:text-white">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
+                                            </div>
+                                            <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                                {wizard?.edit}
+                                            </button>
+                                        </div>
+
+                                        {/* Summary: Courses */}
+                                        <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
+                                            <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthLabel}</h3>
                                             <div className="space-y-4">
-                                                {group.courses.map(c => (
-                                                    <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
-                                                ))}
-                                            </div>
-                                        </section>
-                                    ))}
-                                </motion.div>
-                            )}
-
-                            {/* STEP 2: PERSONAL DATA */}
-                            {step === 2 && (
-                                <motion.div
-                                    key="step2"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="py-8 max-w-2xl"
-                                >
-                                    <div className="space-y-12">
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                            <DateDropdowns
-                                                label={formLabels?.birthdate || "Birthdate"}
-                                                required
-                                                value={watch("personal.birthDate")}
-                                                onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
-                                                error={errors.personal?.birthDate?.message}
-                                                referenceDate={new Date()}
-                                            />
-                                        </div>
-                                        <PhoneInput
-                                            label={formLabels?.phone || "Phone"}
-                                            value={watch("personal.phone")}
-                                            onChange={(val: string) => form.setValue("personal.phone", val, { shouldValidate: true })}
-                                            error={errors.personal?.phone?.message}
-                                        />
-
-                                        <div className="grid grid-cols-[3fr_1fr] gap-8">
-                                            <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
-                                        </div>
-                                        <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
-
-                                        <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
-                                            {formLabels?.required_hint}
-                                        </div>
-
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* STEP 3: SUMMARY */}
-                            {/* --- SUMMARY (STEP 3) --- */}
-                            {step === 3 && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="flex flex-col gap-8 h-full"
-                                >
-                                    {/* LEGAL CONSENTS (Moved to Top) */}
-                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
-                                        <div className="space-y-4 pt-2">
-                                            <LegalCheckbox
-                                                id="privacy"
-                                                label={t?.legal?.privacy || "Privacy Policy"}
-                                                checked={consents.privacy}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
-                                            />
-                                            <LegalCheckbox
-                                                id="agb"
-                                                label={t?.legal?.agb || "AGB"}
-                                                checked={consents.agb}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, agb: v }))}
-                                            />
-                                            <LegalCheckbox
-                                                id="revocation"
-                                                label={t?.legal?.revocation || "Revocation"}
-                                                checked={consents.revocation}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
-                                            />
-                                        </div>
-                                        <p className="text-xs md:text-sm font-medium text-gray-400 dark:text-gray-400 text-right mt-6">
-                                            {formLabels?.required_hint}
-                                        </p>
-                                    </div>
-                                    <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
-                                        <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
-                                            <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
-                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.firstName} {formData?.lastName}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
-                                            <div className="font-medium break-all text-gray-900 dark:text-white">{formData?.email}<br />{formData?.phone}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
-                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.birthDate}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
-                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
-                                        </div>
-                                        <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            {wizard?.edit}
-                                        </button>
-                                    </div>
-
-                                    {/* Summary: Courses */}
-                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthLabel}</h3>
-                                        <div className="space-y-4">
-                                            {selectedCoursesFull.map(c => {
-                                                const [d, m, y] = startDate.split('.').map(Number);
-                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
-                                                const netPrice = c.price * totalUnits;
-                                                return (
-                                                    <div key={c.id} className="flex justify-between items-center text-sm">
-                                                        <span className="font-bold text-gray-900 dark:text-white">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
-                                                        <div className="text-right">
-                                                            <span className="font-mono text-gray-900 dark:text-white">{formatPrice(netPrice)}</span>
-                                                            {deductions.length > 0 && (
-                                                                <div className="text-[10px] text-red-500 text-right">
-                                                                    ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
-                                                                </div>
-                                                            )}
+                                                {selectedCoursesFull.map(c => {
+                                                    const [d, m, y] = startDate.split('.').map(Number);
+                                                    const { totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
+                                                    const netPrice = c.price * totalUnits;
+                                                    return (
+                                                        <div key={c.id} className="flex justify-between items-center text-sm">
+                                                            <span className="font-bold text-gray-900 dark:text-white">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                                            <div className="text-right">
+                                                                <span className="font-mono text-gray-900 dark:text-white">{formatPrice(netPrice)}</span>
+                                                                {deductions.length > 0 && (
+                                                                    <div className="text-[10px] text-red-500 text-right">
+                                                                        ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
+                                                    );
+                                                })}
+                                            </div>
+                                            <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                                {wizard?.change_selection}
+                                            </button>
                                         </div>
-                                        <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            {wizard?.change_selection}
-                                        </button>
-                                    </div>
 
 
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        {/* RIGHT COLUMN: Sticky Sidebar (PricingRoadmap + Action Info) - Desktop only */}
+                        {(step === 1 || step === 2) && (
+                            <div className="hidden lg:block lg:col-span-4">
+                                <div className="sticky top-24 space-y-6">
+                                    {/* Pricing Roadmap */}
+                                    <PricingRoadmap
+                                        dictionary={dictionary}
+                                        lang={lang}
+                                        startDate={startDate}
+                                        selectedCourses={selectedCoursesFull}
+                                        currentMonthPrice={totalMonthlyPrice}
+                                        exceptions={exceptions}
+                                    />
+
+                                    {/* Placeholder/Minimum Height when no courses selected */}
+                                    {selectedCoursesFull.length === 0 && (
+                                        <div className="p-6 rounded-sm border border-dashed border-gray-300 dark:border-white/20 text-center text-gray-400 dark:text-gray-500 text-sm">
+                                            <p className="font-mono uppercase text-[10px] tracking-widest mb-2">
+                                                {wizard?.sidebar_hint_title || "Preisübersicht"}
+                                            </p>
+                                            <p className="text-xs">
+                                                {wizard?.sidebar_hint || "Wähle mindestens einen Kurs aus"}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                     </div>
                 </div>
             </div>
