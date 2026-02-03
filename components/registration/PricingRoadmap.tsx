@@ -97,9 +97,9 @@ export default function PricingRoadmap({
             }}
             className="overflow-hidden"
         >
-            <div className="p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F8F7F4] dark:bg-[#1A1C1E]">
+            <div className="p-4 rounded-sm border border-black/10 dark:border-white/10 bg-[#F8F7F4] dark:bg-[#1A1C1E]">
                 {/* Current Month - Highlighted */}
-                <div className="relative mb-6">
+                <div className="relative mb-4">
                     {/* Orange accent bar */}
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FF5C00] rounded-full" />
 
@@ -123,10 +123,10 @@ export default function PricingRoadmap({
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-black/10 dark:bg-white/10 my-4" />
+                <div className="h-px bg-black/10 dark:bg-white/10 my-3" />
 
-                {/* Future Months - Subtle */}
-                <div className="space-y-3 mb-6">
+                {/* Future Months - Compact */}
+                <div className="space-y-2 mb-4">
                     {futureMonths.map((month, idx) => (
                         <motion.div
                             key={idx}
@@ -138,16 +138,16 @@ export default function PricingRoadmap({
                             {/* Grey dot indicator */}
                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600" />
 
-                            <div className="flex justify-between items-baseline gap-4">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex justify-between items-baseline gap-3">
+                                <div className="flex flex-col">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
                                         {month.label}
                                     </span>
-                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 italic">
+                                    <span className="text-[9px] text-gray-400 dark:text-gray-500 italic">
                                         ({t?.optional_continuation || "Optionale Fortführung"})
                                     </span>
                                 </div>
-                                <span className="font-mono text-sm text-gray-500 dark:text-gray-400">
+                                <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
                                     {formatPrice(month.cost)}
                                 </span>
                             </div>
@@ -155,16 +155,16 @@ export default function PricingRoadmap({
                     ))}
                 </div>
 
-                {/* Cancel Anytime Badge */}
-                <div className="flex items-center gap-2 py-3 px-4 rounded-sm bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50">
-                    <Check size={16} className="text-green-600 dark:text-green-400 shrink-0" strokeWidth={2.5} />
-                    <span className="text-sm font-medium text-green-800 dark:text-green-300">
+                {/* Cancel Anytime Badge - Compact */}
+                <div className="flex items-center gap-2 py-2 px-3 rounded-sm bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50">
+                    <Check size={14} className="text-green-600 dark:text-green-400 shrink-0" strokeWidth={2.5} />
+                    <span className="text-xs font-medium text-green-800 dark:text-green-300">
                         {t?.cancel_anytime || "Jederzeit zum Monatsende kündbar"}
                     </span>
                 </div>
 
-                {/* Fear-Killer: Expandable Explanation */}
-                <div className="mt-4">
+                {/* Fear-Killer: Expandable Explanation - Compact */}
+                <div className="mt-3">
                     <button
                         onClick={() => setShowExplanation(!showExplanation)}
                         className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors group"

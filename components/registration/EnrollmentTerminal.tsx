@@ -1273,7 +1273,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         {/* RIGHT COLUMN: Sticky Sidebar (PricingRoadmap + Action Info) - Desktop only */}
                         {(step === 1 || step === 2) && (
                             <div className="hidden lg:block lg:col-span-4">
-                                <div className="sticky top-24 space-y-6">
+                                <div
+                                    className="sticky top-24 space-y-6 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-hide"
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                                >
                                     {/* Pricing Roadmap */}
                                     <PricingRoadmap
                                         dictionary={dictionary}
