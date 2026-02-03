@@ -72,8 +72,7 @@ const cardVariants = {
   },
 };
 
-// Create a motion component for Link
-const MotionLink = motion(Link);
+
 
 export default function Courses({ dictionary, courses }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
@@ -230,150 +229,154 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
   const unit = `/ ${config.unitDuration} min`;
 
   return (
-    <MotionLink
-      href={`/${lang}/registration?courseId=${config.id}`}
+    <motion.div
       variants={cardVariants}
-      className={`
-        group relative w-full h-full min-h-[380px] 
-        bg-[#F9F8F6] dark:bg-[#1E2024]
-        cursor-pointer
-        block /* Ensure block display for Link */
-        
-        /* Border Collapsing Trick: Negative Margins */
-        -ml-px -mt-px
-        border-[0.5px] border-black/10 dark:border-transparent
-        
-        flex flex-col justify-between overflow-hidden
-        transition-all duration-300 ease-out
-        
-        /* Interaction States */
-        hover:z-20 
-        hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
-        hover:shadow-2xl hover:-translate-y-2
-        
-        /* Thickness Simulation */
-        shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.1)]
-        dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_1px_3px_0_rgba(0,0,0,0.5)]
-        
-        hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_25px_50px_-12px_rgba(0,0,0,0.25)]
-        dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_25px_50px_-12px_rgba(0,0,0,0.5)]
-      `}
+      className="h-full"
     >
-      {/* Paper Texture Overlay (3% Opacity) */}
-      <div
-        className={cn(
-          "absolute inset-0 pointer-events-none z-0 bg-noise-paper",
-          "opacity-[0.03] mix-blend-multiply dark:mix-blend-overlay dark:opacity-[0.05]"
-        )}
-      />
+      <Link
+        href={`/${lang}/registration?courseId=${config.id}`}
+        className={`
+            group relative w-full h-full min-h-[380px] 
+            bg-[#F9F8F6] dark:bg-[#1E2024]
+            cursor-pointer
+            block
+            
+            /* Border Collapsing Trick: Negative Margins */
+            -ml-px -mt-px
+            border-[0.5px] border-black/10 dark:border-transparent
+            
+            flex flex-col justify-between overflow-hidden
+            transition-all duration-300 ease-out
+            
+            /* Interaction States */
+            hover:z-20 
+            hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
+            hover:shadow-2xl hover:-translate-y-2
+            
+            /* Thickness Simulation */
+            shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.1)]
+            dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_1px_3px_0_rgba(0,0,0,0.5)]
+            
+            hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_25px_50px_-12px_rgba(0,0,0,0.25)]
+            dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_25px_50px_-12px_rgba(0,0,0,0.5)]
+          `}
+      >
+        {/* Paper Texture Overlay (3% Opacity) */}
+        <div
+          className={cn(
+            "absolute inset-0 pointer-events-none z-0 bg-noise-paper",
+            "opacity-[0.03] mix-blend-multiply dark:mix-blend-overlay dark:opacity-[0.05]"
+          )}
+        />
 
-      {/* Content Container */}
-      <div className="relative z-10 flex flex-col h-full justify-between">
+        {/* Content Container */}
+        <div className="relative z-10 flex flex-col h-full justify-between">
 
-        {/* Header Area */}
-        <div className="bg-black/[0.02] dark:bg-white/[0.02] p-7 pb-6 border-b border-black/5 dark:border-white/5">
-          <div className="flex justify-between items-start mb-6">
-            {/* Level Badge */}
-            {text.level ? (
-              <span className={`
-                   ${jetbrainsMono.className} 
-                   inline-block px-3 py-1 
-                   border border-[#2D3436] dark:border-[#E2D7CE]
-                   text-[#2D3436] dark:text-[#E2D7CE]
-                   text-[10px] font-bold uppercase tracking-wider
-                   group-hover:border-[#FF5C00] group-hover:text-[#FF5C00]
-                   transition-colors duration-300
-                 `}>
-                {text.level}
-              </span>
-            ) : <div />}
-
-            {/* Start Badge - ONLY restricted logic or from text */}
-            {text.start_badge && (
-              <span className={`
-                   ${jetbrainsMono.className}
-                   bg-[#FF5C00] text-white
-                   px-2 py-0.5 text-[9px] uppercase tracking-wider
-                 `}>
-                {text.start_badge}
-              </span>
-            )}
-          </div>
-
-          <h3 className={`
-              font-sans font-extrabold tracking-tight
-              text-4xl md:text-5xl leading-[0.9]
-              text-[#111111] dark:text-[#E2D7CE]
-            `}>
-            {text.title}
-          </h3>
-        </div>
-
-        {/* Body Area */}
-        <div className="p-7 pt-6 flex-1 flex flex-col justify-between">
-          {/* Description - De-emphasize on hover */}
-          <p className="text-[#2D3436]/70 dark:text-[#E2D7CE]/70 leading-relaxed text-sm font-medium pr-4 group-hover:opacity-50 transition-opacity duration-300">
-            {text.description}
-          </p>
-
-          {/* Accessible Meta-Data Block */}
-          <div className="mt-8">
-            {/* Educator Row (Top of Footer Section) */}
-            <div className="mb-6 pt-6 border-t border-[#2D3436]/10 dark:border-white/10">
-              <div className="flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
-                <User strokeWidth={1.5} size={16} className="text-black/30 dark:text-white/30" />
-                <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider`}>
-                  {educatorName}
+          {/* Header Area */}
+          <div className="bg-black/[0.02] dark:bg-white/[0.02] p-7 pb-6 border-b border-black/5 dark:border-white/5">
+            <div className="flex justify-between items-start mb-6">
+              {/* Level Badge */}
+              {text.level ? (
+                <span className={`
+                      ${jetbrainsMono.className} 
+                      inline-block px-3 py-1 
+                      border border-[#2D3436] dark:border-[#E2D7CE]
+                      text-[#2D3436] dark:text-[#E2D7CE]
+                      text-[10px] font-bold uppercase tracking-wider
+                      group-hover:border-[#FF5C00] group-hover:text-[#FF5C00]
+                      transition-colors duration-300
+                    `}>
+                  {text.level}
                 </span>
-              </div>
+              ) : <div />}
+
+              {/* Start Badge - ONLY restricted logic or from text */}
+              {text.start_badge && (
+                <span className={`
+                      ${jetbrainsMono.className}
+                      bg-[#FF5C00] text-white
+                      px-2 py-0.5 text-[9px] uppercase tracking-wider
+                    `}>
+                  {text.start_badge}
+                </span>
+              )}
             </div>
 
-            {/* Price & Schedule Layout (Bottom Row) */}
-            <div className="flex items-end justify-between text-[#2D3436] dark:text-[#E2D7CE]">
+            <h3 className={`
+                  font-sans font-extrabold tracking-tight
+                  text-4xl md:text-5xl leading-[0.9]
+                  text-[#111111] dark:text-[#E2D7CE]
+                `}>
+              {text.title}
+            </h3>
+          </div>
 
-              {/* LEFT: Schedule (Time Block) */}
-              <div className="relative flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold pb-1">
-                {/* Marker */}
-                <div className="absolute -left-3 top-1 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
+          {/* Body Area */}
+          <div className="p-7 pt-6 flex-1 flex flex-col justify-between">
+            {/* Description - De-emphasize on hover */}
+            <p className="text-[#2D3436]/70 dark:text-[#E2D7CE]/70 leading-relaxed text-sm font-medium pr-4 group-hover:opacity-50 transition-opacity duration-300">
+              {text.description}
+            </p>
 
-                <Clock strokeWidth={1.5} size={16} className="shrink-0 text-black/30 dark:text-white/30 self-start mt-0.5" />
-                <div className={`${jetbrainsMono.className} flex flex-col gap-0.5 text-sm font-medium uppercase tracking-wider leading-tight max-w-[140px]`}>
-                  {formattedSchedule.map((item, i) => (
-                    <React.Fragment key={i}>
-                      {i > 0 && <span className="text-[#FF5C00]">&</span>}
-                      <span>{item}</span>
-                    </React.Fragment>
-                  ))}
+            {/* Accessible Meta-Data Block */}
+            <div className="mt-8">
+              {/* Educator Row (Top of Footer Section) */}
+              <div className="mb-6 pt-6 border-t border-[#2D3436]/10 dark:border-white/10">
+                <div className="flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#2D3436] dark:group-hover:text-[#E2D7CE] transition-all duration-300 group-hover:font-bold">
+                  <User strokeWidth={1.5} size={16} className="text-black/30 dark:text-white/30" />
+                  <span className={`${jetbrainsMono.className} text-sm font-medium uppercase tracking-wider`}>
+                    {educatorName}
+                  </span>
                 </div>
               </div>
 
-              {/* RIGHT: Price & Unit (Cost Block) */}
-              <div className="flex flex-col items-end">
-                {/* Price */}
-                <span className={`
-                            font-sans font-extrabold tracking-tight
-                            text-5xl 
-                            group-hover:text-[#FF5C00] transition-all duration-300 leading-none
-                        `}>
-                  {formattedPrice}
-                </span>
+              {/* Price & Schedule Layout (Bottom Row) */}
+              <div className="flex items-end justify-between text-[#2D3436] dark:text-[#E2D7CE]">
 
-                {/* Unit */}
-                <span className={`
-                  ${jetbrainsMono.className} 
-                  text-[10px] text-[#2D3436]/50 dark:text-[#E2D7CE]/50 uppercase tracking-widest mt-1
-                  group-hover:text-[#FF5C00] group-hover:font-bold group-hover:opacity-100
-                  transition-all duration-300
-                `}>
-                  {unit}
-                </span>
+                {/* LEFT: Schedule (Time Block) */}
+                <div className="relative flex items-center gap-3 text-[#2D3436]/70 dark:text-[#E2D7CE]/70 group-hover:text-[#1A1A1A] dark:group-hover:text-white transition-all duration-300 group-hover:font-bold pb-1">
+                  {/* Marker */}
+                  <div className="absolute -left-3 top-1 w-1 h-3 bg-[#FF5C00] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full" />
+
+                  <Clock strokeWidth={1.5} size={16} className="shrink-0 text-black/30 dark:text-white/30 self-start mt-0.5" />
+                  <div className={`${jetbrainsMono.className} flex flex-col gap-0.5 text-sm font-medium uppercase tracking-wider leading-tight max-w-[140px]`}>
+                    {formattedSchedule.map((item, i) => (
+                      <React.Fragment key={i}>
+                        {i > 0 && <span className="text-[#FF5C00]">&</span>}
+                        <span>{item}</span>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                {/* RIGHT: Price & Unit (Cost Block) */}
+                <div className="flex flex-col items-end">
+                  {/* Price */}
+                  <span className={`
+                                font-sans font-extrabold tracking-tight
+                                text-5xl 
+                                group-hover:text-[#FF5C00] transition-all duration-300 leading-none
+                            `}>
+                    {formattedPrice}
+                  </span>
+
+                  {/* Unit */}
+                  <span className={`
+                      ${jetbrainsMono.className} 
+                      text-[10px] text-[#2D3436]/50 dark:text-[#E2D7CE]/50 uppercase tracking-widest mt-1
+                      group-hover:text-[#FF5C00] group-hover:font-bold group-hover:opacity-100
+                      transition-all duration-300
+                    `}>
+                    {unit}
+                  </span>
+                </div>
+
               </div>
-
             </div>
           </div>
         </div>
-      </div>
-    </MotionLink>
+      </Link>
+    </motion.div>
   );
 });
 CourseCard.displayName = 'CourseCard';
