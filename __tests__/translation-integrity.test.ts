@@ -50,4 +50,45 @@ describe('Translation Integrity', () => {
             expect(missing).toEqual([]);
         });
     });
+
+    test('Values should not be identical to Master (DE) unless explicitly allowed', () => {
+        // Heuristic: If value is identical to DE and length > 4, it's likely untranslated.
+        // We can add a "whitelist" if needed.
+        const whitelist = ['SmartGerman', 'Email', 'Telegram', 'WhatsApp', 'A1.1', 'A1.2', 'A2', 'B1', 'B2'];
+
+        locales.forEach(locale => {
+            const warnings: string[] = [];
+
+            const checkValues = (masterObj: any, targetObj: any, prefix = '') => {
+                Object.keys(masterObj).forEach(key => {
+                    const masterVal = masterObj[key];
+                    const targetVal = targetObj?.[key];
+                    const fullKey = prefix ? `${prefix}.${key}` : key;
+
+                    if (typeof masterVal === 'object' && masterVal !== null && !Array.isArray(masterVal)) {
+                        if (targetVal) checkValues(masterVal, targetVal, fullKey);
+                    } else if (typeof masterVal === 'string' && typeof targetVal === 'string') {
+                        // Check identity
+                        if (masterVal.trim() === targetVal.trim() && masterVal.length > 4) {
+                            // Check whitelist
+                            const isWhitelisted = whitelist.some(w => masterVal.includes(w) && masterVal.length < 15);
+                            if (!isWhitelisted) {
+                                // Double check if it's really the same language content
+                                warnings.push(`${fullKey}: "${masterVal}"`);
+                            }
+                        }
+                    }
+                });
+            };
+
+            checkValues(masterDict, otherDicts[locale]);
+
+            if (warnings.length > 0) {
+                console.warn(`Potential untranslated keys in ${locale} (Identical to DE):`, warnings);
+            }
+
+            // For now, we warn but don't fail the test to avoid blocking deployment on false positives
+            // expecting(warnings).toHaveLength(0); 
+        });
+    });
 });

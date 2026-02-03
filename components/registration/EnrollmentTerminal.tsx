@@ -408,44 +408,100 @@ const DateDropdowns = ({
     error,
     required,
     referenceDate,
-    futureYears = false // NEW PROP: If true, show Next 2 years. If false, show Past 100 years.
+    futureYears = false,
+    minDate,
+    maxDate
 }: any) => {
     // Value format: DD.MM.YYYY
     const [day, month, year] = (value || "..").split(".");
 
-    // Generators
-    const days = Array.from({ length: 31 }, (_, i) => {
-        const d = String(i + 1).padStart(2, '0');
-        return { value: d, label: d };
-    });
-    const months = Array.from({ length: 12 }, (_, i) => {
-        const m = String(i + 1).padStart(2, '0');
-        return { value: m, label: m };
-    });
-    const currentYear = new Date(referenceDate || new Date()).getFullYear();
+    // Parse current selection as numbers for comparison
+    const selYear = parseInt(year);
+    const selMonth = parseInt(month);
 
-    // Dynamic Year Options based on mode
+    // Dynamic Year Options
     const years = React.useMemo(() => {
+        const currentYear = new Date(referenceDate || new Date()).getFullYear();
+        let yList = [];
+
         if (futureYears) {
-            // Show Current Year + Next 2 Years (e.g., 2026, 2027, 2028)
-            // Sufficient for "max 3 months" crossing a year boundary
-            return Array.from({ length: 3 }, (_, i) => {
-                const y = String(currentYear + i);
-                return { value: y, label: y };
-            });
+            // Default Future logic (if no strict maxDate provided, show 3 years)
+            const endYear = maxDate ? maxDate.getFullYear() : currentYear + 2;
+            const startYear = minDate ? minDate.getFullYear() : currentYear;
+
+            for (let y = startYear; y <= endYear; y++) {
+                yList.push({ value: String(y), label: String(y) });
+            }
         } else {
             // Birthdate Mode: Past 100+ Years
-            return Array.from({ length: currentYear - 1920 + 1 }, (_, i) => {
-                const y = String(currentYear - i);
-                return { value: y, label: y };
-            });
+            for (let i = 0; i <= 100; i++) {
+                const y = currentYear - i;
+                yList.push({ value: String(y), label: String(y) });
+            }
         }
-    }, [currentYear, futureYears]);
+        return yList;
+    }, [futureYears, minDate, maxDate, referenceDate]);
+
+    // Dynamic Month Options
+    const months = React.useMemo(() => {
+        const allMonths = Array.from({ length: 12 }, (_, i) => {
+            const m = String(i + 1).padStart(2, '0');
+            return { value: m, label: m };
+        });
+
+        if (!selYear) return allMonths;
+
+        // Filter based on Min/Max
+        return allMonths.filter(mBtn => {
+            const m = parseInt(mBtn.value);
+
+            // Min Check
+            if (minDate && selYear === minDate.getFullYear()) {
+                if (m < minDate.getMonth() + 1) return false;
+            }
+            // Max Check
+            if (maxDate && selYear === maxDate.getFullYear()) {
+                if (m > maxDate.getMonth() + 1) return false;
+            }
+            return true;
+        });
+    }, [selYear, minDate, maxDate]);
+
+    // Dynamic Day Options
+    const days = React.useMemo(() => {
+        const allDays = Array.from({ length: 31 }, (_, i) => {
+            const d = String(i + 1).padStart(2, '0');
+            return { value: d, label: d };
+        });
+
+        if (!selYear || !selMonth) return allDays;
+
+        return allDays.filter(dBtn => {
+            const d = parseInt(dBtn.value);
+
+            // Min Check
+            if (minDate && selYear === minDate.getFullYear() && selMonth === minDate.getMonth() + 1) {
+                if (d < minDate.getDate()) return false;
+            }
+
+            // Max Check
+            if (maxDate && selYear === maxDate.getFullYear() && selMonth === maxDate.getMonth() + 1) {
+                if (d > maxDate.getDate()) return false;
+            }
+            return true;
+        });
+    }, [selYear, selMonth, minDate, maxDate]);
 
     const handleUpdate = (type: 'day' | 'month' | 'year', val: string) => {
         const nD = type === 'day' ? val : (day || "");
         const nM = type === 'month' ? val : (month || "");
         const nY = type === 'year' ? val : (year || "");
+
+        // Auto-correct if selection becomes invalid due to change
+        // E.g. changing month might make the currently selected day invalid
+        // But for now, let's trust the user or the parent's validation to catch that final state.
+        // Or cleaner: Reset lower fields if invalid? 
+        // For standard behavior: just update. Parent handles exact validation.
 
         onChange(`${nD}.${nM}.${nY}`);
     };
@@ -992,49 +1048,54 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 >
                                     {/* --- START DATE SELECTOR --- */}
                                     <div className="max-w-xs mb-8">
-                                        <DateDropdowns
-                                            label={t?.start_date_label || "START DATE"}
-                                            value={startDate}
-                                            onChange={(val: string) => {
-                                                // VALIDATION LOGIC
-                                                const [d, m, y] = val.split('.').map(Number);
-                                                if (d && m && y) {
-                                                    const selected = new Date(y, m - 1, d);
-                                                    const now = serverTime ? new Date(serverTime) : new Date();
+                                        {/* Calculate Constraints for Props */}
+                                        {(() => {
+                                            const now = serverTime ? new Date(serverTime) : new Date();
 
-                                                    // Min: Tomorrow (current day + 1)
-                                                    const minDate = new Date(now);
-                                                    minDate.setDate(minDate.getDate() + 1);
-                                                    minDate.setHours(0, 0, 0, 0);
+                                            // Min: Tomorrow (current day + 1)
+                                            const minDate = new Date(now);
+                                            minDate.setDate(minDate.getDate() + 1);
+                                            minDate.setHours(0, 0, 0, 0);
 
-                                                    // Max: 3 Months
-                                                    const maxDate = new Date(now);
-                                                    maxDate.setMonth(maxDate.getMonth() + 3);
-                                                    maxDate.setHours(23, 59, 59, 999);
+                                            // Max: 3 Months
+                                            const maxDate = new Date(now);
+                                            maxDate.setMonth(maxDate.getMonth() + 3);
+                                            maxDate.setHours(23, 59, 59, 999);
 
-                                                    if (selected < minDate) {
-                                                        // If past/today -> Reset to tomorrow (or just don't update?)
-                                                        // User requested "It should not even be possible".
-                                                        // Resetting to minDate is a safe UI pattern.
-                                                        const dStr = String(minDate.getDate()).padStart(2, '0');
-                                                        const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
-                                                        setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
-                                                        return;
-                                                    }
+                                            return (
+                                                <DateDropdowns
+                                                    label={t?.start_date_label || "START DATE"}
+                                                    value={startDate}
+                                                    minDate={minDate}
+                                                    maxDate={maxDate}
+                                                    onChange={(val: string) => {
+                                                        // VALIDATION LOGIC (Keep strict fallback just in case)
+                                                        const [d, m, y] = val.split('.').map(Number);
+                                                        if (d && m && y) {
+                                                            const selected = new Date(y, m - 1, d);
 
-                                                    if (selected > maxDate) {
-                                                        const dStr = String(maxDate.getDate()).padStart(2, '0');
-                                                        const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
-                                                        setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
-                                                        return;
-                                                    }
-                                                }
-                                                setStartDate(val);
-                                            }}
-                                            required
-                                            futureYears={true} // Enable future years
-                                            referenceDate={serverTime ? new Date(serverTime) : new Date()}
-                                        />
+                                                            if (selected < minDate) {
+                                                                const dStr = String(minDate.getDate()).padStart(2, '0');
+                                                                const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
+                                                                setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
+                                                                return;
+                                                            }
+
+                                                            if (selected > maxDate) {
+                                                                const dStr = String(maxDate.getDate()).padStart(2, '0');
+                                                                const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
+                                                                setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
+                                                                return;
+                                                            }
+                                                        }
+                                                        setStartDate(val);
+                                                    }}
+                                                    required
+                                                    futureYears={true}
+                                                    referenceDate={now}
+                                                />
+                                            );
+                                        })()}
                                         <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase">
                                             {t?.start_hint || "Choose your start date (max 3 months in advance)."}
                                         </p>
