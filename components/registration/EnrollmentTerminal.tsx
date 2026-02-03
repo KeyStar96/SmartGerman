@@ -1393,25 +1393,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         </div>
                     </div>
 
-                    {/* FUTURE OUTLOOK */}
-                    {futurePrices.length > 0 && selectedCoursesFull.length > 0 && (
-                        <div className="px-6 md:px-8 pb-6 bg-[#1A1C1E] border-t border-white/5 pt-4">
-                            <div className="text-[10px] text-gray-500 font-mono uppercase mb-2">
-                                {wizard?.outlook_title || "Voraussichtliche Folgekosten:"}
-                            </div>
-                            <div className="space-y-1">
-                                {futurePrices.map((fp, i) => (
-                                    <div key={i} className="flex justify-between text-xs text-gray-400 font-mono">
-                                        <span>{fp.label}</span>
-                                        <span className="text-gray-300">{formatPrice(fp.cost)}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="text-[9px] text-[#FF5C00]/60 mt-2 italic">
-                                * {wizard?.outlook_note || "Nur bei Fortführung"}
-                            </div>
-                        </div>
-                    )}
+
 
                     {/* ACTION BUTTON */}
                     <button
