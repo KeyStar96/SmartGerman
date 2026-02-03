@@ -1047,67 +1047,72 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     exit={{ opacity: 0 }}
                                     className="space-y-12 py-4"
                                 >
-                                    {/* --- START DATE SELECTOR --- */}
-                                    <div className="max-w-xs mb-8">
-                                        {/* Calculate Constraints for Props */}
-                                        {(() => {
-                                            const now = serverTime ? new Date(serverTime) : new Date();
+                                    {/* --- START DATE + PRICING ROADMAP ROW --- */}
+                                    <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8 mb-8">
+                                        {/* Left: Start Date Selector */}
+                                        <div className="max-w-xs flex-shrink-0">
+                                            {/* Calculate Constraints for Props */}
+                                            {(() => {
+                                                const now = serverTime ? new Date(serverTime) : new Date();
 
-                                            // Min: Tomorrow (current day + 1)
-                                            const minDate = new Date(now);
-                                            minDate.setDate(minDate.getDate() + 1);
-                                            minDate.setHours(0, 0, 0, 0);
+                                                // Min: Tomorrow (current day + 1)
+                                                const minDate = new Date(now);
+                                                minDate.setDate(minDate.getDate() + 1);
+                                                minDate.setHours(0, 0, 0, 0);
 
-                                            // Max: 3 Months
-                                            const maxDate = new Date(now);
-                                            maxDate.setMonth(maxDate.getMonth() + 3);
-                                            maxDate.setHours(23, 59, 59, 999);
+                                                // Max: 3 Months
+                                                const maxDate = new Date(now);
+                                                maxDate.setMonth(maxDate.getMonth() + 3);
+                                                maxDate.setHours(23, 59, 59, 999);
 
-                                            return (
-                                                <DateDropdowns
-                                                    label={t?.start_date_label || "START DATE"}
-                                                    value={startDate}
-                                                    minDate={minDate}
-                                                    maxDate={maxDate}
-                                                    onChange={(val: string) => {
-                                                        const [d, m, y] = val.split('.').map(Number);
-                                                        if (d && m && y) {
-                                                            const selected = new Date(y, m - 1, d);
-                                                            if (selected < minDate) {
-                                                                const dStr = String(minDate.getDate()).padStart(2, '0');
-                                                                const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
-                                                                setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
-                                                                return;
+                                                return (
+                                                    <DateDropdowns
+                                                        label={t?.start_date_label || "START DATE"}
+                                                        value={startDate}
+                                                        minDate={minDate}
+                                                        maxDate={maxDate}
+                                                        onChange={(val: string) => {
+                                                            const [d, m, y] = val.split('.').map(Number);
+                                                            if (d && m && y) {
+                                                                const selected = new Date(y, m - 1, d);
+                                                                if (selected < minDate) {
+                                                                    const dStr = String(minDate.getDate()).padStart(2, '0');
+                                                                    const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
+                                                                    setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
+                                                                    return;
+                                                                }
+                                                                if (selected > maxDate) {
+                                                                    const dStr = String(maxDate.getDate()).padStart(2, '0');
+                                                                    const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
+                                                                    setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
+                                                                    return;
+                                                                }
                                                             }
-                                                            if (selected > maxDate) {
-                                                                const dStr = String(maxDate.getDate()).padStart(2, '0');
-                                                                const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
-                                                                setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
-                                                                return;
-                                                            }
-                                                        }
-                                                        setStartDate(val);
-                                                    }}
-                                                    required
-                                                    futureYears={true}
-                                                    referenceDate={now}
-                                                />
-                                            );
-                                        })()}
-                                        <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase">
-                                            {t?.start_hint || "Choose your start date (max 3 months in advance)."}
-                                        </p>
+                                                            setStartDate(val);
+                                                        }}
+                                                        required
+                                                        futureYears={true}
+                                                        referenceDate={now}
+                                                    />
+                                                );
+                                            })()}
+                                            <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase">
+                                                {t?.start_hint || "Choose your start date (max 3 months in advance)."}
+                                            </p>
+                                        </div>
+
+                                        {/* Right: Pricing Roadmap - appears when courses selected */}
+                                        <div className="flex-1 lg:max-w-md mt-6 lg:mt-0">
+                                            <PricingRoadmap
+                                                dictionary={dictionary}
+                                                lang={lang}
+                                                startDate={startDate}
+                                                selectedCourses={selectedCoursesFull}
+                                                currentMonthPrice={totalMonthlyPrice}
+                                                exceptions={exceptions}
+                                            />
+                                        </div>
                                     </div>
-
-                                    {/* Pricing Roadmap: Visual Timeline */}
-                                    <PricingRoadmap
-                                        dictionary={dictionary}
-                                        lang={lang}
-                                        startDate={startDate}
-                                        selectedCourses={selectedCoursesFull}
-                                        currentMonthPrice={totalMonthlyPrice}
-                                        exceptions={exceptions}
-                                    />
 
                                     {[
                                         { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
