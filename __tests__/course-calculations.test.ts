@@ -483,4 +483,60 @@ describe('Pricing Calculation Logic (Exhaustive Matrix)', () => {
             });
         });
     });
+    describe('7. Flexible Start Date Logic (Pro-Rata)', () => {
+        const mockCourse: CourseConfig = {
+            id: "test_flexible",
+            translationKey: "A1.1",
+            level: "A1.1",
+            type: "presence",
+            price: 10,
+            unitDuration: 45,
+            instructor: "standard",
+            sessions: [
+                { day: "Mo", startTime: "10:00", endTime: "11:30" }, // 90 mins = 2 units
+                { day: "Mi", startTime: "10:00", endTime: "11:30" }  // 90 mins = 2 units
+            ]
+        };
+
+        // Feb 2026:
+        // 01.02 (So), 02.02 (Mo - Session), 03.02 (Di), 04.02 (Mi - Session)
+        // Mo: 2, 9, 16, 23 (4 sessions)
+        // Mi: 4, 11, 18, 25 (4 sessions)
+        // Total sessions: 8
+        // Total units: 16
+        // Price: 16 * 10 = 160
+
+        test("should calculate full month correctly (Control)", () => {
+            const stats = calculateMonthlyStats(mockCourse, "de", 1, 2026); // Feb (Index 1)
+            expect(stats.sessionCount).toBe(8);
+            expect(stats.totalUnits).toBe(16);
+        });
+
+        // Start from 14.02.2026 (Saturday)
+        // Remaining sessions:
+        // Mo 16, Mi 18, Mo 23, Mi 25
+        // Total sessions: 4
+        // Total units: 8
+        // Price: 80
+        test("should calculate pro-rata correctly from mid-month (14th Feb)", () => {
+            const stats = calculateMonthlyStats(mockCourse, "de", 1, 2026, [], 14);
+            expect(stats.sessionCount).toBe(4);
+            expect(stats.totalUnits).toBe(8);
+        });
+
+        // Start from 26.02.2026 (Thursday)
+        // Remaining: None (last was Wed 25th)
+        test("should return 0 if start date is after all sessions (26th Feb)", () => {
+            const stats = calculateMonthlyStats(mockCourse, "de", 1, 2026, [], 26);
+            expect(stats.sessionCount).toBe(0);
+            expect(stats.totalUnits).toBe(0);
+        });
+
+        // Start from 25.02.2026 (Wednesday) - Should include Wednesday
+        test("should include start day if session falls on it (25th Feb)", () => {
+            const stats = calculateMonthlyStats(mockCourse, "de", 1, 2026, [], 25);
+            expect(stats.sessionCount).toBe(1); // Just the 25th
+            expect(stats.totalUnits).toBe(2);
+        });
+    });
 });

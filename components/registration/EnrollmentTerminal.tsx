@@ -599,13 +599,25 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    // Dynamic Start Month Options
-    const startMonths = React.useMemo(() => {
-        const dateRef = serverTime ? new Date(serverTime) : new Date();
-        return getNext6Months(lang, dateRef);
-    }, [lang, serverTime]);
-    // Default to first available month (Next Month)
-    const [selectedStartMonth, setSelectedStartMonth] = useState(startMonths[0].value);
+    // Dynamic Start Date (Default: Tomorrow)
+    const [startDate, setStartDate] = useState(() => {
+        const d = serverTime ? new Date(serverTime) : new Date();
+        d.setDate(d.getDate() + 1); // Earliest is tomorrow
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}.${month}.${year}`;
+    });
+
+    // Derived Start Date Object
+    const startDateObj = React.useMemo(() => {
+        const [d, m, y] = startDate.split('.').map(Number);
+        // Valid check
+        if (!d || !m || !y) return new Date();
+        return new Date(y, m - 1, d);
+    }, [startDate]);
+
+    // Grouping Logic - MEMOIZED
 
     // Grouping Logic - MEMOIZED
     const { presenceCourses, onlineCourses, speechCourses } = React.useMemo(() => {
@@ -617,10 +629,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         };
     }, [courses]);
 
-    // Calc Next Month for UI Display
-    // const nextMonthName = calculateMonthlyStats(COURSES[0], lang).monthName; // OLD
-    // Use selected month's label or full object
-    const currentMonthObj = startMonths.find(m => m.value === selectedStartMonth) || startMonths[0];
+    // Label for current selection
+    const currentMonthLabel = startDateObj.toLocaleString(lang === 'de' ? 'de-DE' : 'en-US', { month: 'long', year: 'numeric' });
 
     const enrollmentSchema = React.useMemo(() => createSchema(dictionary), [dictionary]);
     const form = useForm<EnrollmentFormData>({
@@ -683,24 +693,44 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     // Dynamic Total Calculation - MEMOIZED
     const totalMonthlyPrice = React.useMemo(() => {
-        const mParts = selectedStartMonth.split('-');
-        const month = parseInt(mParts[0]);
-        const year = parseInt(mParts[1]);
+        const [d, m, y] = startDate.split('.').map(Number);
+        if (!d || !m || !y) return 0;
 
         return selectedCoursesFull.reduce((acc, c) => {
-            const stats = calculateMonthlyStats(c, lang, month, year, exceptions);
+            // Pass startDay (d) for the first month
+            const stats = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
             const units = stats.totalUnits;
-            // Subtract deductions from price calculation if logic requires it
-            // Current Price Model: Price per Unit * Units. 
-            // If exception reduces units, totalUnits is already lower? 
-            // - calculateMonthlyStats logic:
-            //   if (exception) { deductions.push... } else { sessionCount++; totalUnits += units; }
-            // So totalUnits ONLY counts non-exception days.
-            // deductions array contains the "lost cost" but we don't need to double subtract.
-            // Just use (totalUnits * c.price).
             return acc + (units * c.price);
         }, 0);
-    }, [selectedCoursesFull, lang, selectedStartMonth, exceptions]);
+    }, [selectedCoursesFull, lang, startDate, exceptions]);
+
+    // Future Outlook (Next 2 Months)
+    const futurePrices = React.useMemo(() => {
+        const [d, m, y] = startDate.split('.').map(Number);
+        if (!d || !m || !y) return [];
+
+        const nextMonths = [];
+        // Calculate for +1 and +2 months
+        for (let i = 1; i <= 2; i++) {
+            let nextM = m - 1 + i;
+            let nextY = y;
+            if (nextM > 11) {
+                nextM -= 12;
+                nextY++;
+            }
+
+            const monthLabel = new Date(nextY, nextM, 1).toLocaleString(lang === 'de' ? 'de-DE' : 'en-US', { month: 'long', year: 'numeric' });
+
+            const cost = selectedCoursesFull.reduce((acc, c) => {
+                // Full month calculation (startDay defaults to 1)
+                const stats = calculateMonthlyStats(c, lang, nextM, nextY, exceptions);
+                return acc + (stats.totalUnits * c.price);
+            }, 0);
+
+            nextMonths.push({ label: monthLabel, cost });
+        }
+        return nextMonths;
+    }, [selectedCoursesFull, lang, startDate, exceptions]);
 
     const formatPrice = React.useCallback((p: number) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(p), []);
 
@@ -809,7 +839,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         });
 
         try {
-            const result = await submitEnrollment(data, selectedCourseIds, selectedStartMonth, totalMonthlyPrice, consents);
+            const result = await submitEnrollment(data, selectedCourseIds, startDate, totalMonthlyPrice, consents);
 
             if (result.success) {
                 console.log("Enrollment success:", result);
@@ -921,7 +951,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         {step === 2 && wizard?.step2_title}
                         {step === 3 && wizard?.step3_title}
                     </h1>
-                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{currentMonthObj.label}</span>.</p>}
+                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{currentMonthLabel}</span>.</p>}
                     {step === 2 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step2_sub}</p>}
                     {step === 3 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step3_sub}</p>}
                 </header>
@@ -945,15 +975,25 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     exit={{ opacity: 0 }}
                                     className="space-y-12 py-4"
                                 >
-                                    {/* --- START MONTH SELECTOR --- */}
+                                    {/* --- START DATE SELECTOR --- */}
                                     <div className="max-w-xs mb-8">
-                                        <CustomSelect
-                                            value={selectedStartMonth}
-                                            onChange={setSelectedStartMonth}
-                                            options={startMonths}
-                                            placeholder="Start"
-                                            label={t?.start_month_label || "START"}
+                                        <DateDropdowns
+                                            label={t?.start_date_label || "START DATE"}
+                                            value={startDate}
+                                            onChange={(val: string) => {
+                                                // Basic Validation (Simple Range Check)
+                                                // Min: Tomorrow, Max: +3 Months
+                                                // We rely on visual feedback or correction? 
+                                                // For now, update state.
+                                                setStartDate(val);
+                                            }}
+                                            required
+                                            // Pass reference date if needed for dropdown generation logic
+                                            referenceDate={serverTime ? new Date(serverTime) : new Date()}
                                         />
+                                        <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase">
+                                            {t?.start_hint || "Choose your start date (max 3 months in advance)."}
+                                        </p>
                                     </div>
 
                                     {[
@@ -1000,7 +1040,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 value={watch("personal.birthDate")}
                                                 onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
                                                 error={errors.personal?.birthDate?.message}
-                                                referenceDate={startMonths[0].year && new Date(startMonths[0].year, startMonths[0].month, 1)}
+                                                referenceDate={new Date()}
                                             />
                                         </div>
                                         <PhoneInput
@@ -1079,13 +1119,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
                                     {/* Summary: Courses */}
                                     <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthObj.label}</h3>
+                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthLabel}</h3>
                                         <div className="space-y-4">
                                             {selectedCoursesFull.map(c => {
-                                                const mParts = selectedStartMonth.split('-');
-                                                const month = parseInt(mParts[0]);
-                                                const year = parseInt(mParts[1]);
-                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year, exceptions);
+                                                const [d, m, y] = startDate.split('.').map(Number);
+                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
                                                 const netPrice = c.price * totalUnits;
                                                 return (
                                                     <div key={c.id} className="flex justify-between items-center text-sm">
@@ -1130,7 +1168,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
                         </div>
-                        <span className="font-mono text-xs text-gray-500">{currentMonthObj.label}</span>
+                        <span className="font-mono text-xs text-gray-500">{currentMonthLabel}</span>
                     </div>
                 </div>
 
@@ -1144,10 +1182,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             </motion.div>
                         ) : (
                             selectedCoursesFull.map(c => {
-                                const mParts = selectedStartMonth.split('-');
-                                const month = parseInt(mParts[0]);
-                                const year = parseInt(mParts[1]);
-                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, month, year, exceptions);
+                                const [d, m, y] = startDate.split('.').map(Number);
+                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
                                 const netPrice = c.price * totalUnits;
                                 const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
                                 const grossPrice = netPrice + deductionSum;
@@ -1206,6 +1242,26 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             <span>{wizard?.total_sub_2}</span>
                         </div>
                     </div>
+
+                    {/* FUTURE OUTLOOK */}
+                    {futurePrices.length > 0 && selectedCoursesFull.length > 0 && (
+                        <div className="px-6 md:px-8 pb-6 bg-[#1A1C1E] border-t border-white/5 pt-4">
+                            <div className="text-[10px] text-gray-500 font-mono uppercase mb-2">
+                                {wizard?.outlook_title || "Voraussichtliche Folgekosten:"}
+                            </div>
+                            <div className="space-y-1">
+                                {futurePrices.map((fp, i) => (
+                                    <div key={i} className="flex justify-between text-xs text-gray-400 font-mono">
+                                        <span>{fp.label}</span>
+                                        <span className="text-gray-300">{formatPrice(fp.cost)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="text-[9px] text-[#FF5C00]/60 mt-2 italic">
+                                * {wizard?.outlook_note || "Nur bei Fortführung"}
+                            </div>
+                        </div>
+                    )}
 
                     {/* ACTION BUTTON */}
                     <button

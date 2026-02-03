@@ -35,7 +35,8 @@ export const calculateMonthlyStats = (
     lang: string,
     targetMonth: number, // 0-11
     targetYear: number,
-    exceptions: CourseException[] = [] // Default to empty if not provided for now
+    exceptions: CourseException[] = [], // Default to empty if not provided for now
+    startDay: number = 1 // New Parameter: Start counting from this day (inclusive)
 ): MonthlyStats => {
     const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
 
@@ -53,7 +54,8 @@ export const calculateMonthlyStats = (
 
     const locale = LOCALE_MAP[lang] || 'de-DE';
 
-    for (let d = 1; d <= daysInMonth; d++) {
+    // Loop starts from startDay instead of fixed 1
+    for (let d = startDay; d <= daysInMonth; d++) {
         const date = new Date(targetYear, targetMonth, d);
         // Warning: Local vs ISO/UTC handling.
         // Construction with (Y, M, D) creates local time.
