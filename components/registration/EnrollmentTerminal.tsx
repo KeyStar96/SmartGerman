@@ -1049,9 +1049,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     className="space-y-12 py-4"
                                 >
                                     {/* === CONTROL DECK: Split Header === */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-stretch">
                                         {/* LEFT: Start Date Picker */}
-                                        <div className="p-6 rounded-sm border border-black/10 dark:border-white/10 bg-white dark:bg-[#1A1C1E]">
+                                        <div className="h-full p-6 rounded-sm border border-black/10 dark:border-white/10 bg-white dark:bg-[#1A1C1E] flex flex-col">
                                             {(() => {
                                                 const now = serverTime ? new Date(serverTime) : new Date();
                                                 const minDate = new Date(now);
@@ -1098,7 +1098,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </div>
 
                                         {/* RIGHT: Pricing Preview Box (with min-height for zero CLS) */}
-                                        <div className="min-h-[200px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-white dark:bg-[#1A1C1E]">
+                                        <div className="h-full min-h-[200px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-white dark:bg-[#1A1C1E] flex flex-col">
                                             {selectedCoursesFull.length === 0 ? (
                                                 /* Empty State - Skeleton */
                                                 <div className="h-full flex flex-col items-center justify-center text-center">
