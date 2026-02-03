@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { CourseConfig, Day, CourseException } from "@/lib/course-config";
 import { calculateMonthlyStats, getDurationMinutes, DAY_MAP, getNext6Months } from "@/lib/course-calculations";
 import { createSchema, EnrollmentFormData } from "@/lib/registration-schema";
+import PricingRoadmap from "@/components/registration/PricingRoadmap";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
@@ -1098,53 +1099,15 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </p>
                                     </div>
 
-                                    <div className="mt-8 pt-4 border-t border-gray-800">
-                                        <p className="text-[10px] uppercase tracking-widest text-[#FF5C00] mb-3 font-bold">
-                                            {t?.form?.future_costs_title || "ESTIMATED FUTURE COSTS"}
-                                        </p>
-                                        <div className="space-y-2">
-                                            {[1, 2].map((offset) => {
-                                                const futureDate = new Date(startDate.split('.').reverse().join('-'));
-                                                if (isNaN(futureDate.getTime())) return null; // Safety check
-                                                futureDate.setMonth(futureDate.getMonth() + offset);
-
-                                                // Calculate full price for this future month (usually full monthly price)
-                                                // Flatten all available courses to find configs
-                                                const allCourses = [...(presenceCourses || []), ...(speechCourses || []), ...(onlineCourses || [])];
-
-                                                const totalFuturePrice = selectedCourseIds.reduce((sum, cId) => {
-                                                    const course = allCourses.find(c => c.id === cId);
-                                                    if (!course) return sum;
-                                                    // Calculate stats for full month (startDay = 1)
-                                                    const stats = calculateMonthlyStats(course, lang, futureDate.getMonth(), futureDate.getFullYear(), [], 1);
-                                                    return sum + (stats.totalUnits * course.price);
-                                                }, 0);
-
-                                                // Localize Month Name
-                                                // Map keys to valid BCP 47 tags: tu -> tr, uk -> uk, ru -> ru, en -> en-US, de -> de-DE
-                                                const localeMap: Record<string, string> = {
-                                                    'de': 'de-DE',
-                                                    'en': 'en-US',
-                                                    'ru': 'ru-RU',
-                                                    'uk': 'uk-UA',
-                                                    'tu': 'tr-TR'
-                                                };
-                                                const localeTag = localeMap[lang] || 'de-DE';
-                                                const monthName = new Intl.DateTimeFormat(localeTag, { month: 'long', year: 'numeric' }).format(futureDate);
-
-                                                return (
-                                                    <div key={offset} className="flex justify-between text-xs text-gray-500">
-                                                        <span>{monthName}</span>
-                                                        <span className="font-mono">{totalFuturePrice.toFixed(2).replace('.', ',')} €</span>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                        <p className="text-[9px] text-gray-600 mt-2 italic">
-                                            {t?.form?.only_on_continuation || "* Only upon continuation"}
-                                        </p>
-
-                                    </div>
+                                    {/* Pricing Roadmap: Visual Timeline */}
+                                    <PricingRoadmap
+                                        dictionary={dictionary}
+                                        lang={lang}
+                                        startDate={startDate}
+                                        selectedCourses={selectedCoursesFull}
+                                        currentMonthPrice={totalMonthlyPrice}
+                                        exceptions={exceptions}
+                                    />
 
                                     {[
                                         { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },

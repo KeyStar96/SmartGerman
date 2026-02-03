@@ -706,6 +706,14 @@
       "privacy": "Verilerimin Gizlilik Politikasına uygun olarak talebimi işleme koymak amacıyla saklanacağını ve kullanılacağını kabul ediyorum. Veriler, AB hizmet sağlayıcımız Supabase (Frankfurt) nezdinde saklanmaktadır.*",
       "agb": "Genel İşletme Şartlarını (AGB) okudum ve kabul ediyorum.*",
       "revocation": "Hizmetin ifasına (kurs başlangıcı) cayma süresi dolmadan önce başlamanızı açıkça talep ediyor ve kabul ediyorum. Sözleşmenin tam olarak ifa edilmesiyle cayma hakkımı kaybedeceğimi ve kurs başladıktan sonra cayma durumunda, halihazırda sunulan hizmetler için tazminat ödemem gerektiğini biliyorum.*"
+    },
+    "pricing_roadmap": {
+      "due_today": "Bugün ödenmesi gereken",
+      "optional_continuation": "İsteğe bağlı devam",
+      "cancel_anytime": "Ay sonunda istediğiniz zaman iptal edin",
+      "how_payment_works": "Ödeme nasıl çalışır?",
+      "payment_explanation": "Bugün sadece ilk ayı ödüyorsunuz. Beğenirseniz kurs devam eder. Beğenmezseniz, ayın 25'ine kadar kısa bir mesaj yeterlidir; katılımınızı otomatik olarak sonlandırırız. Bağlayıcı sözleşme yok.",
+      "total_today": "Bugün toplam tutar"
     }
   }
 }
