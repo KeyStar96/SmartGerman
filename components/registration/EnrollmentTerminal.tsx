@@ -1069,18 +1069,15 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                     minDate={minDate}
                                                     maxDate={maxDate}
                                                     onChange={(val: string) => {
-                                                        // VALIDATION LOGIC (Keep strict fallback just in case)
                                                         const [d, m, y] = val.split('.').map(Number);
                                                         if (d && m && y) {
                                                             const selected = new Date(y, m - 1, d);
-
                                                             if (selected < minDate) {
                                                                 const dStr = String(minDate.getDate()).padStart(2, '0');
                                                                 const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
                                                                 setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
                                                                 return;
                                                             }
-
                                                             if (selected > maxDate) {
                                                                 const dStr = String(maxDate.getDate()).padStart(2, '0');
                                                                 const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
@@ -1101,302 +1098,350 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </p>
                                     </div>
 
-                                    {[
-                                        { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
-                                        { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
-                                        { title: groupTitles?.online || "03 // ONLINE", courses: onlineCourses }
-                                    ].map((group, idx) => (
-                                        <section key={idx}>
-                                            <div className="flex items-center gap-3 mb-6 opacity-60">
-                                                <span className="font-mono text-[10px] uppercase tracking-widest text-black dark:text-[#FF5C00]">{group.title}</span>
-                                                <div className="h-px bg-black/20 dark:bg-white/20 flex-1" />
-                                            </div>
-                                            <div className="space-y-4">
-                                                {group.courses.map(c => (
-                                                    <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
-                                                ))}
-                                            </div>
-                                        </section>
-                                    ))}
-                                </motion.div>
-                            )}
-
-                            {/* STEP 2: PERSONAL DATA */}
-                            {step === 2 && (
-                                <motion.div
-                                    key="step2"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="py-8 max-w-2xl"
-                                >
-                                    <div className="space-y-12">
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                            <DateDropdowns
-                                                label={formLabels?.birthdate || "Birthdate"}
-                                                required
-                                                value={watch("personal.birthDate")}
-                                                onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
-                                                error={errors.personal?.birthDate?.message}
-                                                referenceDate={new Date()}
-                                            />
-                                        </div>
-                                        <PhoneInput
-                                            label={formLabels?.phone || "Phone"}
-                                            value={watch("personal.phone")}
-                                            onChange={(val: string) => form.setValue("personal.phone", val, { shouldValidate: true })}
-                                            error={errors.personal?.phone?.message}
-                                        />
-
-                                        <div className="grid grid-cols-[3fr_1fr] gap-8">
-                                            <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
-                                        </div>
-                                        <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
-
-                                        <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
-                                            {formLabels?.required_hint}
-                                        </div>
-
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* STEP 3: SUMMARY */}
-                            {/* --- SUMMARY (STEP 3) --- */}
-                            {step === 3 && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="flex flex-col gap-8 h-full"
-                                >
-                                    {/* LEGAL CONSENTS (Moved to Top) */}
-                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
-                                        <div className="space-y-4 pt-2">
-                                            <LegalCheckbox
-                                                id="privacy"
-                                                label={t?.legal?.privacy || "Privacy Policy"}
-                                                checked={consents.privacy}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
-                                            />
-                                            <LegalCheckbox
-                                                id="agb"
-                                                label={t?.legal?.agb || "AGB"}
-                                                checked={consents.agb}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, agb: v }))}
-                                            />
-                                            <LegalCheckbox
-                                                id="revocation"
-                                                label={t?.legal?.revocation || "Revocation"}
-                                                checked={consents.revocation}
-                                                onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
-                                            />
-                                        </div>
-                                        <p className="text-xs md:text-sm font-medium text-gray-400 dark:text-gray-400 text-right mt-6">
-                                            {formLabels?.required_hint}
+                                    <div className="mt-8 pt-4 border-t border-gray-800">
+                                        <p className="text-[10px] uppercase tracking-widest text-[#FF5C00] mb-3 font-bold">
+                                            {t?.form?.future_costs_title || "ESTIMATED FUTURE COSTS"}
                                         </p>
-                                    </div>
-                                    <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
-                                        <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
-                                            <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
-                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.firstName} {formData?.lastName}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
-                                            <div className="font-medium break-all text-gray-900 dark:text-white">{formData?.email}<br />{formData?.phone}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
-                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.birthDate}</div>
-                                            <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
-                                            <div className="font-medium text-gray-900 dark:text-white">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
-                                        </div>
-                                        <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            {wizard?.edit}
-                                        </button>
-                                    </div>
+                                        <div className="space-y-2">
+                                            {[1, 2].map((offset) => {
+                                                const futureDate = new Date(startDate.split('.').reverse().join('-'));
+                                                if (isNaN(futureDate.getTime())) return null; // Safety check
+                                                futureDate.setMonth(futureDate.getMonth() + offset);
 
-                                    {/* Summary: Courses */}
-                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
-                                        <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthLabel}</h3>
-                                        <div className="space-y-4">
-                                            {selectedCoursesFull.map(c => {
-                                                const [d, m, y] = startDate.split('.').map(Number);
-                                                const { totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
-                                                const netPrice = c.price * totalUnits;
+                                                // Calculate full price for this future month (usually full monthly price)
+                                                // Flatten all available courses to find configs
+                                                const allCourses = [...(presenceCourses || []), ...(speechCourses || []), ...(onlineCourses || [])];
+
+                                                const totalFuturePrice = selectedCourseIds.reduce((sum, cId) => {
+                                                    const course = allCourses.find(c => c.id === cId);
+                                                    if (!course) return sum;
+                                                    // Calculate stats for full month (startDay = 1)
+                                                    const stats = calculateMonthlyStats(course, lang, futureDate.getMonth(), futureDate.getFullYear(), [], 1);
+                                                    return sum + (stats.totalUnits * course.price);
+                                                }, 0);
+
+                                                // Localize Month Name
+                                                // Map keys to valid BCP 47 tags: tu -> tr, uk -> uk, ru -> ru, en -> en-US, de -> de-DE
+                                                const localeMap: Record<string, string> = {
+                                                    'de': 'de-DE',
+                                                    'en': 'en-US',
+                                                    'ru': 'ru-RU',
+                                                    'uk': 'uk-UA',
+                                                    'tu': 'tr-TR'
+                                                };
+                                                const localeTag = localeMap[lang] || 'de-DE';
+                                                const monthName = new Intl.DateTimeFormat(localeTag, { month: 'long', year: 'numeric' }).format(futureDate);
+
                                                 return (
-                                                    <div key={c.id} className="flex justify-between items-center text-sm">
-                                                        <span className="font-bold text-gray-900 dark:text-white">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
-                                                        <div className="text-right">
-                                                            <span className="font-mono text-gray-900 dark:text-white">{formatPrice(netPrice)}</span>
-                                                            {deductions.length > 0 && (
-                                                                <div className="text-[10px] text-red-500 text-right">
-                                                                    ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                    <div key={offset} className="flex justify-between text-xs text-gray-500">
+                                                        <span>{monthName}</span>
+                                                        <span className="font-mono">{totalFuturePrice.toFixed(2).replace('.', ',')} €</span>
                                                     </div>
                                                 );
                                             })}
                                         </div>
-                                        <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
-                                            {wizard?.change_selection}
-                                        </button>
+                                        <p className="text-[9px] text-gray-600 mt-2 italic">
+                                            {t?.form?.only_on_continuation || "* Only upon continuation"}
+                                        </p>
+                                    </p>
+                                </div>
+
+                                    {[
+                                { title: groupTitles?.presence || "01 // PRESENCE", courses: presenceCourses },
+                                { title: groupTitles?.speech || "02 // SPEECH", courses: speechCourses },
+                                { title: groupTitles?.online || "03 // ONLINE", courses: onlineCourses }
+                            ].map((group, idx) => (
+                                <section key={idx}>
+                                    <div className="flex items-center gap-3 mb-6 opacity-60">
+                                        <span className="font-mono text-[10px] uppercase tracking-widest text-black dark:text-[#FF5C00]">{group.title}</span>
+                                        <div className="h-px bg-black/20 dark:bg-white/20 flex-1" />
+                                    </div>
+                                    <div className="space-y-4">
+                                        {group.courses.map(c => (
+                                            <CourseRow key={c.id} course={c} selected={selectedCourseIds.includes(c.id)} onToggle={() => toggleCourse(c.id)} {...getCourseData(c)} />
+                                        ))}
+                                    </div>
+                                </section>
+                            ))}
+                        </motion.div>
+                            )}
+
+                        {/* STEP 2: PERSONAL DATA */}
+                        {step === 2 && (
+                            <motion.div
+                                key="step2"
+                                initial={{ opacity: 1 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="py-8 max-w-2xl"
+                            >
+                                <div className="space-y-12">
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
+                                        <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
                                     </div>
 
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
+                                        <DateDropdowns
+                                            label={formLabels?.birthdate || "Birthdate"}
+                                            required
+                                            value={watch("personal.birthDate")}
+                                            onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
+                                            error={errors.personal?.birthDate?.message}
+                                            referenceDate={new Date()}
+                                        />
+                                    </div>
+                                    <PhoneInput
+                                        label={formLabels?.phone || "Phone"}
+                                        value={watch("personal.phone")}
+                                        onChange={(val: string) => form.setValue("personal.phone", val, { shouldValidate: true })}
+                                        error={errors.personal?.phone?.message}
+                                    />
 
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </div>
-            </div>
+                                    <div className="grid grid-cols-[3fr_1fr] gap-8">
+                                        <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
+                                        <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                    </div>
+                                    <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
 
-            {/* --- RIGHT PANEL: LIVE TERMINAL --- */}
-            {/* Desktop: Fixed width Right Side. Mobile: Full width at bottom (or sticky). Here: stacked at bottom. */}
-            <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
-                <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
+                                    <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
+                                        {formLabels?.required_hint}
+                                    </div>
 
-                {/* RECEIPT HEADER (Desktop Only likely? Or simplified for mobile?) */}
-                <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10 hidden lg:block">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                        </div>
-                        <span className="font-mono text-xs text-gray-500">{currentMonthLabel}</span>
-                    </div>
-                </div>
-
-                {/* SCROLLABLE RECEIPT LIST (Collapsible on mobile?) */}
-                {/* For now, show on mobile too but maybe limit max height? Or keep as is at bottom. */}
-                <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-[200px] lg:min-h-0">
-                    <AnimatePresence>
-                        {selectedCoursesFull.length === 0 ? (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
-                                // {receipt?.waiting || "Waiting..."}
+                                </div>
                             </motion.div>
-                        ) : (
-                            selectedCoursesFull.map(c => {
-                                const [d, m, y] = startDate.split('.').map(Number);
-                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
-                                const netPrice = c.price * totalUnits;
-                                const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
-                                const grossPrice = netPrice + deductionSum;
+                        )}
 
-                                return (
-                                    <motion.div
-                                        key={c.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
-                                    >
-                                        <div className="flex justify-between items-start mb-1 gap-4">
-                                            <span className="text-gray-200 font-bold flex-1 break-words">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
-                                            <span className="text-white whitespace-nowrap">{formatPrice(grossPrice)}</span>
-                                        </div>
+                        {/* STEP 3: SUMMARY */}
+                        {/* --- SUMMARY (STEP 3) --- */}
+                        {step === 3 && (
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                className="flex flex-col gap-8 h-full"
+                            >
+                                {/* LEGAL CONSENTS (Moved to Top) */}
+                                <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
+                                    <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
+                                    <div className="space-y-4 pt-2">
+                                        <LegalCheckbox
+                                            id="privacy"
+                                            label={t?.legal?.privacy || "Privacy Policy"}
+                                            checked={consents.privacy}
+                                            onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
+                                        />
+                                        <LegalCheckbox
+                                            id="agb"
+                                            label={t?.legal?.agb || "AGB"}
+                                            checked={consents.agb}
+                                            onChange={(v) => setConsents(prev => ({ ...prev, agb: v }))}
+                                        />
+                                        <LegalCheckbox
+                                            id="revocation"
+                                            label={t?.legal?.revocation || "Revocation"}
+                                            checked={consents.revocation}
+                                            onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
+                                        />
+                                    </div>
+                                    <p className="text-xs md:text-sm font-medium text-gray-400 dark:text-gray-400 text-right mt-6">
+                                        {formLabels?.required_hint}
+                                    </p>
+                                </div>
+                                <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
+                                    <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
+                                        <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
+                                        <div className="font-medium text-gray-900 dark:text-white">{formData?.firstName} {formData?.lastName}</div>
+                                        <div className="text-gray-500">{wizard?.summary_labels?.contact || "Kontakt"}</div>
+                                        <div className="font-medium break-all text-gray-900 dark:text-white">{formData?.email}<br />{formData?.phone}</div>
+                                        <div className="text-gray-500">{wizard?.summary_labels?.personal || "Persönlich"}</div>
+                                        <div className="font-medium text-gray-900 dark:text-white">{formData?.birthDate}</div>
+                                        <div className="text-gray-500">{wizard?.summary_labels?.address || "Adresse"}</div>
+                                        <div className="font-medium text-gray-900 dark:text-white">{formData?.street}<br />{formData?.zip} {formData?.city}</div>
+                                    </div>
+                                    <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                        {wizard?.edit}
+                                    </button>
+                                </div>
 
-                                        {deductions.map((d, i) => (
-                                            <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
-                                                <span>{d.date}: {d.reason}</span>
-                                                <span>- {formatPrice(d.amount)}</span>
-                                            </div>
-                                        ))}
+                                {/* Summary: Courses */}
+                                <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
+                                    <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthLabel}</h3>
+                                    <div className="space-y-4">
+                                        {selectedCoursesFull.map(c => {
+                                            const [d, m, y] = startDate.split('.').map(Number);
+                                            const { totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
+                                            const netPrice = c.price * totalUnits;
+                                            return (
+                                                <div key={c.id} className="flex justify-between items-center text-sm">
+                                                    <span className="font-bold text-gray-900 dark:text-white">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                                    <div className="text-right">
+                                                        <span className="font-mono text-gray-900 dark:text-white">{formatPrice(netPrice)}</span>
+                                                        {deductions.length > 0 && (
+                                                            <div className="text-[10px] text-red-500 text-right">
+                                                                ({receipt?.incl || "inkl."} {deductions.length} {deductions.length === 1 ? receipt?.cancellation_s || "Ausfall" : receipt?.cancellation_p || "Ausfälle"})
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <button onClick={() => setStep(1)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
+                                        {wizard?.change_selection}
+                                    </button>
+                                </div>
 
-                                        <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
-                                            <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })
+
+                            </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
+            </div>
+        </div>
 
-                {/* FOOTER AREA (Total + Action) */}
-                <div
-                    ref={footerRef}
-                    className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0 z-50"
-                >
+            {/* --- RIGHT PANEL: LIVE TERMINAL --- */ }
+    {/* Desktop: Fixed width Right Side. Mobile: Full width at bottom (or sticky). Here: stacked at bottom. */ }
+    <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
+        <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
 
-                    {/* TOTAL Display */}
-                    <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
-                        <div className="flex justify-between items-end mb-2">
-                            <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
-                            <motion.span
-                                key={totalMonthlyPrice}
-                                initial={{ scale: 1.1, color: '#fff' }}
-                                animate={{ scale: 1, color: '#FF5C00' }}
-                                className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums"
+        {/* RECEIPT HEADER (Desktop Only likely? Or simplified for mobile?) */}
+        <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10 hidden lg:block">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                </div>
+                <span className="font-mono text-xs text-gray-500">{currentMonthLabel}</span>
+            </div>
+        </div>
+
+        {/* SCROLLABLE RECEIPT LIST (Collapsible on mobile?) */}
+        {/* For now, show on mobile too but maybe limit max height? Or keep as is at bottom. */}
+        <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-[200px] lg:min-h-0">
+            <AnimatePresence>
+                {selectedCoursesFull.length === 0 ? (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
+                                // {receipt?.waiting || "Waiting..."}
+                    </motion.div>
+                ) : (
+                    selectedCoursesFull.map(c => {
+                        const [d, m, y] = startDate.split('.').map(Number);
+                        const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
+                        const netPrice = c.price * totalUnits;
+                        const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
+                        const grossPrice = netPrice + deductionSum;
+
+                        return (
+                            <motion.div
+                                key={c.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
                             >
-                                {formatPrice(totalMonthlyPrice)}
-                            </motion.span>
-                        </div>
-                        <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
-                            <span>{wizard?.total_sub_1}</span>
-                            <span>{wizard?.total_sub_2}</span>
-                        </div>
-                    </div>
+                                <div className="flex justify-between items-start mb-1 gap-4">
+                                    <span className="text-gray-200 font-bold flex-1 break-words">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                    <span className="text-white whitespace-nowrap">{formatPrice(grossPrice)}</span>
+                                </div>
 
-                    {/* FUTURE OUTLOOK */}
-                    {futurePrices.length > 0 && selectedCoursesFull.length > 0 && (
-                        <div className="px-6 md:px-8 pb-6 bg-[#1A1C1E] border-t border-white/5 pt-4">
-                            <div className="text-[10px] text-gray-500 font-mono uppercase mb-2">
-                                {wizard?.outlook_title || "Voraussichtliche Folgekosten:"}
-                            </div>
-                            <div className="space-y-1">
-                                {futurePrices.map((fp, i) => (
-                                    <div key={i} className="flex justify-between text-xs text-gray-400 font-mono">
-                                        <span>{fp.label}</span>
-                                        <span className="text-gray-300">{formatPrice(fp.cost)}</span>
+                                {deductions.map((d, i) => (
+                                    <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
+                                        <span>{d.date}: {d.reason}</span>
+                                        <span>- {formatPrice(d.amount)}</span>
                                     </div>
                                 ))}
-                            </div>
-                            <div className="text-[9px] text-[#FF5C00]/60 mt-2 italic">
-                                * {wizard?.outlook_note || "Nur bei Fortführung"}
-                            </div>
-                        </div>
-                    )}
 
-                    {/* ACTION BUTTON */}
-                    <button
-                        onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
-                        disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid) || isSubmitting}
-                        className={cn(
-                            "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid))
-                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
-                        )}
+                                <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
+                                    <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
+                                </div>
+                            </motion.div>
+                        );
+                    })
+                )}
+            </AnimatePresence>
+        </div>
+
+        {/* FOOTER AREA (Total + Action) */}
+        <div
+            ref={footerRef}
+            className="bg-[#2D3436] p-0 relative overflow-hidden transition-all duration-500 shrink-0 z-50"
+        >
+
+            {/* TOTAL Display */}
+            <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
+                <div className="flex justify-between items-end mb-2">
+                    <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
+                    <motion.span
+                        key={totalMonthlyPrice}
+                        initial={{ scale: 1.1, color: '#fff' }}
+                        animate={{ scale: 1, color: '#FF5C00' }}
+                        className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums"
                     >
-                        <span className="flex flex-col items-start gap-1">
-                            <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
-                                {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : wizard?.btn_binding}
-                            </span>
-                            <span>
-                                {step === 1 && wizard?.btn_continue}
-                                {step === 2 && wizard?.btn_overview}
-                                {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : wizard?.btn_order)}
-                            </span>
-                        </span>
-
-                        <ArrowRight className={cn("transition-transform duration-300",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid)) ? "opacity-20" : "group-hover:translate-x-2"
-                        )} />
-                    </button>
-
+                        {formatPrice(totalMonthlyPrice)}
+                    </motion.span>
+                </div>
+                <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
+                    <span>{wizard?.total_sub_1}</span>
+                    <span>{wizard?.total_sub_2}</span>
                 </div>
             </div>
+
+            {/* FUTURE OUTLOOK */}
+            {futurePrices.length > 0 && selectedCoursesFull.length > 0 && (
+                <div className="px-6 md:px-8 pb-6 bg-[#1A1C1E] border-t border-white/5 pt-4">
+                    <div className="text-[10px] text-gray-500 font-mono uppercase mb-2">
+                        {wizard?.outlook_title || "Voraussichtliche Folgekosten:"}
+                    </div>
+                    <div className="space-y-1">
+                        {futurePrices.map((fp, i) => (
+                            <div key={i} className="flex justify-between text-xs text-gray-400 font-mono">
+                                <span>{fp.label}</span>
+                                <span className="text-gray-300">{formatPrice(fp.cost)}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="text-[9px] text-[#FF5C00]/60 mt-2 italic">
+                        * {wizard?.outlook_note || "Nur bei Fortführung"}
+                    </div>
+                </div>
+            )}
+
+            {/* ACTION BUTTON */}
+            <button
+                onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
+                disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid) || isSubmitting}
+                className={cn(
+                    "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
+                    ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid))
+                        ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                        : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
+                )}
+            >
+                <span className="flex flex-col items-start gap-1">
+                    <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
+                        {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : wizard?.btn_binding}
+                    </span>
+                    <span>
+                        {step === 1 && wizard?.btn_continue}
+                        {step === 2 && wizard?.btn_overview}
+                        {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : wizard?.btn_order)}
+                    </span>
+                </span>
+
+                <ArrowRight className={cn("transition-transform duration-300",
+                    ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid)) ? "opacity-20" : "group-hover:translate-x-2"
+                )} />
+            </button>
+
+        </div>
+    </div>
         </div >
     );
 }

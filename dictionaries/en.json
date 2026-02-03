@@ -591,6 +591,8 @@
       "start_month_label": "START DATE",
       "start_date_label": "START DATE",
       "start_hint": "Choose your start date (max 3 months in advance).",
+      "future_costs_title": "ESTIMATED FUTURE COSTS",
+      "only_on_continuation": "* Only upon continuation",
       "course_selection": "Select your module.",
       "personal_data": "Personal Data.",
       "firstname": "FIRST NAME",

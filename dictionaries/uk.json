@@ -591,6 +591,8 @@
       "start_month_label": "ПОЧАТОК КУРСУ",
       "start_date_label": "ДАТА ПОЧАТКУ",
       "start_hint": "Оберіть дату початку (макс. 3 місяці наперед).",
+      "future_costs_title": "ОЧІКУВАНІ МАЙБУТНІ ВИТРАТИ",
+      "only_on_continuation": "* Тільки при продовженні",
       "course_selection": "Оберіть модуль.",
       "personal_data": "Особисті дані.",
       "firstname": "ІМ'Я",

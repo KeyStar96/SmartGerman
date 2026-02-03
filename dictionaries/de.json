@@ -591,6 +591,8 @@
       "start_month_label": "KURSSTART",
       "start_date_label": "STARTDATUM",
       "start_hint": "Wählen Sie Ihren Starttermin (max. 3 Monate im Voraus).",
+      "future_costs_title": "VORAUSSICHTLICHE FOLGEKOSTEN",
+      "only_on_continuation": "* Nur bei Fortführung",
       "course_selection": "Wählen Sie Ihr Modul.",
       "personal_data": "Persönliche Daten.",
       "firstname": "VORNAME",

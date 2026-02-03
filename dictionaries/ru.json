@@ -591,6 +591,8 @@
       "start_month_label": "НАЧАЛО КУРСА",
       "start_date_label": "ДАТА НАЧАЛА",
       "start_hint": "Выберите дату начала (макс. 3 месяца вперед).",
+      "future_costs_title": "ПРЕДПОЛАГАЕМЫЕ БУДУЩИЕ РАСХОДЫ",
+      "only_on_continuation": "* Только при продолжении",
       "course_selection": "Выберите модуль.",
       "personal_data": "Личные данные.",
       "firstname": "ИМЯ",
