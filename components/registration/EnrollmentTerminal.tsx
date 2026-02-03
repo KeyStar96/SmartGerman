@@ -407,7 +407,8 @@ const DateDropdowns = ({
     label,
     error,
     required,
-    referenceDate
+    referenceDate,
+    futureYears = false // NEW PROP: If true, show Next 2 years. If false, show Past 100 years.
 }: any) => {
     // Value format: DD.MM.YYYY
     const [day, month, year] = (value || "..").split(".");
@@ -422,10 +423,24 @@ const DateDropdowns = ({
         return { value: m, label: m };
     });
     const currentYear = new Date(referenceDate || new Date()).getFullYear();
-    const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => {
-        const y = String(currentYear - i);
-        return { value: y, label: y };
-    });
+
+    // Dynamic Year Options based on mode
+    const years = React.useMemo(() => {
+        if (futureYears) {
+            // Show Current Year + Next 2 Years (e.g., 2026, 2027, 2028)
+            // Sufficient for "max 3 months" crossing a year boundary
+            return Array.from({ length: 3 }, (_, i) => {
+                const y = String(currentYear + i);
+                return { value: y, label: y };
+            });
+        } else {
+            // Birthdate Mode: Past 100+ Years
+            return Array.from({ length: currentYear - 1920 + 1 }, (_, i) => {
+                const y = String(currentYear - i);
+                return { value: y, label: y };
+            });
+        }
+    }, [currentYear, futureYears]);
 
     const handleUpdate = (type: 'day' | 'month' | 'year', val: string) => {
         const nD = type === 'day' ? val : (day || "");
@@ -981,14 +996,43 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                             label={t?.start_date_label || "START DATE"}
                                             value={startDate}
                                             onChange={(val: string) => {
-                                                // Basic Validation (Simple Range Check)
-                                                // Min: Tomorrow, Max: +3 Months
-                                                // We rely on visual feedback or correction? 
-                                                // For now, update state.
+                                                // VALIDATION LOGIC
+                                                const [d, m, y] = val.split('.').map(Number);
+                                                if (d && m && y) {
+                                                    const selected = new Date(y, m - 1, d);
+                                                    const now = serverTime ? new Date(serverTime) : new Date();
+
+                                                    // Min: Tomorrow (current day + 1)
+                                                    const minDate = new Date(now);
+                                                    minDate.setDate(minDate.getDate() + 1);
+                                                    minDate.setHours(0, 0, 0, 0);
+
+                                                    // Max: 3 Months
+                                                    const maxDate = new Date(now);
+                                                    maxDate.setMonth(maxDate.getMonth() + 3);
+                                                    maxDate.setHours(23, 59, 59, 999);
+
+                                                    if (selected < minDate) {
+                                                        // If past/today -> Reset to tomorrow (or just don't update?)
+                                                        // User requested "It should not even be possible".
+                                                        // Resetting to minDate is a safe UI pattern.
+                                                        const dStr = String(minDate.getDate()).padStart(2, '0');
+                                                        const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
+                                                        setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
+                                                        return;
+                                                    }
+
+                                                    if (selected > maxDate) {
+                                                        const dStr = String(maxDate.getDate()).padStart(2, '0');
+                                                        const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
+                                                        setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
+                                                        return;
+                                                    }
+                                                }
                                                 setStartDate(val);
                                             }}
                                             required
-                                            // Pass reference date if needed for dropdown generation logic
+                                            futureYears={true} // Enable future years
                                             referenceDate={serverTime ? new Date(serverTime) : new Date()}
                                         />
                                         <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase">
