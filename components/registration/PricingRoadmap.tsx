@@ -95,9 +95,8 @@ export default function PricingRoadmap({
                 height: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 }
             }}
-            className="overflow-hidden"
         >
-            <div className="p-4 rounded-sm border border-black/10 dark:border-white/10 bg-[#F8F7F4] dark:bg-[#1A1C1E]">
+            <div>
                 {/* Current Month - Highlighted */}
                 <div className="relative mb-4">
                     {/* Orange accent bar */}
