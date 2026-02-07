@@ -1061,7 +1061,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto lg:h-[294px] mb-8 relative z-30">
 
                                         {/* LEFT BOX: Startdatum (Date Selection) */}
-                                        <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
+                                        <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
                                             {/* Header */}
                                             <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", jetbrainsMono.className)}>
                                                 {t?.start_date_label || "STARTDATUM"}
@@ -1112,7 +1112,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </div>
 
                                         {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
-                                        <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full min-h-[294px]">
+                                        <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full min-h-[294px]">
                                             {/* Header */}
                                             <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", jetbrainsMono.className)}>
                                                 {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
@@ -1300,7 +1300,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     className="flex flex-col gap-8 h-full"
                                 >
                                     {/* LEGAL CONSENTS (Moved to Top) */}
-                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
+                                    <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
                                         <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
                                         <div className="space-y-4 pt-2">
                                             <LegalCheckbox
@@ -1326,7 +1326,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                             {formLabels?.required_hint}
                                         </p>
                                     </div>
-                                    <div className="bg-white dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
+                                    <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
                                         <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
                                             <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>
@@ -1344,7 +1344,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     </div>
 
                                     {/* Summary: Courses */}
-                                    <div className="bg-white dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
+                                    <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm space-y-6">
                                         <h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_courses_title} {currentMonthLabel}</h3>
                                         <div className="space-y-4">
                                             {selectedCoursesFull.map(c => {
