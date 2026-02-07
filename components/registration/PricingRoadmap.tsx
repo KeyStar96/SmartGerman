@@ -14,6 +14,7 @@ interface PricingRoadmapProps {
     selectedCourses: CourseConfig[];
     currentMonthPrice: number;
     exceptions?: CourseException[];
+    onShowPaymentInfo?: () => void;
 }
 
 export default function PricingRoadmap({
@@ -22,10 +23,9 @@ export default function PricingRoadmap({
     startDate,
     selectedCourses,
     currentMonthPrice,
-    exceptions = []
+    exceptions = [],
+    onShowPaymentInfo
 }: PricingRoadmapProps) {
-    const [showExplanation, setShowExplanation] = useState(false);
-
     // Translation shortcuts
     const t = dictionary?.registration?.pricing_roadmap;
 
@@ -95,8 +95,9 @@ export default function PricingRoadmap({
                 height: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 }
             }}
+            className="h-full flex flex-col"
         >
-            <div>
+            <div className="flex-1">
                 {/* Current Month - Highlighted */}
                 <div className="relative mb-4">
                     {/* Orange accent bar */}
@@ -161,43 +162,19 @@ export default function PricingRoadmap({
                         {t?.cancel_anytime || "Jederzeit zum Monatsende kündbar"}
                     </span>
                 </div>
+            </div>
 
-                {/* Fear-Killer: Expandable Explanation - Compact */}
-                <div className="mt-3">
-                    <button
-                        onClick={() => setShowExplanation(!showExplanation)}
-                        className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors group"
-                    >
-                        <HelpCircle size={16} className="shrink-0" />
-                        <span className="underline underline-offset-2 decoration-dashed group-hover:decoration-solid">
-                            {t?.how_payment_works || "Wie funktioniert die Bezahlung?"}
-                        </span>
-                        <ChevronDown
-                            size={14}
-                            className={cn(
-                                "transition-transform duration-200",
-                                showExplanation && "rotate-180"
-                            )}
-                        />
-                    </button>
-
-                    <AnimatePresence>
-                        {showExplanation && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="overflow-hidden"
-                            >
-                                <p className="mt-3 p-4 text-sm text-gray-600 dark:text-gray-300 leading-relaxed bg-white dark:bg-[#25282A] border border-black/5 dark:border-white/5 rounded-sm">
-                                    {t?.payment_explanation ||
-                                        "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge."}
-                                </p>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+            {/* Fear-Killer: Link triggers Modal */}
+            <div className="mt-auto pt-4 flex justify-center">
+                <button
+                    onClick={onShowPaymentInfo}
+                    className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors group"
+                >
+                    <HelpCircle size={16} className="shrink-0" />
+                    <span className="underline underline-offset-2 decoration-dashed group-hover:decoration-solid">
+                        {t?.how_payment_works || "Wie funktioniert die Bezahlung?"}
+                    </span>
+                </button>
             </div>
         </motion.div>
     );

@@ -670,6 +670,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [showPaymentInfo, setShowPaymentInfo] = useState(false);
 
     // Dynamic Start Date (Default: Tomorrow)
     const [startDate, setStartDate] = useState(() => {
@@ -959,8 +960,61 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
 
 
+    // --- PAYMENT INFO MODAL ---
+    const PaymentInfoModal = () => (
+        <AnimatePresence>
+            {showPaymentInfo && (
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setShowPaymentInfo(false)}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-all"
+                    />
+
+                    {/* Modal Card */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white dark:bg-[#1A1C1E] rounded-xl shadow-2xl z-50 p-8 border border-black/10 dark:border-white/10"
+                    >
+                        <div className="flex flex-col gap-6">
+                            <div className="flex items-start justify-between">
+                                <h3 className={cn("text-xl font-bold text-gray-900 dark:text-white", jetbrainsMono.className)}>
+                                    {wizard?.payment_info_title || "Bezahlung"}
+                                </h3>
+                                <button
+                                    onClick={() => setShowPaymentInfo(false)}
+                                    className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
+                                >
+                                    <X size={20} className="text-gray-500" />
+                                </button>
+                            </div>
+
+                            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                                {t?.payment_explanation || "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge."}
+                            </p>
+
+                            <button
+                                onClick={() => setShowPaymentInfo(false)}
+                                className="w-full py-3 bg-[#FF5C00] text-white font-bold uppercase rounded hover:bg-[#FF7A33] transition-colors text-sm tracking-wider"
+                            >
+                                {t?.payment_modal_close || "Verstanden"}
+                            </button>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
+    );
+
     return (
         <div className="min-h-screen lg:h-screen w-full bg-transparent text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
+
+            <PaymentInfoModal />
 
             {/* SCROLL INDICATOR (Mobile Mostly) */}
             <AnimatePresence>
@@ -1052,7 +1106,15 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
                                         {/* LEFT: Start Date Picker (Fixed Height: 280px) */}
-                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col shadow-sm transition-colors">
+                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col justify-between shadow-sm transition-colors">
+                                            {/* Top: Label */}
+                                            <div className="shrink-0 mb-4 lg:mb-0">
+                                                <span className={cn("text-[10px] uppercase tracking-widest text-[#FF5C00] font-bold", jetbrainsMono.className)}>
+                                                    {t?.start_date_label || "STARTDATUM"}
+                                                </span>
+                                            </div>
+
+                                            {/* Center: Input */}
                                             <div className="flex-1 flex flex-col justify-center">
                                                 {(() => {
                                                     const now = serverTime ? new Date(serverTime) : new Date();
@@ -1065,7 +1127,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
                                                     return (
                                                         <DateDropdowns
-                                                            label={t?.start_date_label || "START DATE"}
+                                                            label="" // Hidden internal label
                                                             value={startDate}
                                                             minDate={minDate}
                                                             maxDate={maxDate}
@@ -1095,15 +1157,24 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                     );
                                                 })()}
                                             </div>
-                                            <div className="shrink-0 mt-4 border-t border-black/5 dark:border-white/5 pt-4">
-                                                <p className={cn("text-[10px] text-gray-500 font-mono uppercase leading-relaxed", jetbrainsMono.className)}>
+
+                                            {/* Bottom: Hint */}
+                                            <div className="shrink-0 pt-2">
+                                                <p className={cn("text-[10px] text-gray-500 font-mono uppercase leading-relaxed opacity-60", jetbrainsMono.className)}>
                                                     {t?.start_hint || "Wähle dein Startdatum (max. 3 Monate im Voraus)."}
                                                 </p>
                                             </div>
                                         </div>
 
                                         {/* RIGHT: Pricing Preview Box (Fixed Height: 280px) */}
-                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col shadow-sm transition-colors relative overflow-hidden">
+                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col justify-between shadow-sm transition-colors relative overflow-hidden">
+                                            {/* Top: Label */}
+                                            <div className="shrink-0 mb-4 lg:mb-0 z-10">
+                                                <span className={cn("text-[10px] uppercase tracking-widest text-[#FF5C00] font-bold", jetbrainsMono.className)}>
+                                                    {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
+                                                </span>
+                                            </div>
+
                                             <AnimatePresence mode="wait">
                                                 {selectedCoursesFull.length === 0 ? (
                                                     /* Empty State */
@@ -1112,7 +1183,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                         initial={{ opacity: 0 }}
                                                         animate={{ opacity: 1 }}
                                                         exit={{ opacity: 0 }}
-                                                        className="flex-1 flex flex-col items-center justify-center text-center p-4"
+                                                        className="flex-1 flex flex-col items-center justify-center text-center absolute inset-0 z-0 p-6"
                                                     >
                                                         <div className="w-16 h-16 mb-4 rounded-full bg-white dark:bg-white/5 flex items-center justify-center shadow-sm">
                                                             <Monitor size={32} className="text-gray-300 dark:text-gray-600" />
@@ -1128,7 +1199,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                         initial={{ opacity: 0 }}
                                                         animate={{ opacity: 1 }}
                                                         exit={{ opacity: 0 }}
-                                                        className="flex-1 w-full h-full"
+                                                        className="flex-1 w-full h-full flex flex-col justify-center"
                                                     >
                                                         <PricingRoadmap
                                                             dictionary={dictionary}
@@ -1137,6 +1208,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                             selectedCourses={selectedCoursesFull}
                                                             currentMonthPrice={totalMonthlyPrice}
                                                             exceptions={exceptions}
+                                                            onShowPaymentInfo={() => setShowPaymentInfo(true)}
                                                         />
                                                     </motion.div>
                                                 )}
