@@ -1102,36 +1102,33 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     exit={{ opacity: 0 }}
                                     className="space-y-12 py-4"
                                 >
-                                    {/* === CONTROL DECK: Split Header (Fixed Height on Desktop) === */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                                    {/* === CONTROL DECK: Top Fixed Container === */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto lg:h-[280px] mb-8 relative z-30">
 
-                                        {/* LEFT: Start Date Picker (Fixed Height: 280px) */}
-                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col justify-between shadow-sm transition-colors">
-                                            {/* Top: Label */}
-                                            <div className="shrink-0 mb-4 lg:mb-0">
-                                                <span className={cn("text-[10px] uppercase tracking-widest text-[#FF5C00] font-bold", jetbrainsMono.className)}>
-                                                    {t?.start_date_label || "STARTDATUM"}
-                                                </span>
-                                            </div>
+                                        {/* LEFT BOX: Startdatum (Date Selection) */}
+                                        <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
+                                            {/* Header */}
+                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", jetbrainsMono.className)}>
+                                                {t?.start_date_label || "STARTDATUM"}
+                                            </span>
 
-                                            {/* Center: Input */}
-                                            <div className="flex-1 flex flex-col justify-center">
+                                            {/* Input Area - Centered */}
+                                            <div className="flex-1 flex items-center justify-center">
                                                 {(() => {
                                                     const now = serverTime ? new Date(serverTime) : new Date();
-                                                    const minDate = new Date(now);
-                                                    minDate.setDate(minDate.getDate() + 1);
-                                                    minDate.setHours(0, 0, 0, 0);
-                                                    const maxDate = new Date(now);
-                                                    maxDate.setMonth(maxDate.getMonth() + 3);
-                                                    maxDate.setHours(23, 59, 59, 999);
-
                                                     return (
-                                                        <DateDropdowns
-                                                            label="" // Hidden internal label
+                                                        <MaskedDateInput
+                                                            label=""
                                                             value={startDate}
-                                                            minDate={minDate}
-                                                            maxDate={maxDate}
                                                             onChange={(val: string) => {
+                                                                const now = serverTime ? new Date(serverTime) : new Date();
+                                                                const minDate = new Date(now);
+                                                                minDate.setDate(minDate.getDate() + 1);
+                                                                minDate.setHours(0, 0, 0, 0);
+                                                                const maxDate = new Date(now);
+                                                                maxDate.setMonth(maxDate.getMonth() + 3);
+                                                                maxDate.setHours(23, 59, 59, 999);
+
                                                                 const [d, m, y] = val.split('.').map(Number);
                                                                 if (d && m && y) {
                                                                     const selected = new Date(y, m - 1, d);
@@ -1150,42 +1147,32 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                                 }
                                                                 setStartDate(val);
                                                             }}
-                                                            required
-                                                            futureYears={true}
                                                             referenceDate={now}
                                                         />
                                                     );
                                                 })()}
                                             </div>
-
-                                            {/* Bottom: Hint */}
-                                            <div className="shrink-0 pt-2">
-                                                <p className={cn("text-[10px] text-gray-500 font-mono uppercase leading-relaxed opacity-60", jetbrainsMono.className)}>
-                                                    {t?.start_hint || "Wähle dein Startdatum (max. 3 Monate im Voraus)."}
-                                                </p>
-                                            </div>
                                         </div>
 
-                                        {/* RIGHT: Pricing Preview Box (Fixed Height: 280px) */}
-                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col justify-between shadow-sm transition-colors relative overflow-hidden">
-                                            {/* Top: Label */}
-                                            <div className="shrink-0 mb-4 lg:mb-0 z-10">
-                                                <span className={cn("text-[10px] uppercase tracking-widest text-[#FF5C00] font-bold", jetbrainsMono.className)}>
-                                                    {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
-                                                </span>
-                                            </div>
+                                        {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
+                                        <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
+                                            {/* Header */}
+                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", jetbrainsMono.className)}>
+                                                {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
+                                            </span>
 
+                                            {/* Content Area */}
                                             <AnimatePresence mode="wait">
                                                 {selectedCoursesFull.length === 0 ? (
-                                                    /* Empty State */
+                                                    /* Empty State - Centered Placeholder */
                                                     <motion.div
                                                         key="empty"
                                                         initial={{ opacity: 0 }}
                                                         animate={{ opacity: 1 }}
                                                         exit={{ opacity: 0 }}
-                                                        className="flex-1 flex flex-col items-center justify-center text-center absolute inset-0 z-0 p-6"
+                                                        className="flex-1 flex flex-col items-center justify-center text-center"
                                                     >
-                                                        <div className="w-16 h-16 mb-4 rounded-full bg-white dark:bg-white/5 flex items-center justify-center shadow-sm">
+                                                        <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
                                                             <Monitor size={32} className="text-gray-300 dark:text-gray-600" />
                                                         </div>
                                                         <p className={cn("text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium max-w-[200px]", jetbrainsMono.className)}>
@@ -1199,7 +1186,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                         initial={{ opacity: 0 }}
                                                         animate={{ opacity: 1 }}
                                                         exit={{ opacity: 0 }}
-                                                        className="flex-1 w-full h-full flex flex-col justify-center"
+                                                        className="flex-1 w-full flex flex-col justify-center"
                                                     >
                                                         <PricingRoadmap
                                                             dictionary={dictionary}
@@ -1208,9 +1195,42 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                             selectedCourses={selectedCoursesFull}
                                                             currentMonthPrice={totalMonthlyPrice}
                                                             exceptions={exceptions}
-                                                            onShowPaymentInfo={() => setShowPaymentInfo(true)}
                                                         />
                                                     </motion.div>
+                                                )}
+                                            </AnimatePresence>
+
+                                            {/* Footer Link - Anchored to bottom */}
+                                            <button
+                                                onClick={() => setShowPaymentInfo(prev => !prev)}
+                                                className="mt-auto text-xs text-black/40 dark:text-white/40 underline decoration-dotted hover:text-[#FF5C00] transition-colors text-left"
+                                            >
+                                                {wizard?.payment_info_link || "Wie funktioniert die Bezahlung?"}
+                                            </button>
+
+                                            {/* Payment Info Popover */}
+                                            <AnimatePresence>
+                                                {showPaymentInfo && (
+                                                    <>
+                                                        {/* Invisible Overlay to close on click outside */}
+                                                        <div
+                                                            className="fixed inset-0 z-40"
+                                                            onClick={() => setShowPaymentInfo(false)}
+                                                        />
+
+                                                        {/* Popover */}
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: -10 }}
+                                                            transition={{ duration: 0.2 }}
+                                                            className="absolute top-[calc(100%+12px)] left-0 w-full z-50 bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-xl p-6 shadow-2xl"
+                                                        >
+                                                            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                                                                {t?.payment_explanation || "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge."}
+                                                            </p>
+                                                        </motion.div>
+                                                    </>
                                                 )}
                                             </AnimatePresence>
                                         </div>
