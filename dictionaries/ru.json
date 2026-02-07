@@ -604,7 +604,8 @@
       "city": "ГОРОД",
       "birthdate": "ДАТА РОЖДЕНИЯ",
       "date_placeholder": "ДД.ММ.ГГГГ",
-      "required_hint": "* Обязательное поле"
+      "required_hint": "* Обязательное поле",
+      "select_course_hint": "Выберите курс ниже, чтобы увидеть детали"
     },
     "errors": {
       "firstname_required": "Имя обязательно",

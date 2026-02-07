@@ -604,7 +604,8 @@
       "city": "МІСТО",
       "birthdate": "ДАТА НАРОДЖЕННЯ",
       "date_placeholder": "ДД.ММ.РРРР",
-      "required_hint": "* Обов'язкове поле"
+      "required_hint": "* Обов'язкове поле",
+      "select_course_hint": "Виберіть курс нижче, щоб побачити деталі"
     },
     "errors": {
       "firstname_required": "Ім'я обов'язкове",

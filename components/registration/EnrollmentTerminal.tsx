@@ -1048,81 +1048,99 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     exit={{ opacity: 0 }}
                                     className="space-y-12 py-4"
                                 >
-                                    {/* === CONTROL DECK: Split Header === */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-stretch">
-                                        {/* LEFT: Start Date Picker */}
-                                        <div className="h-full p-6 rounded-sm border border-black/10 dark:border-white/10 bg-white dark:bg-[#1A1C1E] flex flex-col">
-                                            {(() => {
-                                                const now = serverTime ? new Date(serverTime) : new Date();
-                                                const minDate = new Date(now);
-                                                minDate.setDate(minDate.getDate() + 1);
-                                                minDate.setHours(0, 0, 0, 0);
-                                                const maxDate = new Date(now);
-                                                maxDate.setMonth(maxDate.getMonth() + 3);
-                                                maxDate.setHours(23, 59, 59, 999);
+                                    {/* === CONTROL DECK: Split Header (Fixed Height on Desktop) === */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-                                                return (
-                                                    <DateDropdowns
-                                                        label={t?.start_date_label || "START DATE"}
-                                                        value={startDate}
-                                                        minDate={minDate}
-                                                        maxDate={maxDate}
-                                                        onChange={(val: string) => {
-                                                            const [d, m, y] = val.split('.').map(Number);
-                                                            if (d && m && y) {
-                                                                const selected = new Date(y, m - 1, d);
-                                                                if (selected < minDate) {
-                                                                    const dStr = String(minDate.getDate()).padStart(2, '0');
-                                                                    const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
-                                                                    setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
-                                                                    return;
+                                        {/* LEFT: Start Date Picker (Fixed Height: 280px) */}
+                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col shadow-sm transition-colors">
+                                            <div className="flex-1 flex flex-col justify-center">
+                                                {(() => {
+                                                    const now = serverTime ? new Date(serverTime) : new Date();
+                                                    const minDate = new Date(now);
+                                                    minDate.setDate(minDate.getDate() + 1);
+                                                    minDate.setHours(0, 0, 0, 0);
+                                                    const maxDate = new Date(now);
+                                                    maxDate.setMonth(maxDate.getMonth() + 3);
+                                                    maxDate.setHours(23, 59, 59, 999);
+
+                                                    return (
+                                                        <DateDropdowns
+                                                            label={t?.start_date_label || "START DATE"}
+                                                            value={startDate}
+                                                            minDate={minDate}
+                                                            maxDate={maxDate}
+                                                            onChange={(val: string) => {
+                                                                const [d, m, y] = val.split('.').map(Number);
+                                                                if (d && m && y) {
+                                                                    const selected = new Date(y, m - 1, d);
+                                                                    if (selected < minDate) {
+                                                                        const dStr = String(minDate.getDate()).padStart(2, '0');
+                                                                        const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
+                                                                        setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
+                                                                        return;
+                                                                    }
+                                                                    if (selected > maxDate) {
+                                                                        const dStr = String(maxDate.getDate()).padStart(2, '0');
+                                                                        const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
+                                                                        setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
+                                                                        return;
+                                                                    }
                                                                 }
-                                                                if (selected > maxDate) {
-                                                                    const dStr = String(maxDate.getDate()).padStart(2, '0');
-                                                                    const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
-                                                                    setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
-                                                                    return;
-                                                                }
-                                                            }
-                                                            setStartDate(val);
-                                                        }}
-                                                        required
-                                                        futureYears={true}
-                                                        referenceDate={now}
-                                                    />
-                                                );
-                                            })()}
-                                            <p className="text-[10px] text-gray-400 mt-3 font-mono uppercase">
-                                                {t?.start_hint || "Wähle dein Startdatum (max. 3 Monate im Voraus)."}
-                                            </p>
+                                                                setStartDate(val);
+                                                            }}
+                                                            required
+                                                            futureYears={true}
+                                                            referenceDate={now}
+                                                        />
+                                                    );
+                                                })()}
+                                            </div>
+                                            <div className="shrink-0 mt-4 border-t border-black/5 dark:border-white/5 pt-4">
+                                                <p className={cn("text-[10px] text-gray-500 font-mono uppercase leading-relaxed", jetbrainsMono.className)}>
+                                                    {t?.start_hint || "Wähle dein Startdatum (max. 3 Monate im Voraus)."}
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        {/* RIGHT: Pricing Preview Box (with min-height for zero CLS) */}
-                                        <div className="h-full min-h-[200px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-white dark:bg-[#1A1C1E] flex flex-col">
-                                            {selectedCoursesFull.length === 0 ? (
-                                                /* Empty State - Skeleton */
-                                                <div className="h-full flex flex-col items-center justify-center text-center">
-                                                    <div className="w-12 h-12 mb-4 rounded-full border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center">
-                                                        <span className="text-gray-300 dark:text-gray-600 text-xl">€</span>
-                                                    </div>
-                                                    <p className="font-mono uppercase text-[10px] tracking-widest text-gray-400 dark:text-gray-500 mb-1">
-                                                        {wizard?.sidebar_hint_title || "Preisübersicht"}
-                                                    </p>
-                                                    <p className="text-xs text-gray-400 dark:text-gray-500">
-                                                        {wizard?.sidebar_hint || "Wähle einen Kurs aus der Liste unten"}
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                /* Active State - PricingRoadmap */
-                                                <PricingRoadmap
-                                                    dictionary={dictionary}
-                                                    lang={lang}
-                                                    startDate={startDate}
-                                                    selectedCourses={selectedCoursesFull}
-                                                    currentMonthPrice={totalMonthlyPrice}
-                                                    exceptions={exceptions}
-                                                />
-                                            )}
+                                        {/* RIGHT: Pricing Preview Box (Fixed Height: 280px) */}
+                                        <div className="h-auto lg:h-[280px] p-6 rounded-sm border border-black/10 dark:border-white/10 bg-[#F0EFE9] dark:bg-[#1A1C1E] flex flex-col shadow-sm transition-colors relative overflow-hidden">
+                                            <AnimatePresence mode="wait">
+                                                {selectedCoursesFull.length === 0 ? (
+                                                    /* Empty State */
+                                                    <motion.div
+                                                        key="empty"
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        exit={{ opacity: 0 }}
+                                                        className="flex-1 flex flex-col items-center justify-center text-center p-4"
+                                                    >
+                                                        <div className="w-16 h-16 mb-4 rounded-full bg-white dark:bg-white/5 flex items-center justify-center shadow-sm">
+                                                            <Monitor size={32} className="text-gray-300 dark:text-gray-600" />
+                                                        </div>
+                                                        <p className={cn("text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium max-w-[200px]", jetbrainsMono.className)}>
+                                                            {formLabels?.select_course_hint || "Wählen Sie unten einen Kurs, um Details zu sehen"}
+                                                        </p>
+                                                    </motion.div>
+                                                ) : (
+                                                    /* Active State - PricingRoadmap */
+                                                    <motion.div
+                                                        key="content"
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        exit={{ opacity: 0 }}
+                                                        className="flex-1 w-full h-full"
+                                                    >
+                                                        <PricingRoadmap
+                                                            dictionary={dictionary}
+                                                            lang={lang}
+                                                            startDate={startDate}
+                                                            selectedCourses={selectedCoursesFull}
+                                                            currentMonthPrice={totalMonthlyPrice}
+                                                            exceptions={exceptions}
+                                                        />
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
                                     </div>
 

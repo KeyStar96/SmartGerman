@@ -604,7 +604,8 @@
       "city": "CITY",
       "birthdate": "DATE OF BIRTH",
       "date_placeholder": "DD.MM.YYYY",
-      "required_hint": "* Required field"
+      "required_hint": "* Required field",
+      "select_course_hint": "Select a course below to see details"
     },
     "errors": {
       "firstname_required": "First name is required",

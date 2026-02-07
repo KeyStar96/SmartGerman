@@ -604,7 +604,8 @@
       "city": "ORT",
       "birthdate": "GEBURTSDATUM",
       "date_placeholder": "TT.MM.JJJJ",
-      "required_hint": "* Pflichtfeld"
+      "required_hint": "* Pflichtfeld",
+      "select_course_hint": "Wählen Sie unten einen Kurs, um Details zu sehen"
     },
     "errors": {
       "firstname_required": "Vorname ist erforderlich",
