@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { JetBrains_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown, ArrowLeft } from "lucide-react";
+import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { CourseConfig, Day, CourseException } from "@/lib/course-config";
@@ -1103,7 +1103,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     className="space-y-12 py-4"
                                 >
                                     {/* === CONTROL DECK: Top Fixed Container === */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto lg:h-[280px] mb-8 relative z-30">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto lg:h-[294px] mb-8 relative z-30">
 
                                         {/* LEFT BOX: Startdatum (Date Selection) */}
                                         <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
@@ -1204,11 +1204,65 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
                                             {/* Footer Link - Anchored to bottom */}
                                             <button
-                                                onClick={() => setShowPaymentInfo(true)}
+                                                onClick={() => setShowPaymentInfo(prev => !prev)}
                                                 className="mt-auto text-xs text-black/40 dark:text-white/40 underline decoration-dotted hover:text-[#FF5C00] transition-colors text-left"
                                             >
                                                 {wizard?.payment_info_link || "Wie funktioniert die Bezahlung?"}
                                             </button>
+
+                                            {/* Payment Info Floating Glass Card Popover */}
+                                            <AnimatePresence>
+                                                {showPaymentInfo && (
+                                                    <>
+                                                        {/* Invisible Overlay to close on click outside */}
+                                                        <div
+                                                            className="fixed inset-0 z-40"
+                                                            onClick={() => setShowPaymentInfo(false)}
+                                                        />
+
+                                                        {/* Floating Glass Card */}
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                            exit={{ opacity: 0, scale: 0.95 }}
+                                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                                            className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white/90 dark:bg-[#1A1C1E]/90 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)]"
+                                                        >
+                                                            {/* Content Layout */}
+                                                            <div className="flex gap-4">
+                                                                {/* Trust Icon */}
+                                                                <div className="shrink-0 mt-0.5">
+                                                                    <CheckCircle2 size={20} className="text-[#FF5C00]" />
+                                                                </div>
+
+                                                                {/* Text Block */}
+                                                                <div className="flex flex-col gap-2">
+                                                                    {/* Headline */}
+                                                                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                                                                        {t?.payment_popover_title || "Keine Knebelverträge"}
+                                                                    </h4>
+
+                                                                    {/* Bullet Points */}
+                                                                    <ul className="space-y-1.5">
+                                                                        <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
+                                                                            <span className="text-[#FF5C00] mt-0.5">•</span>
+                                                                            <span>{t?.payment_point_1 || "Sie zahlen heute nur den ersten Monat."}</span>
+                                                                        </li>
+                                                                        <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
+                                                                            <span className="text-[#FF5C00] mt-0.5">•</span>
+                                                                            <span>{t?.payment_point_2 || "Danach entscheiden Sie flexibel weiter."}</span>
+                                                                        </li>
+                                                                        <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
+                                                                            <span className="text-[#FF5C00] mt-0.5">•</span>
+                                                                            <span>{t?.payment_point_3 || "Kündbar bis zum 25. des Monats."}</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    </>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
                                     </div>
 
