@@ -994,7 +994,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 {/* Header with Progress */}
                 <header className="px-6 md:px-12 py-8 shrink-0 z-10">
                     <div className="flex justify-between items-start mb-6">
-                        <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", jetbrainsMono.className)}>
+                        <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", jetbrainsMono.className)}>
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
                         <Image
@@ -1025,7 +1025,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 transition={{ type: "spring", bounce: 0, duration: 0.5 }}
                             />
                         </div>
-                        <span className={cn("text-xs text-gray-400 dark:text-gray-500", jetbrainsMono.className)}>{wizard?.step_label || "SCHRITT"} {step} / 3</span>
+                        <span className={cn("text-xs text-gray-600 dark:text-gray-500", jetbrainsMono.className)}>{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
                     <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-[#111111] dark:text-[#E2D7CE] mb-2 transition-colors duration-300">
