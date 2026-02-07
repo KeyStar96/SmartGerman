@@ -1103,7 +1103,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </div>
 
                                         {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
-                                        <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
+                                        <div className="bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full min-h-[294px]">
                                             {/* Header */}
                                             <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", jetbrainsMono.className)}>
                                                 {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
@@ -1153,7 +1153,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 onClick={() => setShowPaymentInfo(prev => !prev)}
                                                 className="mt-auto text-xs text-black/40 dark:text-white/40 underline decoration-dotted hover:text-[#FF5C00] transition-colors text-left"
                                             >
-                                                {wizard?.payment_info_link || "Wie funktioniert die Bezahlung?"}
+                                                {t?.pricing_roadmap?.how_payment_works || "Wie funktioniert die Bezahlung?"}
                                             </button>
 
                                             {/* Payment Info Floating Glass Card Popover */}
