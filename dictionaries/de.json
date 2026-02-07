@@ -708,7 +708,11 @@
       "cancel_anytime": "Jederzeit zum Monatsende kündbar",
       "how_payment_works": "Wie funktioniert die Bezahlung?",
       "payment_explanation": "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge.",
-      "total_today": "Gesamtbetrag heute"
+      "total_today": "Gesamtbetrag heute",
+      "payment_popover_title": "Keine Knebelverträge",
+      "payment_point_1": "Sie zahlen heute nur den ersten Monat.",
+      "payment_point_2": "Danach entscheiden Sie flexibel weiter.",
+      "payment_point_3": "Kündbar bis zum 25. des Monats."
     }
   }
 }

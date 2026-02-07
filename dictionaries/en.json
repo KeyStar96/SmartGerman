@@ -708,7 +708,11 @@
       "cancel_anytime": "Cancel anytime at month-end",
       "how_payment_works": "How does payment work?",
       "payment_explanation": "You only pay the first month today. If you like it, the course simply continues. If not, a short message by the 25th of the month is enough and we will automatically end your participation. No binding contracts.",
-      "total_today": "Total due today"
+      "total_today": "Total due today",
+      "payment_popover_title": "No Binding Contracts",
+      "payment_point_1": "You only pay the first month today.",
+      "payment_point_2": "Then you decide flexibly how to continue.",
+      "payment_point_3": "Cancellable until the 25th of the month."
     }
   }
 }
