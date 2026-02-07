@@ -1148,7 +1148,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                                 }
                                                                 setStartDate(val);
                                                             }}
-                                                            required
                                                             futureYears={true}
                                                             referenceDate={now}
                                                         />
@@ -1202,6 +1201,14 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
+
+                                            {/* Footer Link - Anchored to bottom */}
+                                            <button
+                                                onClick={() => setShowPaymentInfo(true)}
+                                                className="mt-auto text-xs text-black/40 dark:text-white/40 underline decoration-dotted hover:text-[#FF5C00] transition-colors text-left"
+                                            >
+                                                {wizard?.payment_info_link || "Wie funktioniert die Bezahlung?"}
+                                            </button>
                                         </div>
                                     </div>
 
