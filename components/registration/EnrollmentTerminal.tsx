@@ -959,62 +959,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     }
 
 
-
-    // --- PAYMENT INFO MODAL ---
-    const PaymentInfoModal = () => (
-        <AnimatePresence>
-            {showPaymentInfo && (
-                <>
-                    {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setShowPaymentInfo(false)}
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-all"
-                    />
-
-                    {/* Modal Card */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-md bg-white dark:bg-[#1A1C1E] rounded-xl shadow-2xl z-50 p-8 border border-black/10 dark:border-white/10"
-                    >
-                        <div className="flex flex-col gap-6">
-                            <div className="flex items-start justify-between">
-                                <h3 className={cn("text-xl font-bold text-gray-900 dark:text-white", jetbrainsMono.className)}>
-                                    {wizard?.payment_info_title || "Bezahlung"}
-                                </h3>
-                                <button
-                                    onClick={() => setShowPaymentInfo(false)}
-                                    className="p-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
-                                >
-                                    <X size={20} className="text-gray-500" />
-                                </button>
-                            </div>
-
-                            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-                                {t?.payment_explanation || "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge."}
-                            </p>
-
-                            <button
-                                onClick={() => setShowPaymentInfo(false)}
-                                className="w-full py-3 bg-[#FF5C00] text-white font-bold uppercase rounded hover:bg-[#FF7A33] transition-colors text-sm tracking-wider"
-                            >
-                                {t?.payment_modal_close || "Verstanden"}
-                            </button>
-                        </div>
-                    </motion.div>
-                </>
-            )}
-        </AnimatePresence>
-    );
-
     return (
         <div className="min-h-screen lg:h-screen w-full bg-transparent text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
-
-            <PaymentInfoModal />
 
             {/* SCROLL INDICATOR (Mobile Mostly) */}
             <AnimatePresence>
