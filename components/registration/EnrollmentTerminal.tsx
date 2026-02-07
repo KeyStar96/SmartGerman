@@ -1185,22 +1185,22 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                                 <div className="flex flex-col gap-2">
                                                                     {/* Headline */}
                                                                     <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                                                                        {t?.payment_popover_title || "Keine Knebelverträge"}
+                                                                        {t?.pricing_roadmap?.payment_popover_title || "Keine Knebelverträge"}
                                                                     </h4>
 
                                                                     {/* Bullet Points */}
                                                                     <ul className="space-y-1.5">
                                                                         <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
                                                                             <span className="text-[#FF5C00] mt-0.5">•</span>
-                                                                            <span>{t?.payment_point_1 || "Sie zahlen heute nur den ersten Monat."}</span>
+                                                                            <span>{t?.pricing_roadmap?.payment_point_1 || "Sie zahlen heute nur den ersten Monat."}</span>
                                                                         </li>
                                                                         <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
                                                                             <span className="text-[#FF5C00] mt-0.5">•</span>
-                                                                            <span>{t?.payment_point_2 || "Danach entscheiden Sie flexibel weiter."}</span>
+                                                                            <span>{t?.pricing_roadmap?.payment_point_2 || "Danach entscheiden Sie flexibel weiter."}</span>
                                                                         </li>
                                                                         <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
                                                                             <span className="text-[#FF5C00] mt-0.5">•</span>
-                                                                            <span>{t?.payment_point_3 || "Kündbar bis zum 25. des Monats."}</span>
+                                                                            <span>{t?.pricing_roadmap?.payment_point_3 || "Kündbar bis zum 25. des Monats."}</span>
                                                                         </li>
                                                                     </ul>
                                                                 </div>
