@@ -703,7 +703,17 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     }, [courses]);
 
     // Label for current selection
-    const currentMonthLabel = startDateObj.toLocaleString(lang === 'de' ? 'de-DE' : 'en-US', { month: 'long', year: 'numeric' });
+    const localeMap: Record<string, string> = {
+        'de': 'de-DE',
+        'en': 'en-US',
+        'ru': 'ru-RU',
+        'uk': 'uk-UA',
+        'tu': 'tr-TR'
+    };
+    const localeTag = localeMap[lang] || 'de-DE';
+
+    // Capitalize first letter for months in languages where it might be lowercase (though standard locales usually handle this)
+    const currentMonthLabel = startDateObj.toLocaleString(localeTag, { month: 'long', year: 'numeric' });
 
     const enrollmentSchema = React.useMemo(() => createSchema(dictionary), [dictionary]);
     const form = useForm<EnrollmentFormData>({
