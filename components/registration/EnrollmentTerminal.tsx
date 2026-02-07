@@ -1116,19 +1116,20 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                             <div className="flex-1 flex items-center justify-center">
                                                 {(() => {
                                                     const now = serverTime ? new Date(serverTime) : new Date();
+                                                    const minDate = new Date(now);
+                                                    minDate.setDate(minDate.getDate() + 1);
+                                                    minDate.setHours(0, 0, 0, 0);
+                                                    const maxDate = new Date(now);
+                                                    maxDate.setMonth(maxDate.getMonth() + 3);
+                                                    maxDate.setHours(23, 59, 59, 999);
+
                                                     return (
-                                                        <MaskedDateInput
+                                                        <DateDropdowns
                                                             label=""
                                                             value={startDate}
+                                                            minDate={minDate}
+                                                            maxDate={maxDate}
                                                             onChange={(val: string) => {
-                                                                const now = serverTime ? new Date(serverTime) : new Date();
-                                                                const minDate = new Date(now);
-                                                                minDate.setDate(minDate.getDate() + 1);
-                                                                minDate.setHours(0, 0, 0, 0);
-                                                                const maxDate = new Date(now);
-                                                                maxDate.setMonth(maxDate.getMonth() + 3);
-                                                                maxDate.setHours(23, 59, 59, 999);
-
                                                                 const [d, m, y] = val.split('.').map(Number);
                                                                 if (d && m && y) {
                                                                     const selected = new Date(y, m - 1, d);
@@ -1147,6 +1148,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                                 }
                                                                 setStartDate(val);
                                                             }}
+                                                            required
+                                                            futureYears={true}
                                                             referenceDate={now}
                                                         />
                                                     );
@@ -1197,40 +1200,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                             exceptions={exceptions}
                                                         />
                                                     </motion.div>
-                                                )}
-                                            </AnimatePresence>
-
-                                            {/* Footer Link - Anchored to bottom */}
-                                            <button
-                                                onClick={() => setShowPaymentInfo(prev => !prev)}
-                                                className="mt-auto text-xs text-black/40 dark:text-white/40 underline decoration-dotted hover:text-[#FF5C00] transition-colors text-left"
-                                            >
-                                                {wizard?.payment_info_link || "Wie funktioniert die Bezahlung?"}
-                                            </button>
-
-                                            {/* Payment Info Popover */}
-                                            <AnimatePresence>
-                                                {showPaymentInfo && (
-                                                    <>
-                                                        {/* Invisible Overlay to close on click outside */}
-                                                        <div
-                                                            className="fixed inset-0 z-40"
-                                                            onClick={() => setShowPaymentInfo(false)}
-                                                        />
-
-                                                        {/* Popover */}
-                                                        <motion.div
-                                                            initial={{ opacity: 0, y: -10 }}
-                                                            animate={{ opacity: 1, y: 0 }}
-                                                            exit={{ opacity: 0, y: -10 }}
-                                                            transition={{ duration: 0.2 }}
-                                                            className="absolute top-[calc(100%+12px)] left-0 w-full z-50 bg-white/95 dark:bg-[#0A0A0A]/95 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-xl p-6 shadow-2xl"
-                                                        >
-                                                            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-                                                                {t?.payment_explanation || "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge."}
-                                                            </p>
-                                                        </motion.div>
-                                                    </>
                                                 )}
                                             </AnimatePresence>
                                         </div>

@@ -100,13 +100,13 @@ export default function PricingRoadmap({
             <div className="flex-1">
                 {/* Current Month - Highlighted */}
                 <div className="relative mb-4">
-                    {/* Orange accent bar */}
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FF5C00] rounded-full" />
+                    {/* Green accent bar */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500 rounded-full" />
 
                     <div className="pl-5">
                         {/* Label */}
-                        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[#FF5C00] font-bold mb-2">
-                            <Check size={12} strokeWidth={3} />
+                        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-green-500 font-bold mb-2">
+                            <Check size={12} strokeWidth={3} className="text-green-500" />
                             {t?.due_today || "Heute fällig"}
                         </span>
 
@@ -162,19 +162,6 @@ export default function PricingRoadmap({
                         {t?.cancel_anytime || "Jederzeit zum Monatsende kündbar"}
                     </span>
                 </div>
-            </div>
-
-            {/* Fear-Killer: Link triggers Modal */}
-            <div className="mt-auto pt-4 flex justify-center">
-                <button
-                    onClick={onShowPaymentInfo}
-                    className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors group"
-                >
-                    <HelpCircle size={16} className="shrink-0" />
-                    <span className="underline underline-offset-2 decoration-dashed group-hover:decoration-solid">
-                        {t?.how_payment_works || "Wie funktioniert die Bezahlung?"}
-                    </span>
-                </button>
             </div>
         </motion.div>
     );
