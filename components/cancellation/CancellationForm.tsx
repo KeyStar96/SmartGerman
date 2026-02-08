@@ -210,10 +210,10 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                 <AnimatePresence>
                     {terminationDateValue === "specific_date" && (
                         <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden"
+                            initial={{ height: 0, opacity: 0, overflow: "hidden" }}
+                            animate={{ height: "auto", opacity: 1, transitionEnd: { overflow: "visible" } }}
+                            exit={{ height: 0, opacity: 0, overflow: "hidden" }}
+                            className=""
                         >
                             <div className="pt-2">
                                 <Controller

@@ -34,7 +34,7 @@ export default async function CancellationPage({
             <main className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 pt-28 md:pt-32">
                 <div className="w-full max-w-lg">
                     {/* Glass Card */}
-                    <div className="glass-panel backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
+                    <div className="glass-panel backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-10 shadow-2xl relative">
 
                         {/* Header Section */}
                         <div className="mb-8 text-center space-y-4">
