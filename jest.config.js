@@ -14,4 +14,5 @@ module.exports = {
             jsx: 'react-jsx'
         }],
     },
+    testPathIgnorePatterns: ['<rootDir>/e2e/', '<rootDir>/node_modules/'],
 };
