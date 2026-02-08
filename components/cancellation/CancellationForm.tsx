@@ -28,12 +28,13 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
         handleSubmit,
         watch,
         control,
-        formState: { errors },
+        formState: { errors, isValid, isValidating },
     } = useForm<CancellationFormData>({
         resolver: zodResolver(createCancellationSchema(dictionary)),
         defaultValues: {
             terminationDate: "asap"
-        }
+        },
+        mode: "onChange"
     });
 
     const terminationDateValue = watch("terminationDate");
@@ -245,13 +246,13 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
             <div className="pt-6">
                 <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !isValid || isValidating}
                     className="w-full bg-[#FF5C00] hover:bg-[#E05000] text-white font-bold py-4 rounded-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                    {isSubmitting ? (
+                    {isSubmitting || isValidating ? (
                         <>
                             <Loader2 className="animate-spin" size={20} />
-                            <span>{t.form.processing}</span>
+                            <span>{isValidating ? "Überprüfe..." : t.form.processing}</span>
                         </>
                     ) : (
                         <span>{t.form.submit_button}</span>

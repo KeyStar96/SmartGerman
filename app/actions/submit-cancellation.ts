@@ -13,7 +13,7 @@ interface SubmitCancellationResult {
 export async function submitCancellation(data: CancellationFormData, lang: string): Promise<SubmitCancellationResult> {
     const dictionary = await getDictionary(lang);
     const schema = createCancellationSchema(dictionary);
-    const result = schema.safeParse(data);
+    const result = await schema.safeParseAsync(data);
 
     if (!result.success) {
         return {

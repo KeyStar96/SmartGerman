@@ -1,6 +1,11 @@
 import { getEarliestCancellationDate } from "@/lib/cancellation-utils";
 import { createCancellationSchema } from "@/lib/cancellation-schema";
 
+// Mock the validateEmail server action
+jest.mock("@/app/actions/validate-email", () => ({
+    validateEmail: jest.fn().mockResolvedValue({ isValid: true })
+}));
+
 describe("Cancellation Logic", () => {
     describe("getEarliestCancellationDate", () => {
         it("should return end of current month if date is <= 25th", () => {
@@ -48,57 +53,60 @@ describe("Cancellation Logic", () => {
                 errors: {
                     name_required: "Name error",
                     email_invalid: "Email error",
-                    date_required_specific: "Date error"
+                    date_required_specific: "Date missing"
                 }
             }
         };
-        const schema = createCancellationSchema(mockT);
 
-        it("should validate correct data", () => {
-            const data = {
+        it("should validate a correct form data", async () => {
+            const schema = createCancellationSchema(mockT);
+            const validData = {
                 fullName: "John Doe",
                 email: "john@example.com",
-                terminationDate: "asap" as const
+                terminationDate: "asap"
             };
-            const result = schema.safeParse(data);
+            const result = await schema.safeParseAsync(validData);
             expect(result.success).toBe(true);
         });
 
-        it("should validate specific date correctly", () => {
-            const data = {
-                fullName: "John Doe",
-                email: "john@example.com",
-                terminationDate: "specific_date" as const,
-                specificDate: "31.12.2024"
-            };
-            const result = schema.safeParse(data);
-            expect(result.success).toBe(true);
-        });
-
-        it("should fail if specific date is missing when required", () => {
-            const data = {
-                fullName: "John Doe",
-                email: "john@example.com",
-                terminationDate: "specific_date" as const
-            };
-            const result = schema.safeParse(data);
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Date error");
-            }
-        });
-
-        it("should fail with invalid email", () => {
-            const data = {
+        it("should fail if email is invalid", async () => {
+            const schema = createCancellationSchema(mockT);
+            const invalidData = {
                 fullName: "John Doe",
                 email: "not-an-email",
-                terminationDate: "asap" as const
+                terminationDate: "asap"
             };
-            const result = schema.safeParse(data);
+            const result = await schema.safeParseAsync(invalidData);
             expect(result.success).toBe(false);
             if (!result.success) {
                 expect(result.error.issues[0].message).toBe("Email error");
             }
+        });
+
+        it("should fail if specific date is selected but no date provided", async () => {
+            const schema = createCancellationSchema(mockT);
+            const invalidData = {
+                fullName: "John Doe",
+                email: "john@example.com",
+                terminationDate: "specific_date"
+            };
+            const result = await schema.safeParseAsync(invalidData);
+            expect(result.success).toBe(false);
+            if (!result.success) {
+                expect(result.error.issues[0].message).toBe("Date missing");
+            }
+        });
+
+        it("should validate successfully with specific date", async () => {
+            const schema = createCancellationSchema(mockT);
+            const validData = {
+                fullName: "John Doe",
+                email: "john@example.com",
+                terminationDate: "specific_date",
+                specificDate: "01.01.2025"
+            };
+            const result = await schema.safeParseAsync(validData);
+            expect(result.success).toBe(true);
         });
     });
 });
