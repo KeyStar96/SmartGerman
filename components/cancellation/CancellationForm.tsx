@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState, useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { cancellationSchema, CancellationFormData } from "@/lib/cancellation-schema";
 import { submitCancellation } from "@/app/actions/submit-cancellation";
+import { DateDropdowns } from "@/components/ui/DateDropdowns";
 
 export default function CancellationForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,6 +19,7 @@ export default function CancellationForm() {
         register,
         handleSubmit,
         watch,
+        control,
         formState: { errors },
     } = useForm<CancellationFormData>({
         resolver: zodResolver(cancellationSchema),
@@ -27,6 +29,33 @@ export default function CancellationForm() {
     });
 
     const terminationDateValue = watch("terminationDate");
+
+    const minDate = useMemo(() => {
+        const now = new Date();
+        const currentDay = now.getDate();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        // If today is <= 25, earliest is end of current month.
+        // If today > 25, earliest is end of NEXT month.
+        let targetMonth = currentMonth;
+        let targetYear = currentYear;
+
+        if (currentDay > 25) {
+            targetMonth = currentMonth + 1;
+        }
+
+        // Handle year overflow
+        if (targetMonth > 11) {
+            targetMonth = 0;
+            targetYear++;
+        }
+
+        // Get last day of the target month
+        // new Date(year, month + 1, 0) gives the last day of 'month'
+        const lastDayOfTargetMonth = new Date(targetYear, targetMonth + 1, 0);
+        return lastDayOfTargetMonth;
+    }, []);
 
     const onSubmit = async (data: CancellationFormData) => {
         setIsSubmitting(true);
@@ -202,16 +231,24 @@ export default function CancellationForm() {
                             className="overflow-hidden"
                         >
                             <div className="pt-2">
-                                <input
-                                    {...register("specificDate")}
-                                    type="date"
-                                    className={cn(
-                                        "block w-full bg-transparent border-b border-gray-300 dark:border-white/10 py-2 text-lg font-sans text-gray-900 dark:text-white focus:outline-none focus:border-[#FF5C00] transition-colors",
-                                        errors.specificDate && "border-red-500"
+                                <Controller
+                                    control={control}
+                                    name="specificDate"
+                                    render={({ field }) => (
+                                        <DateDropdowns
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            label="Wunschdatum"
+                                            futureYears={true}
+                                            minDate={minDate}
+                                            error={errors.specificDate?.message}
+                                        />
                                     )}
                                 />
-                                {errors.specificDate && (
-                                    <span className="text-red-500 text-xs mt-1 block font-mono">{errors.specificDate.message}</span>
+                                {minDate && (
+                                    <p className="text-[10px] text-gray-400 mt-2 font-mono">
+                                        Frühstmöglicher Termin: {minDate.toLocaleDateString("de-DE")}
+                                    </p>
                                 )}
                             </div>
                         </motion.div>
