@@ -18,8 +18,10 @@ export const createCancellationSchema = (t: any) => z.object({
     terminationDate: z.enum(["asap", "specific_date"]),
     specificDate: z.string().optional(), // In case they pick a date
 }).refine((data) => {
-    if (data.terminationDate === "specific_date" && !data.specificDate) {
-        return false;
+    if (data.terminationDate === "specific_date") {
+        if (!data.specificDate) return false;
+        // Strict check for DD.MM.YYYY format
+        return /^\d{2}\.\d{2}\.\d{4}$/.test(data.specificDate);
     }
     return true;
 }, {

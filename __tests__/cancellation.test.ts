@@ -97,6 +97,21 @@ describe("Cancellation Logic", () => {
             }
         });
 
+        it("should fail if specific date is incomplete", async () => {
+            const schema = createCancellationSchema(mockT);
+            const invalidData = {
+                fullName: "John Doe",
+                email: "john@example.com",
+                terminationDate: "specific_date",
+                specificDate: "02.." // Incomplete date
+            };
+            const result = await schema.safeParseAsync(invalidData);
+            expect(result.success).toBe(false);
+            if (!result.success) {
+                expect(result.error.issues[0].message).toBe("Date missing");
+            }
+        });
+
         it("should validate successfully with specific date", async () => {
             const schema = createCancellationSchema(mockT);
             const validData = {
