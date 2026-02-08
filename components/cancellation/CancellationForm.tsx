@@ -110,7 +110,7 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                             "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]"
                         )}
                     >
-                        {t.form.full_name}
+                        {t.form.full_name} <span className="text-[#FF5C00]">*</span>
                     </label>
                     {errors.fullName && (
                         <span className="text-red-500 text-xs mt-1 block font-mono">{errors.fullName.message}</span>
@@ -139,7 +139,7 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                             "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]"
                         )}
                     >
-                        {t.form.email}
+                        {t.form.email} <span className="text-[#FF5C00]">*</span>
                     </label>
                     {errors.email && (
                         <span className="text-red-500 text-xs mt-1 block font-mono">{errors.email.message}</span>
@@ -258,9 +258,14 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                         <span>{t.form.submit_button}</span>
                     )}
                 </button>
-                <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed max-w-sm mx-auto">
-                    {t.form.disclaimer}
-                </p>
+                <div className="text-center mt-4 space-y-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                        {t.required_hint}
+                    </p>
+                    <p className="text-xs text-gray-400 leading-relaxed max-w-sm mx-auto">
+                        {t.form.disclaimer}
+                    </p>
+                </div>
             </div>
         </form>
     );

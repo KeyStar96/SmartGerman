@@ -730,7 +730,8 @@
       "submit_button": "Jetzt kündigen",
       "processing": "Wird verarbeitet...",
       "disclaimer": "Mit dem Klick auf \"Jetzt kündigen\" erklären Sie verbindlich Ihren Kündigungswunsch gemäß § 312k BGB.",
-      "earliest_date": "Frühstmöglicher Termin: "
+      "earliest_date": "Frühstmöglicher Termin: ",
+      "required_hint": "* Pflichtfeld"
     },
     "success": {
       "title": "Kündigung vorgemerkt",

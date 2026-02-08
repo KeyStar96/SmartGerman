@@ -730,6 +730,7 @@
       "submit_button": "Cancel Now",
       "processing": "Processing...",
       "disclaimer": "By clicking \"Cancel Now\", you bindingly declare your wish to cancel according to § 312k BGB.",
+      "required_hint": "* Required field",
       "earliest_date": "Earliest possible date: "
     },
     "success": {
