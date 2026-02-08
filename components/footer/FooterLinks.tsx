@@ -4,12 +4,12 @@ import React, { useState, useCallback } from 'react';
 import { ArrowUpRight, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import TimeStatus from './TimeStatus';
 
-interface BentoGridProps {
+interface FooterLinksProps {
     dictionary: any;
     lang: string;
 }
 
-export default function BentoGrid({ dictionary, lang }: BentoGridProps) {
+export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
     const t = dictionary?.Footer || {};
     // Extract navItems to stable value (or outside component if truly static, but inside is fine if used in memo)
     // Actually better to keep it here so it's close to usage, referenced in useMemo dep array.
@@ -72,10 +72,10 @@ export default function BentoGrid({ dictionary, lang }: BentoGridProps) {
                 {/* 1. Brand / Mission (Left Column) */}
                 <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-2 lg:space-y-8">
                     <div>
-                        {/* OPTIMIERUNG 1: Brand Colors wie im Hero 
-                           "Smart" = Weiß (auf Dark Background)
+                        {/* OPTIMIZATION 1: Brand Colors as in Hero 
+                           "Smart" = White (on Dark Background)
                            "German" = Orange (#FF5C00)
-                           Punkt = Weiß (oder Orange, je nach Geschmack - hier Weiß als Abschluss)
+                           Dot = White (or Orange, depending on taste - here White as closure)
                         */}
                         <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter mb-4 lg:mb-6">
                             <span className="text-white block">Smart</span>
@@ -95,10 +95,10 @@ export default function BentoGrid({ dictionary, lang }: BentoGridProps) {
 
                 {/* 2. Navigation (Middle) */}
                 <div className="lg:col-span-4 flex flex-col justify-start">
-                    {/* OPTIMIERUNG 2: Focus Hover Effect
-                        'group/nav' auf dem Container.
-                        Beim Hovern des Containers werden ALLE Kinder gedimmt (opacity-30).
-                        Das gehoverte Kind (:hover) bekommt wieder volle Power (opacity-100).
+                    {/* OPTIMIZATION 2: Focus Hover Effect
+                        'group/nav' on Container.
+                        On Hover of Container ALL children dimmed (opacity-30).
+                        The hovered child (:hover) gets full power again (opacity-100).
                     */}
                     {navList}
                 </div>
@@ -153,7 +153,9 @@ export default function BentoGrid({ dictionary, lang }: BentoGridProps) {
                     <a href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</a>
                     <a href={`/${lang}/privacy`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</a>
                     <a href={`/${lang}/agb`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</a>
-                    <a href={`/${lang}/cancellation`} className="hover:text-[#FF5C00] transition-colors">Verträge kündigen</a>
+                    <a href={`/${lang}/cancellation`} className="hover:text-[#FF5C00] transition-colors">
+                        {t.Legal?.cancellation || "Cancel Contract"}
+                    </a>
                 </div>
             </div>
         </div>
