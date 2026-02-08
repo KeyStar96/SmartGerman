@@ -921,5 +921,218 @@
         ]
       }
     ]
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "status": "Durum: Kasım 2025",
+    "intro": "Dil okulumuza gösterdiğiniz ilgiden dolayı mutluyuz. Gizliliğinizin korunması bizim için son derece önemlidir. Aşağıda verilerinizin işlenmesi hakkında sizi ayrıntılı olarak bilgilendiriyoruz.",
+    "sections": [
+      {
+        "title": "1. Veri İşlemeden Sorumlu Olan",
+        "content": [
+          "DSGVO Madde 4 No. 7 anlamında kişisel verilerinizin toplanması, işlenmesi ve kullanılmasından sorumlu olan:",
+          "SmartGerman Sprachschule",
+          "Temsilci: Anastasia Sitov",
+          "Hüttenstraße 24a",
+          "30165 Hannover",
+          "Almanya",
+          "Telefon: +49 171 4758620",
+          "E-Posta: info@smart-german.com"
+        ]
+      },
+      {
+        "title": "2. Barındırma ve Sunucu Günlük Dosyaları",
+        "content": [
+          "Web sitemizi IONOS SE, Elgendorfer Str. 57, 56410 Montabaur, Almanya adresinde barındırıyoruz. IONOS, kendisiyle bir veri işleme sözleşmesi bulunan bir işlemci olarak hareket etmektedir.",
+          "Web sitemizi ziyaret ettiğinizde, tarayıcınız tarafından otomatik olarak iletilen bilgiler sunucu günlük dosyalarına kaydedilir:",
+          "- İstekte bulunan bilgisayarın IP adresi",
+          "- Erişim tarihi ve saati",
+          "- İstenen dosyanın adı ve URL'si",
+          "- Aktarılan veri miktarı",
+          "- Başarılı erişim bildirimi",
+          "- Tarayıcı türü ve sürümü",
+          "- Kullanıcının işletim sistemi",
+          "- Yönlendiren URL (daha önce ziyaret edilen sayfa)",
+          "Yasal dayanak: DSGVO Madde 6 Fıkra 1 bent f (web sitesinin teknik olarak sağlanması ve güvenliğindeki meşru menfaat).",
+          "Saklama süresi: Günlük dosyaları en geç 7 gün sonra otomatik olarak silinir."
+        ]
+      },
+      {
+        "title": "3. Çerezler ve LocalStorage",
+        "content": [
+          "Web sitemiz, web sitesinin işlevselliğini sağlamak için localStorage (tarayıcı tarafı depolama teknolojisi) ve teknik olarak gerekli çerezleri kullanır. Bu teknolojiler yalnızca aşağıdaki amaçlar için kullanılır:",
+          "- Dil seçiminizin saklanması (Almanca, İngilizce, Rusça, Ukraynaca)",
+          "- Formlar için oturum yönetimi",
+          "- Web sitesinin teknik işlevselliği",
+          "Yasal dayanak: DSGVO Madde 6 Fıkra 1 bent f (meşru menfaat) ve TTDSG § 25 Fıkra 2 (teknik olarak gerekli çerezler/depolama).",
+          "Bu depolama, web sitesinin rahat bir şekilde kullanılması için teknik olarak gereklidir ve rıza olmaksızın gerçekleşir. Herhangi bir izleme veya profilleme yapılmaz."
+        ]
+      },
+      {
+        "title": "4. Kurs Kaydı ve Katılımcı Yönetimi (Supabase)",
+        "content": [
+          "Kurs kayıtlarının, bekleme listelerinin ve katılımcı verilerinin yönetimi için bir veritabanı hizmet sağlayıcısı olan Supabase kullanıyoruz. Veri işleme AB'de (Frankfurt) gerçekleşir.",
+          "Sağlayıcı: Supabase Inc. / Supabase Germany GmbH",
+          "İşlenen veriler:",
+          "- Soyadı, Adı",
+          "- Adres (Sokak, Posta Kodu, Şehir)",
+          "- E-Posta Adresi",
+          "- Telefon Numarası",
+          "- Kurs isteği ve dil seviyesi",
+          "- Kayıt tarihi",
+          "Amaç: Kurs kayıtlarının, bekleme listelerinin yönetimi, katılımcılarla iletişim, derslerin organizasyonu.",
+          "Yasal dayanak: DSGVO Madde 6 Fıkra 1 bent b (sözleşmenin başlatılması ve ifası) ve DSGVO Madde 6 Fıkra 1 bent f (verimli kurs yönetimindeki meşru menfaat).",
+          "Saklama süresi: Kurs verileri (isim, iletişim, katılım) kurs bitiminden sonra 3 yıla kadar saklanır. Fatura verileri 10 yıl saklanır (HGB/AO uyarınca yasal saklama yükümlülüğü). Çevrimdışı kayıt için kayıt formları 10 yıl saklanır (kanıt sağlama yükümlülüğü).",
+          "Supabase ile DSGVO Madde 28 uyarınca bir veri işleme sözleşmesi mevcuttur."
+        ]
+      },
+      {
+        "title": "5. Faturalandırma ve Muhasebe (Papierkram.de)",
+        "content": [
+          "Faturaların oluşturulması ve yönetimi için Papierkram.de hizmetini kullanıyoruz.",
+          "Sağlayıcı: Papierkram GmbH, Grünberger Str. 54, 10245 Berlin, Almanya",
+          "İşlenen veriler:",
+          "- Soyadı, Adı",
+          "- Adres",
+          "- E-Posta Adresi",
+          "- Fatura bilgileri (kurslar, fiyatlar, ödeme verileri)",
+          "Amaç: Faturaların oluşturulması ve gönderilmesi, muhasebe, vergi yükümlülüklerinin yerine getirilmesi.",
+          "Yasal dayanak: DSGVO Madde 6 Fıkra 1 bent b (sözleşmenin ifası) ve DSGVO Madde 6 Fıkra 1 bent c (HGB/AO uyarınca yasal saklama yükümlülükleri).",
+          "Saklama süresi: Fatura verileri, yasal saklama sürelerine uygun olarak 10 yıl boyunca saklanır.",
+          "Papierkram.de ile DSGVO Madde 28 uyarınca bir veri işleme sözleşmesi mevcuttur."
+        ]
+      },
+      {
+        "title": "6. E-Posta Gönderimi (Resend API)",
+        "content": [
+          "Onay e-postalarının ve diğer bildirimlerin otomatik olarak gönderilmesi için Resend API kullanıyoruz.",
+          "Sağlayıcı: Resend Inc., ABD (veri merkezi AB'de mevcuttur)",
+          "İşlenen veriler:",
+          "- Alıcının e-posta adresi",
+          "- Alıcının adı",
+          "- E-posta içeriği",
+          "- Gönderim zamanı",
+          "- Teslimat durumu",
+          "Amaç: Sözleşmenin ifası kapsamında kurs onayları, hatırlatmalar, faturalar ve diğer işlemsel e-postaların gönderilmesi.",
+          "Yasal dayanak: DSGVO Madde 6 Fıkra 1 bent b (sözleşmenin ifası) ve DSGVO Madde 6 Fıkra 1 bent f (güvenilir e-posta gönderimindeki meşru menfaat).",
+          "Saklama süresi: E-posta günlükleri Resend'de en fazla 30 gün saklanır.",
+          "Resend ile DSGVO Madde 28 uyarınca bir veri işleme sözleşmesi mevcuttur. Daha fazla bilgi: https://resend.com/legal/privacy-policy"
+        ]
+      },
+      {
+        "title": "7. İlgili Kişi Olarak Haklarınız",
+        "content": [
+          "İlgili kişi olarak, her zaman aşağıdaki haklara sahipsiniz:",
+          "- Bilgi alma hakkı (DSGVO Madde 15): Tarafımızca işlenen kişisel verileriniz hakkında bilgi talep etme hakkına sahipsiniz.",
+          "- Düzeltme hakkı (DSGVO Madde 16): Tarafımızca saklanan yanlış kişisel verilerinizin derhal düzeltilmesini veya tamamlanmasını talep etme hakkına sahipsiniz.",
+          "- Silme hakkı (DSGVO Madde 17): İfade ve bilgi özgürlüğü hakkının kullanılması, yasal bir yükümlülüğün yerine getirilmesi, kamu yararı nedenleri veya yasal iddiaların tesisi, kullanılması veya savunulması için işlemenin gerekli olmadığı durumlarda, tarafımızca saklanan kişisel verilerinizin silinmesini talep etme hakkına sahipsiniz.",
+          "- İşlemeyi kısıtlama hakkı (DSGVO Madde 18): Kişisel verilerinizin işlenmesinin kısıtlanmasını talep etme hakkına sahipsiniz.",
+          "- Veri taşınabilirliği hakkı (DSGVO Madde 20): Bize sağladığınız kişisel verilerinizi yapılandırılmış, yaygın olarak kullanılan ve makine tarafından okunabilir bir formatta alma veya başka bir sorumluya iletilmesini talep etme hakkına sahipsiniz.",
+          "- İtiraz hakkı (DSGVO Madde 21): Kişisel verileriniz DSGVO Madde 6 Fıkra 1 bent f uyarınca meşru menfaatlere dayalı olarak işleniyorsa, işlemeye itiraz etme hakkına sahipsiniz.",
+          "- Rızayı geri çekme hakkı (DSGVO Madde 7 Fıkra 3): Bize verdiğiniz rızayı her zaman geri çekme hakkına sahipsiniz. Bu, gelecekte bu rızaya dayalı veri işlemeyi artık sürdüremeyeceğimiz anlamına gelir.",
+          "- Denetim makamına şikayette bulunma hakkı (DSGVO Madde 77): Kişisel verilerinizin tarafımızca işlenmesi hakkında bir veri koruma denetim makamına şikayette bulunma hakkına sahipsiniz.",
+          "Bizim için sorumlu veri koruma denetim makamı:",
+          "Die Landesbeauftragte für den Datenschutz Niedersachsen",
+          "Prinzenstraße 5, 30159 Hannover",
+          "Telefon: 0511 120-4500",
+          "E-Posta: poststelle@lfd.niedersachsen.de",
+          "Web sitesi: https://lfd.niedersachsen.de"
+        ]
+      },
+      {
+        "title": "8. Web Sitemizde Veri Toplama",
+        "content": [
+          "8.1 Barındırma ve Sunucu Günlük Dosyaları",
+          "Web sitemizin güvenli ve istikrarlı çalışmasını sağlamak için aşağıdaki sağlayıcıdan barındırma hizmetleri kullanıyoruz:",
+          "IONOS SE, Elgendorfer Str. 57, 56410 Montabaur, Almanya",
+          "Bu sağlayıcı ile DSGVO Madde 28 uyarınca bir veri işleme sözleşmesi (AVV) imzaladık. Bu sözleşme, sağlayıcının web sitesi ziyaretçilerimizin verilerini yalnızca talimatlarımıza göre ve DSGVO'ya uygun olarak işlemesini garanti eder.",
+          "Web sitemizi ziyaret ettiğinizde, ev sahibimiz tarayıcınızın ilettiği bilgileri (sunucu günlük dosyaları adı verilir) otomatik olarak toplar. Bunlar:",
+          "- IP adresi (genellikle anonim olarak saklanır)",
+          "- İsteğin tarihi ve saati",
+          "- İsteğin içeriği (belirli sayfa)",
+          "- Erişim durumu/HTTP durum kodu",
+          "- İsteğin geldiği web sitesi (Yönlendiren URL)",
+          "- Tarayıcı ve işletim sistemi",
+          "Yasal dayanak: İşleme, web sitemizin teknik olarak hatasız sunumu ve istikrarının ve güvenliğinin garanti edilmesindeki meşru menfaatimize (DSGVO Madde 6 Fıkra 1 bent f) dayanmaktadır.",
+          "Saklama süresi: Ziyaretçilerin IP adresleri 7 gün sonra sunucu günlük dosyalarında anonimleştirilir. Anonimleştirilmiş günlük dosyaları daha sonra 8 hafta saklanır ve ardından silinir. Anonimleştirmeden sonra kişinize kadar izlenmesi artık mümkün değildir.",
+          "",
+          "8.2 Çerezler",
+          "Web sitemiz çerezler kullanır. Çerezler, cihazınızda saklanan küçük metin dosyalarıdır. Yalnızca web sitesinin temel çalışması için gerekli olan teknik olarak gerekli çerezleri kullanıyoruz (örneğin seçtiğiniz dili kaydetmek için).",
+          "Analiz, izleme veya pazarlama amacıyla çerez kullanmıyoruz.",
+          "Yasal dayanak: Bu teknik olarak gerekli çerezlerin kullanımı, hizmetlerimizin kullanıcı dostu ve işlevsel bir şekilde sunulmasındaki meşru menfaatimize (DSGVO Madde 6 Fıkra 1 bent f) dayanmaktadır.",
+          "Saklama süresi: Kullandığımız çerezlerin çoğu sözde 'oturum çerezleri'dir. Ziyaretinizin bitiminden sonra otomatik olarak silinirler. Diğer çerezler (örneğin dil seçimi için) siz silene kadar cihazınızda kayıtlı kalır. Tarayıcınızı, çerezlerin ayarlanması hakkında bilgilendirilecek ve yalnızca bireysel durumlarda çerezlere izin verecek veya belirli durumlar için veya genel olarak çerezlerin kabul edilmesini hariç tutacak şekilde ayarlayabilirsiniz.",
+          "",
+          "8.3 Kurslara Kayıt",
+          "Web sitemiz üzerinden, e-posta ile veya yerinde kağıt form ile bir kursa kayıt olursanız, sözleşmenin ifası için gerekli verileri toplarız:",
+          "- Soyadı ve Adı",
+          "- İletişim bilgileri (E-Posta, Telefon)",
+          "- Adres bilgileri",
+          "- Rezervasyon yapılan kurs verileri",
+          "- Bize sağladığınız diğer gönüllü bilgiler",
+          "Çevrimdışı kayıtlar için: İmzalı kağıt formdaki veriler tarafımızca manuel olarak kurs yönetim sistemimize (Supabase, Frankfurt) girilir. Orijinal form, yasal saklama sürelerine uygun olarak tarafımızca saklanır. Çevrimdışı kayıt için ayrıca kayıt formunda el yazısı imzanızı topluyoruz.",
+          "Yasal dayanak: Bu verilerin işlenmesi, sözleşme öncesi önlemlerin uygulanması ve bir sözleşmenin yerine getirilmesi için gerçekleşir (DSGVO Madde 6 Fıkra 1 bent b).",
+          "Saklama süresi: Bu verileri yasal garanti ve zaman aşımı süreleri dolana kadar saklıyoruz. Muhasebe yükümlülüklerine tabi veriler (örneğin faturalar) yasal sürelere (genellikle HGB ve AO uyarınca 10 yıl) uygun olarak saklanır.",
+          "",
+          "8.4 Kurs Desteği ve Ödevler (Telegram)",
+          "Öğretmenle iletişim, ödev değişimi ve günlük kurs desteği için Telegram mesajlaşma hizmetini kullanıyoruz. Telegram kanalına/grubuna katılım isteğe bağlıdır, ancak optimum kurs desteği için önerilir.",
+          "Sağlayıcı: Telegram Messenger LLP, Dubai, Birleşik Arap Emirlikleri / Telegram FZ-LLC, Dubai",
+          "Sunucu konumları: Dünya çapında dağıtılmış (kesin konumlar halka açık değildir)",
+          "İşlenen veriler:",
+          "- Telegram kullanıcı adı ve kullanıcı kimliği",
+          "- Profil resmi (varsa)",
+          "- Telefon numarası (Telegram ayarlarınıza bağlı olarak)",
+          "- Mesajlar, ödevler, paylaşılan dosyalar ve medya",
+          "- Meta veriler (zaman damgası, bağlantı sırasındaki IP adresi)",
+          "Amaç: Öğretmen ve katılımcılar arasında hızlı iletişim, ödev değişimi, öğrenme materyallerinin sağlanması, kurs akışının organizasyonu, soruların cevaplanması.",
+          "Yasal dayanak: Telegram kullanımı, DSGVO Madde 6 Fıkra 1 bent a uyarınca açık rızanıza dayanmaktadır. Telegram grubuna katılarak, Telegram tarafından veri işlemeye rıza gösterirsiniz. Rızanızı her zaman Telegram grubundan ayrılarak veya bize e-posta ile bildirerek geri çekebilirsiniz.",
+          "Veri koruma riskleri hakkında notlar:",
+          "- Standart uçtan uca şifreleme yok: Normal sohbetler ve grup sohbetleri uçtan uca şifreli değildir. Yalnızca 'Gizli Sohbetler' bu işlevi sunar.",
+          "- Sunucu konumları: Telegram verileri dünya çapında dağıtılmış sunucularda saklar. Kesin konumlar şeffaf değildir.",
+          "- Üçüncü ülkeye aktarım: AB dışındaki, eşdeğer bir veri koruma düzeyi sunmayan ülkelere veri aktarımı gerçekleşir.",
+          "- Meta veriler: Telegram meta verileri (kimin kiminle iletişim kurduğu) 12 aya kadar saklar.",
+          "- Yetkililerin erişimi: Sunucu konumuna bağlı olarak, yerel makamlar belirli durumlarda verilere erişim talep edebilir.",
+          "- Alternatif iletişim: Telegram ile ilgili endişeleriniz varsa, bizimle alternatif olarak e-posta yoluyla iletişim kurabilirsiniz. Telegram olmadan da iyi bir kurs desteği sağlamaya çalışıyoruz.",
+          "Saklama süresi: Telegram gruplarındaki mesajlar, grup daha önce silinmedikçe kurs süresince ve kurs bitiminden sonra 6 aya kadar saklanır. Kendi mesajlarınızı her zaman kendiniz silebilirsiniz.",
+          "Telegram'da veri koruma hakkında daha fazla bilgi: https://telegram.org/privacy",
+          "",
+          "8.5 İletişim (E-Posta, Telefon)",
+          "Bizimle e-posta veya telefon yoluyla iletişime geçerseniz, verdiğiniz veriler (e-posta adresiniz, muhtemelen adınız ve telefon numaranız) sorularınızı yanıtlamak için tarafımızca saklanacaktır.",
+          "Yasal dayanak: DSGVO Madde 6 Fıkra 1 bent b (sözleşme hazırlığı için) veya DSGVO Madde 6 Fıkra 1 bent f (verimli iletişimdeki meşru menfaat).",
+          "",
+          "8.6 Google Maps",
+          "Web sitemizde Google Maps hizmetini kullanıyoruz. Bu, etkileşimli haritaları doğrudan web sitesinde görüntülememize ve harita işlevini rahatça kullanmanıza (örneğin yol tarifi için) olanak tanır.",
+          "Sağlayıcı: Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, İrlanda.",
+          "Ana şirket: Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, ABD.",
+          "Önemli: Harita varsayılan olarak yüklenmez. Yalnızca 'Haritayı Göster' düğmesine (iki tıklama çözümü) aktif olarak tıkladığınızda, Google sunucularıyla bir bağlantı kurulur. Bu sırada IP adresiniz ve muhtemelen konum verileriniz Google'a iletilir.",
+          "Yasal dayanak: Google Maps kullanımı, yalnızca DSGVO Madde 6 Fıkra 1 bent a uyarınca rızanıza dayanmaktadır. Haritayı etkinleştirerek bu rızayı vermiş olursunuz.",
+          "Üçüncü ülkeye aktarım: Google Maps kullanılarak veriler ABD'ye iletilebilir. Google, 'EU-US Data Privacy Framework'e dayanmaktadır. Yine de, ABD'de teorik olarak ABD makamlarının erişim haklarının mevcut olabileceğine dikkat çekeriz.",
+          "Google tarafından veri işleme hakkında daha fazla bilgi Google'ın gizlilik politikasında bulunabilir: https://policies.google.com/privacy."
+        ]
+      },
+      {
+        "title": "9. Video Konferans Araçları (Microsoft Teams)",
+        "content": [
+          "Çevrimiçi kurslarımızın uygulanması için üçüncü taraf sağlayıcıların hizmetlerini kullanıyoruz. Microsoft Teams kullanımına GTC'mizde (AGB) işaret ettik.",
+          "Sağlayıcı: Microsoft Teams: Microsoft Corporation, One Microsoft Way, Redmond, WA 98052-6399, ABD.",
+          "Bu araçları kullanırken çeşitli veriler işlenir (örneğin toplantı meta verileri, ses ve video verileri, metin girişleri). Microsoft ile veri işleme sözleşmeleri (AVV) veya ilgili Veri İşleme Ekleri (DPA) imzaladık.",
+          "Yasal dayanak: Bu araçların kurs hizmetimizin sağlanması için kullanımı DSGVO Madde 6 Fıkra 1 bent b'ye (sözleşmenin ifası) dayanmaktadır.",
+          "Üçüncü ülkelere veri aktarımı (ABD): Microsoft Teams kullanılırken ABD'de veri işleme gerçekleşebilir. Aktarım, Temmuz 2023'ten bu yana bir yeterlilik kararı olarak kabul edilen EU-US Data Privacy Framework'e (DPF) dayanmaktadır. Microsoft DPF sertifikalıdır. Ayrıca, Microsoft ile Standart Sözleşme Maddeleri (SCC'ler) imzaladık. Lütfen dikkat: ABD'de AB'den daha düşük bir veri koruma düzeyi vardır ve ABD makamları belirli durumlarda verilere erişebilir (örneğin FISA 702). DPF şu anda yasal olarak itiraz edilmektedir.",
+          "Saklama süresi: Ses ve video verileri tarafımızca kaydedilmez veya saklanmaz. Microsoft verileri yalnızca canlı aktarım sırasında işler. Toplantı meta verileri, saklama politikalarına uygun olarak Microsoft tarafından saklanır.",
+          "Daha fazla bilgi sağlayıcıların gizlilik politikalarında bulunabilir: Microsoft: https://privacy.microsoft.com/de-de/privacystatement"
+        ]
+      },
+      {
+        "title": "10. Veri Güvenliği",
+        "content": [
+          "Web sitesi ziyareti sırasında tarayıcınız tarafından desteklenen en yüksek şifreleme seviyesiyle bağlantılı olarak yaygın SSL prosedürünü (Secure Socket Layer) kullanıyoruz. İnternet varlığımızın tek bir sayfasının şifreli bir biçimde iletilip iletilmediğini, tarayıcınızın adres çubuğundaki kilit veya anahtar sembolünün kapalı gösteriminden anlayabilirsiniz."
+        ]
+      },
+      {
+        "title": "11. Bu Gizlilik Politikasının Geçerliliği ve Değiştirilmesi",
+        "content": [
+          "Bu Gizlilik Politikası şu anda geçerlidir ve Kasım 2025 durumundadır. Web sitemizin daha da geliştirilmesi veya değişen yasal gereklilikler nedeniyle, bu Gizlilik Politikasını değiştirmek gerekebilir."
+        ]
+      }
+    ]
   }
 }
