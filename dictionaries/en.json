@@ -887,5 +887,46 @@
         ]
       }
     ]
+  },
+  "imprint": {
+    "title": "Imprint",
+    "sections": [
+      {
+        "title": "Information according to § 5 DDG",
+        "content": [
+          "SmartGerman Language School",
+          "Hüttenstraße 24a",
+          "30165 Hannover",
+          "Germany"
+        ]
+      },
+      {
+        "title": "Represented by",
+        "content": [
+          "Anastasia Sitov"
+        ]
+      },
+      {
+        "title": "Contact",
+        "content": [
+          "Phone: +49 171 4758620",
+          "E-Mail: info@smart-german.com"
+        ]
+      },
+      {
+        "title": "VAT",
+        "content": [
+          "According to § 19 UStG no sales tax is charged."
+        ]
+      },
+      {
+        "title": "Responsible for content according to § 18 Abs. 2 MStV",
+        "content": [
+          "Anastasia Sitov",
+          "Hüttenstraße 24a",
+          "30165 Hannover"
+        ]
+      }
+    ]
   }
 }

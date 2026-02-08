@@ -808,31 +808,17 @@
         "title": "Widerrufsbelehrung",
         "highlight": true,
         "content": [
-          "Widerrufsrecht:",
-          "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen.",
-          "Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsschlusses.",
-          "Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (SmartGerman Sprachschule, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com) mittels einer eindeutigen Erklärung (z. B. per E-Mail oder Brief) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren.",
-          "Zur Wahrung der Frist genügt die rechtzeitige Absendung der Mitteilung über die Ausübung des Widerrufsrechts.",
+          "(1) Steht Ihnen ein Widerrufsrecht zu, so können Sie dieses durch Erklärung gegenüber der Sprachschule ausüben. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.",
+          "(2) Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.",
           "Folgen des Widerrufs:",
-          "Wenn Sie diesen Vertrag widerrufen, erstatten wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverzüglich und spätestens binnen 14 Tagen ab dem Tag, an dem die Mitteilung über Ihren Widerruf bei uns eingegangen ist.",
-          "Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart.",
-          "Wertersatz: Haben Sie verlangt, dass die Dienstleistung (z. B. der Kurs) während der Widerrufsfrist beginnen soll, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Ausübung des Widerrufsrechts unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht.",
-          "Besonderer Hinweis zum vorzeitigen Erlöschen:",
-          "Das Widerrufsrecht erlischt bei einem Vertrag zur Erbringung von Dienstleistungen auch dann, wenn wir die Dienstleistung vollständig erbracht haben und mit der Ausführung der Dienstleistung erst begonnen haben, nachdem Sie dazu Ihre ausdrückliche Zustimmung gegeben haben und gleichzeitig Ihre Kenntnis davon bestätigt haben, dass Sie Ihr Widerrufsrecht bei vollständiger Vertragserfüllung durch uns verlieren."
+          "Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser Rückzahlung Entgelte berechnet.",
+          "Haben Sie verlangt, dass die Dienstleistung während der Widerrufsfrist beginnen soll, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Ausübung des Widerrufsrechts hinsichtlich dieses Vertrags unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht."
         ]
       },
       {
         "title": "Muster-Widerrufsformular",
         "highlight": true,
         "content": [
-          "(Wenn Sie den Vertrag widerrufen möchten, füllen Sie dieses Formular aus und senden Sie es zurück.)",
-          "An SmartGerman Sprachschule, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com",
-          "Hiermit widerrufe ich den von mir abgeschlossenen Vertrag über die Teilnahme am folgenden Kurs:",
-          "(Bezeichnung des Kurses)",
-          "Bestellt am: ________________ / erhalten am: ________________",
-          "Name des Verbrauchers: __________________________",
-          "Anschrift des Verbrauchers: ________________________",
-          "Datum: ________________",
           "(Unterschrift, nur bei Mitteilung auf Papier)"
         ]
       },
@@ -884,6 +870,47 @@
           "(1) Es gilt deutsches Recht.",
           "(2) Die Vertragssprache ist Deutsch.",
           "(3) Ist der Teilnehmer Verbraucher, gilt der gesetzliche Gerichtsstand seines Wohnsitzes."
+        ]
+      }
+    ]
+  },
+  "imprint": {
+    "title": "Impressum",
+    "sections": [
+      {
+        "title": "Angaben gemäß § 5 DDG",
+        "content": [
+          "SmartGerman Sprachschule",
+          "Hüttenstraße 24a",
+          "30165 Hannover",
+          "Deutschland"
+        ]
+      },
+      {
+        "title": "Vertreten durch",
+        "content": [
+          "Anastasia Sitov"
+        ]
+      },
+      {
+        "title": "Kontakt",
+        "content": [
+          "Telefon: +49 171 4758620",
+          "E-Mail: info@smart-german.com"
+        ]
+      },
+      {
+        "title": "Umsatzsteuer",
+        "content": [
+          "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet."
+        ]
+      },
+      {
+        "title": "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV",
+        "content": [
+          "Anastasia Sitov",
+          "Hüttenstraße 24a",
+          "30165 Hannover"
         ]
       }
     ]

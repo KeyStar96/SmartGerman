@@ -814,17 +814,11 @@
         "title": "Cayma Hakkı Bilgilendirmesi",
         "highlight": true,
         "content": [
-          "Cayma Hakkı:",
-          "Bu sözleşmeden on dört gün içinde herhangi bir gerekçe göstermeksizin cayma hakkınız vardır.",
-          "Cayma süresi, sözleşmenin yapıldığı günden itibaren on dört gündür.",
-          "Cayma hakkınızı kullanmak için, kararınızı (örneğin, e-posta veya mektupla) açık bir beyanla bize (SmartGerman Dil Okulu, Hüttenstraße 24a, 30165 Hannover, E-Posta: info@smart-german.com) bildirmeniz gerekmektedir.",
-          "Cayma süresine uymak için, cayma hakkını kullandığınıza dair bildirimi cayma süresi dolmadan göndermeniz yeterlidir.",
-          "Cayma Hakkının Sonuçları:",
-          "Bu sözleşmeden cayarsanız, sizden aldığımız tüm ödemeleri, cayma bildiriminizin bize ulaştığı tarihten itibaren en geç on dört gün içinde derhal size iade edeceğiz.",
-          "Bu geri ödeme için, sizinle aksi açıkça kararlaştırılmadıkça, orijinal işlemde kullandığınız ödeme aracını kullanacağız.",
-          "Değer Tazmini: Hizmetin (örneğin, kursun) cayma süresi içinde başlamasını talep ettiyseniz, cayma hakkını kullandığınızı bize bildirdiğiniz tarihe kadar sunulan hizmetlerin sözleşmede öngörülen toplam hizmet kapsamına oranına karşılık gelen makul bir tutarı bize ödemeniz gerekir.",
-          "Erken Sona Erme Hakkında Özel Not:",
-          "Hizmet sunumuna ilişkin bir sözleşmede cayma hakkı, hizmeti tamamen ifa ettiğimizde ve hizmetin ifasına ancak sizin açık onayınızla ve sözleşmenin tarafımızca tam ifasıyla cayma hakkınızı kaybedeceğinizi bildiğinizi teyit etmenizden sonra başladığımız durumlarda da sona erer."
+          "(1) Cayma hakkınız varsa, bunu dil okuluna beyan ederek kullanabilirsiniz. Bunun için ekteki örnek cayma formunu kullanabilirsiniz, ancak bu zorunlu değildir.",
+          "(2) Cayma süresine uymak için, cayma hakkınızı kullandığınıza dair bildirimi cayma süresi dolmadan önce göndermeniz yeterlidir.",
+          "Caymanın Sonuçları:",
+          "Bu sözleşmeden cayarsanız, sizden aldığımız tüm ödemeleri derhal ve en geç bu sözleşmeden caydığınıza dair bildirimin bize ulaştığı günden itibaren on dört gün içinde size geri ödemek zorundayız. Bu geri ödeme için, sizinle açıkça aksi kararlaştırılmadıkça, orijinal işlemde kullandığınız ödeme aracını kullanırız; bu geri ödeme için sizden hiçbir durumda ücret alınmayacaktır.",
+          "Hizmetin cayma süresi içinde başlamasını talep ettiyseniz, bu sözleşmeyle ilgili cayma hakkınızı kullandığınızı bize bildirdiğiniz ana kadar sağlanan hizmetlerin, sözleşmede öngörülen hizmetlerin toplam kapsamına oranına karşılık gelen makul bir tutarı bize ödemeniz gerekir."
         ]
       },
       {
@@ -832,13 +826,6 @@
         "highlight": true,
         "content": [
           "(Sözleşmeden caymak istiyorsanız, lütfen bu formu doldurup geri gönderin.)",
-          "Kime: SmartGerman Dil Okulu, Hüttenstraße 24a, 30165 Hannover, E-Posta: info@smart-german.com",
-          "Aşağıdaki kursa katılım sözleşmemi feshediyorum:",
-          "(Kursun Adı)",
-          "Sipariş Tarihi: ________________ / Teslim Alma Tarihi: ________________",
-          "Tüketicinin Adı: __________________________",
-          "Tüketicinin Adresi: ________________________",
-          "Tarih: ________________",
           "(İmza, sadece kağıt üzerinde bildirimde)"
         ]
       },
@@ -890,6 +877,47 @@
           "(1) Alman hukuku geçerlidir.",
           "(2) Sözleşme dili Almancadır.",
           "(3) Katılımcı tüketici ise, ikametgahının yasal yetkili mahkemesi geçerlidir."
+        ]
+      }
+    ]
+  },
+  "imprint": {
+    "title": "Künye",
+    "sections": [
+      {
+        "title": "§ 5 DDG uyarınca bilgiler",
+        "content": [
+          "SmartGerman Sprachschule",
+          "Hüttenstraße 24a",
+          "30165 Hannover",
+          "Almanya"
+        ]
+      },
+      {
+        "title": "Temsil Eden",
+        "content": [
+          "Anastasia Sitov"
+        ]
+      },
+      {
+        "title": "İletişim",
+        "content": [
+          "Telefon: +49 171 4758620",
+          "E-Posat: info@smart-german.com"
+        ]
+      },
+      {
+        "title": "KDV",
+        "content": [
+          "§ 19 UStG uyarınca satış vergisi alınmamaktadır."
+        ]
+      },
+      {
+        "title": "§ 18 Abs. 2 MStV uyarınca içerikten sorumlu",
+        "content": [
+          "Anastasia Sitov",
+          "Hüttenstraße 24a",
+          "30165 Hannover"
         ]
       }
     ]
