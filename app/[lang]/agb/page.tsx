@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 export default async function AGBPage({ params }: { params: Promise<{ lang: string }> }) {
     const { lang } = await params;
-    const dictionary: any = await getDictionary(lang);
+    const dictionary = await getDictionary(lang);
 
     return (
         <div className="min-h-screen bg-[#050505] text-[#E2D7CE] font-sans selection:bg-[#FF5C00]/30">
@@ -39,11 +39,14 @@ export default async function AGBPage({ params }: { params: Promise<{ lang: stri
 
                 <div className="space-y-12">
                     {dictionary.agb?.sections?.map((section: any, index: number) => (
-                        <section key={index} className="space-y-4">
-                            <h2 className="text-2xl font-semibold tracking-tight text-white">
+                        <section
+                            key={index}
+                            className={`space-y-4 ${section.highlight ? 'bg-white/5 p-6 rounded-xl border border-white/10 my-8' : ''}`}
+                        >
+                            <h2 className={`text-2xl font-semibold tracking-tight text-white ${section.highlight ? 'text-[#FF5C00]' : ''}`}>
                                 {section.title}
                             </h2>
-                            <div className="space-y-2 text-white/70 leading-relaxed">
+                            <div className={`space-y-2 text-white/70 leading-relaxed ${section.title === 'Muster-Widerrufsformular' ? 'font-mono text-sm bg-black/30 p-4 rounded-lg' : ''}`}>
                                 {section.content.map((paragraph: string, pIndex: number) => (
                                     <p key={pIndex}>{paragraph}</p>
                                 ))}

@@ -751,24 +751,30 @@
     "status_date": "Status: October 2025",
     "sections": [
       {
-        "title": "§ 1 Scope of Application",
+        "title": "§ 1 Scope of Application, Provider",
         "content": [
-          "(1) These General Terms and Conditions (GTC) apply to all contracts for participation in language courses (face-to-face and online courses) of the SmartGerman Language School, owner Anastasia Sitov, Hüttenstraße 24a, 30165 Hannover (hereinafter \"Language School\"), which are concluded between the Language School and the participant (hereinafter \"participant\").",
-          "(2) Deviating conditions of the participant are not recognized unless the Language School expressly agrees to their validity in writing."
+          "(1) These General Terms and Conditions (GTC) apply to all contracts for participation in language courses, language training, private lessons, online courses, and other services of the SmartGerman Language School (hereinafter \"Language School\").",
+          "Provider:",
+          "SmartGerman Language School",
+          "Hüttenstraße 24a, 30165 Hannover, Germany",
+          "E-Mail: info@smart-german.com",
+          "Phone: +49 171 4758620",
+          "Authorized Representative: Anastasia Sitov",
+          "(2) Deviating or supplementary conditions of the participant are only binding if the Language School confirms this in writing."
         ]
       },
       {
-        "title": "§ 2 Subject of Performance",
+        "title": "§ 2 Subject of Contract",
         "content": [
-          "(1) The Language School offers German courses for various levels (A1–C1) as well as exam preparation courses. The scope, content, and price of the courses result from the respective course description on the website.",
-          "(2) The Language School is entitled to make minor changes to the course schedule, the staffing of lecturers, or class times, provided that this does not significantly impair the overall character of the course.",
-          "(3) Online courses take place via common video conferencing software (e.g., Microsoft Teams). The participant is responsible for a sufficient internet connection and technical equipment."
+          "(1) The subject of the contract is the services specified in the respective course description (scope of services, course duration, dates, teaching materials). The course description is an integral part of the contract.",
+          "(2) Minor changes in the course schedule, teaching staff, or class times are permissible, provided that the overall character of the course is not significantly impaired.",
+          "(3) Online instruction is conducted via common video conferencing software (e.g., Microsoft Teams). The participant is responsible for a suitable internet connection and technical equipment."
         ]
       },
       {
         "title": "§ 3 Registration and Conclusion of Contract",
         "content": [
-          "(1) Registration can be made online via the website, by e-mail, by written registration form, or in person on site and represents a binding offer by the participant.",
+          "(1) Registration can be made online via the website, by e-mail, by written registration form, or personally on site and constitutes a binding offer by the participant.",
           "(2) In the case of written registration using a paper form, the contract is concluded with your signature on the registration form. You will receive a written or e-mailed confirmation of registration.",
           "(3) In the case of online registration, the contract is concluded as soon as the Language School confirms the registration in writing (e.g., by e-mail). The registration confirmation can be combined with the invoice for the course fee.",
           "(4) The Language School reserves the right to reject registrations for good cause (e.g., overcrowding, inappropriate language level)."
@@ -777,10 +783,15 @@
       {
         "title": "§ 4 Prices, Payment Conditions, Default",
         "content": [
-          "(1) The valid prices are those listed in the price overview published on the website. All prices are final prices. According to § 19 UStG, no sales tax is charged.",
+          "(1) The currently valid prices are those listed in the price overview published on the website. All prices are final prices. According to § 19 UStG, no sales tax is charged.",
           "(2) The course fee is to be paid in advance for the upcoming month. Upon payment, the participant acquires access to the courses of this month. An automatic extension of the contract does not take place.",
           "(3) Payment is made by bank transfer after receipt of invoice, unless otherwise agreed.",
-          "Bank details:\nAccount holder: Anastasia Sitov\nIBAN: DE98 1001 1001 2273 5332 29\nBIC: NTSBDEB1XXX\nBank: N26 Bank SE\nReason for payment: Invoice number",
+          "Bank details:",
+          "Account holder: Anastasia Sitov",
+          "IBAN: DE98 1001 1001 2273 5332 29",
+          "BIC: NTSBDEB1XXX",
+          "Bank: N26 Bank SE",
+          "Reason for payment: Invoice number",
           "(4) Invoices must be paid within 14 days of receipt. Failure to comply with this deadline may result in default interest in accordance with statutory regulations.",
           "(5) If the participant is in default of payment, the statutory default regulations (§ 288 BGB) apply. The Language School is entitled to suspend participation until outstanding amounts are settled."
         ]
@@ -794,19 +805,24 @@
       },
       {
         "title": "Cancellation Policy",
+        "highlight": true,
         "content": [
-          "Right of withdrawal:\nYou have the right to withdraw from this contract within fourteen days without giving any reason.",
+          "Right of withdrawal:",
+          "You have the right to withdraw from this contract within fourteen days without giving any reason.",
           "The withdrawal period is fourteen days from the day of the conclusion of the contract.",
           "To exercise your right of withdrawal, you must inform us (SmartGerman Language School, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com) by means of a clear statement (e.g., by e-mail or letter) of your decision to withdraw from this contract.",
           "To meet the withdrawal deadline, it is sufficient for you to send your communication concerning your exercise of the right of withdrawal before the withdrawal period has expired.",
-          "Consequences of withdrawal:\nIf you withdraw from this contract, we will reimburse to you all payments received from you, promptly and at the latest within 14 days from the day on which we received your notification of withdrawal.",
+          "Consequences of withdrawal:",
+          "If you withdraw from this contract, we will reimburse to you all payments received from you, promptly and at the latest within 14 days from the day on which we received your notification of withdrawal.",
           "For this repayment, we use the same means of payment that you used for the original transaction, unless expressly agreed otherwise with you.",
           "Compensation for value: If you requested that the service (e.g., the course) begin during the withdrawal period, you must pay us a reasonable amount corresponding to the proportion of the services already provided up to the time you inform us of the exercise of the right of withdrawal compared to the total scope of the services provided for in the contract.",
-          "Special note on premature expiration:\nThe right of withdrawal expires in the case of a contract for the provision of services even if we have completely provided the service and have only begun to perform the service after you have given your express consent to this and at the same time confirmed your knowledge that you lose your right of withdrawal upon complete performance of the contract by us."
+          "Special note on premature expiration:",
+          "The right of withdrawal expires in the case of a contract for the provision of services even if we have completely provided the service and have only begun to perform the service after you have given your express consent to this and at the same time confirmed your knowledge that you lose your right of withdrawal upon complete performance of the contract by us."
         ]
       },
       {
         "title": "Model Withdrawal Form",
+        "highlight": true,
         "content": [
           "(If you want to withdraw from the contract, please fill out this form and send it back.)",
           "To SmartGerman Language School, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com",

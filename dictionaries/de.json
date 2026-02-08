@@ -744,5 +744,147 @@
       "server_error": "Ein Fehler ist aufgetreten.",
       "generic_error": "Ein unerwarteter Fehler ist aufgetreten."
     }
+  },
+  "agb": {
+    "title": "Allgemeine Geschäftsbedingungen",
+    "school_name": "SmartGerman Sprachschule",
+    "status_date": "Stand: Oktober 2025",
+    "sections": [
+      {
+        "title": "§ 1 Geltungsbereich, Anbieter",
+        "content": [
+          "(1) Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für sämtliche Verträge über die Teilnahme an Sprachkursen, Sprachtrainings, Einzelunterricht, Online-Kursen und sonstigen Leistungen der SmartGerman Sprachschule (nachfolgend \"Sprachschule\").",
+          "Anbieter:",
+          "SmartGerman Sprachschule",
+          "Hüttenstraße 24a, 30165 Hannover, Deutschland",
+          "E-Mail: info@smart-german.com",
+          "Telefon: +49 171 4758620",
+          "Vertretungsberechtigt: Anastasia Sitov",
+          "(2) Abweichende oder ergänzende Bedingungen des Teilnehmers werden nur verbindlich, wenn die Sprachschule dies schriftlich bestätigt."
+        ]
+      },
+      {
+        "title": "§ 2 Vertragsgegenstand",
+        "content": [
+          "(1) Vertragsgegenstand sind die in der jeweiligen Kursbeschreibung angegebenen Leistungen (Leistungsumfang, Kursdauer, Termine, Lehrmaterialien). Die Kursbeschreibung ist Bestandteil des Vertrags.",
+          "(2) Geringfügige Änderungen im Kursablauf, bei Dozent:innen oder Unterrichtszeiten sind zulässig, sofern der Gesamtcharakter des Kurses nicht wesentlich beeinträchtigt wird.",
+          "(3) Online-Unterricht wird über gängige Videokonferenz-Software (z. B. Microsoft Teams) durchgeführt. Der Teilnehmer ist für eine geeignete Internetverbindung und technische Ausstattung selbst verantwortlich."
+        ]
+      },
+      {
+        "title": "§ 3 Anmeldung und Vertragsschluss",
+        "content": [
+          "(1) Die Anmeldung kann online über die Webseite, per E-Mail, per schriftlichem Anmeldeformular oder persönlich vor Ort erfolgen und stellt ein verbindliches Angebot des Teilnehmers dar.",
+          "(2) Bei schriftlicher Anmeldung mittels Papierformular kommt der Vertrag mit Ihrer Unterschrift auf dem Anmeldeformular zustande. Sie erhalten eine schriftliche oder per E-Mail versendete Anmeldebestätigung.",
+          "(3) Bei Online-Anmeldung kommt der Vertrag zustande, sobald die Sprachschule die Anmeldung schriftlich (z. B. per E-Mail) bestätigt. Die Anmeldebestätigung kann mit der Rechnung für die Kursgebühr verbunden werden.",
+          "(4) Die Sprachschule behält sich das Recht vor, Anmeldungen aus wichtigem Grund (z. B. Überbelegung, unpassendes Sprachniveau) abzulehnen."
+        ]
+      },
+      {
+        "title": "§ 4 Preise, Zahlungsbedingungen, Verzug",
+        "content": [
+          "(1) Die jeweils gültigen Preise ergeben sich aus der auf der Webseite veröffentlichten Preisübersicht. Alle Preise sind Endpreise. Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+          "(2) Die Kursgebühr ist jeweils im Voraus für den kommenden Monat zu entrichten. Mit Zahlung erwirbt der Teilnehmer den Zugang zu den Kursen dieses Monats. Eine automatische Verlängerung des Vertrags erfolgt nicht.",
+          "(3) Die Zahlung erfolgt per Überweisung nach Rechnungserhalt, sofern nicht anders vereinbart.",
+          "Bankverbindung:",
+          "Kontoinhaber: Anastasia Sitov",
+          "IBAN: DE98 1001 1001 2273 5332 29",
+          "BIC: NTSBDEB1XXX",
+          "Bank: N26 Bank SE",
+          "Verwendungszweck: Rechnungsnummer",
+          "(4) Rechnungen sind spätestens 14 Tage nach Erhalt zu begleichen. Bei Nichteinhaltung dieser Frist drohen Verzugszinsen gemäß gesetzlicher Regelung.",
+          "(5) Gerät der Teilnehmer in Zahlungsverzug, gelten die gesetzlichen Verzugsregelungen (§ 288 BGB). Die Sprachschule ist berechtigt, die Teilnahme bis zur Begleichung offener Beträge auszusetzen."
+        ]
+      },
+      {
+        "title": "§ 5 Widerrufsrecht (Verbraucher / Fernabsatzverträge)",
+        "content": [
+          "(1) Sofern der Vertrag im Fernabsatz (z. B. per E-Mail oder Online-Anmeldung) geschlossen wurde, steht dem Teilnehmer, der Verbraucher im Sinne von § 13 BGB ist, ein gesetzliches Widerrufsrecht zu.",
+          "(2) Die Einzelheiten ergeben sich aus der nachfolgenden Widerrufsbelehrung."
+        ]
+      },
+      {
+        "title": "Widerrufsbelehrung",
+        "highlight": true,
+        "content": [
+          "Widerrufsrecht:",
+          "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen.",
+          "Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsschlusses.",
+          "Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (SmartGerman Sprachschule, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com) mittels einer eindeutigen Erklärung (z. B. per E-Mail oder Brief) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren.",
+          "Zur Wahrung der Frist genügt die rechtzeitige Absendung der Mitteilung über die Ausübung des Widerrufsrechts.",
+          "Folgen des Widerrufs:",
+          "Wenn Sie diesen Vertrag widerrufen, erstatten wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverzüglich und spätestens binnen 14 Tagen ab dem Tag, an dem die Mitteilung über Ihren Widerruf bei uns eingegangen ist.",
+          "Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart.",
+          "Wertersatz: Haben Sie verlangt, dass die Dienstleistung (z. B. der Kurs) während der Widerrufsfrist beginnen soll, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Ausübung des Widerrufsrechts unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht.",
+          "Besonderer Hinweis zum vorzeitigen Erlöschen:",
+          "Das Widerrufsrecht erlischt bei einem Vertrag zur Erbringung von Dienstleistungen auch dann, wenn wir die Dienstleistung vollständig erbracht haben und mit der Ausführung der Dienstleistung erst begonnen haben, nachdem Sie dazu Ihre ausdrückliche Zustimmung gegeben haben und gleichzeitig Ihre Kenntnis davon bestätigt haben, dass Sie Ihr Widerrufsrecht bei vollständiger Vertragserfüllung durch uns verlieren."
+        ]
+      },
+      {
+        "title": "Muster-Widerrufsformular",
+        "highlight": true,
+        "content": [
+          "(Wenn Sie den Vertrag widerrufen möchten, füllen Sie dieses Formular aus und senden Sie es zurück.)",
+          "An SmartGerman Sprachschule, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com",
+          "Hiermit widerrufe ich den von mir abgeschlossenen Vertrag über die Teilnahme am folgenden Kurs:",
+          "(Bezeichnung des Kurses)",
+          "Bestellt am: ________________ / erhalten am: ________________",
+          "Name des Verbrauchers: __________________________",
+          "Anschrift des Verbrauchers: ________________________",
+          "Datum: ________________",
+          "(Unterschrift, nur bei Mitteilung auf Papier)"
+        ]
+      },
+      {
+        "title": "§ 6 Nichtteilnahme / Krankheit",
+        "content": [
+          "(1) Die Kursgebühr deckt den Zugang zu den Kursen im jeweiligen Monat ab. Bei Nichtteilnahme an einzelnen Unterrichtseinheiten (z. B. wegen Krankheit oder Urlaub) besteht kein Anspruch auf Erstattung oder Ersatzstunden.",
+          "(2) Auf Kulanzbasis kann die Sprachschule Nachholmöglichkeiten oder Ersatztermine anbieten, sofern organisatorisch möglich."
+        ]
+      },
+      {
+        "title": "§ 7 Ausfall durch die Sprachschule / Ersatzleistungen",
+        "content": [
+          "(1) Fällt Unterricht aus Gründen aus, die die Sprachschule zu vertreten hat (z. B. Erkrankung der Lehrkraft) und kein Ersatztermin angeboten werden kann, wird die anteilige Kursgebühr erstattet.",
+          "(2) Weitergehende Ansprüche, insbesondere Schadensersatz, sind ausgeschlossen, soweit nicht Vorsatz oder grobe Fahrlässigkeit vorliegt."
+        ]
+      },
+      {
+        "title": "§ 8 Haftung",
+        "content": [
+          "(1) Die Sprachschule haftet nur bei Vorsatz und grober Fahrlässigkeit. Bei einfacher Fahrlässigkeit haftet sie nur bei Verletzung wesentlicher Vertragspflichten (Kardinalpflichten) und beschränkt auf den vertragstypischen, vorhersehbaren Schaden.",
+          "(2) Für Schäden aus Verletzung des Lebens, des Körpers oder der Gesundheit gilt die gesetzliche Haftung unbeschränkt.",
+          "(3) Die Sprachschule übernimmt keine Garantie für einen bestimmten Lernerfolg.",
+          "(4) Für Verlust oder Beschädigung persönlicher Gegenstände wird nur bei Vorsatz oder grober Fahrlässigkeit gehaftet."
+        ]
+      },
+      {
+        "title": "§ 9 Urheberrecht / Kursmaterialien",
+        "content": [
+          "Kursunterlagen sind urheberrechtlich geschützt und dürfen ausschließlich zum persönlichen Gebrauch verwendet werden. Eine Weitergabe, Vervielfältigung oder Veröffentlichung ist ohne ausdrückliche schriftliche Zustimmung der Sprachschule untersagt."
+        ]
+      },
+      {
+        "title": "§ 10 Vertragsdauer",
+        "content": [
+          "(1) Mit Zahlung der Kursgebühr wird ein Vertrag über die Teilnahme am Kursangebot des betreffenden Monats geschlossen.",
+          "(2) Eine automatische Verlängerung findet nicht statt. Für jeden weiteren Monat ist eine erneute Anmeldung und Zahlung erforderlich."
+        ]
+      },
+      {
+        "title": "§ 11 Datenschutz",
+        "content": [
+          "Die Erhebung und Verarbeitung personenbezogener Daten erfolgt im Einklang mit der DSGVO und dem BDSG. Weitere Informationen enthält die Datenschutzerklärung auf der Webseite der Sprachschule."
+        ]
+      },
+      {
+        "title": "§ 12 Schlussbestimmungen",
+        "content": [
+          "(1) Es gilt deutsches Recht.",
+          "(2) Die Vertragssprache ist Deutsch.",
+          "(3) Ist der Teilnehmer Verbraucher, gilt der gesetzliche Gerichtsstand seines Wohnsitzes."
+        ]
+      }
+    ]
   }
 }
