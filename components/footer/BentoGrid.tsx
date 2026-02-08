@@ -146,6 +146,7 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                     <a href="/imprint" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</a>
                     <a href="/privacy" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</a>
                     <a href="/terms" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</a>
+                    <a href="/cancellation" className="hover:text-[#FF5C00] transition-colors">Verträge kündigen</a>
                 </div>
             </div>
         </div>
