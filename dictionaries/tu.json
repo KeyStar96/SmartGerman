@@ -720,5 +720,34 @@
       "payment_point_2": "Sonra esnek bir şekilde devam etmeye karar verirsiniz.",
       "payment_point_3": "Ayın 25'ine kadar iptal edilebilir."
     }
+  },
+  "cancellation": {
+    "title": "Sözleşmeleri Buradan İptal Edin",
+    "description": "Lütfen bu formu doldurun. Alındığını hemen e-posta ile onaylayacağız.",
+    "label": "SÖZLEŞME İŞLEMLERİ",
+    "form": {
+      "full_name": "Ad ve Soyad",
+      "email": "E-posta Adresi",
+      "course_name": "Hangi Kurs? (İsteğe bağlı)",
+      "termination_date_label": "İptal Tarihi",
+      "asap_option": "Mümkün olan en kısa sürede",
+      "specific_date_option": "Belirli bir tarihte",
+      "specific_date_label": "Tercih Edilen Tarih",
+      "submit_button": "Şimdi İptal Et",
+      "processing": "İşleniyor...",
+      "disclaimer": "\"Şimdi İptal Et\" butonuna tıklayarak, sözleşmeyi § 312k BGB uyarınca iptal etmek istediğinizi bağlayıcı olarak beyan edersiniz.",
+      "earliest_date": "Mümkün olan en erken tarih: "
+    },
+    "success": {
+      "title": "İptal İsteği Alındı",
+      "message": "Kısa süre içinde e-posta adresinize bir onay gönderilecektir."
+    },
+    "errors": {
+      "name_required": "İsim gereklidir (min. 2 karakter)",
+      "email_invalid": "Geçersiz e-posta adresi",
+      "date_required_specific": "Tarih gereklidir",
+      "server_error": "Bir hata oluştu.",
+      "generic_error": "Beklenmedik bir hata oluştu."
+    }
   }
 }

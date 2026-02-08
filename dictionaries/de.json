@@ -714,5 +714,34 @@
       "payment_point_2": "Danach entscheiden Sie flexibel weiter.",
       "payment_point_3": "Kündbar bis zum 25. des Monats."
     }
+  },
+  "cancellation": {
+    "title": "Verträge hier kündigen",
+    "description": "Füllen Sie dieses Formular aus. Wir bestätigen den Eingang sofort per E-Mail.",
+    "label": "VERTRAGSANGELEGENHEITEN",
+    "form": {
+      "full_name": "Vor- und Nachname",
+      "email": "E-Mail-Adresse",
+      "course_name": "Welcher Kurs? (Optional)",
+      "termination_date_label": "Kündigungsdatum",
+      "asap_option": "Zum nächstmöglichen Termin",
+      "specific_date_option": "Zu einem bestimmten Datum",
+      "specific_date_label": "Wunschdatum",
+      "submit_button": "Jetzt kündigen",
+      "processing": "Wird verarbeitet...",
+      "disclaimer": "Mit dem Klick auf \"Jetzt kündigen\" erklären Sie verbindlich Ihren Kündigungswunsch gemäß § 312k BGB.",
+      "earliest_date": "Frühstmöglicher Termin: "
+    },
+    "success": {
+      "title": "Kündigung vorgemerkt",
+      "message": "Sie erhalten in Kürze eine Bestätigung an Ihre E-Mail-Adresse."
+    },
+    "errors": {
+      "name_required": "Name ist erforderlich (min. 2 Zeichen)",
+      "email_invalid": "Ungültige E-Mail-Adresse",
+      "date_required_specific": "Datum ist erforderlich",
+      "server_error": "Ein Fehler ist aufgetreten.",
+      "generic_error": "Ein unerwarteter Fehler ist aufgetreten."
+    }
   }
 }

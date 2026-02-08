@@ -6,14 +6,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { cancellationSchema, CancellationFormData } from "@/lib/cancellation-schema";
+import { createCancellationSchema, CancellationFormData } from "@/lib/cancellation-schema";
 import { submitCancellation } from "@/app/actions/submit-cancellation";
+import { getEarliestCancellationDate } from "@/lib/cancellation-utils";
 import { DateDropdowns } from "@/components/ui/DateDropdowns";
 
-export default function CancellationForm() {
+interface CancellationFormProps {
+    dictionary: any;
+    lang: string;
+}
+
+export default function CancellationForm({ dictionary, lang }: CancellationFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
+
+    const t = dictionary.cancellation;
 
     const {
         register,
@@ -22,7 +30,7 @@ export default function CancellationForm() {
         control,
         formState: { errors },
     } = useForm<CancellationFormData>({
-        resolver: zodResolver(cancellationSchema),
+        resolver: zodResolver(createCancellationSchema(dictionary)),
         defaultValues: {
             terminationDate: "asap"
         }
@@ -31,44 +39,21 @@ export default function CancellationForm() {
     const terminationDateValue = watch("terminationDate");
 
     const minDate = useMemo(() => {
-        const now = new Date();
-        const currentDay = now.getDate();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        // If today is <= 25, earliest is end of current month.
-        // If today > 25, earliest is end of NEXT month.
-        let targetMonth = currentMonth;
-        let targetYear = currentYear;
-
-        if (currentDay > 25) {
-            targetMonth = currentMonth + 1;
-        }
-
-        // Handle year overflow
-        if (targetMonth > 11) {
-            targetMonth = 0;
-            targetYear++;
-        }
-
-        // Get last day of the target month
-        // new Date(year, month + 1, 0) gives the last day of 'month'
-        const lastDayOfTargetMonth = new Date(targetYear, targetMonth + 1, 0);
-        return lastDayOfTargetMonth;
+        return getEarliestCancellationDate();
     }, []);
 
     const onSubmit = async (data: CancellationFormData) => {
         setIsSubmitting(true);
         setServerError(null);
         try {
-            const result = await submitCancellation(data);
+            const result = await submitCancellation(data, lang);
             if (result.success) {
                 setIsSuccess(true);
             } else {
-                setServerError(result.message || "Something went wrong.");
+                setServerError(result.message || t.errors.generic_error);
             }
         } catch (error) {
-            setServerError("An unexpected error occurred.");
+            setServerError(t.errors.generic_error);
         } finally {
             setIsSubmitting(false);
         }
@@ -85,10 +70,10 @@ export default function CancellationForm() {
                     <CheckCircle2 className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                    Kündigung vorgemerkt
+                    {t.success.title}
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400 max-w-md">
-                    Sie erhalten in Kürze eine Bestätigung an Ihre E-Mail-Adresse.
+                    {t.success.message}
                 </p>
             </motion.div>
         );
@@ -124,7 +109,7 @@ export default function CancellationForm() {
                             "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]"
                         )}
                     >
-                        Vor- und Nachname
+                        {t.form.full_name}
                     </label>
                     {errors.fullName && (
                         <span className="text-red-500 text-xs mt-1 block font-mono">{errors.fullName.message}</span>
@@ -153,7 +138,7 @@ export default function CancellationForm() {
                             "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]"
                         )}
                     >
-                        E-Mail-Adresse
+                        {t.form.email}
                     </label>
                     {errors.email && (
                         <span className="text-red-500 text-xs mt-1 block font-mono">{errors.email.message}</span>
@@ -180,7 +165,7 @@ export default function CancellationForm() {
                             "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]"
                         )}
                     >
-                        Welcher Kurs? (Optional)
+                        {t.form.course_name}
                     </label>
                 </div>
             </div>
@@ -188,7 +173,7 @@ export default function CancellationForm() {
             {/* Termination Date */}
             <div className="space-y-4 pt-4">
                 <span className="block text-xs font-mono uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                    Kündigungsdatum
+                    {t.form.termination_date_label}
                 </span>
                 <div className="space-y-3">
                     <label className="flex items-center gap-3 cursor-pointer group">
@@ -202,7 +187,7 @@ export default function CancellationForm() {
                             <div className="w-2.5 h-2.5 bg-[#FF5C00] rounded-full scale-0 peer-checked:scale-100 transition-transform" />
                         </div>
                         <span className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                            Zum nächstmöglichen Termin
+                            {t.form.asap_option}
                         </span>
                     </label>
 
@@ -217,7 +202,7 @@ export default function CancellationForm() {
                             <div className="w-2.5 h-2.5 bg-[#FF5C00] rounded-full scale-0 peer-checked:scale-100 transition-transform" />
                         </div>
                         <span className="text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-                            Zu einem bestimmten Datum
+                            {t.form.specific_date_option}
                         </span>
                     </label>
                 </div>
@@ -238,7 +223,7 @@ export default function CancellationForm() {
                                         <DateDropdowns
                                             value={field.value}
                                             onChange={field.onChange}
-                                            label="Wunschdatum"
+                                            label={t.form.specific_date_label}
                                             futureYears={true}
                                             minDate={minDate}
                                             error={errors.specificDate?.message}
@@ -247,7 +232,7 @@ export default function CancellationForm() {
                                 />
                                 {minDate && (
                                     <p className="text-[10px] text-gray-400 mt-2 font-mono">
-                                        Frühstmöglicher Termin: {minDate.toLocaleDateString("de-DE")}
+                                        {t.form.earliest_date} {minDate.toLocaleDateString(lang === 'uk' ? 'uk-UA' : lang === 'tu' ? 'tr-TR' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'de-DE')}
                                     </p>
                                 )}
                             </div>
@@ -266,14 +251,14 @@ export default function CancellationForm() {
                     {isSubmitting ? (
                         <>
                             <Loader2 className="animate-spin" size={20} />
-                            <span>Wird verarbeitet...</span>
+                            <span>{t.form.processing}</span>
                         </>
                     ) : (
-                        <span>Jetzt kündigen</span>
+                        <span>{t.form.submit_button}</span>
                     )}
                 </button>
                 <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed max-w-sm mx-auto">
-                    Mit dem Klick auf "Jetzt kündigen" erklären Sie verbindlich Ihren Kündigungswunsch gemäß § 312k BGB.
+                    {t.form.disclaimer}
                 </p>
             </div>
         </form>

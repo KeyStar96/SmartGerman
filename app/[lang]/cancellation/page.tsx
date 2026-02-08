@@ -2,11 +2,21 @@ import React from "react";
 import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 import CancellationForm from "@/components/cancellation/CancellationForm";
+import { Metadata } from "next";
 
-export const metadata = {
-    title: "Vertrag kündigen | SmartGerman",
-    description: "Hier können Sie Ihren Vertrag bei SmartGerman kündigen. Wir bedauern, dass Sie gehen.",
-};
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+    const { lang } = await params;
+    const dictionary = await getDictionary(lang);
+
+    return {
+        title: `${dictionary.cancellation.title} | SmartGerman`,
+        description: dictionary.cancellation.description,
+    };
+}
 
 export default async function CancellationPage({
     params,
@@ -15,6 +25,7 @@ export default async function CancellationPage({
 }) {
     const { lang } = await params;
     const dictionary = await getDictionary(lang);
+    const t = dictionary.cancellation;
 
     return (
         <>
@@ -28,20 +39,20 @@ export default async function CancellationPage({
                         {/* Header Section */}
                         <div className="mb-8 text-center space-y-4">
                             <span className="inline-block text-[10px] font-mono uppercase tracking-widest text-[#FF5C00] border border-[#FF5C00]/20 px-2 py-1 rounded bg-[#FF5C00]/5">
-                                VERTRAGSANGELEGENHEITEN
+                                {t.label}
                             </span>
 
                             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
-                                Verträge hier kündigen
+                                {t.title}
                             </h1>
 
                             <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed max-w-xs mx-auto">
-                                Füllen Sie dieses Formular aus. Wir bestätigen den Eingang sofort per E-Mail.
+                                {t.description}
                             </p>
                         </div>
 
                         {/* Form Component */}
-                        <CancellationForm />
+                        <CancellationForm dictionary={dictionary} lang={lang} />
 
                     </div>
                 </div>

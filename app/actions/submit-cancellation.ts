@@ -1,7 +1,8 @@
 'use server';
 
-import { cancellationSchema, CancellationFormData } from "@/lib/cancellation-schema";
+import { createCancellationSchema, CancellationFormData } from "@/lib/cancellation-schema";
 import { createAdminClient } from '@/utils/supabase/admin';
+import { getDictionary } from "@/lib/dictionary";
 
 interface SubmitCancellationResult {
     success: boolean;
@@ -9,13 +10,15 @@ interface SubmitCancellationResult {
     errors?: any;
 }
 
-export async function submitCancellation(data: CancellationFormData): Promise<SubmitCancellationResult> {
-    const result = cancellationSchema.safeParse(data);
+export async function submitCancellation(data: CancellationFormData, lang: string): Promise<SubmitCancellationResult> {
+    const dictionary = await getDictionary(lang);
+    const schema = createCancellationSchema(dictionary);
+    const result = schema.safeParse(data);
 
     if (!result.success) {
         return {
             success: false,
-            message: "Validation failed",
+            message: dictionary.cancellation.errors.server_error || "Validation failed",
             errors: result.error.flatten().fieldErrors,
         };
     }
@@ -46,7 +49,7 @@ export async function submitCancellation(data: CancellationFormData): Promise<Su
 
         if (error) {
             console.error("Supabase Cancellation Error:", error);
-            return { success: false, message: "Database error" };
+            return { success: false, message: dictionary.cancellation.errors.generic_error || "Database error" };
         }
 
         // Logic to send email would go here.
@@ -56,6 +59,6 @@ export async function submitCancellation(data: CancellationFormData): Promise<Su
 
     } catch (err) {
         console.error("Unexpected Error in submitCancellation:", err);
-        return { success: false, message: "Internal Server Error" };
+        return { success: false, message: dictionary.cancellation.errors.generic_error || "Internal Server Error" };
     }
 }

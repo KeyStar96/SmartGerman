@@ -714,5 +714,34 @@
       "payment_point_2": "Then you decide flexibly how to continue.",
       "payment_point_3": "Cancellable until the 25th of the month."
     }
+  },
+  "cancellation": {
+    "title": "Cancel Contracts Here",
+    "description": "Please fill out this form. We will confirm receipt immediately via email.",
+    "label": "CONTRACT MATTERS",
+    "form": {
+      "full_name": "First and Last Name",
+      "email": "Email Address",
+      "course_name": "Which Course? (Optional)",
+      "termination_date_label": "Termination Date",
+      "asap_option": "As soon as possible",
+      "specific_date_option": "On a specific date",
+      "specific_date_label": "Preferred Date",
+      "submit_button": "Cancel Now",
+      "processing": "Processing...",
+      "disclaimer": "By clicking \"Cancel Now\", you bindingly declare your wish to cancel according to § 312k BGB.",
+      "earliest_date": "Earliest possible date: "
+    },
+    "success": {
+      "title": "Cancellation Scheduled",
+      "message": "You will receive a confirmation email shortly."
+    },
+    "errors": {
+      "name_required": "Name is required (min 2 chars)",
+      "email_invalid": "Invalid email address",
+      "date_required_specific": "Date is required",
+      "server_error": "An error occurred.",
+      "generic_error": "An unexpected error occurred."
+    }
   }
 }
