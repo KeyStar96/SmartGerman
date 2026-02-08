@@ -33,8 +33,12 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
     // Removed IntersectionObserver/Scroll logic.
 
 
-    // Also hide if on registration page
-    if (pathname?.includes("registration")) return null;
+    // Logic: Only show on Start Page (Home)
+    // User requested to hide it on cancellation, registration, etc.
+    // Pathname expected for home: "/de", "/en", etc.
+    const isHomePage = pathname === "/" || /^\/[a-z]{2}$/.test(pathname || "");
+
+    if (!isHomePage) return null;
 
     return (
 
