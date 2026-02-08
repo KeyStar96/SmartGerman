@@ -750,5 +750,131 @@
       "server_error": "Bir hata oluştu.",
       "generic_error": "Beklenmedik bir hata oluştu."
     }
+  },
+  "agb": {
+    "title": "Genel İşlem Koşulları (GİK)",
+    "school_name": "SmartGerman Dil Okulu",
+    "status_date": "Durum: Ekim 2025",
+    "sections": [
+      {
+        "title": "§ 1 Kapsam",
+        "content": [
+          "(1) Bu Genel İşlem Koşulları (GİK), SmartGerman Dil Okulu, sahibi Anastasia Sitov, Hüttenstraße 24a, 30165 Hannover (bundan böyle \"Dil Okulu\" olarak anılacaktır) ile katılımcı (bundan böyle \"katılımcı\" olarak anılacaktır) arasında yapılan dil kurslarına (yüz yüze ve online kurslar) katılıma ilişkin tüm sözleşmeler için geçerlidir.",
+          "(2) Dil Okulu'nun geçerliliğini açıkça yazılı olarak kabul etmediği sürece, katılımcının farklı koşulları tanınmaz."
+        ]
+      },
+      {
+        "title": "§ 2 Hizmet Konusu",
+        "content": [
+          "(1) Dil Okulu, çeşitli seviyeler (A1–C1) için Almanca kursları ve sınav hazırlık kursları sunmaktadır. Kursların kapsamı, içeriği ve fiyatı web sitesindeki ilgili kurs açıklamasından anlaşılmaktadır.",
+          "(2) Kursun genel karakteri önemli ölçüde bozulmadığı sürece, kursun akışında, eğitmenlerde veya ders saatlerinde küçük değişiklikler yapılmasına izin verilir.",
+          "(3) Online dersler, yaygın video konferans yazılımları (örneğin, Microsoft Teams) üzerinden gerçekleştirilir. Katılımcı, uygun bir internet bağlantısı ve teknik donanımdan sorumludur."
+        ]
+      },
+      {
+        "title": "§ 3 Kayıt ve Sözleşmenin Kurulması",
+        "content": [
+          "(1) Kayıt, web sitesi üzerinden online olarak, e-posta ile, yazılı kayıt formuyla veya şahsen yerinde yapılabilir ve katılımcının bağlayıcı bir teklifidir.",
+          "(2) Yazılı form kullanılarak yapılan yazılı kayıtta, sözleşme imzanızla birlikte kurulur. Kayıt onayı yazılı olarak veya e-posta ile tarafınıza gönderilir.",
+          "(3) Online kayıtta, sözleşme, Dil Okulu'nun kaydı yazılı olarak (örneğin, e-posta ile) onaylamasıyla kurulmuş sayılır. Kayıt onayı, kurs ücreti faturası ile birleştirilebilir.",
+          "(4) Dil Okulu, önemli bir nedenden dolayı (örneğin, kontenjan doluluğu, uygun olmayan dil seviyesi) kayıtları reddetme hakkını saklı tutar."
+        ]
+      },
+      {
+        "title": "§ 4 Fiyatlar, Ödeme Koşulları, Gecikme",
+        "content": [
+          "(1) Geçerli fiyatlar, web sitesinde yayınlanan fiyat listesinden anlaşılmaktadır. Tüm fiyatlar son fiyatlardır. § 19 UStG uyarınca satış vergisi alınmamaktadır.",
+          "(2) Kurs ücreti, her gelecek ay için peşin ödenmelidir. Ödeme ile katılımcı, o ayın kurslarına erişim hakkı kazanır. Sözleşmenin otomatik olarak yenilenmesi söz konusu değildir.",
+          "(3) Ödeme, aksi kararlaştırılmadıkça fatura alındıktan sonra banka havalesi ile yapılır.",
+          "Banka Bilgileri:\nHesap Sahibi: Anastasia Sitov\nIBAN: DE98 1001 1001 2273 5332 29\nBIC: NTSBDEB1XXX\nBanka: N26 Bank SE\nAçıklama: Fatura Numarası",
+          "(4) Faturalar, alındıktan sonra en geç 14 gün içinde ödenmelidir. Bu süreye uyulmaması durumunda, yasal düzenlemelere göre gecikme faizi uygulanabilir.",
+          "(5) Katılımcı ödemede temerrüde düşerse, yasal temerrüt düzenlemeleri geçerlidir (§ 288 BGB). Dil Okulu, açık tutarlar ödenene kadar katılımcının katılımını askıya alma hakkına sahiptir."
+        ]
+      },
+      {
+        "title": "§ 5 Cayma Hakkı (Tüketiciler / Mesafeli Sözleşmeler)",
+        "content": [
+          "(1) Sözleşme mesafeli satış yoluyla (örneğin, e-posta veya online kayıt ile) yapılmışsa, § 13 BGB anlamında tüketici olan katılımcının yasal cayma hakkı vardır.",
+          "(2) Detaylar aşağıdaki cayma hakkı bilgilendirmesinden anlaşılmaktadır."
+        ]
+      },
+      {
+        "title": "Cayma Hakkı Bilgilendirmesi",
+        "content": [
+          "Cayma Hakkı:\nBu sözleşmeden on dört gün içinde herhangi bir gerekçe göstermeksizin cayma hakkınız vardır.",
+          "Cayma süresi, sözleşmenin yapıldığı günden itibaren on dört gündür.",
+          "Cayma hakkınızı kullanmak için, kararınızı (örneğin, e-posta veya mektupla) açık bir beyanla bize (SmartGerman Sprachschule, Hüttenstraße 24a, 30165 Hannover, E-Posta: info@smart-german.com) bildirmeniz gerekmektedir.",
+          "Cayma süresine uymak için, cayma hakkını kullandığınıza dair bildirimi cayma süresi dolmadan göndermeniz yeterlidir.",
+          "Cayma Hakkının Sonuçları:\nBu sözleşmeden cayarsanız, sizden aldığımız tüm ödemeleri, cayma bildiriminizin bize ulaştığı tarihten itibaren en geç on dört gün içinde derhal size iade edeceğiz.",
+          "Bu geri ödeme için, sizinle aksi açıkça kararlaştırılmadıkça, orijinal işlemde kullandığınız ödeme aracını kullanacağız.",
+          "Değer Tazmini: Hizmetin (örneğin, kursun) cayma süresi içinde başlamasını talep ettiyseniz, cayma hakkını kullandığınızı bize bildirdiğiniz tarihe kadar sunulan hizmetlerin sözleşmede öngörülen toplam hizmet kapsamına oranına karşılık gelen makul bir tutarı bize ödemeniz gerekir.",
+          "Erken Sona Erme Hakkında Özel Not:\nHizmet sunumuna ilişkin bir sözleşmede cayma hakkı, hizmeti tamamen ifa ettiğimizde ve hizmetin ifasına ancak sizin açık onayınızla ve sözleşmenin tarafımızca tam ifasıyla cayma hakkınızı kaybedeceğinizi bildiğinizi teyit etmenizden sonra başladığımız durumlarda da sona erer."
+        ]
+      },
+      {
+        "title": "Örnek Cayma Formu",
+        "content": [
+          "(Sözleşmeden caymak istiyorsanız, lütfen bu formu doldurup geri gönderin.)",
+          "Kime: SmartGerman Sprachschule, Hüttenstraße 24a, 30165 Hannover, E-Posta: info@smart-german.com",
+          "Aşağıdaki kursa katılım sözleşmemi feshediyorum:",
+          "(Kursun Adı)",
+          "Sipariş Tarihi: ________________ / Teslim Alma Tarihi: ________________",
+          "Tüketicinin Adı: __________________________",
+          "Tüketicinin Adresi: ________________________",
+          "Tarih: ________________",
+          "(İmza, sadece kağıt üzerinde bildirimde)"
+        ]
+      },
+      {
+        "title": "§ 6 Katılmama / Hastalık",
+        "content": [
+          "(1) Kurs ücreti, ilgili aydaki kurslara erişimi kapsar. Bireysel ders birimlerine (örneğin, hastalık veya tatil nedeniyle) katılmama durumunda, geri ödeme veya telafi dersi hakkı yoktur.",
+          "(2) İyi niyet çerçevesinde, Dil Okulu organizasyonel olarak mümkünse telafi imkanları veya yedek tarihler sunabilir."
+        ]
+      },
+      {
+        "title": "§ 7 Dil Okulu Tarafından İptal / İkame Hizmetler",
+        "content": [
+          "(1) Dersler, Dil Okulu'nun sorumlu olduğu nedenlerle (örneğin, öğretmenin hastalığı) iptal edilirse ve yedek bir tarih sunulamazsa, orantılı kurs ücreti iade edilir.",
+          "(2) Özellikle tazminat talepleri olmak üzere daha ileri talepler, kasıt veya ağır ihmal olmadıkça hariç tutulmuştur."
+        ]
+      },
+      {
+        "title": "§ 8 Sorumluluk",
+        "content": [
+          "(1) Dil Okulu, yalnızca kasıt ve ağır ihmal durumunda sorumludur. Basit ihmal durumunda, yalnızca temel sözleşme yükümlülüklerinin (asli yükümlülükler) ihlali durumunda ve sözleşmeye özgü, öngörülebilir zararla sınırlı olarak sorumludur.",
+          "(2) Hayata, bedene veya sağlığa verilen zararlardan dolayı yasal sorumluluk sınırsızdır.",
+          "(3) Dil Okulu, belirli bir öğrenme başarısı için garanti vermez.",
+          "(4) Kişisel eşyaların kaybı veya hasarı için sorumluluk, yalnızca kasıt veya ağır ihmal durumunda kabul edilir."
+        ]
+      },
+      {
+        "title": "§ 9 Telif Hakkı / Kurs Materyalleri",
+        "content": [
+          "Kurs materyalleri telif hakkıyla korunmaktadır ve yalnızca kişisel kullanım içindir. Dil Okulu'nun açık yazılı izni olmaksızın devredilmesi, çoğaltılması veya yayınlanması yasaktır."
+        ]
+      },
+      {
+        "title": "§ 10 Sözleşme Süresi",
+        "content": [
+          "(1) Kurs ücretinin ödenmesiyle, ilgili ayın kurs teklifine katılım için bir sözleşme yapılmış olur.",
+          "(2) Otomatik yenileme yapılmaz. Her sonraki ay için yeni bir kayıt ve ödeme gereklidir."
+        ]
+      },
+      {
+        "title": "§ 11 Veri Koruma",
+        "content": [
+          "Kişisel verilerin toplanması ve işlenmesi, GDPR ve BDSG'ye uygun olarak gerçekleşir. Daha fazla bilgi, Dil Okulu'nun web sitesindeki gizlilik politikasında bulunabilir."
+        ]
+      },
+      {
+        "title": "§ 12 Son Hükümler",
+        "content": [
+          "(1) Alman hukuku geçerlidir.",
+          "(2) Sözleşme dili Almancadır.",
+          "(3) Katılımcı tüketici ise, ikametgahının yasal yetkili mahkemesi geçerlidir."
+        ]
+      }
+    ]
   }
 }

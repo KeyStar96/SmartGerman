@@ -6,9 +6,10 @@ import TimeStatus from './TimeStatus';
 
 interface BentoGridProps {
     dictionary: any;
+    lang: string;
 }
 
-export default function BentoGrid({ dictionary }: BentoGridProps) {
+export default function BentoGrid({ dictionary, lang }: BentoGridProps) {
     const t = dictionary?.Footer || {};
     // Extract navItems to stable value (or outside component if truly static, but inside is fine if used in memo)
     // Actually better to keep it here so it's close to usage, referenced in useMemo dep array.
@@ -23,6 +24,12 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
     }, []);
+
+    const footerLinks = React.useMemo(() => [
+        { label: t.Legal?.imprint || "Imprint", href: `/${lang}/imprint` },
+        { label: t.Legal?.privacy || "Privacy", href: `/${lang}/privacy` },
+        { label: t.Legal?.terms || "Terms", href: `/${lang}/agb` },
+    ], [t, lang]);
 
     const navList = React.useMemo(() => (
         <nav className="flex flex-col space-y-2 group/nav">
@@ -143,10 +150,10 @@ export default function BentoGrid({ dictionary }: BentoGridProps) {
                 <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
 
                 <div className="flex gap-8 md:mr-24">
-                    <a href="/imprint" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</a>
-                    <a href="/privacy" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</a>
-                    <a href="/terms" className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</a>
-                    <a href="/cancellation" className="hover:text-[#FF5C00] transition-colors">Verträge kündigen</a>
+                    <a href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</a>
+                    <a href={`/${lang}/privacy`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</a>
+                    <a href={`/${lang}/agb`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</a>
+                    <a href={`/${lang}/cancellation`} className="hover:text-[#FF5C00] transition-colors">Verträge kündigen</a>
                 </div>
             </div>
         </div>

@@ -744,5 +744,131 @@
       "server_error": "An error occurred.",
       "generic_error": "An unexpected error occurred."
     }
+  },
+  "agb": {
+    "title": "General Terms and Conditions (GTC)",
+    "school_name": "SmartGerman Language School",
+    "status_date": "Status: October 2025",
+    "sections": [
+      {
+        "title": "§ 1 Scope of Application",
+        "content": [
+          "(1) These General Terms and Conditions (GTC) apply to all contracts for participation in language courses (face-to-face and online courses) of the SmartGerman Language School, owner Anastasia Sitov, Hüttenstraße 24a, 30165 Hannover (hereinafter \"Language School\"), which are concluded between the Language School and the participant (hereinafter \"participant\").",
+          "(2) Deviating conditions of the participant are not recognized unless the Language School expressly agrees to their validity in writing."
+        ]
+      },
+      {
+        "title": "§ 2 Subject of Performance",
+        "content": [
+          "(1) The Language School offers German courses for various levels (A1–C1) as well as exam preparation courses. The scope, content, and price of the courses result from the respective course description on the website.",
+          "(2) The Language School is entitled to make minor changes to the course schedule, the staffing of lecturers, or class times, provided that this does not significantly impair the overall character of the course.",
+          "(3) Online courses take place via common video conferencing software (e.g., Microsoft Teams). The participant is responsible for a sufficient internet connection and technical equipment."
+        ]
+      },
+      {
+        "title": "§ 3 Registration and Conclusion of Contract",
+        "content": [
+          "(1) Registration can be made online via the website, by e-mail, by written registration form, or in person on site and represents a binding offer by the participant.",
+          "(2) In the case of written registration using a paper form, the contract is concluded with your signature on the registration form. You will receive a written or e-mailed confirmation of registration.",
+          "(3) In the case of online registration, the contract is concluded as soon as the Language School confirms the registration in writing (e.g., by e-mail). The registration confirmation can be combined with the invoice for the course fee.",
+          "(4) The Language School reserves the right to reject registrations for good cause (e.g., overcrowding, inappropriate language level)."
+        ]
+      },
+      {
+        "title": "§ 4 Prices, Payment Conditions, Default",
+        "content": [
+          "(1) The valid prices are those listed in the price overview published on the website. All prices are final prices. According to § 19 UStG, no sales tax is charged.",
+          "(2) The course fee is to be paid in advance for the upcoming month. Upon payment, the participant acquires access to the courses of this month. An automatic extension of the contract does not take place.",
+          "(3) Payment is made by bank transfer after receipt of invoice, unless otherwise agreed.",
+          "Bank details:\nAccount holder: Anastasia Sitov\nIBAN: DE98 1001 1001 2273 5332 29\nBIC: NTSBDEB1XXX\nBank: N26 Bank SE\nReason for payment: Invoice number",
+          "(4) Invoices must be paid within 14 days of receipt. Failure to comply with this deadline may result in default interest in accordance with statutory regulations.",
+          "(5) If the participant is in default of payment, the statutory default regulations (§ 288 BGB) apply. The Language School is entitled to suspend participation until outstanding amounts are settled."
+        ]
+      },
+      {
+        "title": "§ 5 Right of Withdrawal (Consumers / Distance Contracts)",
+        "content": [
+          "(1) If the contract was concluded via distance selling (e.g., by e-mail or online registration), the participant, who is a consumer within the meaning of § 13 BGB, has a statutory right of withdrawal.",
+          "(2) The details result from the following cancellation policy."
+        ]
+      },
+      {
+        "title": "Cancellation Policy",
+        "content": [
+          "Right of withdrawal:\nYou have the right to withdraw from this contract within fourteen days without giving any reason.",
+          "The withdrawal period is fourteen days from the day of the conclusion of the contract.",
+          "To exercise your right of withdrawal, you must inform us (SmartGerman Language School, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com) by means of a clear statement (e.g., by e-mail or letter) of your decision to withdraw from this contract.",
+          "To meet the withdrawal deadline, it is sufficient for you to send your communication concerning your exercise of the right of withdrawal before the withdrawal period has expired.",
+          "Consequences of withdrawal:\nIf you withdraw from this contract, we will reimburse to you all payments received from you, promptly and at the latest within 14 days from the day on which we received your notification of withdrawal.",
+          "For this repayment, we use the same means of payment that you used for the original transaction, unless expressly agreed otherwise with you.",
+          "Compensation for value: If you requested that the service (e.g., the course) begin during the withdrawal period, you must pay us a reasonable amount corresponding to the proportion of the services already provided up to the time you inform us of the exercise of the right of withdrawal compared to the total scope of the services provided for in the contract.",
+          "Special note on premature expiration:\nThe right of withdrawal expires in the case of a contract for the provision of services even if we have completely provided the service and have only begun to perform the service after you have given your express consent to this and at the same time confirmed your knowledge that you lose your right of withdrawal upon complete performance of the contract by us."
+        ]
+      },
+      {
+        "title": "Model Withdrawal Form",
+        "content": [
+          "(If you want to withdraw from the contract, please fill out this form and send it back.)",
+          "To SmartGerman Language School, Hüttenstraße 24a, 30165 Hannover, E-Mail: info@smart-german.com",
+          "I hereby withdraw from the contract concluded by me for participation in the following course:",
+          "(Name of the course)",
+          "Ordered on: ________________ / received on: ________________",
+          "Name of the consumer: __________________________",
+          "Address of the consumer: ________________________",
+          "Date: ________________",
+          "(Signature, only if notified on paper)"
+        ]
+      },
+      {
+        "title": "§ 6 Non-participation / Illness",
+        "content": [
+          "(1) The course fee covers access to the courses in the respective month. In case of non-participation in individual teaching units (e.g., due to illness or vacation), there is no claim for reimbursement or replacement hours.",
+          "(2) On a goodwill basis, the Language School may offer make-up opportunities or replacement dates, provided this is organizationally possible."
+        ]
+      },
+      {
+        "title": "§ 7 Cancellation by the Language School / Replacement Services",
+        "content": [
+          "(1) If classes are cancelled for reasons for which the Language School is responsible (e.g., illness of the teacher) and no replacement date can be offered, the pro rata course fee will be refunded.",
+          "(2) Further claims, in particular damages, are excluded, unless there is intent or gross negligence."
+        ]
+      },
+      {
+        "title": "§ 8 Liability",
+        "content": [
+          "(1) The Language School is liable only for intent and gross negligence. In cases of simple negligence, it is liable only for the breach of essential contractual obligations (cardinal obligations) and limited to the typical, foreseeable damage.",
+          "(2) For damages resulting from injury to life, body, or health, statutory liability applies without limitation.",
+          "(3) The Language School assumes no guarantee for a specific learning success.",
+          "(4) Liability for loss or damage to personal belongings is assumed only in cases of intent or gross negligence."
+        ]
+      },
+      {
+        "title": "§ 9 Copyright / Course Materials",
+        "content": [
+          "Course materials are protected by copyright and may be used exclusively for personal use. Passing on, duplication, or publication is prohibited without the express written consent of the Language School."
+        ]
+      },
+      {
+        "title": "§ 10 Contract Duration",
+        "content": [
+          "(1) With payment of the course fee, a contract for participation in the course offer of the respective month is concluded.",
+          "(2) An automatic extension does not take place. For every further month, a new registration and payment is required."
+        ]
+      },
+      {
+        "title": "§ 11 Data Protection",
+        "content": [
+          "The collection and processing of personal data takes place in accordance with the GDPR and the BDSG. Further information can be found in the privacy policy on the website of the Language School."
+        ]
+      },
+      {
+        "title": "§ 12 Final Provisions",
+        "content": [
+          "(1) German law applies.",
+          "(2) The contract language is German.",
+          "(3) If the participant is a consumer, the statutory place of jurisdiction of their residence applies."
+        ]
+      }
+    ]
   }
 }

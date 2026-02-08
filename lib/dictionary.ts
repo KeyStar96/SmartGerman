@@ -14,3 +14,4 @@ export const getDictionary = cache(async (locale: string) => {
   const loader = dictionaries[locale as keyof typeof dictionaries] || dictionaries.de;
   return loader();
 });
+// Re-export type if needed

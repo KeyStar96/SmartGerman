@@ -100,7 +100,7 @@ export default async function HomePage({
         </div>
       </main>
 
-      <FooterLayout dictionary={dictionary} />
+      <FooterLayout dictionary={dictionary} lang={lang} />
     </>
   );
 }
