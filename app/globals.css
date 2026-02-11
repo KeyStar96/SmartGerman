@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   APP BACKGROUND — Direct CSS (bypasses /_next/image)
+   Images are pre-optimized WebP, no processing needed.
+   ============================================ */
+.app-bg {
+  background-image: url('/Bilder/SG_Background_Light.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 767px) {
+  .app-bg {
+    background-image: url('/Bilder/SG_Background_Light_Mobile.webp');
+  }
+}
+
+.dark .app-bg {
+  background-image: url('/Bilder/SG_Background_Dark.webp');
+}
+
+@media (max-width: 767px) {
+  .dark .app-bg {
+    background-image: url('/Bilder/SG_Background_Dark_Mobile.webp');
+  }
+}
+
 :root {
   /* ============================================
      SWISS SCIENTIFIC DESIGN COLOR SYSTEM
