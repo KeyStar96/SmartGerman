@@ -45,7 +45,7 @@ const isUnderage = (day: string, month: string, year: string) => {
     return age < 18;
 };
 
-export const createSchema = (t: any) => z.object({
+export const createSchema = (t: Record<string, any>) => z.object({
     personal: z.object({
         firstName: z.string()
             .transform(normalize)

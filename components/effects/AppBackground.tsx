@@ -29,10 +29,10 @@ export default function AppBackground({ className }: { className?: string }) {
                         src="/Bilder/SG_Background_Light.webp"
                         alt="Smart German Background Light"
                         fill
-                        priority={false}
+                        priority={true}
                         sizes="100vw"
                         className="object-cover object-center"
-                        quality={90}
+                        quality={75}
                     />
                 </div>
 
@@ -42,10 +42,10 @@ export default function AppBackground({ className }: { className?: string }) {
                         src="/Bilder/SG_Background_Light_Mobile.webp"
                         alt="Smart German Background Light Mobile"
                         fill
-                        priority={false}
+                        priority={true}
                         sizes="100vw"
                         className="object-cover object-center"
-                        quality={90}
+                        quality={75}
                     />
                 </div>
             </div>
@@ -62,8 +62,7 @@ export default function AppBackground({ className }: { className?: string }) {
                         priority={true}
                         sizes="100vw"
                         className="object-cover object-center"
-                        // loading="lazy" Removed lazy, priority is true now
-                        quality={90}
+                        quality={75}
                     />
                 </div>
 
@@ -76,7 +75,7 @@ export default function AppBackground({ className }: { className?: string }) {
                         priority={true}
                         sizes="100vw"
                         className="object-cover object-center"
-                        quality={90}
+                        quality={75}
                     />
                 </div>
             </div>

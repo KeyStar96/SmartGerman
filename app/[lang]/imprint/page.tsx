@@ -3,9 +3,15 @@ import FooterLayout from "@/components/footer/FooterLayout";
 import Header from "@/components/layout/Header";
 import { Metadata } from "next";
 
+export async function generateStaticParams() {
+    return [
+        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tu' },
+    ];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
     const { lang } = await params;
-    const dictionary: any = await getDictionary(lang);
+    const dictionary = await getDictionary(lang);
     return {
         title: dictionary.imprint?.title || "Imprint",
         description: dictionary.imprint?.title || "Imprint",

@@ -761,6 +761,7 @@ export default function NeuralBrain() {
         window.addEventListener("scroll", handleScroll, { passive: true });
 
         return () => {
+            if (requestRef.current) cancelAnimationFrame(requestRef.current);
             observer.disconnect();
             intersectionObserver.disconnect();
             window.removeEventListener("resize", updateMetrics);

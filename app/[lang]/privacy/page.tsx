@@ -3,9 +3,15 @@ import FooterLayout from "@/components/footer/FooterLayout";
 import Header from "@/components/layout/Header";
 import { Metadata } from "next";
 
+export async function generateStaticParams() {
+    return [
+        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tu' },
+    ];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
     const { lang } = await params;
-    const dictionary: any = await getDictionary(lang);
+    const dictionary = await getDictionary(lang);
     return {
         title: dictionary.privacy?.title || "Privacy Policy",
         description: dictionary.privacy?.title || "Privacy Policy",
@@ -14,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 export default async function PrivacyPage({ params }: { params: Promise<{ lang: string }> }) {
     const { lang } = await params;
-    const dictionary: any = await getDictionary(lang);
+    const dictionary = await getDictionary(lang);
 
     return (
         <div className="min-h-screen bg-transparent text-foreground font-sans selection:bg-primary-orange/30">

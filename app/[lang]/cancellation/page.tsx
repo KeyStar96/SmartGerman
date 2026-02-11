@@ -4,6 +4,12 @@ import { getDictionary } from "@/lib/dictionary";
 import CancellationForm from "@/components/cancellation/CancellationForm";
 import { Metadata } from "next";
 
+export async function generateStaticParams() {
+    return [
+        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tu' },
+    ];
+}
+
 export async function generateMetadata({
     params,
 }: {

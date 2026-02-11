@@ -5,22 +5,56 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { JetBrains_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-import { CourseConfig, Day, CourseException } from "@/lib/course-config";
+import { CourseConfig, Day, CourseException, CourseSession } from "@/lib/course-config";
 import { calculateMonthlyStats, getDurationMinutes, DAY_MAP, getNext6Months } from "@/lib/course-calculations";
 import { createSchema, EnrollmentFormData } from "@/lib/registration-schema";
 import PricingRoadmap from "@/components/registration/PricingRoadmap";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { DateDropdowns } from "@/components/ui/DateDropdowns";
+import { submitEnrollment } from "@/app/actions/submit-enrollment";
 
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
+// Use the CSS variable --font-mono from layout.tsx instead of re-instantiating
+const monoClassName = "font-mono";
 
+// --- TYPE INTERFACES ---
+interface MaskedDateInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+    label: string;
+    error?: string;
+    required?: boolean;
+    referenceDate?: Date;
+}
 
+interface CourseRowProps {
+    course: CourseConfig;
+    selected: boolean;
+    onToggle: () => void;
+    title: string;
+    priceFormatted: string;
+    level?: string;
+    dictionary: Record<string, any>;
+}
+
+interface TerminalInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    label: string;
+    error?: string;
+    registration?: ReturnType<ReturnType<typeof useForm>['register']>;
+}
+
+interface PhoneInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    label: string;
+    error?: string;
+    required?: boolean;
+}
 
 
 const MaskedDateInput = ({
@@ -31,7 +65,7 @@ const MaskedDateInput = ({
     error,
     required,
     referenceDate
-}: any) => {
+}: MaskedDateInputProps) => {
     // ... existing MaskedDateInput code ...
     const defaultPlaceholder = placeholder;
 
@@ -160,7 +194,7 @@ const MaskedDateInput = ({
             error={error}
             maxLength={10}
             // Logic to select text on focus so user can start typing immediately replacing placeholder?
-            onFocus={(e: any) => {
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
                 if (displayVal === defaultPlaceholder) {
                     // Move cursor to start
                     e.target.setSelectionRange(0, 0);
@@ -175,7 +209,7 @@ const MaskedDateInput = ({
 
 // --- COMPONENT: ROW (PAPER OPTIK) ---
 
-const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatted, level, dictionary }: any) => {
+const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatted, level, dictionary }: CourseRowProps) => {
     const t = dictionary?.registration?.course_card;
     const daysDict = dictionary?.timetable?.days;
 
@@ -270,7 +304,7 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
 
             {/* Expanded Details when selected */}
             <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pl-9 md:pl-[44px]">
-                {course.sessions.map((s: any, i: number) => {
+                {course.sessions.map((s: CourseSession, i: number) => {
                     // Properly access day properties
                     const shortWeekdays: Record<string, string> = {
                         "mo": daysDict?.mo || "Mo",
@@ -302,7 +336,7 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
     );
 });
 
-const TerminalInput = ({ label, error, registration, ...props }: any) => {
+const TerminalInput = ({ label, error, registration, ...props }: TerminalInputProps) => {
     const defaultId = React.useId();
     const id = props.id || registration?.name || defaultId;
     return (
@@ -324,14 +358,14 @@ const TerminalInput = ({ label, error, registration, ...props }: any) => {
                 htmlFor={id}
                 className={cn(
                     "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-all pointer-events-none",
-                    jetbrainsMono.className,
+                    monoClassName,
                     "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-500",
                     "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]",
-                    jetbrainsMono.className
+                    monoClassName
                 )}>
                 {label} {props.required && <span className="text-[#FF5C00]">*</span>}
             </label>
-            {error && <span className={cn("text-red-500 dark:text-red-400 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
+            {error && <span className={cn("text-red-500 dark:text-red-400 text-[10px] absolute right-0 top-2", monoClassName)}>{error}</span>}
         </div>
     );
 };
@@ -361,7 +395,7 @@ const PhoneInput = ({
     label,
     error,
     required
-}: any) => {
+}: PhoneInputProps) => {
     // Value format: "+49 12345678" or just "12345678" (if no code selected yet, though we default to DE)
     // We split by space if we assume "Code Number" format. 
     // BUT user might have pasted full number. 
@@ -400,7 +434,7 @@ const PhoneInput = ({
         <div className="relative group z-30">
             <span className={cn(
                 "absolute left-0 top-0 text-xs uppercase tracking-widest text-[#FF5C00] transition-all",
-                jetbrainsMono.className,
+                monoClassName,
                 // Always visible label
             )}>
                 {label} {required && <span>*</span>}
@@ -428,17 +462,17 @@ const PhoneInput = ({
                     />
                 </div>
             </div>
-            {error && <span className={cn("text-red-500 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
+            {error && <span className={cn("text-red-500 text-[10px] absolute right-0 top-2", monoClassName)}>{error}</span>}
         </div>
     );
 };
 
-import { submitEnrollment } from "@/app/actions/submit-enrollment";
+// submitEnrollment import moved to top of file
 
 // --- MAIN TERMINAL ---
 
 export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime, courses, exceptions = [] }: {
-    dictionary: any,
+    dictionary: Record<string, any>,
     lang: string,
     serverTime?: number,
     courses: CourseConfig[],
@@ -783,7 +817,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 {/* Header with Progress */}
                 <header className="px-6 md:px-12 py-8 shrink-0 z-10">
                     <div className="flex justify-between items-start mb-6">
-                        <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", jetbrainsMono.className)}>
+                        <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", monoClassName)}>
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
                         <Image
@@ -814,7 +848,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 transition={{ type: "spring", bounce: 0, duration: 0.5 }}
                             />
                         </div>
-                        <span className={cn("text-xs text-gray-600 dark:text-gray-500", jetbrainsMono.className)}>{wizard?.step_label || "SCHRITT"} {step} / 3</span>
+                        <span className={cn("text-xs text-gray-600 dark:text-gray-500", monoClassName)}>{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
                     <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-[#111111] dark:text-[#E2D7CE] mb-2 transition-colors duration-300">
@@ -853,7 +887,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         {/* LEFT BOX: Startdatum (Date Selection) */}
                                         <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
                                             {/* Header */}
-                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", jetbrainsMono.className)}>
+                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
                                                 {t?.start_date_label || "STARTDATUM"}
                                             </span>
 
@@ -904,7 +938,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
                                         <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full min-h-[294px]">
                                             {/* Header */}
-                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", jetbrainsMono.className)}>
+                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
                                                 {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
                                             </span>
 
@@ -922,7 +956,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                         <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
                                                             <Monitor size={32} className="text-gray-300 dark:text-gray-600" />
                                                         </div>
-                                                        <p className={cn("text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium max-w-[200px]", jetbrainsMono.className)}>
+                                                        <p className={cn("text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium max-w-[200px]", monoClassName)}>
                                                             {formLabels?.select_course_hint || "Wählen Sie unten einen Kurs, um Details zu sehen"}
                                                         </p>
                                                     </motion.div>
