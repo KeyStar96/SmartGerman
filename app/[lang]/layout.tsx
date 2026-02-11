@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
-// Header moved to individual pages to prevent layout shifts
-// import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 import SupportNode from "@/components/layout/SupportNode";
 import AppBackground from "@/components/effects/AppBackground";
 import { ThemeInit } from "@/components/effects/ThemeInit";
+import NavigationProgress from "@/components/effects/NavigationProgress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -84,6 +83,8 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.className} ${jetbrainsMono.variable} text-foreground antialiased font-sans`}>
+        {/* Navigation progress bar — instant visual feedback during page transitions */}
+        <NavigationProgress />
         {/* 
           CHROME FIX für backdrop-filter:
           - Hintergründe mit z-index: 0/1 statt negativen Werten
