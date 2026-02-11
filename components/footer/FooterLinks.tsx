@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import Link from 'next/link';
 import { ArrowUpRight, Check, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import TimeStatus from './TimeStatus';
 
@@ -150,12 +151,12 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                 <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
 
                 <div className="flex gap-8 md:mr-24">
-                    <a href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</a>
-                    <a href={`/${lang}/privacy`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</a>
-                    <a href={`/${lang}/agb`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</a>
-                    <a href={`/${lang}/cancellation`} className="hover:text-[#FF5C00] transition-colors">
+                    <Link href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</Link>
+                    <Link href={`/${lang}/privacy`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</Link>
+                    <Link href={`/${lang}/agb`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</Link>
+                    <Link href={`/${lang}/cancellation`} className="hover:text-[#FF5C00] transition-colors">
                         {t.Legal?.cancellation || "Cancel Contract"}
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

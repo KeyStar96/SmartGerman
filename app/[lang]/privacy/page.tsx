@@ -1,6 +1,7 @@
 import { getDictionary } from "@/lib/dictionary";
 import FooterLayout from "@/components/footer/FooterLayout";
 import Header from "@/components/layout/Header";
+import Link from "next/link";
 import { Metadata } from "next";
 
 export async function generateStaticParams() {
@@ -28,10 +29,10 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
 
             <main className="container mx-auto px-4 pt-32 pb-16 max-w-4xl relative">
                 <div className="mb-8">
-                    <a href={`/${lang}`} className="inline-flex items-center text-foreground/60 hover:text-primary-orange transition-colors gap-2 group">
+                    <Link href={`/${lang}`} className="inline-flex items-center text-foreground/60 hover:text-primary-orange transition-colors gap-2 group">
                         <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
                         <span className="text-sm font-medium tracking-wide uppercase">{dictionary.registration?.back_home || "Back"}</span>
-                    </a>
+                    </Link>
                 </div>
 
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
