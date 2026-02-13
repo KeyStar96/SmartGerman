@@ -31,7 +31,11 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                 MOBILE LAYOUT: TEXT-ONLY (Clean Editorial)
                 NeuralBrain & Visuals hidden.
                 ═══════════════════════════════════════════════════════ */}
-            <div className="lg:hidden relative px-6 max-w-lg mx-auto">
+            {/* ═══════════════════════════════════════════════════════
+                MOBILE LAYOUT: TEXT-ONLY (Clean Editorial)
+                NeuralBrain & Visuals hidden.
+                ═══════════════════════════════════════════════════════ */}
+            <div className="md:hidden relative px-6 max-w-lg mx-auto">
                 {/* Protocol label */}
                 <div className="mb-6">
                     <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
@@ -54,13 +58,13 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
 
             {/* ═══════════════════════════════════════════════════════
                 DESKTOP LAYOUT: Original 2-column grid (UNCHANGED)
-                Only visible at lg breakpoint and above.
+                Only visible at md breakpoint and above.
                 ═══════════════════════════════════════════════════════ */}
-            <div className="hidden lg:block">
-                <div className="container mx-auto px-6 md:px-12 grid grid-cols-10 gap-12 items-center relative z-10">
+            <div className="hidden md:block">
+                <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-10 gap-12 items-center relative z-10">
 
                     {/* Left: Scientific Text (40%) */}
-                    <div className="col-span-4">
+                    <div className="md:col-span-4">
                         <div className="inline-block mb-6">
                             <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
                                 {dictionary.science.protocol}
@@ -79,17 +83,17 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
 
                     {/* Right: The Brain Composition (60%) */}
-                    <div className="col-span-6 relative w-full">
+                    <div className="md:col-span-6 relative w-full flex justify-center">
 
-                        {/* Sandwich Wrapper: Reduced to 70% size (approx 420px) */}
-                        <div className="relative w-full max-w-[420px] mx-auto">
+                        {/* Sandwich Wrapper: Responsive size */}
+                        <div className="relative w-full max-w-[320px] lg:max-w-[420px] mx-auto">
                             {/* Layer 2 (Top): Head Image with Transparency */}
                             <Image
                                 src="/Bilder/SG_Brain-Compressed.webp"
                                 alt="Human Head Structure"
                                 width={2838}
                                 height={3162}
-                                sizes="420px"
+                                sizes="(max-width: 1024px) 320px, 420px"
                                 className="relative z-20 w-full h-auto pointer-events-none select-none scale-x-[-1]"
                                 priority={false}
                             />
@@ -107,39 +111,41 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             >
                                 <NeuralBrain />
                             </div>
-                        </div>
 
-                        {/* Data Points - "Lab Labels" */}
-                        {/* Top Right Data Block */}
-                        <div className="absolute top-0 right-[-20px] z-30 pointer-events-none flex flex-row items-center justify-end gap-0">
-                            <div className="h-[1px] w-8 bg-[#FF5C00] mr-[-1px] z-20" />
-                            <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
-                                <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none" />
-                                <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
-                                    <span className="opacity-70">{dictionary.science.data_points.data_stream_label}:</span>
-                                    <span>{dictionary.science.data_points.data_stream_value}</span>
-                                    <span className="opacity-70">{dictionary.science.data_points.neuron_count_label}:</span>
-                                    <span>{dictionary.science.data_points.neuron_count_value}</span>
-                                    <span className="opacity-70">{dictionary.science.data_points.signal_speed_label}:</span>
-                                    <span>{dictionary.science.data_points.signal_speed_value}</span>
-                                    <span className="opacity-70 text-[#FF5C00]">{dictionary.science.data_points.synapse_firing_label}:</span>
-                                    <span className="text-[#FF5C00] font-bold">{dictionary.science.data_points.synapse_firing_value}</span>
+                            {/* Data Points - Attached to Wrapper for Symmetry */}
+
+                            {/* Top Right Data Block */}
+                            <div className="absolute top-[5%] -right-16 lg:-right-24 z-30 pointer-events-none flex flex-row items-center justify-end gap-0 translate-x-[20%]">
+                                <div className="h-[1px] w-6 lg:w-8 bg-[#FF5C00] mr-[-1px] z-20" />
+                                <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
+                                    <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none" />
+                                    <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[8px] lg:text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
+                                        <span className="opacity-70">{dictionary.science.data_points.data_stream_label}:</span>
+                                        <span>{dictionary.science.data_points.data_stream_value}</span>
+                                        <span className="opacity-70">{dictionary.science.data_points.neuron_count_label}:</span>
+                                        <span>{dictionary.science.data_points.neuron_count_value}</span>
+                                        <span className="opacity-70">{dictionary.science.data_points.signal_speed_label}:</span>
+                                        <span>{dictionary.science.data_points.signal_speed_value}</span>
+                                        <span className="opacity-70 text-[#FF5C00]">{dictionary.science.data_points.synapse_firing_label}:</span>
+                                        <span className="text-[#FF5C00] font-bold">{dictionary.science.data_points.synapse_firing_value}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Bottom Left Data Block */}
-                        <div className="absolute bottom-0 left-[-20px] z-30 pointer-events-none flex flex-row items-center justify-start gap-0">
-                            <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
-                                <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none" />
-                                <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
-                                    <span className="opacity-70">{dictionary.science.data_points.hemisphere_label}:</span>
-                                    <span>{dictionary.science.data_points.hemisphere_value}</span>
-                                    <span className="opacity-70">{dictionary.science.data_points.plasticity_label}:</span>
-                                    <span>{dictionary.science.data_points.plasticity_value}</span>
+                            {/* Bottom Left Data Block */}
+                            <div className="absolute bottom-[5%] -left-16 lg:-left-24 z-30 pointer-events-none flex flex-row items-center justify-start gap-0 -translate-x-[20%]">
+                                <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
+                                    <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none" />
+                                    <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[8px] lg:text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
+                                        <span className="opacity-70">{dictionary.science.data_points.hemisphere_label}:</span>
+                                        <span>{dictionary.science.data_points.hemisphere_value}</span>
+                                        <span className="opacity-70">{dictionary.science.data_points.plasticity_label}:</span>
+                                        <span>{dictionary.science.data_points.plasticity_value}</span>
+                                    </div>
                                 </div>
+                                <div className="h-[1px] w-6 lg:w-8 bg-[#FF5C00] ml-[-1px] z-20" />
                             </div>
-                            <div className="h-[1px] w-8 bg-[#FF5C00] ml-[-1px] z-20" />
+
                         </div>
                     </div>
                 </div>
