@@ -51,7 +51,7 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
             <div className="container mx-auto px-6 md:px-12 relative z-10 pointer-events-none">
 
                 {/* Header Section */}
-                <div className="mb-20 pointer-events-auto">
+                <div className="mb-20 text-center md:text-left pointer-events-auto">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={isInView ? { opacity: 1, x: 0 } : {}}
