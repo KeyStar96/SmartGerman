@@ -529,8 +529,8 @@
           "level": "C1 Akıcı"
         },
         {
-          "code": "FR/TR",
-          "name": "Fransızca / Türkçe",
+          "code": "TR",
+          "name": "Türkçe",
           "level": "A2 Temel Bilgi"
         }
       ]
@@ -580,7 +580,8 @@
       "copyright": "© 2025 SmartGerman. Tüm hakları saklıdır.",
       "privacy": "Gizlilik",
       "imprint": "Künye",
-      "terms": "Şartlar"
+      "terms": "Şartlar",
+      "cancellation": "Sözleşme İptali"
     }
   },
   "registration": {

@@ -65,7 +65,7 @@ export default function LanguageMatrix({ title, items }: LanguageMatrixProps) {
                 {title}
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
                 {items.map((item, i) => (
                     <LanguageCard key={i} item={item} index={i} />
                 ))}
