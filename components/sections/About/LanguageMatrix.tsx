@@ -28,12 +28,12 @@ const LanguageCard = ({ item, index }: { item: LanguageItem; index: number }) =>
                 "bg-white/70 dark:bg-[#1A1A1A]/70", // Fallback color
                 "backdrop-blur-[16px] backdrop-saturate-150", // Glass effect
                 "border border-[#FF6B00]/20", // Subtle orange border
-                "flex flex-col justify-between p-6 h-32 md:h-40"
+                "flex flex-col justify-between p-4 md:p-6 h-full min-h-[8rem]"
             )}
         >
             {/* Background ISO Code */}
             <span
-                className="absolute -right-4 -bottom-6 text-[5rem] md:text-[6rem] font-black leading-none 
+                className="absolute -right-4 -bottom-6 text-[4rem] md:text-[6rem] font-black leading-none 
                    text-[#1A1A1A]/5 dark:text-[#FAFAFA]/5 select-none pointer-events-none
                    group-hover:text-[#FF6B00]/10 transition-colors duration-500"
             >
@@ -43,10 +43,10 @@ const LanguageCard = ({ item, index }: { item: LanguageItem; index: number }) =>
 
             {/* Content */}
             <div className="relative z-10">
-                <h4 className="text-xl font-bold text-[#1A1A1A] dark:text-[#FAFAFA] group-hover:text-[#FF6B00] transition-colors">
+                <h4 className="text-lg md:text-xl font-bold text-[#1A1A1A] dark:text-[#FAFAFA] group-hover:text-[#FF6B00] transition-colors leading-tight">
                     {item.name}
                 </h4>
-                <p className="text-xs font-medium text-[#1A1A1A]/60 dark:text-[#FAFAFA]/60 mt-1 uppercase tracking-wider">
+                <p className="text-[10px] font-medium text-[#1A1A1A]/60 dark:text-[#FAFAFA]/60 mt-1 uppercase tracking-wider leading-tight">
                     {item.level}
                 </p>
             </div>
