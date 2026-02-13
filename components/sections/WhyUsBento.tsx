@@ -94,7 +94,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
             <div className="container mx-auto px-6 md:px-12 relative z-10">
 
                 {/* Header: Klar und seriös */}
-                <div className="mb-20">
+                <div className="mb-20 text-center md:text-left">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={isInView ? { opacity: 1, x: 0 } : {}}
