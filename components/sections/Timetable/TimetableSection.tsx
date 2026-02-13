@@ -24,7 +24,15 @@ export default function TimetableSection({ dictionary, courses }: TimetableSecti
     const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
     useEffect(() => {
-        const checkIsDesktop = () => window.innerWidth >= 768;
+        const checkIsDesktop = () => {
+            // Logic:
+            // 1. Large screens (>= 1024px) are always desktop.
+            // 2. Medium screens (>= 768px, like tablets) are desktop ONLY if height is sufficient (> 600px).
+            //    - iPad Landscape (1024x768): True
+            //    - iPad Portrait (768x1024): True (768>=768 && 1024>=600)
+            //    - iPhone Landscape (e.g. 932x430): False (932>=768 BUT 430<600) -> Shows Mobile Layout
+            return window.innerWidth >= 1024 || (window.innerWidth >= 768 && window.innerHeight >= 600);
+        };
 
         // Initial check
         setIsDesktop(checkIsDesktop());
