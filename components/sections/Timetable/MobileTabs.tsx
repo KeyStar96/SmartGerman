@@ -74,7 +74,7 @@ export default function MobileTabs({ dictionary, courses }: MobileTabsProps) {
     });
 
     return (
-        <div ref={containerRef} className="md:hidden flex flex-col gap-8 relative">
+        <div ref={containerRef} className="flex flex-col gap-8 relative">
             {/* 1. Pill Tabs Scroll Container */}
             <div className="overflow-x-auto pb-4 hide-scrollbar sticky top-[60px] z-20 bg-[#F0EFE9]/95 dark:bg-[#111111]/95 backdrop-blur-md py-2 -mx-4 px-4 w-[calc(100%+2rem)]">
                 <div className="flex gap-2 px-2">

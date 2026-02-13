@@ -85,7 +85,7 @@ export default function DesktopGrid({ dictionary, courses }: DesktopGridProps) {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true, margin: "-100px" }}
-            className="hidden md:grid grid-cols-5 gap-8 relative mt-16"
+            className="grid grid-cols-5 gap-8 relative mt-16"
         >
             {DAYS.map((day) => {
                 const courses = getDayCourses(day);
