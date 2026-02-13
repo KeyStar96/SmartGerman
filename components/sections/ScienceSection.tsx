@@ -115,7 +115,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             {/* Data Points - Attached to Wrapper for Symmetry */}
 
                             {/* Top Right Data Block */}
-                            <div className="absolute top-[5%] -right-16 lg:-right-24 z-30 pointer-events-none flex flex-row items-center justify-end gap-0 translate-x-[20%]">
+                            <div className="hidden lg:flex absolute top-[5%] -right-16 lg:-right-24 z-30 pointer-events-none flex-row items-center justify-end gap-0 translate-x-[20%]">
                                 <div className="h-[1px] w-6 lg:w-8 bg-[#FF5C00] mr-[-1px] z-20" />
                                 <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
                                     <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none" />
@@ -133,7 +133,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             </div>
 
                             {/* Bottom Left Data Block */}
-                            <div className="absolute bottom-[5%] -left-16 lg:-left-24 z-30 pointer-events-none flex flex-row items-center justify-start gap-0 -translate-x-[20%]">
+                            <div className="hidden lg:flex absolute bottom-[5%] -left-16 lg:-left-24 z-30 pointer-events-none flex-row items-center justify-start gap-0 -translate-x-[20%]">
                                 <div className="relative overflow-hidden bg-[#F0EFE9] dark:bg-[#1E2024] shadow-md rounded-sm border-[0.5px] border-black/10 dark:border-white/10 px-3 py-2 z-30">
                                     <div className="absolute inset-0 bg-noise-paper opacity-20 pointer-events-none" />
                                     <div className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-left font-mono text-[8px] lg:text-[9px] font-bold uppercase tracking-widest text-[#2D3436] dark:text-[#E2D7CE]">
