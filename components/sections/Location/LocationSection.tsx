@@ -85,7 +85,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
 
                 {/* Header Section */}
                 <motion.div
-                    className="max-w-4xl mb-16 md:mb-24"
+                    className="max-w-4xl mb-16 md:mb-24 text-center md:text-left"
                 >
                     {/* Label */}
                     <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4">

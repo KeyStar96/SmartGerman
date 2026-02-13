@@ -44,7 +44,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                 </div>
 
                 {/* Title */}
-                <h2 className="text-4xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none mb-8">
+                <h2 className="text-4xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none mb-8 text-center">
                     {dictionary.science.title_part1} <br />
                     <span className="text-[#FF5C00]">{dictionary.science.title_part2}</span>
                 </h2>
