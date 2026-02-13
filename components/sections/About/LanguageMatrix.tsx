@@ -46,7 +46,7 @@ const LanguageCard = ({ item, index }: { item: LanguageItem; index: number }) =>
                 <h4 className="text-xl font-bold text-[#1A1A1A] dark:text-[#FAFAFA] group-hover:text-[#FF6B00] transition-colors">
                     {item.name}
                 </h4>
-                <p className="text-sm font-medium text-[#1A1A1A]/60 dark:text-[#FAFAFA]/60 mt-1 uppercase tracking-wider">
+                <p className="text-xs font-medium text-[#1A1A1A]/60 dark:text-[#FAFAFA]/60 mt-1 uppercase tracking-wider">
                     {item.level}
                 </p>
             </div>
