@@ -418,23 +418,18 @@ html.dark {
     /* will-change: transform, opacity; ← ENTFERNT wegen Chrome backdrop-filter Bug */
   }
 
-  /* Performance: Reduziere Re-Paints bei statischen Elementen */
-  .hero-content-fade {
-    contain: layout style paint;
+  /* ── HERO MASKED REVEAL ──────────────────────────
+     Overflow-hidden container clips the inner content.
+     The inner element slides up from y:110% → y:0% via GSAP.
+     ─────────────────────────────────────────────── */
+  .hero-line-mask {
+    overflow: hidden;
+    position: relative;
   }
 
-  /* Performance: contain entfernt - kann Scroll-Probleme verursachen */
-
-  /* Hero-Text initial versteckt - verhindert FOUC */
-  .hero-text-reveal {
-    clip-path: inset(100% 0 0 0);
-    transform-origin: center bottom;
-  }
-
-  /* Hero-Content initial versteckt - verhindert FOUC */
-  .hero-content-fade {
-    opacity: 0;
-    transform: translateY(30px);
+  .hero-line-inner {
+    display: block;
+    will-change: transform;
   }
 
   /* Spaceship UI: Button-System */
