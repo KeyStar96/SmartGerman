@@ -21,7 +21,7 @@ const CONFIG = {
 
     particleSize: 0.035, // Base size
 
-    // Theme Colors
+    // Theme Colors (Standard)
     colorIdleDark: 0xE0E0E0,
     colorIdleLight: 0x444444,
 
@@ -29,6 +29,11 @@ const CONFIG = {
     colorLow: 0xCC3300,
     colorMid: 0xFF9900,
     colorHigh: 0xFFC000,
+
+    // --- SPECIAL TYPE (10%) ---
+    // Blue/Purple futuristic accent
+    colorSpecialIdle: 0x5C4DFF, // Soft Electric Purple/Blue
+    colorSpecialSignal: 0x00FFFF, // Cyan / Bright Blue
 
     // Auto Pulse
     autoPulseEnabled: true,
@@ -45,6 +50,7 @@ interface Neuron {
     flash: number;
     visualDepth: number;     // 0 (Back) to 1 (Front)
     phase: number;
+    type: number;            // 0 = Normal, 1 = Special
 }
 
 interface Pulse {
@@ -56,6 +62,7 @@ interface Pulse {
     trailIntensity: number;
     hasTriggered: boolean;
     lineIdx: number;
+    type: number; // 0 or 1
 }
 
 export default function NeuralBrain() {
@@ -127,6 +134,9 @@ export default function NeuralBrain() {
             // Visual Depth: 0 (Far/Sharp/Small) -> 1 (Near/Blurry/Large)
             const visualDepth = Math.random();
 
+            // 10% Chance for Special Type
+            const type = Math.random() < 0.10 ? 1 : 0;
+
             neurons.push({
                 id: neurons.length,
                 vec: new THREE.Vector3(testP.x, testP.y, z),
@@ -135,7 +145,8 @@ export default function NeuralBrain() {
                 connections: [],
                 flash: 0,
                 visualDepth: visualDepth,
-                phase: Math.random() * Math.PI * 2
+                phase: Math.random() * Math.PI * 2,
+                type: type
             });
         }
 
@@ -178,6 +189,7 @@ export default function NeuralBrain() {
         const phases = new Float32Array(neurons.length);
         const flashes = new Float32Array(neurons.length);
         const visualDepths = new Float32Array(neurons.length);
+        const types = new Float32Array(neurons.length);
 
         neurons.forEach((n, i) => {
             positions[i * 3] = n.vec.x;
@@ -186,12 +198,14 @@ export default function NeuralBrain() {
             phases[i] = Math.random() * Math.PI * 2;
             flashes[i] = 0.0;
             visualDepths[i] = n.visualDepth;
+            types[i] = n.type;
         });
 
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3).setUsage(THREE.DynamicDrawUsage));
         particlesGeo.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
         particlesGeo.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 1).setUsage(THREE.DynamicDrawUsage));
         particlesGeo.setAttribute('aVisualDepth', new THREE.BufferAttribute(visualDepths, 1));
+        particlesGeo.setAttribute('aType', new THREE.BufferAttribute(types, 1));
 
         // Custom Shader for Depth Effect
         const particlesMat = new THREE.ShaderMaterial({
@@ -202,6 +216,10 @@ export default function NeuralBrain() {
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
+
+                uColorSpecialIdle: { value: new THREE.Color(CONFIG.colorSpecialIdle) },
+                uColorSpecialSignal: { value: new THREE.Color(CONFIG.colorSpecialSignal) },
+
                 uSize: { value: CONFIG.particleSize * 450 }
             },
             vertexShader: `
@@ -211,10 +229,12 @@ export default function NeuralBrain() {
                 attribute float aPhase;
                 attribute float aFlash;
                 attribute float aVisualDepth; // 0..1
+                attribute float aType; // 0 or 1
                 
                 varying float vFlash;
                 varying float vPhase;
                 varying float vVisualDepth;
+                varying float vType;
                 
                 void main() {
                     // Wander Logic (GPU)
@@ -233,6 +253,7 @@ export default function NeuralBrain() {
                     vFlash = aFlash;
                     vPhase = aPhase;
                     vVisualDepth = aVisualDepth;
+                    vType = aType;
 
                     // Pulsate
                     float breath = 0.1 * sin(uTime * 1.5 + aPhase); 
@@ -255,14 +276,26 @@ export default function NeuralBrain() {
                 uniform vec3 uColorLow;
                 uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
+
+                uniform vec3 uColorSpecialIdle;
+                uniform vec3 uColorSpecialSignal;
                 
                 varying float vFlash;
                 varying float vPhase;
                 varying float vVisualDepth;
+                varying float vType;
                 
                 vec3 getHeatColor(float i) {
+                    // Normal
                     vec3 c = mix(uColorLow, uColorMid, smoothstep(0.0, 0.6, i));
                     c = mix(c, uColorHigh, smoothstep(0.6, 2.0, i));
+
+                    // Special Overwrite
+                    if (vType > 0.5) {
+                        // Mix from special idle to special high
+                        c = mix(uColorSpecialIdle, uColorSpecialSignal, smoothstep(0.0, 1.5, i));
+                    }
+
                     return c;
                 }
 
@@ -292,7 +325,12 @@ export default function NeuralBrain() {
                     
                     // Idle
                     float breath = 0.5 + 0.5 * sin(uTime * 2.0 + vPhase);
-                    vec3 idleState = mix(uColorIdle, uColorIdle * 1.2, breath * 0.3);
+                    
+                    vec3 baseIdle = (vType > 0.5) ? uColorSpecialIdle : uColorIdle;
+                    // Boost idle brightness for special type to make them visible
+                    if (vType > 0.5) baseIdle *= 1.5; 
+                    
+                    vec3 idleState = mix(baseIdle, baseIdle * 1.2, breath * 0.3);
                     
                     // Heat
                     vec3 heatState = getHeatColor(vFlash);
@@ -325,7 +363,8 @@ export default function NeuralBrain() {
         const linesGeo = new THREE.BufferGeometry();
         const linePositions = new Float32Array(connectionPairs.length * 2 * 3);
         const lineProgress = new Float32Array(connectionPairs.length * 2);
-        const signalData = new Float32Array(connectionPairs.length * 2 * 2);
+        // Changed aSignal to vec3: x=progress, y=strength, z=type
+        const signalData = new Float32Array(connectionPairs.length * 2 * 3);
         const distData = new Float32Array(connectionPairs.length * 2);
         const linePhases = new Float32Array(connectionPairs.length * 2);
 
@@ -356,7 +395,7 @@ export default function NeuralBrain() {
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
         linesGeo.setAttribute('aLineProgress', new THREE.BufferAttribute(lineProgress, 1));
-        linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 2).setUsage(THREE.DynamicDrawUsage));
+        linesGeo.setAttribute('aSignal', new THREE.BufferAttribute(signalData, 3).setUsage(THREE.DynamicDrawUsage)); // Changed to 3
         linesGeo.setAttribute('aDist', new THREE.BufferAttribute(distData, 1));
         linesGeo.setAttribute('aPhase', new THREE.BufferAttribute(linePhases, 1));
 
@@ -368,6 +407,9 @@ export default function NeuralBrain() {
                 uColorLow: { value: new THREE.Color(CONFIG.colorLow) },
                 uColorMid: { value: new THREE.Color(CONFIG.colorMid) },
                 uColorHigh: { value: new THREE.Color(CONFIG.colorHigh) },
+
+                uColorSpecialSignal: { value: new THREE.Color(CONFIG.colorSpecialSignal) },
+
                 uOpacityBase: { value: 0.08 },
             },
             transparent: true,
@@ -375,12 +417,12 @@ export default function NeuralBrain() {
                 uniform float uTime;
                 uniform float uExpansion;
                 attribute float aLineProgress;
-                attribute vec2 aSignal; 
+                attribute vec3 aSignal; // x=prog, y=str, z=type
                 attribute float aDist;
                 attribute float aPhase; // Phase of the attached neuron
                 
                 varying float vProgress;
-                varying vec2 vSignal;
+                varying vec3 vSignal;
                 varying float vDist;
                 
                 void main() {
@@ -405,15 +447,22 @@ export default function NeuralBrain() {
                 uniform vec3 uColorLow;
                 uniform vec3 uColorMid;
                 uniform vec3 uColorHigh;
+                uniform vec3 uColorSpecialSignal;
+                
                 uniform float uOpacityBase;
                 
                 varying float vProgress;
-                varying vec2 vSignal;
+                varying vec3 vSignal; // x=prog, y=str, z=type
                 varying float vDist;
                 
-                vec3 getHeatColor(float i) {
+                vec3 getHeatColor(float i, float type) {
                     // Force start from Orange (Mid) even at low intensity to be visible against black
                     // Blend directly from Mid (Orange) to High (Gold) to keep it bright
+                    
+                    if (type > 0.5) {
+                        return uColorSpecialSignal;
+                    }
+
                     vec3 c = mix(uColorMid, uColorHigh, smoothstep(0.0, 1.0, i));
                     return c;
                 }
@@ -421,6 +470,8 @@ export default function NeuralBrain() {
                 void main() {
                     float signalProgress = vSignal.x;
                     float rawStrength = vSignal.y;
+                    float signalType = vSignal.z;
+
                     float signalStrength = abs(rawStrength);
                     
                     vec3 finalColor = uColorIdle;
@@ -437,11 +488,13 @@ export default function NeuralBrain() {
                             float glow = max(0.0, 1.0 - (distWorld / tailLen));
                             
                             if (glow > 0.0) {
-                                vec3 trailColor = getHeatColor(signalStrength);
+                                vec3 trailColor = getHeatColor(signalStrength, signalType);
                                 trailColor *= 2.0;
 
                                 if (distWorld < 0.05) {
-                                     trailColor = mix(trailColor, uColorHigh, 0.6);
+                                    // Flash head
+                                    vec3 flashColor = (signalType > 0.5) ? uColorSpecialSignal : uColorHigh;
+                                    trailColor = mix(trailColor, flashColor, 0.6);
                                 }
                                 
                                 finalColor = mix(finalColor, trailColor, glow);
@@ -499,13 +552,13 @@ export default function NeuralBrain() {
         const activePulseIndices: number[] = [];
 
         for (let i = 0; i < maxPulses; i++) {
-            pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1 });
+            pulsePool.push({ active: false, fromIdx: 0, toIdx: 0, progress: 0, strength: 0, trailIntensity: 0, hasTriggered: false, lineIdx: -1, type: 0 });
             freePulseIndices.push(i);
         }
 
         const dirtyLines: number[] = [];
 
-        const spawnPulse = (from: number, to: number, strength: number, startProgress = 0.0) => {
+        const spawnPulse = (from: number, to: number, strength: number, startProgress = 0.0, type: number) => {
             const key = `${Math.min(from, to)}-${Math.max(from, to)}`;
             const lineIdx = connectionMap.get(key);
             if (lineIdx === undefined) return;
@@ -522,6 +575,7 @@ export default function NeuralBrain() {
                 p.trailIntensity = strength;
                 p.hasTriggered = false;
                 p.lineIdx = lineIdx;
+                p.type = type; // Pass Type
 
                 activePulseIndices.push(pIdx);
             }
@@ -543,7 +597,8 @@ export default function NeuralBrain() {
                 if (fired >= targetCount) break;
                 // Randomized chance to pick this connection, or force if we run out of time
                 if (Math.random() < 0.5 || (n.connections.length - i) <= (targetCount - fired)) {
-                    spawnPulse(idx, n.connections[i], 3.0);
+                    // Propagate type!
+                    spawnPulse(idx, n.connections[i], 3.0, 0.0, n.type);
                     fired++;
                 }
             }
@@ -643,12 +698,18 @@ export default function NeuralBrain() {
 
             // Clean previous dirty signals
             dirtyLines.forEach(lineIdx => {
-                const v1 = lineIdx * 4;
+                // v1 + 0,1,2 = first vertex attr
+                // v2 + 0,1,2 = second vertex attr
+                // attr is vec3
+                const v1 = lineIdx * 6; // 2 vertices * 3 floats
                 signalArray[v1] = 0;
                 signalArray[v1 + 1] = 0;
-                const v2 = v1 + 2;
+                signalArray[v1 + 2] = 0; // type default 0
+
+                const v2 = v1 + 3;
                 signalArray[v2] = 0;
-                signalArray[v1 + 3] = 0;
+                signalArray[v2 + 1] = 0;
+                signalArray[v2 + 2] = 0;
             });
             dirtyLines.length = 0;
 
@@ -674,13 +735,16 @@ export default function NeuralBrain() {
                 if (isReverse) encodedStrength = -currentStrength;
                 else encodedStrength = currentStrength;
 
-                const v1 = lineIdx * 4;
+                // UPDATE FOR VEC3 SIGNAL
+                const v1 = lineIdx * 6;
                 signalArray[v1] = shaderProgress;
                 signalArray[v1 + 1] = encodedStrength;
+                signalArray[v1 + 2] = p.type;
 
-                const v2 = v1 + 2;
+                const v2 = v1 + 3;
                 signalArray[v2] = shaderProgress;
                 signalArray[v2 + 1] = encodedStrength;
+                signalArray[v2 + 2] = p.type;
 
                 dirtyLines.push(lineIdx);
 
@@ -688,10 +752,25 @@ export default function NeuralBrain() {
                     const targetN = neurons[p.toIdx];
                     targetN.flash += currentStrength;
 
+                    // If target is triggered by a Special Pulse (Type 1), does it become Special temporarily?
+                    // Or does it fire based on its OWN type?
+                    // Request: "diese auch weiterleiten" (also forward them).
+                    // imply: signal chains should maintain color?
+                    // BUT: neurons have fixed types.
+                    // Interpretation: A blue signal hitting a normal neuron triggers a NORMAL signal?
+                    // OR: A blue signal hitting a normal neuron triggers a BLUE signal?
+                    // "10% have blue color AND forward them".
+                    // This implies the SOURCE determines the color.
+                    // So if Type 1 fires -> Blue Signal.
+                    // If Blue Signal hits Type 0 -> Type 0 fires Orange Signal.
+                    // If Blue Signal hits Type 1 -> Type 1 fires Blue Signal.
+                    // This creates "pockets" of blue activity if types are clustered, or just blue sparks if random.
+                    // Since random distribution: just sparkles.
+
                     if (currentStrength > CONFIG.minSignalStrength) {
                         targetN.connections.forEach(mateIdx => {
                             if (mateIdx !== p.fromIdx) {
-                                spawnPulse(p.toIdx, mateIdx, currentStrength, 0.0);
+                                spawnPulse(p.toIdx, mateIdx, currentStrength, 0.0, targetN.type);
                             }
                         });
                     }
@@ -784,7 +863,6 @@ export default function NeuralBrain() {
             ref={containerRef}
             className="w-full h-full transition-opacity duration-1000 ease-in-out cursor-pointer"
             style={{ opacity: opacity }}
-            title="Click to interact"
         />
     );
 }
