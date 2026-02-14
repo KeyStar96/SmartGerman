@@ -213,14 +213,13 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         <div
           ref={textContentRef}
           className="col-span-1 lg:col-span-7 flex flex-col justify-start text-left"
-          style={{ contain: 'paint' }}
         >
 
           {/* ─── Block A: Brand Split (Masked Reveal) ─── */}
           <h1
             ref={brandRef}
-            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 will-change-transform overflow-visible pl-1"
-            style={{ visibility: 'hidden' }}
+            className="text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 will-change-transform pl-3"
+            style={{ visibility: 'hidden', overflow: 'visible' }}
             onMouseEnter={handleBrandEnter}
             onMouseLeave={handleBrandLeave}
           >
