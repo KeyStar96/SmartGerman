@@ -35,9 +35,9 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                 MOBILE LAYOUT: TEXT-ONLY (Clean Editorial)
                 NeuralBrain & Visuals hidden.
                 ═══════════════════════════════════════════════════════ */}
-            <div className="md:hidden relative px-6 max-w-lg mx-auto text-center">
+            <div className="md:hidden relative px-6 max-w-lg mx-auto">
                 {/* Protocol label */}
-                <div className="mb-6">
+                <div className="mb-6 text-center">
                     <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
                         {dictionary.science.protocol}
                     </span>
