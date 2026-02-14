@@ -147,7 +147,7 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
             </div>
 
             {/* BOTTOM ROW: Footer Meta */}
-            <div className="mt-8 lg:mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
+            <div className="mt-8 lg:mt-16 pt-8 border-t border-white/10 flex flex-col items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
                 <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
 
                 <div className="flex flex-wrap justify-center gap-8">
