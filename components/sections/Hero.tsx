@@ -79,7 +79,15 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
         }
       });
     } else {
-      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+      const tl = gsap.timeline({
+        defaults: { ease: "power4.out" },
+        onComplete: () => {
+          // After reveal finishes, allow overflow so magnetic drift doesn't clip
+          if (brandRef.current) {
+            brandRef.current.style.overflow = 'visible';
+          }
+        }
+      });
 
       revealTargets.forEach(({ el, delay }) => {
         if (!el) return;
@@ -218,8 +226,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Block A: Brand Split (Masked Reveal) ─── */}
           <h1
             ref={brandRef}
-            className="text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 will-change-transform pl-3"
-            style={{ visibility: 'hidden', overflow: 'visible' }}
+            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 will-change-transform"
+            style={{ visibility: 'hidden' }}
             onMouseEnter={handleBrandEnter}
             onMouseLeave={handleBrandLeave}
           >

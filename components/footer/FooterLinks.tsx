@@ -150,7 +150,7 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
             <div className="mt-8 lg:mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
                 <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
 
-                <div className="flex gap-8 md:mr-24">
+                <div className="flex flex-wrap justify-center gap-8">
                     <Link href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</Link>
                     <Link href={`/${lang}/privacy`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</Link>
                     <Link href={`/${lang}/agb`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</Link>
