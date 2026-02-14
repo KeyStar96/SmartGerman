@@ -219,7 +219,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Block A: Brand Split (Masked Reveal) ─── */}
           <h1
             ref={brandRef}
-            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 will-change-transform"
+            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 will-change-transform overflow-visible pl-1"
             style={{ visibility: 'hidden' }}
             onMouseEnter={handleBrandEnter}
             onMouseLeave={handleBrandLeave}
