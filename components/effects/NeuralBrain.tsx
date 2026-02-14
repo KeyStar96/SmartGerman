@@ -14,6 +14,10 @@ const CONFIG = {
     springStiffness: 0.04,
     maxConnections: 6,
 
+    // Spline Connections
+    curveSegments: 8, // Smoothness
+    curveCurvature: 0.6, // Strength of the curve
+
     // Signals
     signalSpeed: 1.25,
     minSignalStrength: 0.05,
@@ -30,7 +34,7 @@ const CONFIG = {
     colorMid: 0xFF9900,
     colorHigh: 0xFFC000,
 
-    // --- SPECIAL TYPE (10%) ---
+    // --- SPECIAL TYPE (5%) ---
     // Blue/Purple futuristic accent
     colorSpecialIdle: 0x5C4DFF, // Soft Electric Purple/Blue
     colorSpecialSignal: 0x00FFFF, // Cyan / Bright Blue
@@ -134,8 +138,8 @@ export default function NeuralBrain() {
             // Visual Depth: 0 (Far/Sharp/Small) -> 1 (Near/Blurry/Large)
             const visualDepth = Math.random();
 
-            // 10% Chance for Special Type
-            const type = Math.random() < 0.10 ? 1 : 0;
+            // 5% Chance for Special Type
+            const type = Math.random() < 0.05 ? 1 : 0;
 
             neurons.push({
                 id: neurons.length,
@@ -151,7 +155,7 @@ export default function NeuralBrain() {
         }
 
         // --- 3. CREATE CONNECTIONS ---
-        const connectionPairs: { from: number; to: number; dist: number }[] = [];
+        const connectionPairs: { from: number; to: number; dist: number; cp: THREE.Vector3 }[] = [];
         const maxDistSq = CONFIG.connectionDistance * CONFIG.connectionDistance;
         const minDistSq = CONFIG.minConnectionDistance * CONFIG.minConnectionDistance;
 
@@ -175,7 +179,19 @@ export default function NeuralBrain() {
                 if ((isLocal || isGlobal) && dSq > minDistSq) {
                     n1.connections.push(j);
                     n2.connections.push(i);
-                    connectionPairs.push({ from: i, to: j, dist: Math.sqrt(dSq) });
+
+                    // --- SPLINE CONTROL POINT ---
+                    // Calculate a perpendicular offset
+                    const mid = new THREE.Vector3().addVectors(n1.vec, n2.vec).multiplyScalar(0.5);
+                    const dir = new THREE.Vector3().subVectors(n2.vec, n1.vec);
+                    const len = dir.length();
+                    // Normal in 2D (rotate 90 deg: -y, x)
+                    const perp = new THREE.Vector3(-dir.y, dir.x, 0).normalize();
+                    // Random curvature direction and strength
+                    const curvature = (Math.random() - 0.5) * CONFIG.curveCurvature * len;
+                    const cp = mid.add(perp.multiplyScalar(curvature));
+
+                    connectionPairs.push({ from: i, to: j, dist: len, cp: cp });
                     connCount++;
                 }
             }
@@ -359,38 +375,80 @@ export default function NeuralBrain() {
         scene.add(particleSystem);
 
 
-        // B. Connections (Lines)
+        // B. Connections (Splines)
+        const segments = CONFIG.curveSegments;
+        const totalVertices = connectionPairs.length * segments * 2;
+
         const linesGeo = new THREE.BufferGeometry();
-        const linePositions = new Float32Array(connectionPairs.length * 2 * 3);
-        const lineProgress = new Float32Array(connectionPairs.length * 2);
+        const linePositions = new Float32Array(totalVertices * 3);
+        const lineProgress = new Float32Array(totalVertices);
         // Changed aSignal to vec3: x=progress, y=strength, z=type
-        const signalData = new Float32Array(connectionPairs.length * 2 * 3);
-        const distData = new Float32Array(connectionPairs.length * 2);
-        const linePhases = new Float32Array(connectionPairs.length * 2);
+        const signalData = new Float32Array(totalVertices * 3);
+        const distData = new Float32Array(totalVertices);
+        const linePhases = new Float32Array(totalVertices);
 
         for (let i = 0; i < connectionPairs.length; i++) {
             const pair = connectionPairs[i];
             const n1 = neurons[pair.from];
             const n2 = neurons[pair.to];
+            const cp = pair.cp;
 
-            // Fill Positions (Static Base)
-            const idx = i * 6;
-            linePositions[idx] = n1.vec.x;
-            linePositions[idx + 1] = n1.vec.y;
-            linePositions[idx + 2] = n1.vec.z;
+            // Approximate Curve Length (sum of chords)
+            let curveLen = 0;
+            const points: THREE.Vector3[] = [];
 
-            linePositions[idx + 3] = n2.vec.x;
-            linePositions[idx + 4] = n2.vec.y;
-            linePositions[idx + 5] = n2.vec.z;
+            // Generate Points inclusive (0 to segments) -> segments + 1 points
+            for (let s = 0; s <= segments; s++) {
+                const t = s / segments;
+                // Quadratic Bezier
+                const invT = 1 - t;
+                const p = new THREE.Vector3();
+                p.x = invT * invT * n1.vec.x + 2 * invT * t * cp.x + t * t * n2.vec.x;
+                p.y = invT * invT * n1.vec.y + 2 * invT * t * cp.y + t * t * n2.vec.y;
+                p.z = 0;
+                points.push(p);
 
-            // Fill Attributes
-            lineProgress[i * 2] = 0.0;
-            distData[i * 2] = pair.dist;
-            linePhases[i * 2] = n1.phase;
+                if (s > 0) {
+                    curveLen += points[s].distanceTo(points[s - 1]);
+                }
+            }
 
-            lineProgress[i * 2 + 1] = 1.0;
-            distData[i * 2 + 1] = pair.dist;
-            linePhases[i * 2 + 1] = n2.phase;
+            // Fill Buffers (segments lines)
+            const baseIdx = i * segments * 2; // vertex index in buffer (not float index)
+
+            for (let s = 0; s < segments; s++) {
+                const pStart = points[s];
+                const pEnd = points[s + 1];
+                const tStart = s / segments;
+                const tEnd = (s + 1) / segments;
+
+                // Vertex 1
+                const v1 = (baseIdx + s * 2);
+                linePositions[v1 * 3] = pStart.x;
+                linePositions[v1 * 3 + 1] = pStart.y;
+                linePositions[v1 * 3 + 2] = pStart.z;
+
+                lineProgress[v1] = tStart;
+                distData[v1] = curveLen;
+                linePhases[v1] = n1.phase;
+
+                // Vertex 2
+                const v2 = (baseIdx + s * 2 + 1);
+                linePositions[v2 * 3] = pEnd.x;
+                linePositions[v2 * 3 + 1] = pEnd.y;
+                linePositions[v2 * 3 + 2] = pEnd.z;
+
+                lineProgress[v2] = tEnd;
+                distData[v2] = curveLen;
+                linePhases[v2] = n2.phase; // Or n1? Phase dictates wander... use mixing? Just stick to n1 for consistency across line.
+                // Actually if I use n1.phase for whole line, the whole line wanders together.
+                // If I use mixed phase, it might stretch weirdly.
+                // Let's use n1.phase for consistency.
+                linePhases[v2] = n1.phase;
+            }
+
+            // Update pair dist to curve length for accurate speed calc
+            pair.dist = curveLen;
         }
 
         linesGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
@@ -431,6 +489,7 @@ export default function NeuralBrain() {
                     vDist = aDist;
 
                     // Wander Logic (Match Particles)
+                    // Use aPhase to keep the line attached to the neuron visually
                     vec3 offset = vec3(
                         sin(uTime * 0.5 + aPhase), 
                         cos(uTime * 0.4 + aPhase * 0.9), 
@@ -456,13 +515,9 @@ export default function NeuralBrain() {
                 varying float vDist;
                 
                 vec3 getHeatColor(float i, float type) {
-                    // Force start from Orange (Mid) even at low intensity to be visible against black
-                    // Blend directly from Mid (Orange) to High (Gold) to keep it bright
-                    
                     if (type > 0.5) {
                         return uColorSpecialSignal;
                     }
-
                     vec3 c = mix(uColorMid, uColorHigh, smoothstep(0.0, 1.0, i));
                     return c;
                 }
@@ -686,6 +741,7 @@ export default function NeuralBrain() {
             // Signal Logic
             const signalAttr = linesGeo.attributes.aSignal as THREE.BufferAttribute;
             const signalArray = signalAttr.array as Float32Array;
+            const segments = CONFIG.curveSegments;
 
             // Auto Pulse (Random / Organic)
             if (CONFIG.autoPulseEnabled) {
@@ -698,18 +754,14 @@ export default function NeuralBrain() {
 
             // Clean previous dirty signals
             dirtyLines.forEach(lineIdx => {
-                // v1 + 0,1,2 = first vertex attr
-                // v2 + 0,1,2 = second vertex attr
-                // attr is vec3
-                const v1 = lineIdx * 6; // 2 vertices * 3 floats
-                signalArray[v1] = 0;
-                signalArray[v1 + 1] = 0;
-                signalArray[v1 + 2] = 0; // type default 0
-
-                const v2 = v1 + 3;
-                signalArray[v2] = 0;
-                signalArray[v2 + 1] = 0;
-                signalArray[v2 + 2] = 0;
+                const base = lineIdx * segments * 2 * 3;
+                // Loop over all vertices of the spline
+                for (let k = 0; k < segments * 2; k++) {
+                    const idx = base + k * 3;
+                    signalArray[idx] = 0;
+                    signalArray[idx + 1] = 0;
+                    signalArray[idx + 2] = 0;
+                }
             });
             dirtyLines.length = 0;
 
@@ -735,37 +787,23 @@ export default function NeuralBrain() {
                 if (isReverse) encodedStrength = -currentStrength;
                 else encodedStrength = currentStrength;
 
-                // UPDATE FOR VEC3 SIGNAL
-                const v1 = lineIdx * 6;
-                signalArray[v1] = shaderProgress;
-                signalArray[v1 + 1] = encodedStrength;
-                signalArray[v1 + 2] = p.type;
+                // UPDATE FOR VEC3 SIGNAL (Spline)
+                const base = lineIdx * segments * 2 * 3;
 
-                const v2 = v1 + 3;
-                signalArray[v2] = shaderProgress;
-                signalArray[v2 + 1] = encodedStrength;
-                signalArray[v2 + 2] = p.type;
+                // Set uniform signal value for the entire curve
+                // The shader uses aLineProgress to determine local effect
+                for (let k = 0; k < segments * 2; k++) {
+                    const idx = base + k * 3;
+                    signalArray[idx] = shaderProgress;
+                    signalArray[idx + 1] = encodedStrength;
+                    signalArray[idx + 2] = p.type;
+                }
 
                 dirtyLines.push(lineIdx);
 
                 if (!p.hasTriggered && p.progress >= 1.0) {
                     const targetN = neurons[p.toIdx];
                     targetN.flash += currentStrength;
-
-                    // If target is triggered by a Special Pulse (Type 1), does it become Special temporarily?
-                    // Or does it fire based on its OWN type?
-                    // Request: "diese auch weiterleiten" (also forward them).
-                    // imply: signal chains should maintain color?
-                    // BUT: neurons have fixed types.
-                    // Interpretation: A blue signal hitting a normal neuron triggers a NORMAL signal?
-                    // OR: A blue signal hitting a normal neuron triggers a BLUE signal?
-                    // "10% have blue color AND forward them".
-                    // This implies the SOURCE determines the color.
-                    // So if Type 1 fires -> Blue Signal.
-                    // If Blue Signal hits Type 0 -> Type 0 fires Orange Signal.
-                    // If Blue Signal hits Type 1 -> Type 1 fires Blue Signal.
-                    // This creates "pockets" of blue activity if types are clustered, or just blue sparks if random.
-                    // Since random distribution: just sparkles.
 
                     if (currentStrength > CONFIG.minSignalStrength) {
                         targetN.connections.forEach(mateIdx => {
@@ -780,7 +818,8 @@ export default function NeuralBrain() {
                 if (p.progress >= 1.0 + (CONFIG.trailDecay / dist)) {
                     p.active = false;
                     freePulseIndices.push(pIdx);
-                    const lastActive = activePulseIndices[activePulseIndices.length - 1];
+                    const activeLen = activePulseIndices.length;
+                    const lastActive = activePulseIndices[activeLen - 1];
                     activePulseIndices[i] = lastActive;
                     activePulseIndices.pop();
                 }
