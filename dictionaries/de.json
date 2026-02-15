@@ -34,7 +34,7 @@
     "brand_name_part1": "Smart",
     "brand_name_part2": "German",
     "badge": "Evidenzbasiert • Neuro-Didaktik • Master-Expertise",
-    "headline": "Smart German: Mit Erfahrung und Wissenschaft zur neuen Sprache.",
+    "headline": "<<SmartGerman>>: Mit Erfahrung und Wissenschaft zur neuen Sprache.",
     "claim": "Mit Erfahrung und Wissenschaft zur neuen Sprache.",
     "subline": "Entdecken Sie eine Methode, die Ihr Wissen wertschätzt und Ihr Lerntempo respektiert. Sprachenlernen ab 50 ist keine Frage des Alters – es ist eine Frage der richtigen Verbindung.",
     "cta_primary": "Die Methode entdecken",
@@ -334,8 +334,8 @@
     "protocol": "Wissenschaftliches Fundament",
     "title_part1": "WARUM SPRACHENLERNEN",
     "title_part2": "IM BESTEN ALTER ANDERS FUNKTIONIERT.",
-    "description_1": "Wissenschaftlich belegt: Ihr Gehirn lernt lebenslang. Entgegen veralteter Mythen ist das Gehirn über 50 keineswegs weniger leistungsfähig – es ist spezialisierter. Während herkömmliche Methoden oft auf die schnelle Verarbeitung junger Gehirne setzen, nutzt „Smart German“ Ihre größte Stärke: Ihre kristalline Intelligenz und Ihr lebenslang aufgebautes Wissen.",
-    "description_2": "In unserer Forschung an der TU Braunschweig und der Universität Hannover zeigen wir: Erfolgreiches Lernen im Alter erfordert Methoden, die die natürliche Anpassungsfähigkeit (Neuroplastizität) Ihres Gehirns nutzen, statt es mit starren Regeln zu überfordern. Wir schaffen neue neuronale Verbindungen, indem wir neue Wörter direkt mit Ihren wertvollen Lebenserfahrungen verknüpfen. So bleibt das Gelernte nicht nur im Kopf, sondern wird Teil Ihres Alltags.",
+    "description_1": "Wissenschaftlich belegt: Ihr Gehirn lernt lebenslang. Entgegen veralteter Mythen ist das Gehirn über 50 keineswegs weniger leistungsfähig – es ist spezialisierter. Während herkömmliche Methoden oft auf die schnelle Verarbeitung junger Gehirne setzen, nutzt <<SmartGerman>> Ihre größte Stärke: Ihre kristalline Intelligenz und Ihr lebenslang aufgebautes Wissen.",
+    "description_2": "Erfolgreiches Lernen im Alter erfordert Methoden, die die natürliche Anpassungsfähigkeit (Neuroplastizität) Ihres Gehirns nutzen. Ich schaffe neue neuronale Verbindungen, indem ich neue Wörter direkt mit Ihren wertvollen Lebenserfahrungen verknüpfe. So bleibt das Gelernte nicht nur im Kopf, sondern wird Teil Ihres Alltags.",
     "layer_active": "Neuronale Plastizität",
     "data_points": {
       "data_stream_label": "DATENSTROM",
@@ -380,7 +380,7 @@
     "card1": {
       "category": "Universitäre Forschung",
       "title": "Lernen ohne Druck: Warum unsere Spezialisierung den Unterschied macht.",
-      "text": "Staatliche Standard-Kurse sind oft für ein breites Spektrum an Lernenden konzipiert, nehmen aber selten Rücksicht auf die veränderten Wahrnehmungskanäle und das individuelle Lerntempo der Generation 50+. Wir wissen, dass ein nachlassendes Hörvermögen in lauten Klassenräumen oder zu schnelles Sprechtempo von Lehrkräften Stress auslösen können. Unsere Methode setzt dort an, wo andere aufhören: Wir schaffen eine ruhige, barrierefreie Lernumgebung mit klaren Strukturen und viel Raum für Wiederholung. Wir nutzen moderne Geragogik (Altersdidaktik), um sicherzustellen, dass Sie nicht nur Deutsch lernen, sondern Freude am Fortschritt empfinden – ganz ohne Leistungsdruck.",
+      "text": "Staatliche Standard-Kurse sind oft für ein breites Spektrum an Lernenden konzipiert, nehmen aber selten Rücksicht auf die veränderten Wahrnehmungskanäle und das individuelle Lerntempo der Generation 50+. Ich weiß, dass ein nachlassendes Hörvermögen in lauten Klassenräumen oder zu schnelles Sprechtempo von Lehrkräften Stress auslösen können. Meine Methode setzt dort an, wo andere aufhören: Ich schaffe eine ruhige, barrierefreie Lernumgebung mit klaren Strukturen und viel Raum für Wiederholung. Ich nutze moderne Geragogik (Altersdidaktik), um sicherzustellen, dass Sie nicht nur Deutsch lernen, sondern Freude am Fortschritt empfinden – ganz ohne Leistungsdruck.",
       "specialization": "Spezialisierung: DaF / DaZ & Biologie"
     },
     "card2": {
@@ -404,12 +404,12 @@
     "card3": {
       "category": "Erfahrung",
       "title": "Erprobt in der Praxis.",
-      "text": "2 Jahre lang leiteten wir Deutschkurse für den Ukrainischen Verein in Niedersachsen e.V. Durch unsere Arbeit in Willkommensklassen und als studentische Hilfskraft im Bereich Deutsch als Zweitsprache an der Universität Hannover kennen wir die realen Hürden, vor denen Sie stehen."
+      "text": "2 Jahre lang leitete ich Deutschkurse für den Ukrainischen Verein in Niedersachsen e.V. Durch meine Arbeit in Willkommensklassen und als studentische Hilfskraft im Bereich Deutsch als Zweitsprache an der Universität Hannover kenne ich die realen Hürden, vor denen Sie stehen."
     },
     "card4": {
       "category": "Bilingualität",
       "title": "Zwei Muttersprachen: Deutsch & Russisch.",
-      "text": "Wir sind vollständig zweisprachig aufgewachsen. Das erlaubt es uns, komplexe Regeln direkt in Ihrer Muttersprache zu erklären. Um Ihre Perspektive als Lernende noch besser zu verstehen, lernen wir aktuell selbst Türkisch – wir wissen also genau, wie es sich anfühlt, noch einmal neu anzufangen."
+      "text": "Ich bin vollständig zweisprachig aufgewachsen. Das erlaubt es mir, komplexe Regeln direkt in Ihrer Muttersprache zu erklären. Um Ihre Perspektive als Lernende noch besser zu verstehen, lerne ich aktuell selbst Türkisch – ich weiß also genau, wie es sich anfühlt, noch einmal neu anzufangen."
     }
   },
   "about_v2": {
@@ -420,7 +420,7 @@
     },
     "headline": "Anastasia Sitov - Gründerin & Lehrkraft",
     "subline": "Als Expertin für Spracherwerb im Alter und Master of Education weiß ich: Jeder Mensch lernt so individuell wie sein eigener Fingerabdruck. Da ich selbst vollständig zweisprachig (Deutsch & Russisch) aufgewachsen bin, kenne ich die Hürden beim Wechsel zwischen zwei Welten aus erster Hand. Mein Ansatz verbindet aktuelle Forschung zur Neuroplastizität mit einer empathischen Lernbegleitung auf Augenhöhe.",
-    "body": "Wir erklären komplexe Regeln direkt in Ihrer Muttersprache, damit Sie sich von Anfang an sicher fühlen. Aktuell lerne ich selbst Türkisch – so bleibe ich mit Ihnen gemeinsam auf der Reise des Entdeckens und weiß genau, wie es sich anfühlt, noch einmal neu anzufangen.",
+    "body": "Ich erkläre komplexe Regeln direkt in Ihrer Muttersprache, damit Sie sich von Anfang an sicher fühlen. Aktuell lerne ich selbst Türkisch – so bleibe ich mit Ihnen gemeinsam auf der Reise des Entdeckens und weiß genau, wie es sich anfühlt, noch einmal neu anzufangen.",
     "timeline": {
       "title": "Akademischer Werdegang",
       "items": [
@@ -677,6 +677,7 @@
       "step3_sub": "Bitte prüfen Sie Ihre Angaben.",
       "progress_course": "Kursauswahl",
       "progress_personal": "Pers. Daten",
+      "sidebar_hint_title": "KOSTENÜBERSICHT",
       "progress_review": "Überprüfung",
       "btn_next": "NÄCHSTER SCHRITT",
       "btn_continue": "WEITER",

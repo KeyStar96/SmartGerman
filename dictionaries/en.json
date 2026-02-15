@@ -322,8 +322,8 @@
     "protocol": "Scientific Foundation",
     "title_part1": "Why Language Learning",
     "title_part2": "Works Differently at the Best Age.",
-    "description_1": "Scientifically proven: Your brain learns lifelong. Contrary to outdated myths, the brain over 50 is by no means less capable – it is more specialized. While conventional methods often rely on the fast processing of young brains, 'Smart German' uses your greatest strength: your crystalline intelligence and your lifelong accumulated knowledge.",
-    "description_2": "In our research at TU Braunschweig and the University of Hannover, we show: Successful learning in old age requires methods that use the natural adaptability (neuroplasticity) of your brain instead of overwhelming it with rigid rules. We create new neural connections by linking new words directly with your valuable life experiences. This way, what is learned stays not only in your head but becomes part of your everyday life.",
+    "description_1": "Scientifically proven: Your brain learns lifelong. Contrary to outdated myths, the brain over 50 is by no means less capable – it is more specialized. While conventional methods often rely on the fast processing of young brains, <<SmartGerman>> uses your greatest strength: your crystalline intelligence and your lifelong accumulated knowledge.",
+    "description_2": "Successful learning in old age requires methods that use the natural adaptability (neuroplasticity) of your brain. I create new neural connections by linking new words directly with your valuable life experiences. This way, what is learned stays not only in your head but becomes part of your everyday life.",
     "layer_active": "Neural Plasticity",
     "data_points": {
       "data_stream_label": "DATA_STREAM",
@@ -368,7 +368,7 @@
     "card1": {
       "category": "University Research",
       "title": "Learning Without Pressure: Why Our Specialization Makes the Difference.",
-      "text": "State standard courses are often designed for a broad spectrum of learners but rarely take into account the changed perception channels and the individual learning pace of the generation 50+. We know that diminishing hearing in loud classrooms or too fast speaking tempo of teachers can trigger stress. Our method starts where others stop: We create a quiet, barrier-free learning environment with clear structures and plenty of room for repetition. We use modern geragogy (age didactics) to ensure that you not only learn German but also find joy in progress – completely without performance pressure.",
+      "text": "State standard courses are often designed for a broad spectrum of learners but rarely take into account the changed perception channels and the individual learning pace of the generation 50+. I know that diminishing hearing in loud classrooms or too fast speaking tempo of teachers can trigger stress. My method starts where others stop: I create a quiet, barrier-free learning environment with clear structures and plenty of room for repetition. I use modern geragogy (age didactics) to ensure that you not only learn German but also find joy in progress – completely without performance pressure.",
       "specialization": "Specialization: GFL / GSL & Biology"
     },
     "card2": {
@@ -392,12 +392,12 @@
     "card3": {
       "category": "Experience",
       "title": "Proven in practice.",
-      "text": "For 2 years, we led German courses for the Ukrainian Association in Lower Saxony e.V. Through our work in welcome classes and as a student assistant in the field of German as a Second Language at the University of Hannover, we know the real hurdles you face."
+      "text": "For 2 years, I led German courses for the Ukrainian Association in Lower Saxony e.V. Through my work in welcome classes and as a student assistant in the field of German as a Second Language at the University of Hannover, I know the real hurdles you face."
     },
     "card4": {
       "category": "Bilingualism",
       "title": "Two mother tongues: German & Russian.",
-      "text": "We grew up completely bilingual. This allows us to explain complex rules directly in your native language. To understand your perspective as a learner even better, we are currently learning Turkish ourselves – so we know exactly how it feels to start all over again."
+      "text": "I grew up completely bilingual. This allows me to explain complex rules directly in your native language. To understand your perspective as a learner even better, I am currently learning Turkish myself – so I know exactly how it feels to start all over again."
     }
   },
   "about_v2": {
@@ -408,7 +408,7 @@
     },
     "headline": "Your Companion on the Way to a New Language: Anastasia Sitov.",
     "subline": "As an expert in language acquisition in old age and Master of Education, I know: Every person learns as individually as their own fingerprint. Since I grew up fully bilingual (German & Russian), I know the hurdles of switching between two worlds first-hand. My approach combines current research on neuroplasticity with empathic learning support at eye level.",
-    "body": "We explain complex rules directly in your native language so that you feel secure from the beginning. Currently, I am learning Turkish myself – so I remain with you on the journey of discovery and know exactly how it feels to start anew.",
+    "body": "I explain complex rules directly in your native language so that you feel secure from the beginning. Currently, I am learning Turkish myself – so I remain with you on the journey of discovery and know exactly how it feels to start anew.",
     "timeline": {
       "title": "Academic Background",
       "items": [
@@ -677,6 +677,7 @@
       "step3_sub": "Please check your details.",
       "progress_course": "Course Selection",
       "progress_personal": "Pers. Data",
+      "sidebar_hint_title": "COST OVERVIEW",
       "progress_review": "Review",
       "btn_next": "NEXT STEP",
       "btn_continue": "CONTINUE",

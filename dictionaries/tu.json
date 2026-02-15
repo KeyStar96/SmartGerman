@@ -407,8 +407,8 @@
     "protocol": "Bilimsel Temel",
     "title_part1": "NEDEN DİL ÖĞRENİMİ",
     "title_part2": "EN İYİ YAŞTA FARKLI ÇALIŞIR.",
-    "description_1": "Bilimsel olarak kanıtlanmış: Beyniniz yaşam boyu öğrenir. Eskimiş mitlerin aksine, 50 yaşın üzerindeki beyin daha az yetenekli değildir — daha uzmanlaşmıştır. Geleneksel yöntemler genellikle genç beyinlerin hızlı işlemlemesine dayanırken, 'Smart German' en büyük gücünüzü kullanır: kristalize zekanız ve yaşam boyu birikmiş bilginiz.",
-    "description_2": "TU Braunschweig ve Hannover Üniversitesi'ndeki araştırmamızda şunu gösteriyoruz: İleri yaşta başarılı öğrenme, beyninizi katı kurallarla boğmak yerine doğal uyum yeteneğini (nöroplastisite) kullanan yöntemler gerektirir. Yeni kelimeleri doğrudan değerli yaşam deneyimlerinizle ilişkilendirerek yeni nöronal bağlantılar oluşturuyoruz. Böylece öğrenilenler sadece kafanızda kalmaz, günlük yaşamınızın bir parçası olur.",
+    "description_1": "Bilimsel olarak kanıtlanmış: Beyniniz yaşam boyu öğrenir. Eskimiş mitlerin aksine, 50 yaşın üzerindeki beyin daha az yetenekli değildir — daha uzmanlaşmıştır. Geleneksel yöntemler genellikle genç beyinlerin hızlı işlemlemesine dayanırken, <<SmartGerman>> en büyük gücünüzü kullanır: kristalize zekanız ve yaşam boyu birikmiş bilginiz.",
+    "description_2": "İleri yaşta başarılı öğrenme, doğal uyum yeteneğini (nöroplastisite) kullanan yöntemler gerektirir. Yeni kelimeleri doğrudan değerli yaşam deneyimlerinizle ilişkilendirerek yeni nöronal bağlantılar oluşturuyorum. Böylece öğrenilenler sadece kafanızda kalmaz, günlük yaşamınızın bir parçası olur.",
     "layer_active": "Nöronal Plastisite",
     "data_points": {
       "data_stream_label": "VERİ_AKIŞI",
@@ -443,7 +443,7 @@
     "card1": {
       "category": "Üniversite Araştırması",
       "title": "Baskısız Öğrenme: Uzmanlığımız Neden Fark Yaratıyor.",
-      "text": "Devlet standart kursları genellikle geniş bir öğrenci yelpazesi için tasarlanmıştır, ancak nadiren 50+ neslinin değişen algı kanallarını ve bireysel öğrenme hızını dikkate alır. Gürültülü sınıflarda azalan işitme yeteneğinin veya öğretmenlerin çok hızlı konuşma temposunun stres tetikleyebileceğini biliyoruz. Bizim yöntemimiz diğerlerinin durduğu yerde başlar: Net yapılar ve tekrar için bolca alan ile sakin, engelsiz bir öğrenme ortamı yaratıyoruz. Sadece Almanca öğrenmenizi değil, aynı zamanda ilerlemeden keyif almanızı sağlamak için modern geragoji (yaşlılık didaktiği) kullanıyoruz — tamamen performans baskısı olmadan.",
+      "text": "Devlet standart kursları genellikle geniş bir öğrenci yelpazesi için tasarlanmıştır, ancak nadiren 50+ neslinin değişen algı kanallarını ve bireysel öğrenme hızını dikkate alır. Gürültülü sınıflarda azalan işitme yeteneğinin veya öğretmenlerin çok hızlı konuşma temposunun stres tetikleyebileceğini biliyorum. Benim yöntemim diğerlerinin durduğu yerde başlar: Net yapılar ve tekrar için bolca alan ile sakin, engelsiz bir öğrenme ortamı yaratıyorum. Sadece Almanca öğrenmenizi değil, aynı zamanda ilerlemeden keyif almanızı sağlamak için modern geragoji (yaşlılık didaktiği) kullanıyorum — tamamen performans baskısı olmadan.",
       "specialization": "Uzmanlık: DaF / DaZ & Biyoloji"
     },
     "card2": {
@@ -467,12 +467,12 @@
     "card3": {
       "category": "Deneyim",
       "title": "Pratikte kanıtlanmış.",
-      "text": "2 yıl boyunca Aşağı Saksonya Ukrayna Derneği e.V. için Almanca kursları yönettik. Karşılama sınıflarındaki çalışmalarımız ve Hannover Üniversitesi'nde İkinci Dil Olarak Almanca alanındaki öğrenci asistanlığımız sayesinde, karşılaştığınız gerçek engelleri biliyoruz."
+      "text": "2 yıl boyunca Aşağı Saksonya Ukrayna Derneği e.V. için Almanca kursları yönettim. Karşılama sınıflarındaki çalışmalarım ve Hannover Üniversitesi'nde İkinci Dil Olarak Almanca alanındaki öğrenci asistanlığım sayesinde, karşılaştığınız gerçek engelleri biliyorum."
     },
     "card4": {
       "category": "İki Dillilik",
       "title": "İki ana dil: Almanca & Rusça.",
-      "text": "Tamamen iki dilli olarak büyüdük. Bu, karmaşık kuralları doğrudan ana dilinizde açıklamamıza olanak tanır. Öğrenci olarak bakış açınızı daha iyi anlamak için şu anda kendimiz Türkçe öğreniyoruz - bu yüzden her şeye yeniden başlamanın nasıl bir his olduğunu tam olarak biliyoruz."
+      "text": "Tamamen iki dilli olarak büyüdüm. Bu, karmaşık kuralları doğrudan ana dilinizde açıklamama olanak tanır. Öğrenci olarak bakış açınızı daha iyi anlamak için şu anda kendim Türkçe öğreniyorum - bu yüzden her şeye yeniden başlamanın nasıl bir his olduğunu tam olarak biliyorum."
     }
   },
   "about_v2": {
@@ -483,7 +483,7 @@
     },
     "headline": "Anastasia Sitov - Kurucu ve Eğitmen",
     "subline": "İleri yaşta dil edinimi uzmanı ve Eğitim Yüksek Lisansı olarak biliyorum ki: Her insan kendi parmak izi kadar bireysel öğrenir. Kendim tamamen iki dilli (Almanca ve Rusça) büyüdüğüm için, iki dünya arasında geçiş yapmanın zorluklarını ilk elden biliyorum. Yaklaşımım, nöroplastisite üzerine güncel araştırmaları göz hizasında empatik öğrenme desteğiyle birleştiriyor.",
-    "body": "Karmaşık kuralları doğrudan ana dilinizde açıklıyoruz, böylece başlangıçtan itibaren kendinizi güvende hissedersiniz. Şu anda kendim Türkçe öğreniyorum — böylece keşif yolculuğunda sizinle kalıyorum ve yeniden başlamanın nasıl bir his olduğunu tam olarak biliyorum.",
+    "body": "Karmaşık kuralları doğrudan ana dilinizde açıklıyorum, böylece başlangıçtan itibaren kendinizi güvende hissedersiniz. Şu anda kendim Türkçe öğreniyorum — böylece keşif yolculuğunda sizinle kalıyorum ve yeniden başlamanın nasıl bir his olduğunu tam olarak biliyorum.",
     "timeline": {
       "title": "Akademik Geçmiş",
       "items": [
@@ -684,6 +684,7 @@
       "step3_sub": "Lütfen bilgilerinizi kontrol edin.",
       "progress_course": "Kurs Seçimi",
       "progress_personal": "Kişisel Veriler",
+      "sidebar_hint_title": "MALİYET GENEL BAKIŞ",
       "progress_review": "İnceleme",
       "btn_next": "SONRAKİ ADIM",
       "btn_continue": "DEVAM ET",
