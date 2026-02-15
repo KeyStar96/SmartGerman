@@ -24,7 +24,7 @@ const LanguageCard = ({ item, index }: { item: LanguageItem; index: number }) =>
             transition={{ delay: index * 0.1, duration: 0.4 }}
             whileHover={{ y: -5 }}
             className={cn(
-                "relative overflow-hidden group rounded-xl",
+                "relative overflow-hidden group", // removed rounded-xl
                 "bg-white/70 dark:bg-[#1A1A1A]/70", // Fallback color
                 "backdrop-blur-[16px] backdrop-saturate-150", // Glass effect
                 "border border-[#FF6B00]/20", // Subtle orange border

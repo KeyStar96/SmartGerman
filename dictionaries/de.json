@@ -462,12 +462,12 @@
         {
           "code": "EN",
           "name": "Englisch",
-          "level": "C1 Fließend"
+          "level": "Fließend"
         },
         {
           "code": "TR",
           "name": "Türkisch",
-          "level": "A2 Grundkenntnisse"
+          "level": "Grundkenntnisse"
         }
       ]
     }

@@ -16,7 +16,7 @@ const PaperCard = ({ children, className, isOrange = false }: { children: React.
     return (
         <div
             className={cn(
-                "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card rounded-xl",
+                "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card", // removed rounded-xl
                 isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9] dark:bg-[#1E2024]",
                 "border-[0.5px] border-black/10 dark:border-white/5",
                 "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]",
@@ -78,7 +78,7 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                         transition={{ duration: 0.8 }}
                         className="lg:col-span-7 h-full pointer-events-auto" // removed old classes
                     >
-                        <PaperCard className="rounded-2xl overflow-hidden"> {/* Ensure overflow hidden for image cutoff */}
+                        <PaperCard className="overflow-hidden"> {/* Ensure overflow hidden for image cutoff */}
                             <BioReveal
                                 headline={data.headline}
                                 subline={data.subline}
@@ -110,7 +110,7 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                         transition={{ delay: 0.4, duration: 0.8 }}
                         className="lg:col-span-12 h-full pointer-events-auto"
                     >
-                        <PaperCard className="rounded-2xl overflow-hidden">
+                        <PaperCard className="overflow-hidden">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-full">
                                 {/* Visual Label */}
                                 <div className="p-12 md:border-r border-black/10 dark:border-white/5 bg-transparent">

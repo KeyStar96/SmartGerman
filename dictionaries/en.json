@@ -450,12 +450,12 @@
         {
           "code": "EN",
           "name": "English",
-          "level": "C1 Fluent"
+          "level": "Fluent"
         },
         {
           "code": "TR",
           "name": "Turkish",
-          "level": "A2 Basic Knowledge"
+          "level": "Basic Knowledge"
         }
       ]
     }

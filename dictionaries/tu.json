@@ -525,12 +525,12 @@
         {
           "code": "EN",
           "name": "İngilizce",
-          "level": "C1 Akıcı"
+          "level": "Akıcı"
         },
         {
           "code": "TR",
           "name": "Türkçe",
-          "level": "A2 Temel Bilgi"
+          "level": "Temel Bilgi"
         }
       ]
     }
