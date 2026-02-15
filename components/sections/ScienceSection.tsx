@@ -61,32 +61,32 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                 Only visible at md breakpoint and above.
                 ═══════════════════════════════════════════════════════ */}
             <div className="hidden md:block">
-                <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-10 gap-12 items-center relative z-10">
+                <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-16 items-center relative z-10">
 
                     {/* Left: Scientific Text (40%) */}
-                    <div className="md:col-span-4">
+                    <div className="md:col-span-4 lg:col-span-5">
                         <div className="inline-block mb-6">
                             <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
                                 {dictionary.science.protocol}
                             </span>
                         </div>
 
-                        <h2 className="text-5xl mb-10 tracking-tighter uppercase font-bold text-[#2D3436] dark:text-[#E2D7CE] leading-none">
+                        <h2 className="text-5xl lg:text-6xl mb-10 tracking-tighter uppercase font-bold text-[#2D3436] dark:text-[#E2D7CE] leading-[0.9] max-w-[15ch]">
                             {dictionary.science.title_part1} <br />
                             <span className="text-[#FF5C00]">{dictionary.science.title_part2}</span>
                         </h2>
 
                         <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
                             <p>{dictionary.science.description_1}</p>
-                            <p className="text-lg">{dictionary.science.description_2}</p>
+                            <p>{dictionary.science.description_2}</p>
                         </div>
                     </div>
 
                     {/* Right: The Brain Composition (60%) */}
-                    <div className="md:col-span-6 relative w-full flex justify-center">
+                    <div className="md:col-span-8 lg:col-span-7 relative w-full flex justify-end">
 
                         {/* Sandwich Wrapper: Responsive size */}
-                        <div className="relative w-full max-w-[320px] lg:max-w-[420px] mx-auto">
+                        <div className="relative w-full max-w-[320px] lg:max-w-[420px] mr-0 lg:mr-12">
                             {/* Layer 2 (Top): Head Image with Transparency */}
                             <Image
                                 src="/Bilder/SG_Brain-Compressed.webp"
@@ -111,13 +111,6 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             >
                                 <NeuralBrain />
                             </div>
-
-                            {/* Data Points - Attached to Wrapper for Symmetry */}
-
-                            {/* Labels removed per user request */}
-
-
-
                         </div>
                     </div>
                 </div>
