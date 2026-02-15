@@ -9,6 +9,8 @@ const NeuralBrain = dynamic(() => import("../effects/NeuralBrain"), {
     loading: () => <div className="w-full h-full bg-transparent" />,
 });
 
+import { SmartGermanFormatter } from "../utils/SmartGermanFormatter";
+
 interface ScienceSectionProps {
     dictionary: any;
 }
@@ -51,8 +53,12 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
 
                 {/* Description text */}
                 <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
-                    <p>{dictionary.science.description_1}</p>
-                    <p className="text-lg opacity-90">{dictionary.science.description_2}</p>
+                    <p>
+                        <SmartGermanFormatter text={dictionary.science.description_1} />
+                    </p>
+                    <p className="text-lg opacity-90">
+                        <SmartGermanFormatter text={dictionary.science.description_2} />
+                    </p>
                 </div>
             </div>
 
@@ -71,20 +77,24 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             </span>
                         </div>
 
-                        <h2 className="text-5xl lg:text-7xl tracking-tighter uppercase font-bold text-[#2D3436] dark:text-[#E2D7CE] leading-[0.9]">
+                        <h2 className="text-5xl lg:text-7xl tracking-tighter uppercase font-bold text-[#2D3436] dark:text-[#E2D7CE] leading-none">
                             {dictionary.science.title_part1} <br />
                             <span className="text-[#FF5C00]">{dictionary.science.title_part2}</span>
                         </h2>
                     </div>
 
-                    {/* Content Grid: 60/40 Split */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-start">
+                    {/* Content Grid: 60/40 Split - CHANGED items-start to items-center for better alignment */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
 
                         {/* Left: Scientific Text (60%) */}
                         <div className="md:col-span-7">
                             <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
-                                <p>{dictionary.science.description_1}</p>
-                                <p>{dictionary.science.description_2}</p>
+                                <p>
+                                    <SmartGermanFormatter text={dictionary.science.description_1} />
+                                </p>
+                                <p>
+                                    <SmartGermanFormatter text={dictionary.science.description_2} />
+                                </p>
                             </div>
                         </div>
 
