@@ -332,8 +332,8 @@
   },
   "science": {
     "protocol": "Wissenschaftliches Fundament",
-    "title_part1": "Warum Sprachenlernen",
-    "title_part2": "im besten Alter anders funktioniert.",
+    "title_part1": "WARUM SPRACHENLERNEN",
+    "title_part2": "IM BESTEN ALTER ANDERS FUNKTIONIERT.",
     "description_1": "Wissenschaftlich belegt: Ihr Gehirn lernt lebenslang. Entgegen veralteter Mythen ist das Gehirn über 50 keineswegs weniger leistungsfähig – es ist spezialisierter. Während herkömmliche Methoden oft auf die schnelle Verarbeitung junger Gehirne setzen, nutzt „Smart German“ Ihre größte Stärke: Ihre kristalline Intelligenz und Ihr lebenslang aufgebautes Wissen.",
     "description_2": "In unserer Forschung an der TU Braunschweig und der Universität Hannover zeigen wir: Erfolgreiches Lernen im Alter erfordert Methoden, die die natürliche Anpassungsfähigkeit (Neuroplastizität) Ihres Gehirns nutzen, statt es mit starren Regeln zu überfordern. Wir schaffen neue neuronale Verbindungen, indem wir neue Wörter direkt mit Ihren wertvollen Lebenserfahrungen verknüpfen. So bleibt das Gelernte nicht nur im Kopf, sondern wird Teil Ihres Alltags.",
     "layer_active": "Neuronale Plastizität",
@@ -415,10 +415,10 @@
   "about_v2": {
     "header": {
       "label": "Hintergrund & Profil",
-      "title_Line1": "Persönlichkeit",
-      "title_Line2": "trifft Expertise."
+      "title_Line1": "Ihre Begleiterin auf dem Weg zur neuen Sprache:",
+      "title_Line2": "Anastasia Sitov"
     },
-    "headline": "Ihre Begleiterin auf dem Weg zur neuen Sprache: Anastasia Sitov.",
+    "headline": "Anastasia Sitov - Gründerin & Lehrkraft",
     "subline": "Als Expertin für Spracherwerb im Alter und Master of Education weiß ich: Jeder Mensch lernt so individuell wie sein eigener Fingerabdruck. Da ich selbst vollständig zweisprachig (Deutsch & Russisch) aufgewachsen bin, kenne ich die Hürden beim Wechsel zwischen zwei Welten aus erster Hand. Mein Ansatz verbindet aktuelle Forschung zur Neuroplastizität mit einer empathischen Lernbegleitung auf Augenhöhe.",
     "body": "Wir erklären komplexe Regeln direkt in Ihrer Muttersprache, damit Sie sich von Anfang an sicher fühlen. Aktuell lerne ich selbst Türkisch – so bleibe ich mit Ihnen gemeinsam auf der Reise des Entdeckens und weiß genau, wie es sich anfühlt, noch einmal neu anzufangen.",
     "timeline": {
