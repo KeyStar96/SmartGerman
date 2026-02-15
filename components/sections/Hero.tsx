@@ -251,8 +251,8 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Block B: Claim (Masked Reveal) ─── */}
           <h2
             ref={claimRef}
-            className="hero-line-mask text-2xl md:text-3xl font-normal leading-tight text-[#2D3436] dark:text-[#E2D7CE] font-mono opacity-90 mb-12 min-h-[2em] will-change-transform"
-            style={{ fontFamily: 'var(--font-mono)', visibility: 'hidden' }}
+            className="hero-line-mask text-2xl md:text-3xl font-medium leading-tight text-[#2D3436] dark:text-[#E2D7CE] opacity-90 mb-12 min-h-[2em] will-change-transform"
+            style={{ visibility: 'hidden' }}
           >
             <span className="hero-line-inner block">
               {claimText}
