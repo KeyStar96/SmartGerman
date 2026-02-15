@@ -27,11 +27,26 @@ export async function submitEnrollment(
     }
 
     // Parse Start Date: "0-2026" -> 2026-01-01
+    // Expected format: "monthIndex-year" (e.g. "0-2026" for Jan 2026)
+    console.log("SubmitEnrollment: Received startMonth:", startMonth);
+
+    if (!startMonth || !startMonth.includes('-')) {
+        console.error("Invalid startMonth format:", startMonth);
+        return { success: false, message: "Invalid date format" };
+    }
+
     const [mStr, yStr] = startMonth.split('-');
-    const monthIndex = parseInt(mStr);
-    const year = parseInt(yStr);
+    const monthIndex = parseInt(mStr, 10);
+    const year = parseInt(yStr, 10);
+
+    if (isNaN(monthIndex) || isNaN(year)) {
+        console.error("Failed to parse date components:", { mStr, yStr });
+        return { success: false, message: "Invalid date components" };
+    }
+
     // Construct Date object manually to avoid timezone shifts
     const startDateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-01`;
+    console.log("SubmitEnrollment: Calculated startDateStr:", startDateStr);
 
     try {
         // 1. Check for existing User (IDENTIFIER: First Name + Last Name + Birth Date)
