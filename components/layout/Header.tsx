@@ -132,7 +132,7 @@ export default function Header({ lang, dictionary }: HeaderProps) {
 
   const navLinks = [
     { id: "hero", label: dictionary.header.nav.home },
-    { id: "science", label: dictionary.science?.title_part1 || "Wissenschaft" },
+    { id: "science", label: dictionary.header.nav.science || "Methode" },
     { id: "about", label: dictionary.Footer?.Nav?.about || "Über uns" },
     { id: "courses", label: dictionary.header.nav.courses },
     { id: "location", label: dictionary.Footer?.Nav?.location || "Standort" },
