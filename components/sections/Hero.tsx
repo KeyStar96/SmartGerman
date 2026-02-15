@@ -3,7 +3,6 @@
 import { useRef, useCallback, useState, useEffect } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { ArrowRight } from "lucide-react";
-import { SmartGermanFormatter } from "../utils/SmartGermanFormatter";
 
 // Type-safe dictionary interface
 interface HeroDictionary {
@@ -256,7 +255,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             style={{ fontFamily: 'var(--font-mono)', visibility: 'hidden' }}
           >
             <span className="hero-line-inner block">
-              <SmartGermanFormatter text={claimText} />
+              {claimText}
             </span>
           </h2>
 
@@ -267,7 +266,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             style={{ visibility: 'hidden' }}
           >
             <span className="hero-line-inner block">
-              <SmartGermanFormatter text={dictionary.hero.subline} />
+              {dictionary.hero.subline}
             </span>
           </p>
 

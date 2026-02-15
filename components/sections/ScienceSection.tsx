@@ -9,8 +9,6 @@ const NeuralBrain = dynamic(() => import("../effects/NeuralBrain"), {
     loading: () => <div className="w-full h-full bg-transparent" />,
 });
 
-import { SmartGermanFormatter } from "../utils/SmartGermanFormatter";
-
 interface ScienceSectionProps {
     dictionary: any;
 }
@@ -53,12 +51,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
 
                 {/* Description text */}
                 <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
-                    <p>
-                        <SmartGermanFormatter text={dictionary.science.description_1} />
-                    </p>
-                    <p className="text-lg opacity-90">
-                        <SmartGermanFormatter text={dictionary.science.description_2} />
-                    </p>
+                    <p>{dictionary.science.description_1}</p>
+                    <p className="text-lg opacity-90">{dictionary.science.description_2}</p>
                 </div>
             </div>
 
@@ -89,12 +83,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         {/* Left: Scientific Text (60%) */}
                         <div className="md:col-span-7">
                             <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
-                                <p>
-                                    <SmartGermanFormatter text={dictionary.science.description_1} />
-                                </p>
-                                <p>
-                                    <SmartGermanFormatter text={dictionary.science.description_2} />
-                                </p>
+                                <p>{dictionary.science.description_1}</p>
+                                <p>{dictionary.science.description_2}</p>
                             </div>
                         </div>
 
