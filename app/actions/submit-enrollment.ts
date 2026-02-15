@@ -105,7 +105,10 @@ export async function submitEnrollment(
                 privacy_accepted: consents.privacy,
                 agb_accepted: consents.agb,
                 revocation_waiver_accepted: consents.revocation,
-                status: 'pending'
+                status: 'pending',
+
+                // NEW: Save selected courses here instead of creating enrollments immediately
+                course_ids: selectedCourseIds
             })
             .select('id')
             .single();
@@ -119,22 +122,8 @@ export async function submitEnrollment(
             return { success: false, message: "Registration creation failed (no data returned)" };
         }
 
-        const registrationId = registration.id;
-
-        // 3. Create Enrollments (Link Courses)
-        const enrollmentData = selectedCourseIds.map(courseId => ({
-            registration_id: registrationId,
-            course_id: courseId
-        }));
-
-        const { error: enrollError } = await supabase
-            .from('enrollments')
-            .insert(enrollmentData);
-
-        if (enrollError) {
-            console.error("Supabase Enrollment Error:", enrollError);
-            return { success: false, message: `Enrollment details failed: ${enrollError.message}`, error: enrollError };
-        }
+        // Enrollments are now created via Database Trigger when status -> 'confirmed'
+        // So we do NOT insert into 'enrollments' here anymore.
 
         return { success: true, message: "registration_success" };
 
