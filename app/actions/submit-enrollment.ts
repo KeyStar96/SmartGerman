@@ -18,7 +18,8 @@ export async function submitEnrollment(
         privacy: boolean;
         agb: boolean;
         revocation: boolean;
-    }
+    },
+    coursePrices: Record<string, number> // Map of courseId -> price
 ): Promise<SubmitEnrollmentResult> {
     const supabase = createAdminClient();
 
@@ -124,7 +125,8 @@ export async function submitEnrollment(
                 status: 'pending',
 
                 // NEW: Save selected courses here instead of creating enrollments immediately
-                course_ids: selectedCourseIds
+                course_ids: selectedCourseIds,
+                course_prices: coursePrices
             })
             .select('id')
             .single();

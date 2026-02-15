@@ -738,14 +738,24 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
         setIsSubmitting(true);
 
+        // Calculate individual prices for the map
+        const coursePrices: Record<string, number> = {};
+        const [d, m, y] = startDate.split('.').map(Number);
+
+        selectedCoursesFull.forEach(c => {
+            const stats = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
+            coursePrices[c.id] = stats.totalUnits * c.price;
+        });
+
         console.log("Submitting to Supabase...", {
             courses: selectedCourseIds,
             personal: data,
-            consents
+            consents,
+            coursePrices
         });
 
         try {
-            const result = await submitEnrollment(data, selectedCourseIds, startDate, totalMonthlyPrice, consents);
+            const result = await submitEnrollment(data, selectedCourseIds, startDate, totalMonthlyPrice, consents, coursePrices);
 
             if (result.success) {
                 console.log("Enrollment success:", result);
