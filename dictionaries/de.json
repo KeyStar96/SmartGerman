@@ -34,9 +34,9 @@
     "brand_name_part1": "Smart",
     "brand_name_part2": "German",
     "badge": "Evidenzbasiert • Neuro-Didaktik • Master-Expertise",
-    "headline": "SmartGerman. Spracherwerb durch Wissenschaft.",
+    "headline": "Smart German: Mit Erfahrung und Wissenschaft zur neuen Sprache.",
     "claim": "Spracherwerb durch Wissenschaft.",
-    "subline": "Sprachen lernen ist keine Frage des Alters, sondern eine Frage der Methode.",
+    "subline": "Entdecken Sie eine Methode, die Ihr Wissen wertschätzt und Ihr Lerntempo respektiert. Sprachenlernen ab 50 ist keine Frage des Alters – es ist eine Frage der richtigen Verbindung.",
     "cta_primary": "Die Methode entdecken",
     "cta_secondary": "Kursplan 2026"
   },
@@ -332,10 +332,10 @@
   },
   "science": {
     "protocol": "Wissenschaftliches Fundament",
-    "title_part1": "Wissenschaft",
-    "title_part2": "trifft Plastizität.",
-    "description_1": "Spracherwerb ist kein bloßes Auswendiglernen. Es ist die physische Umstrukturierung Ihres Gehirns. Wir nutzen wissenschaftlich fundierte Methoden, um die neuronale Plastizität gezielt zu stimulieren.",
-    "description_2": "Durch adaptive Lernalgorithmen und kognitive Trigger schaffen wir neue synaptische Verbindungen, die besonders im Erwachsenenalter den entscheidenden Unterschied machen.",
+    "title_part1": "Warum Sprachenlernen",
+    "title_part2": "im besten Alter anders funktioniert.",
+    "description_1": "Wissenschaftlich belegt: Ihr Gehirn lernt lebenslang. Entgegen veralteter Mythen ist das Gehirn über 50 keineswegs weniger leistungsfähig – es ist spezialisierter. Während herkömmliche Methoden oft auf die schnelle Verarbeitung junger Gehirne setzen, nutzt „Smart German“ Ihre größte Stärke: Ihre kristalline Intelligenz und Ihr lebenslang aufgebautes Wissen.",
+    "description_2": "In unserer Forschung an der TU Braunschweig und der Universität Hannover zeigen wir: Erfolgreiches Lernen im Alter erfordert Methoden, die die natürliche Anpassungsfähigkeit (Neuroplastizität) Ihres Gehirns nutzen, statt es mit starren Regeln zu überfordern. Wir schaffen neue neuronale Verbindungen, indem wir neue Wörter direkt mit Ihren wertvollen Lebenserfahrungen verknüpfen. So bleibt das Gelernte nicht nur im Kopf, sondern wird Teil Ihres Alltags.",
     "layer_active": "Neuronale Plastizität",
     "data_points": {
       "data_stream_label": "DATENSTROM",
@@ -379,8 +379,8 @@
     },
     "card1": {
       "category": "Universitäre Forschung",
-      "title": "Warum staatliche Standard-Kurse oft scheitern.",
-      "text": "Herkömmliche Methoden (wie die des BAMF) nehmen oft keine Rücksicht auf die biologischen Veränderungen des Gehirns ab 50. In unserer aktuellen Forschung an der TU Braunschweig und der Universität Hannover zeigen wir: Erfolgreiches Lernen im Alter erfordert angepasste Methoden, die die natürliche Neuroplastizität nutzen, statt sie zu überfordern.",
+      "title": "Lernen ohne Druck: Warum unsere Spezialisierung den Unterschied macht.",
+      "text": "Staatliche Standard-Kurse sind oft für ein breites Spektrum an Lernenden konzipiert, nehmen aber selten Rücksicht auf die veränderten Wahrnehmungskanäle und das individuelle Lerntempo der Generation 50+. Wir wissen, dass ein nachlassendes Hörvermögen in lauten Klassenräumen oder zu schnelles Sprechtempo von Lehrkräften Stress auslösen können. Unsere Methode setzt dort an, wo andere aufhören: Wir schaffen eine ruhige, barrierefreie Lernumgebung mit klaren Strukturen und viel Raum für Wiederholung. Wir nutzen moderne Geragogik (Altersdidaktik), um sicherzustellen, dass Sie nicht nur Deutsch lernen, sondern Freude am Fortschritt empfinden – ganz ohne Leistungsdruck.",
       "specialization": "Spezialisierung: DaF / DaZ & Biologie"
     },
     "card2": {
@@ -418,9 +418,9 @@
       "title_Line1": "Persönlichkeit",
       "title_Line2": "trifft Expertise."
     },
-    "headline": "Anastasia Sitov - Gründerin & Lehrkraft",
-    "subline": "Wissenschaftlich fundiert. Zweisprachig. Empathisch.",
-    "body": "Zweisprachig aufgewachsen, verstehe ich die Herausforderungen des Sprachenlernens aus eigener Erfahrung. Mein Ansatz kombiniert neurobiologische Erkenntnisse mit individuellen Lernstrategien – für ein Lernen im eigenen Tempo, das wirklich funktioniert.",
+    "headline": "Ihre Begleiterin auf dem Weg zur neuen Sprache: Anastasia Sitov.",
+    "subline": "Als Expertin für Spracherwerb im Alter und Master of Education weiß ich: Jeder Mensch lernt so individuell wie sein eigener Fingerabdruck. Da ich selbst vollständig zweisprachig (Deutsch & Russisch) aufgewachsen bin, kenne ich die Hürden beim Wechsel zwischen zwei Welten aus erster Hand. Mein Ansatz verbindet aktuelle Forschung zur Neuroplastizität mit einer empathischen Lernbegleitung auf Augenhöhe.",
+    "body": "Wir erklären komplexe Regeln direkt in Ihrer Muttersprache, damit Sie sich von Anfang an sicher fühlen. Aktuell lerne ich selbst Türkisch – so bleibe ich mit Ihnen gemeinsam auf der Reise des Entdeckens und weiß genau, wie es sich anfühlt, noch einmal neu anzufangen.",
     "timeline": {
       "title": "Akademischer Werdegang",
       "items": [

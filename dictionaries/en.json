@@ -34,9 +34,9 @@
     "brand_name_part1": "Smart",
     "brand_name_part2": "German",
     "badge": "Evidence-Based • Neuro-Didactics • Master Expertise",
-    "headline": "Language Acquisition Based on Science.",
+    "headline": "Smart German: With Experience and Science to a New Language.",
     "claim": "Language Acquisition through Science.",
-    "subline": "Learning languages is not a question of age, but a question of method.",
+    "subline": "Discover a method that values your knowledge and respects your learning pace. Language learning over 50 is not a question of age – it is a question of the right connection.",
     "cta_primary": "Discover the Method",
     "cta_secondary": "Course Schedule 2026"
   },
@@ -320,10 +320,10 @@
   },
   "science": {
     "protocol": "Scientific Foundation",
-    "title_part1": "Science",
-    "title_part2": "meets Plasticity.",
-    "description_1": "Language acquisition is not just memorization. It is the physical restructuring of your brain. We use scientifically proven methods to specifically stimulate neural plasticity.",
-    "description_2": "Through adaptive learning algorithms and cognitive triggers, we create new synaptic connections that make the decisive difference, especially in adulthood.",
+    "title_part1": "Why Language Learning",
+    "title_part2": "Works Differently at the Best Age.",
+    "description_1": "Scientifically proven: Your brain learns lifelong. Contrary to outdated myths, the brain over 50 is by no means less capable – it is more specialized. While conventional methods often rely on the fast processing of young brains, 'Smart German' uses your greatest strength: your crystalline intelligence and your lifelong accumulated knowledge.",
+    "description_2": "In our research at TU Braunschweig and the University of Hannover, we show: Successful learning in old age requires methods that use the natural adaptability (neuroplasticity) of your brain instead of overwhelming it with rigid rules. We create new neural connections by linking new words directly with your valuable life experiences. This way, what is learned stays not only in your head but becomes part of your everyday life.",
     "layer_active": "Neural Plasticity",
     "data_points": {
       "data_stream_label": "DATA_STREAM",
@@ -367,8 +367,8 @@
     },
     "card1": {
       "category": "University Research",
-      "title": "Why standard government courses often fail.",
-      "text": "Traditional methods (like those of the BAMF) often take no account of the biological changes in the brain after 50. In our current research at TU Braunschweig and the University of Hannover, we show: Successful learning in old age requires adapted methods that use natural neuroplasticity instead of overwhelming it.",
+      "title": "Learning Without Pressure: Why Our Specialization Makes the Difference.",
+      "text": "State standard courses are often designed for a broad spectrum of learners but rarely take into account the changed perception channels and the individual learning pace of the generation 50+. We know that diminishing hearing in loud classrooms or too fast speaking tempo of teachers can trigger stress. Our method starts where others stop: We create a quiet, barrier-free learning environment with clear structures and plenty of room for repetition. We use modern geragogy (age didactics) to ensure that you not only learn German but also find joy in progress – completely without performance pressure.",
       "specialization": "Specialization: GFL / GSL & Biology"
     },
     "card2": {
@@ -406,9 +406,9 @@
       "title_Line1": "Personality",
       "title_Line2": "meets Expertise."
     },
-    "headline": "Anastasia Sitov - Founder & Instructor",
-    "subline": "Scientifically based. Bilingual. Empathetic.",
-    "body": "Growing up bilingual, I understand the challenges of language learning from my own experience. My approach combines neurobiological insights with individual learning strategies – for learning at your own pace that actually works.",
+    "headline": "Your Companion on the Way to a New Language: Anastasia Sitov.",
+    "subline": "As an expert in language acquisition in old age and Master of Education, I know: Every person learns as individually as their own fingerprint. Since I grew up fully bilingual (German & Russian), I know the hurdles of switching between two worlds first-hand. My approach combines current research on neuroplasticity with empathic learning support at eye level.",
+    "body": "We explain complex rules directly in your native language so that you feel secure from the beginning. Currently, I am learning Turkish myself – so I remain with you on the journey of discovery and know exactly how it feels to start anew.",
     "timeline": {
       "title": "Academic Background",
       "items": [

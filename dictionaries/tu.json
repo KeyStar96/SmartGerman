@@ -34,9 +34,9 @@
     "brand_name_part1": "Smart",
     "brand_name_part2": "German",
     "badge": "Kanıta Dayalı • Nöro-Didaktik • Uzmanlık",
-    "headline": "Bilime Dayalı Dil Edinimi.",
+    "headline": "Smart German: Deneyim ve Bilimle Yeni Bir Dile.",
     "claim": "Bilim Yoluyla Dil Edinimi.",
-    "subline": "Dil öğrenmek yaş meselesi değil, yöntem meselesidir.",
+    "subline": "Bilginize değer veren ve öğrenme hızınıza saygı duyan bir yöntemi keşfedin. 50 yaşından sonra dil öğrenmek bir yaş meselesi değil, doğru bağlantı meselesidir.",
     "cta_primary": "Yöntemi Keşfet",
     "cta_secondary": "2026 Kurs Programı"
   },
@@ -405,10 +405,10 @@
   },
   "science": {
     "protocol": "Bilimsel Temel",
-    "title_part1": "Bilim",
-    "title_part2": "Plastisite ile Buluşuyor.",
-    "description_1": "Dil öğrenimi sadece ezberlemek değildir. Beyninizin fiziksel olarak yeniden yapılandırılmasıdır. Nöronal plastisiteyi özel olarak uyarmak için bilimsel olarak kanıtlanmış yöntemler kullanıyoruz.",
-    "description_2": "Uyarlanabilir öğrenme algoritmaları ve bilişsel tetikleyiciler sayesinde, özellikle yetişkinlikte belirleyici farkı yaratan yeni sinaptik bağlantılar oluşturuyoruz.",
+    "title_part1": "Neden Dil Öğrenimi",
+    "title_part2": "En İyi Yaşta Farklı Çalışır.",
+    "description_1": "Bilimsel olarak kanıtlanmış: Beyniniz yaşam boyu öğrenir. Eskimiş mitlerin aksine, 50 yaşın üzerindeki beyin daha az yetenekli değildir — daha uzmanlaşmıştır. Geleneksel yöntemler genellikle genç beyinlerin hızlı işlemlemesine dayanırken, 'Smart German' en büyük gücünüzü kullanır: kristalize zekanız ve yaşam boyu birikmiş bilginiz.",
+    "description_2": "TU Braunschweig ve Hannover Üniversitesi'ndeki araştırmamızda şunu gösteriyoruz: İleri yaşta başarılı öğrenme, beyninizi katı kurallarla boğmak yerine doğal uyum yeteneğini (nöroplastisite) kullanan yöntemler gerektirir. Yeni kelimeleri doğrudan değerli yaşam deneyimlerinizle ilişkilendirerek yeni nöronal bağlantılar oluşturuyoruz. Böylece öğrenilenler sadece kafanızda kalmaz, günlük yaşamınızın bir parçası olur.",
     "layer_active": "Nöronal Plastisite",
     "data_points": {
       "data_stream_label": "VERİ_AKIŞI",
@@ -442,8 +442,8 @@
     },
     "card1": {
       "category": "Üniversite Araştırması",
-      "title": "Standart devlet kursları neden sıklıkla başarısız olur?",
-      "text": "Geleneksel yöntemler (BAMF gibi) genellikle 50 yaşından sonra beyindeki biyolojik değişiklikleri dikkate almaz. TU Braunschweig ve Hannover Üniversitesi'ndeki güncel araştırmalarımızda şunu gösteriyoruz: İleri yaşta başarılı öğrenme, doğal nöroplastisiteyi aşırı yüklemek yerine onu kullanan uyarlanmış yöntemler gerektirir.",
+      "title": "Baskısız Öğrenme: Uzmanlığımız Neden Fark Yaratıyor.",
+      "text": "Devlet standart kursları genellikle geniş bir öğrenci yelpazesi için tasarlanmıştır, ancak nadiren 50+ neslinin değişen algı kanallarını ve bireysel öğrenme hızını dikkate alır. Gürültülü sınıflarda azalan işitme yeteneğinin veya öğretmenlerin çok hızlı konuşma temposunun stres tetikleyebileceğini biliyoruz. Bizim yöntemimiz diğerlerinin durduğu yerde başlar: Net yapılar ve tekrar için bolca alan ile sakin, engelsiz bir öğrenme ortamı yaratıyoruz. Sadece Almanca öğrenmenizi değil, aynı zamanda ilerlemeden keyif almanızı sağlamak için modern geragoji (yaşlılık didaktiği) kullanıyoruz — tamamen performans baskısı olmadan.",
       "specialization": "Uzmanlık: DaF / DaZ & Biyoloji"
     },
     "card2": {
@@ -481,9 +481,9 @@
       "title_Line1": "Kişilik",
       "title_Line2": "ve Uzmanlık."
     },
-    "headline": "Anastasia Sitov - Kurucu ve Eğitmen",
-    "subline": "Bilimsel temelli. İki dilli. Empatik.",
-    "body": "İki dilli büyüdüğüm için dil öğrenmenin zorluklarını kendi deneyimlerimden biliyorum. Yaklaşımım, nörobiyolojik bulguları bireysel öğrenme stratejileriyle birleştiriyor – gerçekten işe yarayan, kendi hızınızda bir öğrenme için.",
+    "headline": "Yeni dile giden yolda yol arkadaşınız: Anastasia Sitov.",
+    "subline": "İleri yaşta dil edinimi uzmanı ve Eğitim Yüksek Lisansı olarak biliyorum ki: Her insan kendi parmak izi kadar bireysel öğrenir. Kendim tamamen iki dilli (Almanca ve Rusça) büyüdüğüm için, iki dünya arasında geçiş yapmanın zorluklarını ilk elden biliyorum. Yaklaşımım, nöroplastisite üzerine güncel araştırmaları göz hizasında empatik öğrenme desteğiyle birleştiriyor.",
+    "body": "Karmaşık kuralları doğrudan ana dilinizde açıklıyoruz, böylece başlangıçtan itibaren kendinizi güvende hissedersiniz. Şu anda kendim Türkçe öğreniyorum — böylece keşif yolculuğunda sizinle kalıyorum ve yeniden başlamanın nasıl bir his olduğunu tam olarak biliyorum.",
     "timeline": {
       "title": "Akademik Geçmiş",
       "items": [
