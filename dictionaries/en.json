@@ -347,9 +347,9 @@
     "subtitle": "In the Heart of Hanover",
     "address_label": "Address",
     "description": "Our courses take place at leisure center Vahrenwald – a modern, cultural meeting point with excellent accessibility. Only 10 minutes from the main station.",
-    "get_directions": "Get Directions",
+    "get_directions": "Load Map",
     "privacy_title": "Activate Map",
-    "privacy_text": "Google Maps loads external scripts.",
+    "privacy_text": "By loading the map, your IP address will be transmitted to Google (USA). You can find more information in our privacy policy.",
     "load_map": "Load Map"
   },
   "footer": {

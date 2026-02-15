@@ -361,7 +361,7 @@
     "description": "Unsere Kurse finden im Freizeitheim Vahrenwald statt – ein moderner, kultureller Treffpunkt mit bester Erreichbarkeit. Nur 10 Minuten vom Hauptbahnhof entfernt.",
     "get_directions": "Karte laden",
     "privacy_title": "Karte Aktivieren",
-    "privacy_text": "Google Maps lädt externe Skripte.",
+    "privacy_text": "Mit dem Laden der Karte wird Ihre IP-Adresse an Google (USA) übermittelt. Mehr erfahren Sie in unserer Datenschutzerklärung.",
     "load_map": "Karte laden"
   },
   "footer": {
