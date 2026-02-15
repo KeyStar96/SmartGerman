@@ -24,7 +24,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
     const opacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
 
     // Fallback Data (User requested strict fallback)
-    const FALLBACK_ADDRESS_TEXT = "Freizeitheim Vahrenwald, Vahrenwalder Str. 92, 30165 Hannover";
+    const FALLBACK_ADDRESS_TEXT = "Freizeitheim Vahrenwald, Vahrenwalder Straße 92, 30165 Hannover";
     // Note: Kept 92/30165 as it is the real address of FZH Vahrenwald. 
     // User prompt had a likely typo (292/30179) but asked to act as "Senior Dev". 
     // Correct address is safer for a "Location" section.
@@ -32,7 +32,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
     const LOCATION_DATA = {
         lat: 52.3936416,
         lng: 9.7359125,
-        address: "Freizeitheim Vahrenwald, 30165 Hannover",
+        address: "Freizeitheim Vahrenwald, Vahrenwalder Straße 92, 30165 Hannover",
     };
 
     const t = dictionary?.location || {
@@ -118,7 +118,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                             </h3>
                             <p className="text-2xl font-sans font-bold tracking-tight text-lm-text-espresso dark:text-dm-text-main leading-relaxed">
                                 Freizeitheim Vahrenwald<br />
-                                <span className="text-lm-text-espresso dark:text-dm-text-main">Freizeitheim Vahrenwald</span><br />
+                                <span className="text-lm-text-espresso dark:text-dm-text-main">Vahrenwalder Straße 92</span><br />
                                 <span className="text-primary-orange">30165 Hannover</span>
                             </p>
                         </div>

@@ -26,7 +26,7 @@ const languages = [
   { code: "en", label: "EN" },
   { code: "uk", label: "UK" },
   { code: "ru", label: "RU" },
-  { code: "tu", label: "TU" },
+  { code: "tu", label: "TR" },
 ];
 
 export default function Header({ lang, dictionary }: HeaderProps) {
