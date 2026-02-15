@@ -193,9 +193,11 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
                                     <h3 className={headingStyle}>{t.card3.title}</h3>
-                                    <p className={bodyStyle}>
-                                        {t.card3.text}
-                                    </p>
+                                    <div className={bodyStyle}>
+                                        <p className="opacity-100 leading-relaxed text-lg font-bold">
+                                            {t.card3.text}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </PaperCard>
@@ -211,9 +213,11 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center">
                                     <h3 className={headingStyle}>{t.card4.title}</h3>
-                                    <p className={bodyStyle}>
-                                        {t.card4.text}
-                                    </p>
+                                    <div className={bodyStyle}>
+                                        <p className="opacity-100 leading-relaxed text-lg font-bold">
+                                            {t.card4.text}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </PaperCard>
