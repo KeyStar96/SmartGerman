@@ -127,9 +127,9 @@ Deno.serve(async (req) => {
                 const priceLabel = (typeof finalPrice === 'number') ? finalPrice.toFixed(2) : '0.00';
 
                 return `
-                <tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="padding: 12px 0; color: #111827; font-size: 16px;">${realTitle}</td>
-                    <td style="padding: 12px 0; color: #6b7280; font-size: 16px; text-align: right;">${priceLabel}€</td>
+                <tr>
+                    <td class="td">${realTitle}</td>
+                    <td class="td td-price">${priceLabel}€</td>
                 </tr>`;
             }).join('');
 
@@ -143,82 +143,104 @@ Deno.serve(async (req) => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anmeldebestätigung</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #374151; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .header { background-color: #ffffff; padding: 40px 40px 20px; text-align: center; border-bottom: 3px solid #FF5C00; }
+        .logo { height: 50px; width: auto; }
+        .content { padding: 40px; }
+        .h1 { color: #111827; font-size: 24px; font-weight: 700; margin-bottom: 24px; text-align: center; letter-spacing: -0.025em; }
+        .text { font-size: 16px; line-height: 1.6; margin-bottom: 24px; color: #4b5563; }
+        .table { width: 100%; border-collapse: collapse; margin: 32px 0; }
+        .th { text-align: left; padding: 12px 0; border-bottom: 2px solid #e5e7eb; color: #9ca3af; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .td { padding: 16px 0; border-bottom: 1px solid #f3f4f6; color: #111827; font-size: 16px; }
+        .td-price { text-align: right; font-family: monospace; font-weight: 600; }
+        .total-row td { border-top: 2px solid #e5e7eb; border-bottom: none; font-weight: 700; font-size: 18px; padding-top: 20px; color: #111827; }
+        .info-box { background-color: #FFF4EC; border: 1px solid #FFD8C2; border-radius: 8px; padding: 24px; margin-bottom: 32px; }
+        .info-title { color: #9C3800; font-size: 16px; font-weight: 700; margin-top: 0; margin-bottom: 8px; }
+        .info-text { font-size: 14px; line-height: 1.5; color: #5C2B0D; margin: 0; }
+        .footer { background-color: #0F172A; padding: 40px; text-align: center; color: #94A3B8; font-size: 13px; line-height: 1.6; }
+        .footer a { color: #CBD5E1; text-decoration: none; transition: color 0.2s; }
+        .footer a:hover { color: #ffffff; text-decoration: underline; }
+        .copyright { margin-top: 24px; padding-top: 24px; border-top: 1px solid #1E293B; color: #64748B; font-size: 12px; }
+        @media only screen and (max-width: 600px) {
+            .container { margin: 0; border-radius: 0; }
+            .content { padding: 24px; }
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; color: #374151;">
-    <div style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+<body>
+    <div class="container">
         
-        <!-- Header with Logo -->
-        <div style="background-color: #ffffff; padding: 40px 40px 20px 40px; text-align: center; border-bottom: 1px solid #e5e7eb;">
-            <img src="${logoUrl}" alt="SmartGerman Logo" style="height: 60px; width: auto; max-width: 100%;">
+        <!-- Header -->
+        <div class="header">
+            <img src="${logoUrl}" alt="SmartGerman Logo" class="logo">
         </div>
 
         <!-- Content -->
-        <div style="padding: 40px;">
-            <h1 style="color: #111827; font-size: 24px; font-weight: 700; margin-bottom: 24px; text-align: center;">Anmeldebestätigung</h1>
+        <div class="content">
+            <h1 class="h1">Anmeldebestätigung</h1>
             
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+            <p class="text">
                 Hallo ${user.first_name || 'Student'},
             </p>
             
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
-                vielen Dank für deine Anmeldung! Wir freuen uns sehr, dich bei SmartGerman begrüßen zu dürfen. Hier ist eine Übersicht deiner gewählten Kurse:
+            <p class="text">
+                vielen Dank für deine Anmeldung bei SmartGerman! Wir haben deine Kursauswahl erhalten und bestätigt.
             </p>
 
             <!-- Course Table -->
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
+            <table class="table">
                 <thead>
-                    <tr style="border-bottom: 2px solid #e5e7eb;">
-                        <th style="padding: 12px 0; text-align: left; color: #374151; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Kurs</th>
-                        <th style="padding: 12px 0; text-align: right; color: #374151; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Preis</th>
+                    <tr>
+                        <th class="th">Kurs</th>
+                        <th class="th" style="text-align: right;">Preis</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${courseListHtml}
-                    <tr style="border-top: 2px solid #e5e7eb;">
-                        <td style="padding: 16px 0; color: #111827; font-weight: 700; font-size: 18px;">Gesamtbetrag</td>
-                        <td style="padding: 16px 0; color: #111827; font-weight: 700; font-size: 18px; text-align: right;">${reg.total_price}€</td>
+                    <tr class="total-row">
+                        <td>Gesamtbetrag</td>
+                        <td style="text-align: right;">${reg.total_price}€</td>
                     </tr>
                 </tbody>
             </table>
 
             <!-- Payment Info Box -->
-            <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 24px; margin-bottom: 32px;">
-                <h3 style="color: #111827; font-size: 18px; margin-top: 0; margin-bottom: 12px;">Wichtige Information zur Zahlung</h3>
-                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 12px; color: #4b5563;">
-                    Du erhältst in Kürze eine separate E-Mail mit der offiziellen Rechnung von unserer Buchhaltungssoftware <strong>"Papierkram.de"</strong>.
-                </p>
-                <p style="font-size: 15px; line-height: 1.5; margin: 0; color: #4b5563;">
-                    Bitte begleiche den Rechnungsbetrag bequem per Überweisung vor Kursbeginn.
+            <div class="info-box">
+                <h3 class="info-title">Nächste Schritte & Zahlung</h3>
+                <p class="info-text">
+                    Du erhältst in Kürze eine separate E-Mail mit der offiziellen Rechnung von <strong>Papierkram.de</strong>. 
+                    Bitte überweise den Betrag erst nach Erhalt dieser Rechnung vor Kursbeginn.
                 </p>
             </div>
 
-            <p style="font-size: 16px; line-height: 1.6; margin-bottom: 40px;">
-                Falls du Fragen hast, antworte einfach auf diese E-Mail oder schreib uns per Telegram.<br><br>
-                Mit freundlichen Grüßen,<br>
-                <strong>Dein SmartGerman Team</strong>
+            <p class="text">
+                Falls du Fragen hast, antworte einfach auf diese E-Mail.<br>
+                Wir freuen uns auf dich!
+            </p>
+
+            <p class="text" style="font-weight: 600; margin-top: 32px;">
+                Dein SmartGerman Team
             </p>
         </div>
 
         <!-- Footer -->
-        <div style="background-color: #1f2937; padding: 40px; text-align: center; color: #9ca3af; font-size: 12px; line-height: 1.5;">
-            <p style="margin-bottom: 12px;">
+        <div class="footer">
+            <p style="margin-bottom: 16px;">
                 <strong>SmartGerman Sprachschule</strong><br>
-                Hüttenstraße 24a<br>
-                30165 Hannover, Deutschland
+                Hüttenstraße 24a • 30165 Hannover
             </p>
-            <p style="margin-bottom: 12px;">
-                Telefon: +49 171 4758620<br>
-                E-Mail: <a href="mailto:info@smart-german.com" style="color: #d1d5db; text-decoration: none;">info@smart-german.com</a>
+            <p style="margin-bottom: 8px;">
+                <a href="mailto:info@smart-german.com">info@smart-german.com</a> • +49 171 4758620
             </p>
-            <p style="margin-bottom: 24px;">
-                Vertretungsberechtigt: Anastasia Sitov
-            </p>
-            <p style="margin: 0; border-top: 1px solid #374151; padding-top: 20px;">
+            <div class="copyright">
                 &copy; 2025 SmartGerman. Alle Rechte vorbehalten.<br>
-                <a href="https://www.smart-german.com/imprint" style="color: #9ca3af; text-decoration: underline; margin: 0 8px;">Impressum</a>
-                <a href="https://www.smart-german.com/privacy" style="color: #9ca3af; text-decoration: underline; margin: 0 8px;">Datenschutz</a>
-                <a href="https://www.smart-german.com/agb" style="color: #9ca3af; text-decoration: underline; margin: 0 8px;">AGB</a>
-            </p>
+                Vertretungsberechtigt: Anastasia Sitov<br><br>
+                <a href="https://www.smart-german.com/imprint">Impressum</a> • 
+                <a href="https://www.smart-german.com/privacy">Datenschutz</a> • 
+                <a href="https://www.smart-german.com/agb">AGB</a>
+            </div>
         </div>
     </div>
 </body>
