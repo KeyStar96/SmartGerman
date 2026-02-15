@@ -13,6 +13,17 @@ const TimetableSection = dynamic(() => import("@/components/sections/Timetable/T
 const LocationSection = dynamic(() => import("@/components/sections/Location/LocationSection").then(mod => mod.LocationSection));
 import FooterLayout from "@/components/footer/FooterLayout";
 
+/* ─── Locale → OpenGraph locale mapping ─── */
+const OG_LOCALE_MAP: Record<string, string> = {
+  de: 'de_DE',
+  en: 'en_US',
+  uk: 'uk_UA',
+  ru: 'ru_RU',
+  tu: 'tr_TR',
+};
+
+const BASE_URL = "https://smart-german.com";
+
 export async function generateMetadata({
   params
 }: {
@@ -21,29 +32,41 @@ export async function generateMetadata({
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
-  const baseUrl = "https://smartgerman.com";
-
   return {
     title: dictionary.meta.title,
     description: dictionary.meta.description,
+    keywords: dictionary.meta.keywords,
+    robots: { index: true, follow: true },
     openGraph: {
       title: dictionary.meta.title,
       description: dictionary.meta.description,
-      url: `${baseUrl}/${lang}`,
+      url: `${BASE_URL}/${lang}`,
       siteName: "SmartGerman",
       type: "website",
-      locale: lang,
+      locale: OG_LOCALE_MAP[lang] || 'de_DE',
+      images: [{
+        url: `${BASE_URL}/Bilder/og-smartgerman.jpg`,
+        width: 1200,
+        height: 630,
+        alt: dictionary.meta.og_image_alt || dictionary.meta.title,
+      }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: dictionary.meta.title,
+      description: dictionary.meta.description,
+      images: [`${BASE_URL}/Bilder/og-smartgerman.jpg`],
     },
     alternates: {
-      canonical: `${baseUrl}/${lang}`,
+      canonical: `${BASE_URL}/${lang}`,
       languages: {
-        de: `${baseUrl}/de`,
-        en: `${baseUrl}/en`,
-        uk: `${baseUrl}/uk`,
-        ru: `${baseUrl}/ru`,
-        tr: `${baseUrl}/tu`, // Mapping standard 'tr' code to our '/tu' route
+        de: `${BASE_URL}/de`,
+        en: `${BASE_URL}/en`,
+        uk: `${BASE_URL}/uk`,
+        ru: `${BASE_URL}/ru`,
+        tr: `${BASE_URL}/tu`, // Mapping standard 'tr' code to our '/tu' route
       },
-    }
+    },
   };
 }
 
@@ -57,26 +80,121 @@ export default async function HomePage({
 
   const courses = await getCourses();
 
+  /* ─── Rich JSON-LD: @graph with EducationalOrganization + Course + WebSite ─── */
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LanguageSchool",
-    "name": "SmartGerman",
-    "description": dictionary.meta.description,
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Vahrenwalder Str.",
-      "addressLocality": "Hannover",
-      "addressCountry": "DE"
-    },
-    "openingHours": "Mo-Fr 09:00-18:00",
-    "priceRange": "FROM 2.50€",
-    "offers": courses.map(course => ({
-      "@type": "Offer",
-      "name": course.id,
-      "price": course.price,
-      "priceCurrency": "EUR",
-      "category": course.type
-    }))
+    "@graph": [
+      /* ── 1. Organization ── */
+      {
+        "@type": ["EducationalOrganization", "LocalBusiness"],
+        "@id": `${BASE_URL}/#organization`,
+        "name": "SmartGerman",
+        "alternateName": "SmartGerman Sprachschule",
+        "url": BASE_URL,
+        "logo": `${BASE_URL}/Bilder/SG_Logo_Lightmode.png`,
+        "image": `${BASE_URL}/Bilder/og-smartgerman.jpg`,
+        "description": dictionary.meta.description,
+        "email": "info@smart-german.com",
+        "telephone": "+49 171 4758620",
+        "priceRange": "€€",
+        "currenciesAccepted": "EUR",
+        "paymentAccepted": "Bank Transfer",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Vahrenwalder Str. 92",
+          "addressLocality": "Hannover",
+          "postalCode": "30165",
+          "addressRegion": "Niedersachsen",
+          "addressCountry": "DE",
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 52.3975,
+          "longitude": 9.7380,
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "09:00",
+            "closes": "18:00",
+          },
+        ],
+        "sameAs": [
+          "https://t.me/smartgerman_hannover",
+        ],
+        "availableLanguage": [
+          { "@type": "Language", "name": "German", "alternateName": "de" },
+          { "@type": "Language", "name": "Russian", "alternateName": "ru" },
+          { "@type": "Language", "name": "Ukrainian", "alternateName": "uk" },
+          { "@type": "Language", "name": "English", "alternateName": "en" },
+          { "@type": "Language", "name": "Turkish", "alternateName": "tr" },
+        ],
+        "founder": {
+          "@type": "Person",
+          "name": "Anastasia Sitov",
+          "jobTitle": "M.Ed., DaF/DaZ",
+        },
+      },
+
+      /* ── 2. Courses ── */
+      ...courses.map(course => ({
+        "@type": "Course",
+        "@id": `${BASE_URL}/#course-${course.id}`,
+        "name": dictionary.CourseData?.[course.id]?.title || course.id,
+        "description": dictionary.CourseData?.[course.id]?.description || "",
+        "provider": { "@id": `${BASE_URL}/#organization` },
+        "inLanguage": "de",
+        "educationalLevel": dictionary.CourseData?.[course.id]?.level || "",
+        "courseMode": course.type === "online" ? "Online" : "Onsite",
+        "offers": {
+          "@type": "Offer",
+          "price": String(course.price),
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock",
+          "url": `${BASE_URL}/${lang}`,
+        },
+        ...(course.sessions && course.sessions.length > 0 ? {
+          "hasCourseInstance": course.sessions.map(session => ({
+            "@type": "CourseInstance",
+            "courseMode": course.type === "online" ? "Online" : "Onsite",
+            "instructor": {
+              "@type": "Person",
+              "name": "Anastasia Sitov",
+            },
+          })),
+        } : {}),
+      })),
+
+      /* ── 3. WebSite ── */
+      {
+        "@type": "WebSite",
+        "@id": `${BASE_URL}/#website`,
+        "url": BASE_URL,
+        "name": "SmartGerman",
+        "inLanguage": lang,
+        "publisher": { "@id": `${BASE_URL}/#organization` },
+      },
+
+      /* ── 4. BreadcrumbList ── */
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "SmartGerman",
+            "item": BASE_URL,
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": dictionary.meta.title,
+            "item": `${BASE_URL}/${lang}`,
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -88,7 +206,8 @@ export default async function HomePage({
 
       <Header lang={lang} dictionary={dictionary} />
 
-      <main className="w-full bg-transparent">
+      {/* Semantic: layout.tsx already provides <main id="main-content">, so no nested <main> */}
+      <div className="w-full bg-transparent">
         <div className="relative w-full pt-28">
           <Hero dictionary={dictionary} lang={lang} />
           <ScienceSection dictionary={dictionary} />
@@ -98,7 +217,7 @@ export default async function HomePage({
           <TimetableSection dictionary={dictionary} courses={courses} />
           <LocationSection dictionary={dictionary} />
         </div>
-      </main>
+      </div>
 
       <FooterLayout dictionary={dictionary} lang={lang} />
     </>

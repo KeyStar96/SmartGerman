@@ -8,6 +8,21 @@ import AppBackground from "@/components/effects/AppBackground";
 import { ThemeInit } from "@/components/effects/ThemeInit";
 import NavigationProgress from "@/components/effects/NavigationProgress";
 
+/* ─── Global metadata defaults (inherited by all pages) ─── */
+export const metadata: Metadata = {
+  metadataBase: new URL('https://smart-german.com'),
+  title: {
+    template: '%s | SmartGerman',
+    default: 'SmartGerman — Deutschkurse in Hannover',
+  },
+  description: 'Deutschkurse in Hannover für Ukrainer & Russischsprachige. A1-B2, Online & Präsenz.',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+};
+
 const inter = Inter({
   subsets: ["latin"],
   display: 'swap',
