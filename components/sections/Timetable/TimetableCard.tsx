@@ -116,7 +116,7 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
 
                         <div className="flex items-center gap-2 text-xs text-black/50 dark:text-white/50">
                             {isOnline ? <Monitor size={12} /> : <MapPin size={12} />}
-                            <span className="truncate font-sans">{location}</span>
+                            <span className="line-clamp-2 font-sans leading-tight">{location}</span>
                         </div>
                     </div>
                 </div>

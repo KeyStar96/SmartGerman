@@ -306,7 +306,7 @@
       "online": "Online Class"
     },
     "locations": {
-      "presence": "Vahrenwalder Straße 92",
+      "presence": "Freizeitheim Vahrenwald",
       "online": "Microsoft Teams"
     },
     "instructors": {
@@ -526,37 +526,37 @@
       "title": "German 50+ A1.1",
       "description": "Specially designed for learners 50+. Slow pace, relaxed atmosphere.",
       "level": "A1.1",
-      "location": "Vahrenwalder Straße 92"
+      "location": "Freizeitheim Vahrenwald"
     },
     "de50_a1_2": {
       "title": "German 50+ A1.2",
       "description": "Advanced beginners. Deepening the basics.",
       "level": "A1.2",
-      "location": "Vahrenwalder Straße 92"
+      "location": "Freizeitheim Vahrenwald"
     },
     "de50_a2": {
       "title": "German 50+ A2",
       "description": "Independent communication (doctors, authorities).",
       "level": "A2",
-      "location": "Vahrenwalder Straße 92"
+      "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1": {
       "title": "Speaking Training A1.1",
       "description": "Lose shyness, gain confidence.",
       "level": "A1.1",
-      "location": "Vahrenwalder Straße 92"
+      "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_2": {
       "title": "Speaking Training A1.2",
       "description": "Deepening speaking skills.",
       "level": "A1.2",
-      "location": "Vahrenwalder Straße 92"
+      "location": "Freizeitheim Vahrenwald"
     },
     "speech_a2": {
       "title": "Speaking Training A2",
       "description": "Confident speaking in everyday situations.",
       "level": "A2",
-      "location": "Vahrenwalder Straße 92"
+      "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1": {
       "title": "Basics A1.1 (Online)",

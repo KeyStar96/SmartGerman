@@ -32,7 +32,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
     const LOCATION_DATA = {
         lat: 52.3936416,
         lng: 9.7359125,
-        address: "Vahrenwalder Straße 92, 30165 Hannover",
+        address: "Freizeitheim Vahrenwald, 30165 Hannover",
     };
 
     const t = dictionary?.location || {
@@ -118,7 +118,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                             </h3>
                             <p className="text-2xl font-sans font-bold tracking-tight text-lm-text-espresso dark:text-dm-text-main leading-relaxed">
                                 Freizeitheim Vahrenwald<br />
-                                <span className="text-lm-text-espresso dark:text-dm-text-main">Vahrenwalder Straße 92</span><br />
+                                <span className="text-lm-text-espresso dark:text-dm-text-main">Freizeitheim Vahrenwald</span><br />
                                 <span className="text-primary-orange">30165 Hannover</span>
                             </p>
                         </div>
