@@ -52,8 +52,23 @@ export async function submitCancellation(data: CancellationFormData, lang: strin
             return { success: false, message: dictionary.cancellation.errors.generic_error || "Database error" };
         }
 
-        // Logic to send email would go here.
-        // console.log("Cancellation Submitted & Saved:", result.data);
+        // Logic to send email
+        console.log("Cancellation Submitted & Saved:", result.data);
+
+        // Invoke Edge Function
+        // Note: Edge Functions internal URL usually available via environment or constructed.
+        // For server actions, we can use fetch to the project's functions endpoint.
+        // Ideally we use the supabase client's invoke if available, but admin client might not have it configured same way.
+        // Let's use simple fetch for now if we know the URL, OR just rely on the cron/scheduled invocation if that's the plan.
+        // But implementation plan said "Trigger the email".
+        // A robust way in Supabase is using `functions.invoke`.
+
+        const { error: funcError } = await supabase.functions.invoke('send-cancellation-confirmation');
+
+        if (funcError) {
+            console.warn("Failed to trigger send-cancellation-email function directly:", funcError);
+            // Non-blocking error, we still return success to user as DB insert worked.
+        }
 
         return { success: true };
 
