@@ -3,6 +3,9 @@ import Header from "@/components/layout/Header";
 import { getDictionary } from "@/lib/dictionary";
 import CancellationForm from "@/components/cancellation/CancellationForm";
 import { Metadata } from "next";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export async function generateStaticParams() {
     return [
@@ -41,6 +44,12 @@ export default async function CancellationPage({
                 <div className="w-full max-w-lg">
                     {/* Glass Card */}
                     <div className="glass-panel backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-10 shadow-2xl relative">
+                        {/* Back Button */}
+                        <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
+                            <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2 font-mono")}>
+                                <ChevronLeft size={14} /> {dictionary.cancellation.back_home || "Back"}
+                            </Link>
+                        </div>
 
                         {/* Header Section */}
                         <div className="mb-8 text-center space-y-4">
