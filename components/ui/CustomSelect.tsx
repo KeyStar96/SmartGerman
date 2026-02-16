@@ -39,7 +39,7 @@ export const CustomSelect = ({ value, onChange, options, placeholder, label }: a
                 onClick={() => setIsOpen(!isOpen)}
                 className="block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] cursor-pointer flex justify-between items-center group-hover:border-[#FF5C00] dark:group-hover:border-[#FF5C00] transition-colors"
             >
-                <span className={!value ? "text-transparent" : "text-gray-900 dark:text-[#E2D7CE]"}>
+                <span className={!value ? "text-gray-400" : "text-gray-900 dark:text-[#E2D7CE]"}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
                 <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />

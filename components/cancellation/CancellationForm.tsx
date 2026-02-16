@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import React, { useState, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,9 +75,12 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     {t.success.title}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 max-w-md">
+                <p className="text-gray-500 dark:text-gray-400 max-w-md mb-8">
                     {t.success.message}
                 </p>
+                <Link href={`/${lang}`} className="bg-[#FF5C00] text-white px-8 py-4 rounded font-bold uppercase tracking-widest hover:bg-[#FF7A33] transition-colors">
+                    {t.back_home}
+                </Link>
             </motion.div>
         );
     }
@@ -231,11 +236,6 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                                         />
                                     )}
                                 />
-                                {minDate && (
-                                    <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-2 font-mono">
-                                        {t.form.earliest_date} {minDate.toLocaleDateString(lang === 'uk' ? 'uk-UA' : lang === 'tu' ? 'tr-TR' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'de-DE')}
-                                    </p>
-                                )}
                             </div>
                         </motion.div>
                     )}
@@ -267,6 +267,6 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                     </p>
                 </div>
             </div>
-        </form>
+        </form >
     );
 }

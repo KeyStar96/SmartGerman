@@ -746,7 +746,8 @@
   "cancellation": {
     "title": "Sözleşmeleri Buradan İptal Edin",
     "description": "Lütfen bu formu doldurun. Alındığını hemen e-posta ile onaylayacağız.",
-    "label": "SÖZLEŞME İŞLEMLERİ",
+    "label": "SÖZLEŞME KONULARI",
+    "back_home": "ANA SAYFAYA DÖN",
     "form": {
       "full_name": "Ad ve Soyad",
       "email": "E-posta Adresi",

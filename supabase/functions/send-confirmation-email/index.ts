@@ -136,6 +136,58 @@ Deno.serve(async (req) => {
             // Logo URL in Supabase Storage (public 'assets' bucket)
             const logoUrl = `${SUPABASE_URL}/storage/v1/object/public/assets/logo.png`;
 
+            // Calculate Payment Period (Start Date - End of Month)
+            let periodString = '';
+            try {
+                if (reg.start_date) {
+                    let d, m, y;
+                    // Handle potential ISO string "YYYY-MM-DDTHH:mm:ss" by taking only the date part
+                    const dateStr = String(reg.start_date).split('T')[0];
+
+                    // Handle different formats (YYYY-MM-DD from DB or DD.MM.YYYY from input)
+                    if (dateStr.includes('-')) {
+                        [y, m, d] = dateStr.split('-').map(n => parseInt(n, 10));
+                    } else {
+                        [d, m, y] = dateStr.split('.').map(n => parseInt(n, 10));
+                    }
+
+                    if (!d || !m || !y || isNaN(d) || isNaN(m) || isNaN(y)) {
+                        console.error(`Invalid date components parsed from "${reg.start_date}":`, { d, m, y });
+                        throw new Error("Invalid date format");
+                    }
+
+                    // Get last day of the month
+                    // month is 0-indexed in JS Date constructor (0=Jan, 1=Feb, 2=Mar, etc.)
+                    // BUT new Date(year, monthIndex, 0) returns the last day of the *previous* month.
+                    // If m is parsed from "02" (Feb), it is 2.
+                    // new Date(y, 2, 0) is last day of Feb (month index 2 is Mar).
+                    const lastDay = new Date(y, m, 0).getDate();
+
+                    const pad = (n: number) => n.toString().padStart(2, '0');
+                    const formattedStart = `${pad(d)}.${pad(m)}.${y}`;
+                    const formattedEnd = `${pad(lastDay)}.${pad(m)}.${y}`;
+
+                    periodString = `${formattedStart} bis ${formattedEnd}`;
+                }
+            } catch (e) {
+                console.error("Error formatting date period:", e);
+                // Fallback: Try to format the raw string nicely if possible, or just show it
+                periodString = reg.start_date || 'N/A';
+            }
+
+            // Payment Info Box
+            const infoBoxHtml = `
+            <div class="info-box">
+                <h3 class="info-title">Nächste Schritte & Zahlung</h3>
+                <p class="info-text" style="font-weight: bold; margin-bottom: 12px;">
+                    Leistungszeitraum: ${periodString}
+                </p>
+                <p class="info-text">
+                    Du erhältst in Kürze eine separate E-Mail mit der offiziellen Rechnung von <strong>Papierkram.de</strong>. 
+                    Bitte überweise den Betrag erst nach Erhalt dieser Rechnung vor Kursbeginn.
+                </p>
+            </div>`;
+
             const emailHtml = `
 <!DOCTYPE html>
 <html lang="de">
@@ -207,13 +259,7 @@ Deno.serve(async (req) => {
             </table>
 
             <!-- Payment Info Box -->
-            <div class="info-box">
-                <h3 class="info-title">Nächste Schritte & Zahlung</h3>
-                <p class="info-text">
-                    Du erhältst in Kürze eine separate E-Mail mit der offiziellen Rechnung von <strong>Papierkram.de</strong>. 
-                    Bitte überweise den Betrag erst nach Erhalt dieser Rechnung vor Kursbeginn.
-                </p>
-            </div>
+            ${infoBoxHtml}
 
             <p class="text">
                 Falls du Fragen hast, antworte einfach auf diese E-Mail.<br>

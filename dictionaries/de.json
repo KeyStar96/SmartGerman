@@ -743,6 +743,7 @@
     "title": "Verträge hier kündigen",
     "description": "Füllen Sie dieses Formular aus. Wir bestätigen den Eingang sofort per E-Mail.",
     "label": "VERTRAGSANGELEGENHEITEN",
+    "back_home": "ZURÜCK ZUR STARTSEITE",
     "form": {
       "full_name": "Vor- und Nachname",
       "email": "E-Mail-Adresse",
