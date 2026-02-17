@@ -229,7 +229,7 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                             exit={{ height: 0, opacity: 0, overflow: "hidden" }}
                             onAnimationComplete={(definition) => {
                                 // Only set visible if we are animating IN (height: auto)
-                                if (definition === "animate" || (typeof definition === "object" && definition.height === "auto")) {
+                                if (definition === "animate" || (typeof definition === "object" && !Array.isArray(definition) && (definition as any).height === "auto")) {
                                     setIsAnimationComplete(true);
                                 }
                             }}
