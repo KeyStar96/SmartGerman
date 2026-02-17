@@ -185,7 +185,7 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
             </div>
 
             {/* Termination Date */}
-            <div className="space-y-4 pt-4">
+            <div className="space-y-4 pt-4 relative z-20">
                 <span className="block text-xs font-mono uppercase tracking-widest text-gray-600 dark:text-gray-400">
                     {t.form.termination_date_label}
                 </span>
@@ -224,14 +224,10 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                 <AnimatePresence>
                     {terminationDateValue === "specific_date" && (
                         <motion.div
-                            initial={{ height: 0, opacity: 0, overflow: "hidden" }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0, overflow: "hidden" }}
-                            onAnimationComplete={(definition) => {
-                                setIsAnimationComplete(true);
-                            }}
-                            style={{ overflow: isAnimationComplete ? "visible" : "hidden" }}
-                            className=""
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="overflow-visible"
                         >
                             <div className="pt-2">
                                 <Controller
