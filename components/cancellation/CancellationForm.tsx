@@ -45,6 +45,14 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
         return getEarliestCancellationDate();
     }, []);
 
+    const [isAnimationComplete, setIsAnimationComplete] = useState(false);
+
+    React.useEffect(() => {
+        if (terminationDateValue !== "specific_date") {
+            setIsAnimationComplete(false);
+        }
+    }, [terminationDateValue]);
+
     const onSubmit = async (data: CancellationFormData) => {
         setIsSubmitting(true);
         setServerError(null);
@@ -217,9 +225,15 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                     {terminationDateValue === "specific_date" && (
                         <motion.div
                             initial={{ height: 0, opacity: 0, overflow: "hidden" }}
-                            animate={{ height: "auto", opacity: 1, transitionEnd: { overflow: "visible" } }}
+                            animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0, overflow: "hidden" }}
-                            className=""
+                            onAnimationComplete={(definition) => {
+                                // Only set visible if we are animating IN (height: auto)
+                                if (definition === "animate" || (typeof definition === "object" && definition.height === "auto")) {
+                                    setIsAnimationComplete(true);
+                                }
+                            }}
+                            className={cn("", isAnimationComplete ? "overflow-visible" : "overflow-hidden")}
                         >
                             <div className="pt-2">
                                 <Controller
