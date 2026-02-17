@@ -409,7 +409,8 @@
     "labels": {
       "time": "Saat",
       "course": "Ders",
-      "room": "Oda"
+      "room": "Oda",
+      "no_courses_scheduled": "Planlanmış kurs yok"
     }
   },
   "location": {
@@ -746,7 +747,6 @@
   "cancellation": {
     "title": "Sözleşmeleri Buradan İptal Edin",
     "description": "Lütfen bu formu doldurun. Alındığını hemen e-posta ile onaylayacağız.",
-    "label": "SÖZLEŞME KONULARI",
     "back_home": "ANA SAYFAYA DÖN",
     "form": {
       "full_name": "Ad ve Soyad",

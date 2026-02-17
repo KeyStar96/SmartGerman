@@ -336,7 +336,8 @@
     "labels": {
       "time": "Time",
       "course": "Course",
-      "room": "Room"
+      "room": "Room",
+      "no_courses_scheduled": "No courses scheduled"
     }
   },
   "science": {
@@ -740,7 +741,6 @@
   "cancellation": {
     "title": "Cancel Contracts Here",
     "description": "Please fill out this form. We will confirm receipt immediately via email.",
-    "label": "CONTRACT MATTERS",
     "back_home": "BACK TO HOME",
     "form": {
       "full_name": "First and Last Name",

@@ -53,9 +53,7 @@ export default async function CancellationPage({
 
                         {/* Header Section */}
                         <div className="mb-8 text-center space-y-4">
-                            <span className="inline-block text-[10px] font-mono uppercase tracking-widest text-[#FF5C00] border border-[#FF5C00]/20 px-2 py-1 rounded bg-[#FF5C00]/5">
-                                {t.label}
-                            </span>
+
 
                             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
                                 {t.title}

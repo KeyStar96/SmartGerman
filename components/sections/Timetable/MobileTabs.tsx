@@ -134,7 +134,7 @@ export default function MobileTabs({ dictionary, courses }: MobileTabsProps) {
                             })
                         ) : (
                             <div className="pl-12 py-12 text-sm text-black/40 dark:text-white/40 italic">
-                                No courses scheduled.
+                                {t.no_courses_scheduled || "No courses scheduled."}
                             </div>
                         )}
                     </motion.div>
