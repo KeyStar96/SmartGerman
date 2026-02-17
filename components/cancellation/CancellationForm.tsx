@@ -226,14 +226,16 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                                     control={control}
                                     name="specificDate"
                                     render={({ field }) => (
-                                        <DateDropdowns
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            label={t.form.specific_date_label}
-                                            futureYears={true}
-                                            minDate={minDate}
-                                            error={errors.specificDate?.message}
-                                        />
+                                        <div className="relative z-50">
+                                            <DateDropdowns
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                label={t.form.specific_date_label}
+                                                futureYears={true}
+                                                minDate={minDate}
+                                                error={errors.specificDate?.message}
+                                            />
+                                        </div>
                                     )}
                                 />
                             </div>

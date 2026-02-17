@@ -51,7 +51,7 @@ export const CustomSelect = ({ value, onChange, options, placeholder, label }: a
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute left-0 top-full w-full bg-[#FCF4E6] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-50 rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent divide-y divide-black/5 dark:divide-white/5"
+                        className="absolute left-0 top-full w-full bg-[#FCF4E6] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-[100] rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent divide-y divide-black/5 dark:divide-white/5"
                     >
                         {options.map((opt: any) => (
                             <div

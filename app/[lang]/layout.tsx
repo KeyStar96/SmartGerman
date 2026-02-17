@@ -21,6 +21,11 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  icons: {
+    icon: '/Bilder/favicon.png',
+    shortcut: '/Bilder/favicon.png',
+    apple: '/Bilder/favicon.png',
+  },
 };
 
 const inter = Inter({
