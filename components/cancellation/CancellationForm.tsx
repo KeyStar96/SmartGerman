@@ -235,7 +235,7 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                             }}
                             className={cn("", isAnimationComplete ? "overflow-visible" : "overflow-hidden")}
                         >
-                            <div className="pt-2">
+                            <div className="pt-2 pb-60">
                                 <Controller
                                     control={control}
                                     name="specificDate"
