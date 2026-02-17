@@ -228,14 +228,12 @@ export default function CancellationForm({ dictionary, lang }: CancellationFormP
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0, overflow: "hidden" }}
                             onAnimationComplete={(definition) => {
-                                // Only set visible if we are animating IN (height: auto)
-                                if (definition === "animate" || (typeof definition === "object" && !Array.isArray(definition) && (definition as any).height === "auto")) {
-                                    setIsAnimationComplete(true);
-                                }
+                                setIsAnimationComplete(true);
                             }}
-                            className={cn("", isAnimationComplete ? "overflow-visible" : "overflow-hidden")}
+                            style={{ overflow: isAnimationComplete ? "visible" : "hidden" }}
+                            className=""
                         >
-                            <div className="pt-2 pb-60">
+                            <div className="pt-2">
                                 <Controller
                                     control={control}
                                     name="specificDate"
