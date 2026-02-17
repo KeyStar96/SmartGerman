@@ -2,6 +2,8 @@
 
 import { createAdminClient } from '@/utils/supabase/admin';
 import { EnrollmentFormData } from '@/lib/registration-schema';
+import { headers } from "next/headers";
+import { rateLimit } from "@/lib/ratelimit";
 
 interface SubmitEnrollmentResult {
     success: boolean;
@@ -21,6 +23,19 @@ export async function submitEnrollment(
     },
     coursePrices: Record<string, number> // Map of courseId -> price
 ): Promise<SubmitEnrollmentResult> {
+    const headersList = await headers();
+    const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
+
+    // Rate Limit: 3 requests per 60 minutes
+    const { success: rateLimitSuccess } = await rateLimit(ip, 3, "60 m");
+
+    if (!rateLimitSuccess) {
+        return {
+            success: false,
+            message: "Too many requests. Please try again later."
+        };
+    }
+
     const supabase = createAdminClient();
 
     if (!selectedCourseIds || selectedCourseIds.length === 0) {

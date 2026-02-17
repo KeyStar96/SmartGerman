@@ -3,6 +3,8 @@
 import { createCancellationSchema, CancellationFormData } from "@/lib/cancellation-schema";
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getDictionary } from "@/lib/dictionary";
+import { headers } from "next/headers";
+import { rateLimit } from "@/lib/ratelimit";
 
 interface SubmitCancellationResult {
     success: boolean;
@@ -11,6 +13,19 @@ interface SubmitCancellationResult {
 }
 
 export async function submitCancellation(data: CancellationFormData, lang: string): Promise<SubmitCancellationResult> {
+    const headersList = await headers();
+    const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
+
+    // Rate Limit: 3 requests per 60 minutes
+    const { success: rateLimitSuccess } = await rateLimit(ip, 3, "60 m");
+
+    if (!rateLimitSuccess) {
+        return {
+            success: false,
+            message: "Too many requests. Please try again later."
+        };
+    }
+
     const dictionary = await getDictionary(lang);
     const schema = createCancellationSchema(dictionary);
     const result = await schema.safeParseAsync(data);

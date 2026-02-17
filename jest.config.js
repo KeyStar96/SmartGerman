@@ -13,6 +13,15 @@ module.exports = {
             // Enable jsx support in ts-jest
             jsx: 'react-jsx'
         }],
+        // Process js/mjs files with ts-jest as well (needed for ESM modules in node_modules)
+        '^.+\\.(js|jsx|mjs)$': ['ts-jest', {
+            tsconfig: 'tsconfig.json',
+            useESM: true,
+            isolatedModules: true
+        }],
     },
+    transformIgnorePatterns: [
+        '/node_modules/(?!(uncrypto|@upstash)/)'
+    ],
     testPathIgnorePatterns: ['<rootDir>/e2e/', '<rootDir>/node_modules/'],
 };

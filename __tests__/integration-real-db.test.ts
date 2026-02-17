@@ -9,6 +9,16 @@ import path from 'path';
 // Load .env.local explicitly assuming we are running from project root
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
+// MOCK HEADERS for server action - Must be top level to ensure hoisting works before imports
+jest.mock("next/headers", () => ({
+    headers: () => ({
+        get: (key: string) => {
+            if (key === "x-forwarded-for") return "127.0.0.1";
+            return null;
+        }
+    })
+}));
+
 describe('Deep Integration: Real Database Operations', () => {
     // Increase timeout for real network calls
     jest.setTimeout(30000);
@@ -52,8 +62,9 @@ describe('Deep Integration: Real Database Operations', () => {
         };
 
         const selectedCourseIds = ["c_a1_1_50plus"]; // Must exist
-        const startMonth = "0-2026";
+        const startMonth = "01.02.2026"; // Correct format DD.MM.YYYY
         const totalPrice = 123.45;
+        const coursePrices = { "c_a1_1_50plus": 123.45 }; // Missing arg
 
         // 1. EXECUTE ACTION
         const result = await submitEnrollment(
@@ -61,7 +72,8 @@ describe('Deep Integration: Real Database Operations', () => {
             selectedCourseIds,
             startMonth,
             totalPrice,
-            { privacy: true, agb: true, revocation: true }
+            { privacy: true, agb: true, revocation: true },
+            coursePrices
         );
 
         // 2. VERIFY SUCCESS

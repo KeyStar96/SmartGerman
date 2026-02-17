@@ -12,6 +12,21 @@ jest.mock("@/utils/supabase/admin", () => ({
     createAdminClient: jest.fn(),
 }));
 
+// Mock ratelimit to avoid ESM issues with uncrypto/upstash in jsdom environment
+jest.mock("@/lib/ratelimit", () => ({
+    rateLimit: jest.fn().mockResolvedValue({ success: true, limit: 10, remaining: 9, reset: 0 })
+}));
+
+// Mock next/headers for submitEnrollment
+jest.mock("next/headers", () => ({
+    headers: () => ({
+        get: (key: string) => {
+            if (key === "x-forwarded-for") return "127.0.0.1";
+            return null;
+        }
+    })
+}));
+
 describe("Database Integration Tests (Mocked)", () => {
     // --- Shared Spies ---
     const mockSelect = jest.fn();
@@ -158,9 +173,10 @@ describe("Database Integration Tests (Mocked)", () => {
             const result = await submitEnrollment(
                 mockFormData as any,
                 ["c_1", "c_2"],
-                "0-2026", // Jan 2026
+                "01.01.2026", // Valid date
                 500,
-                { privacy: true, agb: true, revocation: true }
+                { privacy: true, agb: true, revocation: true },
+                { "c_1": 250, "c_2": 250 } // Course prices
             );
 
             expect(result.success).toBe(true);
@@ -186,12 +202,15 @@ describe("Database Integration Tests (Mocked)", () => {
                 total_price: 500
             }));
 
-            // 4. Verify Enrollment Insert
-            expect(mockFrom).toHaveBeenCalledWith("enrollments");
-            expect(mockEnrollInsert).toHaveBeenCalledWith([
-                { registration_id: "mock-reg-uuid", course_id: "c_1" },
-                { registration_id: "mock-reg-uuid", course_id: "c_2" }
-            ]);
+            // 4. Verify Enrollment Inserts (NOT HAPPENING ANYMORE IN submitEnrollment, managed by DB trigger)
+            // The test expects enrollments to be inserted, but the code comment says:
+            // "Enrollments are now created via Database Trigger when status -> 'confirmed'. So we do NOT insert into 'enrollments' here anymore."
+            // So we should expect it NOT to be called.
+            expect(mockEnrollInsert).not.toHaveBeenCalled();
+            // Or better, check that registration has course_ids
+            expect(mockRegInsert).toHaveBeenCalledWith(expect.objectContaining({
+                course_ids: ["c_1", "c_2"]
+            }));
         });
 
         it("should identify returning user and Link Registration (Deduplication)", async () => {
@@ -201,9 +220,10 @@ describe("Database Integration Tests (Mocked)", () => {
             const result = await submitEnrollment(
                 mockFormData as any,
                 ["c_1"],
-                "0-2026",
+                "01.01.2026",
                 100,
-                { privacy: true, agb: true, revocation: true }
+                { privacy: true, agb: true, revocation: true },
+                { "c_1": 100 }
             );
 
             expect(result.success).toBe(true);
@@ -236,9 +256,10 @@ describe("Database Integration Tests (Mocked)", () => {
             const result = await submitEnrollment(
                 updatedFormData as any,
                 ["c_1"],
-                "0-2026",
+                "01.01.2026",
                 100,
-                { privacy: true, agb: true, revocation: true }
+                { privacy: true, agb: true, revocation: true },
+                { "c_1": 100 }
             );
 
             expect(result.success).toBe(true);
@@ -257,23 +278,22 @@ describe("Database Integration Tests (Mocked)", () => {
         it("should handle Registration Table failure", async () => {
             mockRegSingle.mockResolvedValue({ data: null, error: { message: "Reg failed" } });
 
-            const result = await submitEnrollment(mockFormData as any, ["c_1"], "0-2026", 100, { privacy: true, agb: true, revocation: true });
+            const result = await submitEnrollment(
+                mockFormData as any,
+                ["c_1"],
+                "01.01.2026",
+                100,
+                { privacy: true, agb: true, revocation: true },
+                { "c_1": 100 }
+            );
 
             expect(result.success).toBe(false);
             expect(result.message).toContain("Registration failed");
-            expect(mockEnrollInsert).not.toHaveBeenCalled(); // Should stop before enrolling
+            expect(mockEnrollInsert).not.toHaveBeenCalled();
         });
 
-        it("should handle Enrollment Table failure", async () => {
-            // Reg succeeds
-            mockRegSingle.mockResolvedValue({ data: { id: "mock-reg-uuid" }, error: null });
-            // Enrollment fails
-            mockEnrollInsert.mockResolvedValue({ error: { message: "Enroll fail" } });
-
-            const result = await submitEnrollment(mockFormData as any, ["c_1"], "0-2026", 100, { privacy: true, agb: true, revocation: true });
-
-            expect(result.success).toBe(false);
-            expect(result.message).toContain("Enrollment details failed");
-        });
+        // The Enrollment Table failure test is obsolete because enrollments are not inserted manually anymore
+        // I will remove it or update it to check registration logic errors if applicable.
+        // For now, removing it or commenting it out is safest.
     });
 });
