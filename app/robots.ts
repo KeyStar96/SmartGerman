@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: '*',
                 allow: '/',
-                disallow: ['/private/', '/admin/', '/api/'], // Disallow sensitive paths
+                disallow: ['/private/', '/admin/', '/api/', '/registration'], // Disallow sensitive paths
             },
         ],
         sitemap: 'https://www.smart-german.com/sitemap.xml',

@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Überprüfen, ob die URL bereits mit einer Sprache beginnt
-  const pathnameIsMissingLocale = ['/de', '/en', '/uk', '/ru', '/tu'].every(
+  const pathnameIsMissingLocale = ['/de', '/en', '/uk', '/ru', '/tr'].every(
     (locale) => !pathname.startsWith(`${locale}/`) && pathname !== locale
   )
 
@@ -27,7 +27,7 @@ export const config = {
      * 3. /Bilder, /public (Deine Assets)
      * 4. favicon.ico, sitemap.xml, robots.txt
      */
-    '/((?!api|_next|Bilder|public|favicon.ico|sitemap.xml|robots.txt).*)',
+    '/((?!api|_next|Bilder|public|favicon.ico|sitemap.xml|robots.txt|google236d470275910d3c.html).*)',
   ],
 }
 

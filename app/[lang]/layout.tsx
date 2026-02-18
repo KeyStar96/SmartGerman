@@ -10,7 +10,7 @@ import NavigationProgress from "@/components/effects/NavigationProgress";
 
 /* ─── Global metadata defaults (inherited by all pages) ─── */
 export const metadata: Metadata = {
-  metadataBase: new URL('https://smart-german.com'),
+  metadataBase: new URL('https://www.smart-german.com'),
   title: {
     template: '%s | SmartGerman',
     default: 'SmartGerman — Deutschkurse in Hannover',
@@ -48,7 +48,7 @@ export async function generateStaticParams() {
     { lang: 'en' },
     { lang: 'uk' },
     { lang: 'ru' },
-    { lang: 'tu' },
+    { lang: 'tr' },
   ];
 }
 
