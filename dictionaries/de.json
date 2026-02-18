@@ -694,7 +694,7 @@
     },
     "wizard": {
       "step1_title": "Wähle deinen Kurs.",
-      "step1_sub": "Kuratiert für maximale Effizienz. Wähle beliebig viele Module.",
+      "step1_sub": "Wählen Sie ein oder mehrere Module.",
       "step2_title": "Deine Identität.",
       "step2_sub": "Wir benötigen diese Daten für deine offizielle Einschreibung.",
       "step3_title": "Einschreibungs-Protokoll",
@@ -728,12 +728,12 @@
       "revocation": "Ich verlange ausdrücklich und stimme zu, dass Sie mit der Ausführung der Dienstleistung (Kursbeginn) vor Ablauf der Widerrufsfrist beginnen. Mir ist bekannt, dass ich bei vollständiger Vertragserfüllung mein Widerrufsrecht verliere und bei einem Widerruf nach Kursbeginn Wertersatz für die bereits erbrachten Leistungen zahlen muss.*"
     },
     "pricing_roadmap": {
-      "due_today": "Heute fällig",
+      "due_today": "Rechnungsbetrag",
       "optional_continuation": "Optionale Fortführung",
       "cancel_anytime": "Jederzeit zum Monatsende kündbar",
       "how_payment_works": "Wie funktioniert die Bezahlung?",
       "payment_explanation": "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge.",
-      "total_today": "Gesamtbetrag heute",
+      "total_today": "Gesamtbetrag",
       "payment_popover_title": "Keine Knebelverträge",
       "payment_point_1": "Sie zahlen heute nur den ersten Monat.",
       "payment_point_2": "Danach entscheiden Sie flexibel weiter.",

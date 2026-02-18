@@ -692,7 +692,7 @@
     },
     "wizard": {
       "step1_title": "Course Selection",
-      "step1_sub": "Choose your modules for starting in",
+      "step1_sub": "Select one or more modules.",
       "step2_title": "Personal Data",
       "step2_sub": "We need this data for your invoice.",
       "step3_title": "Enrollment Protocol",
@@ -726,12 +726,12 @@
       "revocation": "I expressly request and agree that you begin the execution of the service (start of the course) before the end of the withdrawal period. I am aware that I lose my right of withdrawal upon complete performance of the contract and that I must pay compensation for the services already rendered if I withdraw after the course has started.*"
     },
     "pricing_roadmap": {
-      "due_today": "Due today",
+      "due_today": "Invoice Amount",
       "optional_continuation": "Optional continuation",
       "cancel_anytime": "Cancel anytime at month-end",
       "how_payment_works": "How does payment work?",
       "payment_explanation": "You only pay the first month today. If you like it, the course simply continues. If not, a short message by the 25th of the month is enough and we will automatically end your participation. No binding contracts.",
-      "total_today": "Total due today",
+      "total_today": "Total Amount",
       "payment_popover_title": "No Binding Contracts",
       "payment_point_1": "You only pay the first month today.",
       "payment_point_2": "Then you decide flexibly how to continue.",
