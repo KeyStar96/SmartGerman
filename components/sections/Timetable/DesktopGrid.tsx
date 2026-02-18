@@ -131,8 +131,8 @@ export default function DesktopGrid({ dictionary, courses }: DesktopGridProps) {
                                     );
                                 })
                             ) : (
-                                <div className="pl-8 text-sm text-slate-300 dark:text-slate-600 font-mono uppercase tracking-widest">
-                                    {t.no_courses_scheduled || "No courses scheduled."}
+                                <div className="pl-8 text-sm text-slate-500 dark:text-slate-400 font-mono uppercase tracking-widest">
+                                    {t.labels?.no_courses_scheduled || "No courses scheduled."}
                                 </div>
                             )}
                         </div>

@@ -133,8 +133,8 @@ export default function MobileTabs({ dictionary, courses }: MobileTabsProps) {
                                 );
                             })
                         ) : (
-                            <div className="pl-12 py-12 text-sm text-black/40 dark:text-white/40 italic">
-                                {t.no_courses_scheduled || "No courses scheduled."}
+                            <div className="pl-12 py-12 text-sm text-black/60 dark:text-white/60 italic">
+                                {t.labels?.no_courses_scheduled || "No courses scheduled."}
                             </div>
                         )}
                     </motion.div>
