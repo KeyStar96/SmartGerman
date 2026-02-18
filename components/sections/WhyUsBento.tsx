@@ -18,7 +18,7 @@ interface WhyUsDictionary {
 
 // --- TACTILE PAPER CARD COMPONENT ---
 // Removed "Tilt" 3D logic for a flatter, more solid print aesthetic
-// --- TACTILE CARDBOARD COMPONENT ---
+// --- TACTILE CARDBOARD COMPONENT. ---
 // Memoized to prevent re-renders when parent state changes
 const PaperCard = React.memo(function PaperCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
     return (
