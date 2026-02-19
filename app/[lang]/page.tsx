@@ -19,10 +19,10 @@ const OG_LOCALE_MAP: Record<string, string> = {
   en: 'en_US',
   uk: 'uk_UA',
   ru: 'ru_RU',
-  tu: 'tr_TR',
+  tr: 'tr_TR',
 };
 
-const BASE_URL = "https://smart-german.com";
+const BASE_URL = "https://www.smart-german.com";
 
 export async function generateMetadata({
   params
@@ -60,11 +60,12 @@ export async function generateMetadata({
     alternates: {
       canonical: `${BASE_URL}/${lang}`,
       languages: {
+        'x-default': `${BASE_URL}/de`,
         de: `${BASE_URL}/de`,
         en: `${BASE_URL}/en`,
         uk: `${BASE_URL}/uk`,
         ru: `${BASE_URL}/ru`,
-        tr: `${BASE_URL}/tu`, // Mapping standard 'tr' code to our '/tu' route
+        tr: `${BASE_URL}/tr`,
       },
     },
   };
