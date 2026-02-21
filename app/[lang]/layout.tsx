@@ -94,7 +94,7 @@ export default async function RootLayout({
             __html: `
               (function() {
                 try {
-                  const theme = localStorage.getItem('theme') || 'dark';
+                  const theme = localStorage.getItem('theme') || 'light';
                   document.documentElement.classList.toggle('dark', theme === 'dark');
                 } catch (e) {}
               })();
