@@ -669,6 +669,32 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         }, 0);
     }, [selectedCoursesFull, lang, startDate, exceptions]);
 
+    // Auto-advance start date if no sessions are left in the selected month
+    React.useEffect(() => {
+        if (isTrialMode || selectedCoursesFull.length === 0) return;
+
+        const [d, m, y] = startDate.split('.').map(Number);
+        if (!d || !m || !y) return;
+
+        let totalUnitsRemaining = 0;
+        selectedCoursesFull.forEach(c => {
+            const stats = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
+            totalUnitsRemaining += stats.totalUnits;
+        });
+
+        // If no units left, and we aren't already on the 1st (avoid infinite loops for dead months), shift to the 1st of next month
+        if (totalUnitsRemaining === 0 && d !== 1) {
+            let nextM = m + 1;
+            let nextY = y;
+            if (nextM > 12) {
+                nextM = 1;
+                nextY++;
+            }
+            const newDate = `01.${String(nextM).padStart(2, '0')}.${nextY}`;
+            setStartDate(newDate);
+        }
+    }, [selectedCoursesFull, lang, startDate, exceptions, isTrialMode]);
+
     // Future Outlook (Next 2 Months)
     const futurePrices = React.useMemo(() => {
         const [d, m, y] = startDate.split('.').map(Number);
