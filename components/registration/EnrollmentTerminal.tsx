@@ -893,7 +893,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 );
                 setTrialEligible(eligible);
                 setTrialCheckLoading(false);
-                if (!eligible) return; // Don't proceed
+                if (!eligible) {
+                    setIsAlreadyUsed(true);
+                    return; // Don't proceed
+                }
             }
             setStep(3);
         }
