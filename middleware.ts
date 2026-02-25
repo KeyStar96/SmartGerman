@@ -3,6 +3,23 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
+  const searchParams = request.nextUrl.searchParams
+
+  // Legacy-Redirect: ?lang=xx → /xx (permanenter 301-Redirect für alte URLs)
+  const legacyLang = searchParams.get('lang')
+  if (legacyLang) {
+    const langMap: Record<string, string> = {
+      en: 'en',
+      ru: 'ru',
+      ua: 'uk', // ua → uk (neues Kürzel)
+      de: 'de',
+    }
+    const mappedLang = langMap[legacyLang.toLowerCase()] || 'de'
+    return NextResponse.redirect(
+      new URL(`/${mappedLang}`, request.url),
+      { status: 301 }
+    )
+  }
 
   // Überprüfen, ob die URL bereits mit einer Sprache beginnt
   const pathnameIsMissingLocale = ['/de', '/en', '/uk', '/ru', '/tr'].every(
