@@ -7,7 +7,7 @@ import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, Check, X, ArrowRight, Loader2, MapPin, Monitor, User, ChevronDown, ArrowLeft, CheckCircle2, Gift, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { CourseConfig, Day, CourseException, CourseSession } from "@/lib/course-config";
@@ -17,6 +17,8 @@ import PricingRoadmap from "@/components/registration/PricingRoadmap";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { DateDropdowns } from "@/components/ui/DateDropdowns";
 import { submitEnrollment } from "@/app/actions/submit-enrollment";
+import { submitTrialLesson } from "@/app/actions/submit-trial";
+import { checkTrialEligibility } from "@/app/actions/check-trial-eligibility";
 
 // Use the CSS variable --font-mono from layout.tsx instead of re-instantiating
 const monoClassName = "font-mono";
@@ -480,9 +482,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 }) {
     const searchParams = useSearchParams();
     const initialCourseId = searchParams.get("courseId");
+    const isTrialMode = searchParams.get("trial") === "1";
 
     // Translation Shortcuts
     const t = dictionary?.registration;
+    const trialT = t?.trial;
     const formLabels = t?.form;
     const wizard = t?.wizard;
     const success = t?.success;
@@ -494,6 +498,69 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [showPaymentInfo, setShowPaymentInfo] = useState(false);
+
+    // --- TRIAL MODE STATE ---
+    const [trialDate, setTrialDate] = useState<string>(""); // ISO YYYY-MM-DD
+    const [trialEligible, setTrialEligible] = useState<boolean | null>(null); // null = not checked
+    const [trialCheckLoading, setTrialCheckLoading] = useState(false);
+    const [trialFirstName, setTrialFirstName] = useState("");
+    const [trialLastName, setTrialLastName] = useState("");
+    const [trialEmail, setTrialEmail] = useState("");
+    const [trialPhone, setTrialPhone] = useState("");
+
+    // Compute available trial dates (next 4 weeks of valid session days)
+    const trialCourse = React.useMemo(() => {
+        if (!isTrialMode || !initialCourseId) return null;
+        return (courses || []).find(c => c.id === initialCourseId) || null;
+    }, [isTrialMode, initialCourseId, courses]);
+
+    const trialDates = React.useMemo(() => {
+        if (!trialCourse) return [];
+        const dayMap: Record<string, number> = { Mo: 1, Di: 2, Mi: 3, Do: 4, Fr: 5, Sa: 6, So: 0 };
+        const sessionDays = trialCourse.sessions.map(s => dayMap[s.day]);
+        const dates: { date: Date; label: string; iso: string }[] = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const daysDict = dictionary?.timetable?.days;
+        const dayNames: Record<string, string> = {
+            0: daysDict?.so || "So",
+            1: daysDict?.mo || "Mo",
+            2: daysDict?.di || "Di",
+            3: daysDict?.mi || "Mi",
+            4: daysDict?.do || "Do",
+            5: daysDict?.fr || "Fr",
+            6: daysDict?.sa || "Sa",
+        };
+        for (let i = 1; i <= 28; i++) {
+            const d = new Date(today);
+            d.setDate(d.getDate() + i);
+            if (sessionDays.includes(d.getDay())) {
+                const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                const dayName = dayNames[d.getDay()];
+                const label = `${dayName}, ${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+                dates.push({ date: d, label, iso });
+            }
+        }
+        return dates;
+    }, [trialCourse, dictionary]);
+
+    // Trial email eligibility check (debounced)
+    const trialEmailCheckRef = React.useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        if (!isTrialMode) return;
+        if (!trialEmail || !trialEmail.includes('@') || !trialEmail.includes('.')) {
+            setTrialEligible(null);
+            return;
+        }
+        setTrialCheckLoading(true);
+        if (trialEmailCheckRef.current) clearTimeout(trialEmailCheckRef.current);
+        trialEmailCheckRef.current = setTimeout(async () => {
+            const { eligible } = await checkTrialEligibility(trialEmail);
+            setTrialEligible(eligible);
+            setTrialCheckLoading(false);
+        }, 600);
+        return () => { if (trialEmailCheckRef.current) clearTimeout(trialEmailCheckRef.current); };
+    }, [trialEmail, isTrialMode]);
 
     // Dynamic Start Date (Default: Tomorrow)
     const [startDate, setStartDate] = useState(() => {
@@ -733,6 +800,37 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         </label>
     );
 
+    // --- TRIAL SUBMIT HANDLER ---
+    const onTrialSubmit = async () => {
+        if (!trialCourse || !trialDate || !trialFirstName || !trialLastName || !trialEmail) return;
+        if (trialEligible === false) return;
+
+        setIsSubmitting(true);
+        try {
+            const result = await submitTrialLesson({
+                firstName: trialFirstName,
+                lastName: trialLastName,
+                email: trialEmail,
+                phone: trialPhone || undefined,
+                courseId: trialCourse.id,
+                trialDate: trialDate,
+            });
+
+            if (result.success) {
+                setIsSuccess(true);
+            } else if (result.message === 'trial_already_used') {
+                setTrialEligible(false);
+            } else {
+                alert(result.message || "Something went wrong. Please try again.");
+            }
+        } catch (error) {
+            console.error("Trial submission error:", error);
+            alert("Network error. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const onSubmit = async (data: EnrollmentFormData) => {
         if (!isLegalValid) return; // safety check
 
@@ -787,6 +885,30 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     };
 
     if (isSuccess) {
+        // Trial-specific success screen
+        if (isTrialMode) {
+            const selectedDateLabel = trialDates.find(d => d.iso === trialDate)?.label || trialDate;
+            return (
+                <div className="min-h-screen w-full flex flex-col items-center justify-center text-center p-8 font-sans">
+                    <div className="w-20 h-20 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
+                        <Gift size={40} />
+                    </div>
+                    <h3 className="text-3xl font-bold mb-4 tracking-tight text-gray-900 dark:text-white">{trialT?.success_title || "Probestunde angefragt!"}</h3>
+                    <p className="text-gray-500 text-lg mb-4 max-w-md">
+                        {(trialT?.success_message || "Wir haben Ihre Anfrage erhalten und melden uns in Kürze bei")}{" "}
+                        <strong className="text-gray-900 dark:text-white">{trialEmail}</strong>.
+                    </p>
+                    <p className="text-[#FF5C00] font-bold text-lg mb-12">
+                        <CalendarDays size={18} className="inline mr-2" />
+                        {selectedDateLabel}
+                    </p>
+                    <Link href={`/${lang}`} className="bg-[#FF5C00] text-white px-8 py-4 rounded font-bold uppercase tracking-widest hover:bg-[#FF7A33] transition-colors">
+                        {t?.back_home}
+                    </Link>
+                </div>
+            );
+        }
+
         return (
             <div className="min-h-screen w-full text-white flex flex-col items-center justify-center text-center p-8 font-sans">
                 <div className="w-20 h-20 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-6">
@@ -861,14 +983,34 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         <span className={cn("text-xs text-gray-600 dark:text-gray-500", monoClassName)}>{wizard?.step_label || "SCHRITT"} {step} / 3</span>
                     </div>
 
+                    {/* Trial Mode Banner */}
+                    {isTrialMode && (
+                        <div className="flex items-center gap-2 mb-4 bg-[#FF5C00]/10 dark:bg-[#FF5C00]/20 border border-[#FF5C00]/30 rounded-lg px-4 py-2 w-fit">
+                            <Gift size={16} className="text-[#FF5C00]" />
+                            <span className={cn("text-[11px] font-bold uppercase tracking-widest text-[#FF5C00]", monoClassName)}>
+                                {trialT?.badge || "KOSTENLOSE PROBESTUNDE"}
+                            </span>
+                        </div>
+                    )}
+
                     <h1 className="text-3xl md:text-5xl font-bold tracking-tighter text-[#111111] dark:text-[#E2D7CE] mb-2 transition-colors duration-300">
-                        {step === 1 && wizard?.step1_title}
-                        {step === 2 && wizard?.step2_title}
-                        {step === 3 && wizard?.step3_title}
+                        {isTrialMode
+                            ? (trialT?.title || "Probestunde buchen")
+                            : (<>
+                                {step === 1 && wizard?.step1_title}
+                                {step === 2 && wizard?.step2_title}
+                                {step === 3 && wizard?.step3_title}
+                            </>)
+                        }
                     </h1>
-                    {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{currentMonthLabel}</span>.</p>}
-                    {step === 2 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step2_sub}</p>}
-                    {step === 3 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step3_sub}</p>}
+                    {isTrialMode
+                        ? <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{trialT?.subtitle || "Lernen Sie uns unverbindlich kennen."}</p>
+                        : (<>
+                            {step === 1 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step1_sub} <span className="text-[#FF5C00] font-bold">{currentMonthLabel}</span>.</p>}
+                            {step === 2 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step2_sub}</p>}
+                            {step === 3 && <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-xl transition-colors duration-300">{wizard?.step3_sub}</p>}
+                        </>)
+                    }
                 </header>
 
                 {/* SCROLLABLE CONTENT AREA */}
@@ -882,8 +1024,149 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                     <div className="max-w-4xl mx-auto">
                         <AnimatePresence mode="wait">
 
-                            {/* STEP 1: SELECTION */}
-                            {step === 1 && (
+                            {/* TRIAL MODE: Single-page form */}
+                            {isTrialMode && trialCourse && (
+                                <motion.div
+                                    key="trial"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="space-y-10 py-4 max-w-2xl"
+                                >
+                                    {/* Selected Course (locked) */}
+                                    <div>
+                                        <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-4 block", monoClassName)}>
+                                            {formLabels?.course_selection || "Gewählter Kurs"}
+                                        </span>
+                                        <div className="bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border border-[#FF5C00] rounded-sm p-4 md:p-6">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <span className="font-sans text-lg md:text-xl font-bold tracking-tight text-[#FF5C00]">
+                                                        {dictionary?.CourseData?.[trialCourse.translationKey]?.title || trialCourse.translationKey}
+                                                    </span>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        {dictionary?.CourseData?.[trialCourse.translationKey]?.level && (
+                                                            <span className="text-[10px] font-mono uppercase bg-white dark:bg-[#FF5C00] border border-black/10 dark:border-[#FF5C00] px-1.5 py-0.5 rounded text-gray-500 dark:text-white">
+                                                                {dictionary.CourseData[trialCourse.translationKey].level}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="font-sans font-extrabold text-2xl text-[#FF5C00]">
+                                                        {trialT?.price_label || "Kostenlos"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Day Picker */}
+                                    <div>
+                                        <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-4 block", monoClassName)}>
+                                            <CalendarDays size={12} className="inline mr-1" />
+                                            {trialT?.select_day || "Tag für Ihre Probestunde wählen"}
+                                        </span>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {trialDates.map(d => (
+                                                <button
+                                                    key={d.iso}
+                                                    type="button"
+                                                    onClick={() => setTrialDate(d.iso)}
+                                                    className={cn(
+                                                        "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
+                                                        trialDate === d.iso
+                                                            ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
+                                                            : "bg-[#F0EFE9] dark:bg-[#1A1C1E] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
+                                                    )}
+                                                >
+                                                    {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
+                                                    {d.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Personal Data (simplified) */}
+                                    <div>
+                                        <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-4 block", monoClassName)}>
+                                            {formLabels?.personal_data || "Persönliche Daten"}
+                                        </span>
+                                        <div className="space-y-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <TerminalInput
+                                                    label={formLabels?.firstname || "Vorname"}
+                                                    required
+                                                    value={trialFirstName}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTrialFirstName(e.target.value)}
+                                                />
+                                                <TerminalInput
+                                                    label={formLabels?.lastname || "Nachname"}
+                                                    required
+                                                    value={trialLastName}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTrialLastName(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="relative">
+                                                <TerminalInput
+                                                    label={formLabels?.email || "E-Mail"}
+                                                    type="email"
+                                                    required
+                                                    value={trialEmail}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTrialEmail(e.target.value)}
+                                                    error={trialEligible === false ? (trialT?.already_used_title || "Probestunde bereits genutzt") : undefined}
+                                                />
+                                                {trialCheckLoading && (
+                                                    <Loader2 size={14} className="absolute right-0 top-6 animate-spin text-gray-400" />
+                                                )}
+                                            </div>
+                                            <PhoneInput
+                                                label={formLabels?.phone || "Telefon"}
+                                                value={trialPhone}
+                                                onChange={(val: string) => setTrialPhone(val)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Eligibility Warning Banner */}
+                                    {trialEligible === false && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex gap-3"
+                                        >
+                                            <X size={18} className="text-red-500 shrink-0 mt-0.5" />
+                                            <div>
+                                                <p className="font-bold text-sm text-red-700 dark:text-red-400">
+                                                    {trialT?.already_used_title || "Probestunde bereits genutzt"}
+                                                </p>
+                                                <p className="text-xs text-red-600 dark:text-red-300 mt-1">
+                                                    {trialT?.already_used_message || "Sie haben bereits eine kostenlose Probestunde in Anspruch genommen. Melden Sie sich gerne direkt für einen unserer Kurse an!"}
+                                                </p>
+                                                <Link
+                                                    href={`/${lang}/registration?courseId=${trialCourse.id}`}
+                                                    className="text-[#FF5C00] text-xs font-bold uppercase tracking-wider mt-2 inline-block hover:underline"
+                                                >
+                                                    {wizard?.btn_continue || "Zur Kursanmeldung"} →
+                                                </Link>
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Privacy Consent for Trial */}
+                                    <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] p-6 border border-black/10 dark:border-white/10 rounded-sm">
+                                        <LegalCheckbox
+                                            id="trial-privacy"
+                                            label={t?.legal?.privacy || "Privacy Policy"}
+                                            checked={consents.privacy}
+                                            onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
+                                        />
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* STEP 1: SELECTION (only if NOT trial mode) */}
+                            {step === 1 && !isTrialMode && (
                                 <motion.div
                                     key="step1"
                                     initial={{ opacity: 1 }}
@@ -1076,8 +1359,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 </motion.div>
                             )}
 
-                            {/* STEP 2: PERSONAL DATA */}
-                            {step === 2 && (
+                            {/* STEP 2: PERSONAL DATA (only if NOT trial mode) */}
+                            {step === 2 && !isTrialMode && (
                                 <motion.div
                                     key="step2"
                                     initial={{ opacity: 1 }}
@@ -1126,7 +1409,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
                             {/* STEP 3: SUMMARY */}
                             {/* --- SUMMARY (STEP 3) --- */}
-                            {step === 3 && (
+                            {step === 3 && !isTrialMode && (
                                 <motion.div
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -1218,64 +1501,98 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
                 <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
 
-                {/* RECEIPT HEADER (Desktop Only likely? Or simplified for mobile?) */}
+                {/* RECEIPT HEADER */}
                 <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10 hidden lg:block">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">{receipt?.live_title || "Live Receipt"}</span>
+                            <span className="font-mono text-xs text-[#FF5C00] uppercase tracking-widest">
+                                {isTrialMode ? (trialT?.badge || "PROBESTUNDE") : (receipt?.live_title || "Live Receipt")}
+                            </span>
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
                         </div>
-                        <span className="font-mono text-xs text-gray-500">{currentMonthLabel}</span>
+                        {!isTrialMode && <span className="font-mono text-xs text-gray-500">{currentMonthLabel}</span>}
                     </div>
                 </div>
 
-                {/* SCROLLABLE RECEIPT LIST (Collapsible on mobile?) */}
-                {/* For now, show on mobile too but maybe limit max height? Or keep as is at bottom. */}
                 <div data-lenis-prevent className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4 min-h-[200px] lg:min-h-0">
-                    <AnimatePresence>
-                        {selectedCoursesFull.length === 0 ? (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
+                    {isTrialMode && trialCourse ? (
+                        <div className="space-y-6">
+                            {/* Course */}
+                            <div className="font-mono text-sm border-b border-white/5 pb-4">
+                                <div className="flex justify-between items-start mb-1 gap-4">
+                                    <span className="text-gray-200 font-bold flex-1 break-words">
+                                        {dictionary?.CourseData?.[trialCourse.translationKey]?.title || trialCourse.translationKey}
+                                    </span>
+                                    <span className="text-green-400 font-bold whitespace-nowrap">{trialT?.price_label || "Kostenlos"}</span>
+                                </div>
+                                <div className="text-[10px] text-gray-500 uppercase mt-1">
+                                    {trialT?.badge || "PROBESTUNDE"}
+                                </div>
+                            </div>
+
+                            {/* Selected Date */}
+                            {trialDate && (
+                                <div className="flex items-center gap-2 text-sm text-gray-300">
+                                    <CalendarDays size={14} className="text-[#FF5C00]" />
+                                    <span className="font-mono">{trialDates.find(d => d.iso === trialDate)?.label || trialDate}</span>
+                                </div>
+                            )}
+
+                            {/* Contact Summary */}
+                            {trialFirstName && (
+                                <div className="text-[10px] text-gray-500 font-mono uppercase space-y-1 pt-2 border-t border-white/5">
+                                    <div>{trialFirstName} {trialLastName}</div>
+                                    {trialEmail && <div className="text-gray-400">{trialEmail}</div>}
+                                    {trialPhone && <div>{trialPhone}</div>}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <AnimatePresence>
+                            {selectedCoursesFull.length === 0 ? (
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-600 font-mono text-xs italic mt-10 text-center">
                                 // {receipt?.waiting || "Waiting..."}
-                            </motion.div>
-                        ) : (
-                            selectedCoursesFull.map(c => {
-                                const [d, m, y] = startDate.split('.').map(Number);
-                                const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
-                                const netPrice = c.price * totalUnits;
-                                const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
-                                const grossPrice = netPrice + deductionSum;
+                                </motion.div>
+                            ) : (
+                                selectedCoursesFull.map(c => {
+                                    const [d, m, y] = startDate.split('.').map(Number);
+                                    const { sessionCount, totalUnits, deductions } = calculateMonthlyStats(c, lang, m - 1, y, exceptions, d);
+                                    const netPrice = c.price * totalUnits;
+                                    const deductionSum = deductions.reduce((acc, d) => acc + d.amount, 0);
+                                    const grossPrice = netPrice + deductionSum;
 
-                                return (
-                                    <motion.div
-                                        key={c.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
-                                    >
-                                        <div className="flex justify-between items-start mb-1 gap-4">
-                                            <span className="text-gray-200 font-bold flex-1 break-words">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
-                                            <span className="text-white whitespace-nowrap">{formatPrice(grossPrice)}</span>
-                                        </div>
-
-                                        {deductions.map((d, i) => (
-                                            <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
-                                                <span>{d.date}: {d.reason}</span>
-                                                <span>- {formatPrice(d.amount)}</span>
+                                    return (
+                                        <motion.div
+                                            key={c.id}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="font-mono text-sm border-b border-white/5 pb-3 last:border-0"
+                                        >
+                                            <div className="flex justify-between items-start mb-1 gap-4">
+                                                <span className="text-gray-200 font-bold flex-1 break-words">{dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey}</span>
+                                                <span className="text-white whitespace-nowrap">{formatPrice(grossPrice)}</span>
                                             </div>
-                                        ))}
 
-                                        <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
-                                            <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })
-                        )}
-                    </AnimatePresence>
+                                            {deductions.map((d, i) => (
+                                                <div key={i} className="flex justify-between text-[10px] text-red-500 mb-1">
+                                                    <span>{d.date}: {d.reason}</span>
+                                                    <span>- {formatPrice(d.amount)}</span>
+                                                </div>
+                                            ))}
+
+                                            <div className="flex justify-between text-[10px] text-gray-500 uppercase mt-1">
+                                                <span>{totalUnits} {receipt?.units || "Einheiten"} ({sessionCount} {receipt?.sessions || "Termine"})</span>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })
+                            )}
+                        </AnimatePresence>
+                    )}
                 </div>
 
                 {/* FOOTER AREA (Total + Action) */}
@@ -1285,52 +1602,89 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 >
 
                     {/* TOTAL Display */}
-                    <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
-                        <div className="flex justify-between items-end mb-2">
-                            <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
-                            <motion.span
-                                key={totalMonthlyPrice}
-                                initial={{ scale: 1.1, color: '#fff' }}
-                                animate={{ scale: 1, color: '#FF5C00' }}
-                                className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums"
-                            >
-                                {formatPrice(totalMonthlyPrice)}
-                            </motion.span>
+                    {isTrialMode ? (
+                        <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
+                            <div className="flex justify-between items-end mb-2">
+                                <span className="font-mono text-xs uppercase text-gray-400">{trialT?.price_label || "Kostenlos"}</span>
+                                <span className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums text-green-400">0,00 €</span>
+                            </div>
+                            <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
+                                <span>{trialT?.badge || "PROBESTUNDE"}</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
-                            <span>{wizard?.total_sub_1}</span>
-                            <span>{wizard?.total_sub_2}</span>
+                    ) : (
+                        <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
+                            <div className="flex justify-between items-end mb-2">
+                                <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
+                                <motion.span
+                                    key={totalMonthlyPrice}
+                                    initial={{ scale: 1.1, color: '#fff' }}
+                                    animate={{ scale: 1, color: '#FF5C00' }}
+                                    className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums"
+                                >
+                                    {formatPrice(totalMonthlyPrice)}
+                                </motion.span>
+                            </div>
+                            <div className="flex justify-between text-[10px] text-gray-600 font-mono uppercase">
+                                <span>{wizard?.total_sub_1}</span>
+                                <span>{wizard?.total_sub_2}</span>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
 
 
                     {/* ACTION BUTTON */}
-                    <button
-                        onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
-                        disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid) || isSubmitting}
-                        className={cn(
-                            "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid))
-                                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                                : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
-                        )}
-                    >
-                        <span className="flex flex-col items-start gap-1">
-                            <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
-                                {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : wizard?.btn_binding}
+                    {isTrialMode ? (
+                        <button
+                            onClick={onTrialSubmit}
+                            disabled={!trialDate || !trialFirstName || !trialLastName || !trialEmail || trialEligible === false || !consents.privacy || isSubmitting}
+                            className={cn(
+                                "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
+                                (!trialDate || !trialFirstName || !trialLastName || !trialEmail || trialEligible === false || !consents.privacy)
+                                    ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                    : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
+                            )}
+                        >
+                            <span className="flex flex-col items-start gap-1">
+                                <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
+                                    {trialT?.badge || "PROBESTUNDE"}
+                                </span>
+                                <span>
+                                    {isSubmitting ? <Loader2 className="animate-spin" /> : (trialT?.submit_button || "Probestunde anfragen")}
+                                </span>
                             </span>
-                            <span>
-                                {step === 1 && wizard?.btn_continue}
-                                {step === 2 && wizard?.btn_overview}
-                                {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : wizard?.btn_order)}
+                            <Gift className={cn("transition-transform duration-300",
+                                (!trialDate || !trialFirstName || !trialLastName || !trialEmail || trialEligible === false || !consents.privacy) ? "opacity-20" : "group-hover:translate-x-2"
+                            )} />
+                        </button>
+                    ) : (
+                        <button
+                            onClick={step === 3 ? handleSubmit(onSubmit) : handleNextStep}
+                            disabled={(step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid) || isSubmitting}
+                            className={cn(
+                                "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
+                                ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid))
+                                    ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                                    : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
+                            )}
+                        >
+                            <span className="flex flex-col items-start gap-1">
+                                <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
+                                    {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : wizard?.btn_binding}
+                                </span>
+                                <span>
+                                    {step === 1 && wizard?.btn_continue}
+                                    {step === 2 && wizard?.btn_overview}
+                                    {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : wizard?.btn_order)}
+                                </span>
                             </span>
-                        </span>
 
-                        <ArrowRight className={cn("transition-transform duration-300",
-                            ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid)) ? "opacity-20" : "group-hover:translate-x-2"
-                        )} />
-                    </button>
+                            <ArrowRight className={cn("transition-transform duration-300",
+                                ((step === 1 && selectedCourseIds.length === 0) || (step === 2 && !isValid) || (step === 3 && !isLegalValid)) ? "opacity-20" : "group-hover:translate-x-2"
+                            )} />
+                        </button>
+                    )}
 
                 </div>
             </div>

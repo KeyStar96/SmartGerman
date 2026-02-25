@@ -540,7 +540,8 @@
       "presence": "IN-PERSON",
       "online": "ONLINE CLASS"
     },
-    "footer_note": "All courses are monthly cancellable. Telegram support included. All prices incl. VAT."
+    "footer_note": "All courses are monthly cancellable. Telegram support included. All prices incl. VAT.",
+    "trial_cta": "★ Free Trial Lesson"
   },
   "CourseData": {
     "de50_a1_1": {
@@ -600,6 +601,18 @@
   },
   "registration": {
     "back_home": "BACK TO HOMEPAGE",
+    "trial": {
+      "badge": "FREE TRIAL LESSON",
+      "title": "Book a Trial Lesson",
+      "subtitle": "Get to know us – one free trial lesson per person.",
+      "select_day": "Choose a day for your trial lesson",
+      "submit_button": "Request Trial Lesson",
+      "success_title": "Trial Lesson Requested!",
+      "success_message": "We have received your request and will get back to you shortly at",
+      "already_used_title": "Trial already used",
+      "already_used_message": "You have already used your free trial lesson. You are welcome to register directly for one of our courses!",
+      "price_label": "Free"
+    },
     "step_course": "COURSE",
     "step_personal": "PERSONAL",
     "headline": "Start your academic journey.",

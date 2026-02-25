@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { JetBrains_Mono } from "next/font/google";
-import { User, Clock } from "lucide-react";
+import { User, Clock, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CourseConfig, Day } from "@/lib/course-config";
 import { useRouter, useParams } from "next/navigation";
@@ -31,6 +31,7 @@ interface Dictionary {
     headline: { line1: string; line2: string };
     tabs: Record<string, string>;
     footer_note: string;
+    trial_cta?: string;
   };
   CourseData: Record<string, CourseText>;
   timetable: {
@@ -188,6 +189,7 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
                     formattedSchedule={courseConfig.formattedSchedule}
                     formattedPrice={courseConfig.formattedPrice}
                     educatorName={t_instructors?.[courseConfig.instructor] || courseConfig.instructor}
+                    dictionary={dictionary}
                   />
                 );
               })}
@@ -218,9 +220,10 @@ interface CourseCardProps {
   formattedSchedule: string[];
   formattedPrice: string;
   educatorName: string;
+  dictionary: Dictionary;
 }
 
-const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice, educatorName }: CourseCardProps) => {
+const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice, educatorName, dictionary }: CourseCardProps) => {
   const params = useParams();
   const lang = (params?.lang as string) || "de";
 
@@ -228,32 +231,34 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
   // Strictly use config duration
   const unit = `/ ${config.unitDuration} min`;
 
+  const trialCtaText = dictionary?.courses_v2?.trial_cta || "★ Kostenlose Probestunde";
+
   return (
     <motion.div
       variants={cardVariants}
-      className="h-full"
+      className="h-full flex flex-col
+        -ml-px -mt-px
+        transition-all duration-300 ease-out
+        hover:z-20 hover:-translate-y-2
+      "
     >
+      {/* Main Card Area → Regular Registration */}
       <Link
         href={`/${lang}/registration?courseId=${config.id}`}
         className={`
-            group relative w-full h-full min-h-[380px] 
+            group relative w-full flex-1 min-h-[380px] 
             bg-[#F9F8F6] dark:bg-[#1E2024]
             cursor-pointer
             block
             
-            /* Border Collapsing Trick: Negative Margins */
-            -ml-px -mt-px
             border-[0.5px] border-black/10 dark:border-transparent
+            border-b-0
             
             flex flex-col justify-between overflow-hidden
             transition-all duration-300 ease-out
             
-            /* Interaction States */
-            hover:z-20 
             hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
-            hover:shadow-2xl hover:-translate-y-2
             
-            /* Thickness Simulation */
             shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.1)]
             dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_1px_3px_0_rgba(0,0,0,0.5)]
             
@@ -374,6 +379,36 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
               </div>
             </div>
           </div>
+        </div>
+      </Link>
+
+      {/* Trial Lesson CTA Strip → Registration in Trial Mode */}
+      <Link
+        href={`/${lang}/registration?courseId=${config.id}&trial=1`}
+        className={`
+          group/trial relative block w-full
+          bg-[#F0EDE8] dark:bg-[#181A1D]
+          border-[0.5px] border-black/10 dark:border-transparent
+          border-t-[1px] border-t-[#FF5C00]/20 dark:border-t-[#FF5C00]/30
+          px-7 py-4
+          transition-all duration-300 ease-out
+          hover:bg-[#FF5C00] dark:hover:bg-[#FF5C00]
+        `}
+      >
+        <div className="flex items-center justify-center gap-2">
+          <Gift
+            size={14}
+            strokeWidth={2}
+            className="text-[#FF5C00] group-hover/trial:text-white transition-colors duration-300"
+          />
+          <span className={`
+            ${jetbrainsMono.className}
+            text-[11px] font-bold uppercase tracking-widest
+            text-[#FF5C00] group-hover/trial:text-white
+            transition-colors duration-300
+          `}>
+            {trialCtaText}
+          </span>
         </div>
       </Link>
     </motion.div>

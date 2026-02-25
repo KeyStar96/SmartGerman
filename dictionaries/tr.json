@@ -357,7 +357,8 @@
       "presence": "YÜZ YÜZE",
       "online": "ÇEVRİMİÇİ"
     },
-    "footer_note": "Tüm kurslar aylık iptal edilebilir. Telegram desteği dahil. Fiyatlar KDV dahil."
+    "footer_note": "Tüm kurslar aylık iptal edilebilir. Telegram desteği dahil. Fiyatlar KDV dahil.",
+    "trial_cta": "★ Ücretsiz Deneme Dersi"
   },
   "schedule": {
     "title": "Başarıya Giden Yolunuz – Haftalık Program",
@@ -606,6 +607,18 @@
   },
   "registration": {
     "back_home": "ANA SAYFAYA DÖN",
+    "trial": {
+      "badge": "ÜCRETSiZ DENEME DERSi",
+      "title": "Deneme Dersi Rezerve Et",
+      "subtitle": "Bizi tanıyın – kişi başına bir ücretsiz deneme dersi.",
+      "select_day": "Deneme dersiniz için bir gün seçin",
+      "submit_button": "Deneme Dersi Talep Et",
+      "success_title": "Deneme Dersi Talep Edildi!",
+      "success_message": "Talebinizi aldık ve en kısa sürede size döneceğiz:",
+      "already_used_title": "Deneme dersi zaten kullanıldı",
+      "already_used_message": "Ücretsiz deneme dersinizi zaten kullandınız. Kurslarımızdan birine doğrudan kayıt olabilirsiniz!",
+      "price_label": "Ücretsiz"
+    },
     "step_course": "DERS",
     "step_personal": "KİŞİSEL VERİLER",
     "headline": "Akademik yolculuğunuza başlayın.",

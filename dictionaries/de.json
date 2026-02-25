@@ -298,7 +298,8 @@
       "presence": "PRÄSENZ",
       "online": "ONLINE"
     },
-    "footer_note": "Alle Kurse sind monatlich kündbar. Telegram-Support inklusive. Alle Preise inkl. MwSt."
+    "footer_note": "Alle Kurse sind monatlich kündbar. Telegram-Support inklusive. Alle Preise inkl. MwSt.",
+    "trial_cta": "★ Kostenlose Probestunde"
   },
   "schedule": {
     "title": "Dein Weg zum Erfolg – Der Wochenplan",
@@ -602,6 +603,18 @@
   },
   "registration": {
     "back_home": "ZURÜCK ZUR STARTSEITE",
+    "trial": {
+      "badge": "KOSTENLOSE PROBESTUNDE",
+      "title": "Probestunde buchen",
+      "subtitle": "Lernen Sie uns unverbindlich kennen – eine kostenlose Probestunde pro Person.",
+      "select_day": "Wählen Sie einen Tag für Ihre Probestunde",
+      "submit_button": "Probestunde anfragen",
+      "success_title": "Probestunde angefragt!",
+      "success_message": "Wir haben Ihre Anfrage erhalten und melden uns in Kürze bei",
+      "already_used_title": "Probestunde bereits genutzt",
+      "already_used_message": "Sie haben bereits eine kostenlose Probestunde in Anspruch genommen. Melden Sie sich gerne direkt für einen unserer Kurse an!",
+      "price_label": "Kostenlos"
+    },
     "step_course": "KURS",
     "step_personal": "PERSÖNLICHES",
     "headline": "Starten Sie Ihre akademische Reise.",
