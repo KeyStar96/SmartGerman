@@ -497,6 +497,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [isAlreadyUsed, setIsAlreadyUsed] = useState(false);
     const [showPaymentInfo, setShowPaymentInfo] = useState(false);
 
     // --- TRIAL MODE STATE ---
@@ -816,7 +817,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             if (result.success) {
                 setIsSuccess(true);
             } else if (result.message === 'trial_already_used') {
-                setTrialEligible(false);
+                setIsAlreadyUsed(true);
             } else {
                 alert(result.message || "Something went wrong. Please try again.");
             }
@@ -897,6 +898,26 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             setStep(3);
         }
     };
+
+    if (isAlreadyUsed) {
+        return (
+            <div className="min-h-screen w-full flex flex-col items-center justify-center text-center p-8 font-sans">
+                <div className="w-20 h-20 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] flex items-center justify-center mb-6 relative">
+                    <span className="absolute -top-1 -right-1 text-xs">!</span>
+                    <User size={32} />
+                </div>
+                <h3 className="text-3xl font-bold mb-4 tracking-tight text-gray-900 dark:text-white">
+                    {trialT?.already_used_title || "Bereits gebucht"}
+                </h3>
+                <p className="text-gray-500 text-lg mb-12 max-w-md mx-auto">
+                    {trialT?.already_used_message || "Sie haben bereits eine kostenlose Probestunde in Anspruch genommen."}
+                </p>
+                <Link href={`/${lang}`} className="bg-[#FF5C00] text-white px-8 py-4 rounded font-bold uppercase tracking-widest hover:bg-[#FF7A33] transition-colors">
+                    {t?.back_home || "Zur Startseite"}
+                </Link>
+            </div>
+        );
+    }
 
     if (isSuccess) {
         // Trial-specific success screen
