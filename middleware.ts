@@ -5,6 +5,14 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const searchParams = request.nextUrl.searchParams
 
+  // Legacy-Redirect: alte .html-Seiten → neue Pfade (permanenter 301-Redirect)
+  if (pathname === '/AGB.html') {
+    return NextResponse.redirect(
+      new URL('/de/agb', request.url),
+      { status: 301 }
+    )
+  }
+
   // Legacy-Redirect: ?lang=xx → /xx (permanenter 301-Redirect für alte URLs)
   const legacyLang = searchParams.get('lang')
   if (legacyLang) {
