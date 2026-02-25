@@ -238,7 +238,7 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
       variants={cardVariants}
       className="group/card h-full flex flex-col
         rounded-xl overflow-hidden
-        border-[1.5px] border-black/8 dark:border-white/8
+        border-[1.5px] border-black/8 dark:border-transparent
         transition-all duration-300 ease-out
         hover:z-20 hover:-translate-y-2
         hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
