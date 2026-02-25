@@ -3,7 +3,7 @@ import path from 'path';
 
 describe('Translation Integrity', () => {
     const dictionariesDir = path.join(process.cwd(), 'dictionaries');
-    const locales = ['en', 'ru', 'uk', 'tu'];
+    const locales = ['en', 'ru', 'uk', 'tr'];
     const masterLocale = 'de';
 
     let masterDict: any;
