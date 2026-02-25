@@ -236,10 +236,16 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
   return (
     <motion.div
       variants={cardVariants}
-      className="h-full flex flex-col
-        -ml-px -mt-px
+      className="group/card h-full flex flex-col
+        rounded-xl overflow-hidden
+        border-[1.5px] border-black/8 dark:border-white/8
         transition-all duration-300 ease-out
         hover:z-20 hover:-translate-y-2
+        hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
+        hover:shadow-[0_25px_50px_-12px_rgba(255,92,0,0.15)]
+        dark:hover:shadow-[0_25px_50px_-12px_rgba(255,92,0,0.25)]
+        shadow-[0_1px_3px_0_rgba(0,0,0,0.08)]
+        dark:shadow-[0_1px_3px_0_rgba(0,0,0,0.4)]
       "
     >
       {/* Main Card Area → Regular Registration */}
@@ -251,19 +257,8 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
             cursor-pointer
             block
             
-            border-[0.5px] border-black/10 dark:border-transparent
-            border-b-0
-            
             flex flex-col justify-between overflow-hidden
             transition-all duration-300 ease-out
-            
-            hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
-            
-            shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_1px_3px_0_rgba(0,0,0,0.1)]
-            dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_1px_3px_0_rgba(0,0,0,0.5)]
-            
-            hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8),inset_0_-1px_0_0_rgba(0,0,0,0.05),0_25px_50px_-12px_rgba(0,0,0,0.25)]
-            dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),inset_0_-1px_0_0_rgba(0,0,0,0.8),0_25px_50px_-12px_rgba(0,0,0,0.5)]
           `}
       >
         {/* Paper Texture Overlay (3% Opacity) */}
@@ -388,8 +383,8 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
         className={`
           group/trial relative block w-full
           bg-[#F0EDE8] dark:bg-[#181A1D]
-          border-[0.5px] border-black/10 dark:border-transparent
-          border-t-[1px] border-t-[#FF5C00]/20 dark:border-t-[#FF5C00]/30
+          border-t border-t-black/5 dark:border-t-white/5
+          group-hover/card:border-t-[#FF5C00]/30
           px-7 py-4
           transition-all duration-300 ease-out
           hover:bg-[#FF5C00] dark:hover:bg-[#FF5C00]

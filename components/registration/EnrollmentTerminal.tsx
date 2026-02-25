@@ -503,16 +503,19 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [trialDate, setTrialDate] = useState<string>(""); // ISO YYYY-MM-DD
     const [trialEligible, setTrialEligible] = useState<boolean | null>(null); // null = not checked
     const [trialCheckLoading, setTrialCheckLoading] = useState(false);
-    const [trialFirstName, setTrialFirstName] = useState("");
-    const [trialLastName, setTrialLastName] = useState("");
-    const [trialEmail, setTrialEmail] = useState("");
-    const [trialPhone, setTrialPhone] = useState("");
 
-    // Compute available trial dates (next 4 weeks of valid session days)
+    // Compute the selected trial course (from selectedCourseIds, so it updates when user switches)
     const trialCourse = React.useMemo(() => {
-        if (!isTrialMode || !initialCourseId) return null;
-        return (courses || []).find(c => c.id === initialCourseId) || null;
-    }, [isTrialMode, initialCourseId, courses]);
+        if (!isTrialMode) return null;
+        const cid = selectedCourseIds[0];
+        if (!cid) return null;
+        return (courses || []).find(c => c.id === cid) || null;
+    }, [isTrialMode, selectedCourseIds, courses]);
+
+    // Reset trialDate when course changes
+    useEffect(() => {
+        if (isTrialMode) setTrialDate("");
+    }, [selectedCourseIds[0]]);
 
     const trialDates = React.useMemo(() => {
         if (!trialCourse) return [];
@@ -543,24 +546,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         }
         return dates;
     }, [trialCourse, dictionary]);
-
-    // Trial email eligibility check (debounced)
-    const trialEmailCheckRef = React.useRef<NodeJS.Timeout | null>(null);
-    useEffect(() => {
-        if (!isTrialMode) return;
-        if (!trialEmail || !trialEmail.includes('@') || !trialEmail.includes('.')) {
-            setTrialEligible(null);
-            return;
-        }
-        setTrialCheckLoading(true);
-        if (trialEmailCheckRef.current) clearTimeout(trialEmailCheckRef.current);
-        trialEmailCheckRef.current = setTimeout(async () => {
-            const { eligible } = await checkTrialEligibility(trialEmail);
-            setTrialEligible(eligible);
-            setTrialCheckLoading(false);
-        }, 600);
-        return () => { if (trialEmailCheckRef.current) clearTimeout(trialEmailCheckRef.current); };
-    }, [trialEmail, isTrialMode]);
 
     // Dynamic Start Date (Default: Tomorrow)
     const [startDate, setStartDate] = useState(() => {
@@ -610,7 +595,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         resolver: zodResolver(enrollmentSchema),
         mode: "onChange"
     });
-    const { register, handleSubmit, formState: { errors, isValid }, trigger, watch, setValue } = form; // Added setValue
+    const { register, handleSubmit, formState: { errors, isValid }, trigger, watch, setValue, getValues } = form;
     const formData = watch("personal");
     const zipCode = watch("personal.zip");
 
@@ -647,8 +632,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     }, [initialCourseId, courses]);
 
     const toggleCourse = React.useCallback((id: string) => {
-        setSelectedCourseIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-    }, []);
+        if (isTrialMode) {
+            // Trial mode: single select only
+            setSelectedCourseIds(prev => prev.includes(id) ? [] : [id]);
+        } else {
+            setSelectedCourseIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+        }
+    }, [isTrialMode]);
 
     const getCourseData = React.useCallback((c: CourseConfig) => {
         // Calculate price based on selected month
@@ -801,18 +791,24 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     );
 
     // --- TRIAL SUBMIT HANDLER ---
-    const onTrialSubmit = async () => {
-        if (!trialCourse || !trialDate || !trialFirstName || !trialLastName || !trialEmail) return;
+    const onTrialSubmit = async (data: EnrollmentFormData) => {
+        if (!isLegalValid) return;
+        const courseId = selectedCourseIds[0];
+        if (!courseId || !trialDate) return;
         if (trialEligible === false) return;
 
         setIsSubmitting(true);
         try {
             const result = await submitTrialLesson({
-                firstName: trialFirstName,
-                lastName: trialLastName,
-                email: trialEmail,
-                phone: trialPhone || undefined,
-                courseId: trialCourse.id,
+                firstName: data.personal.firstName,
+                lastName: data.personal.lastName,
+                email: data.personal.email,
+                phone: data.personal.phone || undefined,
+                birthDate: data.personal.birthDate || undefined,
+                street: data.personal.street || undefined,
+                zip: data.personal.zip || undefined,
+                city: data.personal.city || undefined,
+                courseId: courseId,
                 trialDate: trialDate,
             });
 
@@ -877,10 +873,27 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     const handleNextStep = async () => {
         if (step === 1 && selectedCourseIds.length > 0) {
+            // In trial mode, also require a day selection
+            if (isTrialMode && !trialDate) return;
             setStep(2);
         } else if (step === 2) {
             const valid = await trigger("personal");
-            if (valid) setStep(3);
+            if (!valid) return;
+
+            // In trial mode, check eligibility before proceeding to step 3
+            if (isTrialMode) {
+                const formVals = getValues();
+                setTrialCheckLoading(true);
+                const { eligible } = await checkTrialEligibility(
+                    formVals.personal.email,
+                    formVals.personal.firstName,
+                    formVals.personal.lastName
+                );
+                setTrialEligible(eligible);
+                setTrialCheckLoading(false);
+                if (!eligible) return; // Don't proceed
+            }
+            setStep(3);
         }
     };
 
@@ -896,7 +909,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                     <h3 className="text-3xl font-bold mb-4 tracking-tight text-gray-900 dark:text-white">{trialT?.success_title || "Probestunde angefragt!"}</h3>
                     <p className="text-gray-500 text-lg mb-4 max-w-md">
                         {(trialT?.success_message || "Wir haben Ihre Anfrage erhalten und melden uns in Kürze bei")}{" "}
-                        <strong className="text-gray-900 dark:text-white">{trialEmail}</strong>.
+                        <strong className="text-gray-900 dark:text-white">{formData?.email}</strong>.
                     </p>
                     <p className="text-[#FF5C00] font-bold text-lg mb-12">
                         <CalendarDays size={18} className="inline mr-2" />
@@ -1024,149 +1037,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                     <div className="max-w-4xl mx-auto">
                         <AnimatePresence mode="wait">
 
-                            {/* TRIAL MODE: Single-page form */}
-                            {isTrialMode && trialCourse && (
-                                <motion.div
-                                    key="trial"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0 }}
-                                    className="space-y-10 py-4 max-w-2xl"
-                                >
-                                    {/* Selected Course (locked) */}
-                                    <div>
-                                        <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-4 block", monoClassName)}>
-                                            {formLabels?.course_selection || "Gewählter Kurs"}
-                                        </span>
-                                        <div className="bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border border-[#FF5C00] rounded-sm p-4 md:p-6">
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <span className="font-sans text-lg md:text-xl font-bold tracking-tight text-[#FF5C00]">
-                                                        {dictionary?.CourseData?.[trialCourse.translationKey]?.title || trialCourse.translationKey}
-                                                    </span>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        {dictionary?.CourseData?.[trialCourse.translationKey]?.level && (
-                                                            <span className="text-[10px] font-mono uppercase bg-white dark:bg-[#FF5C00] border border-black/10 dark:border-[#FF5C00] px-1.5 py-0.5 rounded text-gray-500 dark:text-white">
-                                                                {dictionary.CourseData[trialCourse.translationKey].level}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="text-right">
-                                                    <span className="font-sans font-extrabold text-2xl text-[#FF5C00]">
-                                                        {trialT?.price_label || "Kostenlos"}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Day Picker */}
-                                    <div>
-                                        <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-4 block", monoClassName)}>
-                                            <CalendarDays size={12} className="inline mr-1" />
-                                            {trialT?.select_day || "Tag für Ihre Probestunde wählen"}
-                                        </span>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            {trialDates.map(d => (
-                                                <button
-                                                    key={d.iso}
-                                                    type="button"
-                                                    onClick={() => setTrialDate(d.iso)}
-                                                    className={cn(
-                                                        "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
-                                                        trialDate === d.iso
-                                                            ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
-                                                            : "bg-[#F0EFE9] dark:bg-[#1A1C1E] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
-                                                    )}
-                                                >
-                                                    {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
-                                                    {d.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Personal Data (simplified) */}
-                                    <div>
-                                        <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-4 block", monoClassName)}>
-                                            {formLabels?.personal_data || "Persönliche Daten"}
-                                        </span>
-                                        <div className="space-y-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                <TerminalInput
-                                                    label={formLabels?.firstname || "Vorname"}
-                                                    required
-                                                    value={trialFirstName}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTrialFirstName(e.target.value)}
-                                                />
-                                                <TerminalInput
-                                                    label={formLabels?.lastname || "Nachname"}
-                                                    required
-                                                    value={trialLastName}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTrialLastName(e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="relative">
-                                                <TerminalInput
-                                                    label={formLabels?.email || "E-Mail"}
-                                                    type="email"
-                                                    required
-                                                    value={trialEmail}
-                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTrialEmail(e.target.value)}
-                                                    error={trialEligible === false ? (trialT?.already_used_title || "Probestunde bereits genutzt") : undefined}
-                                                />
-                                                {trialCheckLoading && (
-                                                    <Loader2 size={14} className="absolute right-0 top-6 animate-spin text-gray-400" />
-                                                )}
-                                            </div>
-                                            <PhoneInput
-                                                label={formLabels?.phone || "Telefon"}
-                                                value={trialPhone}
-                                                onChange={(val: string) => setTrialPhone(val)}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Eligibility Warning Banner */}
-                                    {trialEligible === false && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex gap-3"
-                                        >
-                                            <X size={18} className="text-red-500 shrink-0 mt-0.5" />
-                                            <div>
-                                                <p className="font-bold text-sm text-red-700 dark:text-red-400">
-                                                    {trialT?.already_used_title || "Probestunde bereits genutzt"}
-                                                </p>
-                                                <p className="text-xs text-red-600 dark:text-red-300 mt-1">
-                                                    {trialT?.already_used_message || "Sie haben bereits eine kostenlose Probestunde in Anspruch genommen. Melden Sie sich gerne direkt für einen unserer Kurse an!"}
-                                                </p>
-                                                <Link
-                                                    href={`/${lang}/registration?courseId=${trialCourse.id}`}
-                                                    className="text-[#FF5C00] text-xs font-bold uppercase tracking-wider mt-2 inline-block hover:underline"
-                                                >
-                                                    {wizard?.btn_continue || "Zur Kursanmeldung"} →
-                                                </Link>
-                                            </div>
-                                        </motion.div>
-                                    )}
-
-                                    {/* Privacy Consent for Trial */}
-                                    <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] p-6 border border-black/10 dark:border-white/10 rounded-sm">
-                                        <LegalCheckbox
-                                            id="trial-privacy"
-                                            label={t?.legal?.privacy || "Privacy Policy"}
-                                            checked={consents.privacy}
-                                            onChange={(v) => setConsents(prev => ({ ...prev, privacy: v }))}
-                                        />
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* STEP 1: SELECTION (only if NOT trial mode) */}
-                            {step === 1 && !isTrialMode && (
+                            {/* STEP 1: SELECTION */}
+                            {step === 1 && (
                                 <motion.div
                                     key="step1"
                                     initial={{ opacity: 1 }}
@@ -1356,11 +1228,47 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                             </div>
                                         </section>
                                     ))}
+
+                                    {/* === TRIAL DAY PICKER (only in trial mode, after course list) === */}
+                                    {isTrialMode && selectedCourseIds.length > 0 && (
+                                        <section className="mb-8 mt-4">
+                                            <div className="flex items-center gap-3 mb-6 opacity-80">
+                                                <CalendarDays size={14} className="text-[#FF5C00]" />
+                                                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF5C00]">
+                                                    {trialT?.select_day || "Tag für Ihre Probestunde wählen"}
+                                                </span>
+                                                <div className="h-px bg-[#FF5C00]/20 flex-1" />
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                {trialDates.map(d => (
+                                                    <button
+                                                        key={d.iso}
+                                                        type="button"
+                                                        onClick={() => setTrialDate(d.iso)}
+                                                        className={cn(
+                                                            "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
+                                                            trialDate === d.iso
+                                                                ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
+                                                                : "bg-[#F0EFE9] dark:bg-[#1A1C1E] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
+                                                        )}
+                                                    >
+                                                        {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
+                                                        {d.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {trialDates.length === 0 && selectedCourseIds.length > 0 && (
+                                                <p className="text-xs text-gray-500 font-mono italic mt-2">
+                                                    {trialT?.no_dates || "Keine verfügbaren Termine für diesen Kurs."}
+                                                </p>
+                                            )}
+                                        </section>
+                                    )}
                                 </motion.div>
                             )}
 
-                            {/* STEP 2: PERSONAL DATA (only if NOT trial mode) */}
-                            {step === 2 && !isTrialMode && (
+                            {/* STEP 2: PERSONAL DATA */}
+                            {step === 2 && (
                                 <motion.div
                                     key="step2"
                                     initial={{ opacity: 1 }}
@@ -1409,7 +1317,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
                             {/* STEP 3: SUMMARY */}
                             {/* --- SUMMARY (STEP 3) --- */}
-                            {step === 3 && !isTrialMode && (
+                            {step === 3 && (
                                 <motion.div
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -1542,11 +1450,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             )}
 
                             {/* Contact Summary */}
-                            {trialFirstName && (
+                            {formData?.firstName && (
                                 <div className="text-[10px] text-gray-500 font-mono uppercase space-y-1 pt-2 border-t border-white/5">
-                                    <div>{trialFirstName} {trialLastName}</div>
-                                    {trialEmail && <div className="text-gray-400">{trialEmail}</div>}
-                                    {trialPhone && <div>{trialPhone}</div>}
+                                    <div>{formData.firstName} {formData.lastName}</div>
+                                    {formData.email && <div className="text-gray-400">{formData.email}</div>}
+                                    {formData.phone && <div>{formData.phone}</div>}
                                 </div>
                             )}
                         </div>
@@ -1637,26 +1545,45 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                     {/* ACTION BUTTON */}
                     {isTrialMode ? (
                         <button
-                            onClick={onTrialSubmit}
-                            disabled={!trialDate || !trialFirstName || !trialLastName || !trialEmail || trialEligible === false || !consents.privacy || isSubmitting}
+                            onClick={step === 3 ? handleSubmit(onTrialSubmit) : handleNextStep}
+                            disabled={
+                                (step === 1 && (selectedCourseIds.length === 0 || !trialDate)) ||
+                                (step === 2 && (!isValid || trialCheckLoading)) ||
+                                (step === 3 && !isLegalValid) ||
+                                trialEligible === false ||
+                                isSubmitting
+                            }
                             className={cn(
                                 "w-full h-16 md:h-20 font-bold uppercase tracking-[0.2em] text-sm flex items-center justify-between px-6 md:px-8 transition-all duration-300 group hover:shadow-[0_0_30px_rgba(255,92,0,0.3)] z-10 relative",
-                                (!trialDate || !trialFirstName || !trialLastName || !trialEmail || trialEligible === false || !consents.privacy)
+                                (
+                                    (step === 1 && (selectedCourseIds.length === 0 || !trialDate)) ||
+                                    (step === 2 && !isValid) ||
+                                    (step === 3 && !isLegalValid) ||
+                                    trialEligible === false
+                                )
                                     ? "bg-gray-700 text-gray-500 cursor-not-allowed"
                                     : "bg-[#FF5C00] text-white hover:bg-[#FF7A33]"
                             )}
                         >
                             <span className="flex flex-col items-start gap-1">
                                 <span className="text-[10px] opacity-70 font-mono normal-case tracking-normal">
-                                    {trialT?.badge || "PROBESTUNDE"}
+                                    {step === 1 ? wizard?.btn_next : step === 2 ? wizard?.btn_almost : (trialT?.badge || "PROBESTUNDE")}
                                 </span>
                                 <span>
-                                    {isSubmitting ? <Loader2 className="animate-spin" /> : (trialT?.submit_button || "Probestunde anfragen")}
+                                    {step === 1 && wizard?.btn_continue}
+                                    {step === 2 && (trialCheckLoading ? <Loader2 className="animate-spin" /> : wizard?.btn_overview)}
+                                    {step === 3 && (isSubmitting ? <Loader2 className="animate-spin" /> : (trialT?.submit_button || "Probestunde anfragen"))}
                                 </span>
                             </span>
-                            <Gift className={cn("transition-transform duration-300",
-                                (!trialDate || !trialFirstName || !trialLastName || !trialEmail || trialEligible === false || !consents.privacy) ? "opacity-20" : "group-hover:translate-x-2"
-                            )} />
+                            {step === 3 ? (
+                                <Gift className={cn("transition-transform duration-300",
+                                    !isLegalValid || trialEligible === false ? "opacity-20" : "group-hover:translate-x-2"
+                                )} />
+                            ) : (
+                                <ArrowRight className={cn("transition-transform duration-300",
+                                    (step === 1 && (selectedCourseIds.length === 0 || !trialDate)) || (step === 2 && !isValid) ? "opacity-20" : "group-hover:translate-x-2"
+                                )} />
+                            )}
                         </button>
                     ) : (
                         <button

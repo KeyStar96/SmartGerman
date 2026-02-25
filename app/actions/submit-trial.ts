@@ -15,6 +15,10 @@ interface TrialFormData {
     lastName: string;
     email: string;
     phone?: string;
+    birthDate?: string;
+    street?: string;
+    zip?: string;
+    city?: string;
     courseId: string;
     trialDate: string; // ISO date string YYYY-MM-DD
 }
@@ -41,11 +45,13 @@ export async function submitTrialLesson(data: TrialFormData): Promise<SubmitTria
     const supabase = createAdminClient();
 
     try {
-        // 1. Check if email already has a trial (server-side double-check)
+        // 1. Check if person already has a trial (first_name + last_name + email)
         const { data: existing, error: checkError } = await supabase
             .from('trial_lessons')
             .select('id')
-            .ilike('email', data.email.trim().toLowerCase())
+            .ilike('email', data.email.trim())
+            .ilike('first_name', data.firstName.trim())
+            .ilike('last_name', data.lastName.trim())
             .limit(1);
 
         if (checkError) {
@@ -65,13 +71,17 @@ export async function submitTrialLesson(data: TrialFormData): Promise<SubmitTria
                 first_name: data.firstName.trim(),
                 last_name: data.lastName.trim(),
                 phone: data.phone?.trim() || null,
+                birth_date: data.birthDate || null,
+                street: data.street?.trim() || null,
+                zip: data.zip?.trim() || null,
+                city: data.city?.trim() || null,
                 course_id: data.courseId,
                 trial_date: data.trialDate,
                 status: 'pending',
             });
 
         if (insertError) {
-            // Unique constraint violation = email already used
+            // Unique constraint violation = person already used trial
             if (insertError.code === '23505') {
                 return { success: false, message: 'trial_already_used' };
             }
