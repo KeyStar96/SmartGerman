@@ -534,7 +534,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             5: daysDict?.fr || "Fr",
             6: daysDict?.sa || "Sa",
         };
-        for (let i = 1; i <= 28; i++) {
+        for (let i = 1; i <= 60; i++) { // Look ahead up to 60 days
             const d = new Date(today);
             d.setDate(d.getDate() + i);
             if (sessionDays.includes(d.getDay())) {
@@ -542,6 +542,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 const dayName = dayNames[d.getDay()];
                 const label = `${dayName}, ${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
                 dates.push({ date: d, label, iso });
+                if (dates.length >= 8) break; // Only show next 8 sessions
             }
         }
         return dates;
@@ -1213,7 +1214,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="col-span-1 lg:col-span-2 bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full justify-center">
+                                            <div className="col-span-1 lg:col-span-2 bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
                                                 {/* Header */}
                                                 <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-6", monoClassName)}>
                                                     {trialT?.select_day || "Tag für Ihre Probestunde wählen"}
@@ -1229,28 +1230,30 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                         </p>
                                                     </div>
                                                 ) : (
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                                                        {trialDates.map(d => (
-                                                            <button
-                                                                key={d.iso}
-                                                                type="button"
-                                                                onClick={() => setTrialDate(d.iso)}
-                                                                className={cn(
-                                                                    "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
-                                                                    trialDate === d.iso
-                                                                        ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
-                                                                        : "bg-white dark:bg-[#202225] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
-                                                                )}
-                                                            >
-                                                                {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
-                                                                {d.label}
-                                                            </button>
-                                                        ))}
-                                                        {trialDates.length === 0 && (
-                                                            <p className="text-xs text-gray-500 font-mono italic mt-2 col-span-full">
-                                                                {trialT?.no_dates || "Keine verfügbaren Termine für diesen Kurs."}
-                                                            </p>
-                                                        )}
+                                                    <div className="flex-1 flex flex-col justify-center">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                                            {trialDates.map(d => (
+                                                                <button
+                                                                    key={d.iso}
+                                                                    type="button"
+                                                                    onClick={() => setTrialDate(d.iso)}
+                                                                    className={cn(
+                                                                        "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
+                                                                        trialDate === d.iso
+                                                                            ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
+                                                                            : "bg-white dark:bg-[#202225] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
+                                                                    )}
+                                                                >
+                                                                    {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
+                                                                    {d.label}
+                                                                </button>
+                                                            ))}
+                                                            {trialDates.length === 0 && (
+                                                                <p className="text-xs text-gray-500 font-mono italic mt-2 col-span-full">
+                                                                    {trialT?.no_dates || "Keine verfügbaren Termine für diesen Kurs."}
+                                                                </p>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
