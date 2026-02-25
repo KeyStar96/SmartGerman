@@ -646,7 +646,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         // The Monthly Total is calculated separately in `totalMonthlyPrice`.
         return {
             title: dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
-            priceFormatted: new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
+            priceFormatted: isTrialMode ? (trialT?.price_label || "Kostenlos") : new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
             level: dictionary?.CourseData?.[c.translationKey]?.level,
             dictionary // Pass dictionary down
         };
@@ -1049,165 +1049,212 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     {/* === CONTROL DECK: Top Fixed Container === */}
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto lg:h-[294px] mb-8 relative z-30">
 
-                                        {/* LEFT BOX: Startdatum (Date Selection) */}
-                                        <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
-                                            {/* Header */}
-                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
-                                                {t?.start_date_label || "STARTDATUM"}
-                                            </span>
+                                        {!isTrialMode ? (
+                                            <>
+                                                {/* LEFT BOX: Startdatum (Date Selection) */}
+                                                <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
+                                                    {/* Header */}
+                                                    <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
+                                                        {t?.start_date_label || "STARTDATUM"}
+                                                    </span>
 
-                                            {/* Input Area - Centered */}
-                                            <div className="flex-1 flex items-center justify-center">
-                                                {(() => {
-                                                    const now = serverTime ? new Date(serverTime) : new Date();
-                                                    const minDate = new Date(now);
-                                                    minDate.setDate(minDate.getDate() + 1);
-                                                    minDate.setHours(0, 0, 0, 0);
-                                                    const maxDate = new Date(now);
-                                                    maxDate.setMonth(maxDate.getMonth() + 3);
-                                                    maxDate.setHours(23, 59, 59, 999);
+                                                    {/* Input Area - Centered */}
+                                                    <div className="flex-1 flex items-center justify-center">
+                                                        {(() => {
+                                                            const now = serverTime ? new Date(serverTime) : new Date();
+                                                            const minDate = new Date(now);
+                                                            minDate.setDate(minDate.getDate() + 1);
+                                                            minDate.setHours(0, 0, 0, 0);
+                                                            const maxDate = new Date(now);
+                                                            maxDate.setMonth(maxDate.getMonth() + 3);
+                                                            maxDate.setHours(23, 59, 59, 999);
 
-                                                    return (
-                                                        <DateDropdowns
-                                                            label=""
-                                                            value={startDate}
-                                                            minDate={minDate}
-                                                            maxDate={maxDate}
-                                                            onChange={(val: string) => {
-                                                                const [d, m, y] = val.split('.').map(Number);
-                                                                if (d && m && y) {
-                                                                    const selected = new Date(y, m - 1, d);
-                                                                    if (selected < minDate) {
-                                                                        const dStr = String(minDate.getDate()).padStart(2, '0');
-                                                                        const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
-                                                                        setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
-                                                                        return;
-                                                                    }
-                                                                    if (selected > maxDate) {
-                                                                        const dStr = String(maxDate.getDate()).padStart(2, '0');
-                                                                        const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
-                                                                        setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
-                                                                        return;
-                                                                    }
-                                                                }
-                                                                setStartDate(val);
-                                                            }}
-                                                            futureYears={true}
-                                                            referenceDate={now}
-                                                        />
-                                                    );
-                                                })()}
-                                            </div>
-                                        </div>
+                                                            return (
+                                                                <DateDropdowns
+                                                                    label=""
+                                                                    value={startDate}
+                                                                    minDate={minDate}
+                                                                    maxDate={maxDate}
+                                                                    onChange={(val: string) => {
+                                                                        const [d, m, y] = val.split('.').map(Number);
+                                                                        if (d && m && y) {
+                                                                            const selected = new Date(y, m - 1, d);
+                                                                            if (selected < minDate) {
+                                                                                const dStr = String(minDate.getDate()).padStart(2, '0');
+                                                                                const mStr = String(minDate.getMonth() + 1).padStart(2, '0');
+                                                                                setStartDate(`${dStr}.${mStr}.${minDate.getFullYear()}`);
+                                                                                return;
+                                                                            }
+                                                                            if (selected > maxDate) {
+                                                                                const dStr = String(maxDate.getDate()).padStart(2, '0');
+                                                                                const mStr = String(maxDate.getMonth() + 1).padStart(2, '0');
+                                                                                setStartDate(`${dStr}.${mStr}.${maxDate.getFullYear()}`);
+                                                                                return;
+                                                                            }
+                                                                        }
+                                                                        setStartDate(val);
+                                                                    }}
+                                                                    futureYears={true}
+                                                                    referenceDate={now}
+                                                                />
+                                                            );
+                                                        })()}
+                                                    </div>
+                                                </div>
 
-                                        {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
-                                        <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full min-h-[294px]">
-                                            {/* Header */}
-                                            <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
-                                                {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
-                                            </span>
+                                                {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
+                                                <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full min-h-[294px]">
+                                                    {/* Header */}
+                                                    <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
+                                                        {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
+                                                    </span>
 
-                                            {/* Content Area */}
-                                            <AnimatePresence mode="wait">
-                                                {selectedCoursesFull.length === 0 ? (
-                                                    /* Empty State - Centered Placeholder */
-                                                    <motion.div
-                                                        key="empty"
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        exit={{ opacity: 0 }}
-                                                        className="flex-1 flex flex-col items-center justify-center text-center"
+                                                    {/* Content Area */}
+                                                    <AnimatePresence mode="wait">
+                                                        {selectedCoursesFull.length === 0 ? (
+                                                            /* Empty State - Centered Placeholder */
+                                                            <motion.div
+                                                                key="empty"
+                                                                initial={{ opacity: 0 }}
+                                                                animate={{ opacity: 1 }}
+                                                                exit={{ opacity: 0 }}
+                                                                className="flex-1 flex flex-col items-center justify-center text-center"
+                                                            >
+                                                                <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+                                                                    <Monitor size={32} className="text-gray-300 dark:text-gray-600" />
+                                                                </div>
+                                                                <p className={cn("text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium max-w-[200px]", monoClassName)}>
+                                                                    {formLabels?.select_course_hint || "Wählen Sie unten einen Kurs, um Details zu sehen"}
+                                                                </p>
+                                                            </motion.div>
+                                                        ) : (
+                                                            /* Active State - PricingRoadmap */
+                                                            <motion.div
+                                                                key="content"
+                                                                initial={{ opacity: 0 }}
+                                                                animate={{ opacity: 1 }}
+                                                                exit={{ opacity: 0 }}
+                                                                className="flex-1 w-full flex flex-col justify-center"
+                                                            >
+                                                                <PricingRoadmap
+                                                                    dictionary={dictionary}
+                                                                    lang={lang}
+                                                                    startDate={startDate}
+                                                                    selectedCourses={selectedCoursesFull}
+                                                                    currentMonthPrice={totalMonthlyPrice}
+                                                                    exceptions={exceptions}
+                                                                />
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+
+                                                    {/* Footer Link - Anchored to bottom */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPaymentInfo(prev => !prev)}
+                                                        className="mt-auto text-xs text-black/40 dark:text-white/40 underline decoration-dotted hover:text-[#FF5C00] transition-colors text-left"
                                                     >
+                                                        {t?.pricing_roadmap?.how_payment_works || "Wie funktioniert die Bezahlung?"}
+                                                    </button>
+
+                                                    {/* Payment Info Floating Glass Card Popover */}
+                                                    <AnimatePresence>
+                                                        {showPaymentInfo && (
+                                                            <>
+                                                                {/* Invisible Overlay to close on click outside */}
+                                                                <div
+                                                                    className="fixed inset-0 z-40"
+                                                                    onClick={() => setShowPaymentInfo(false)}
+                                                                />
+
+                                                                {/* Floating Glass Card */}
+                                                                <motion.div
+                                                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                                    exit={{ opacity: 0, scale: 0.95 }}
+                                                                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                                                    className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white/90 dark:bg-[#1A1C1E]/90 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)]"
+                                                                >
+                                                                    {/* Content Layout */}
+                                                                    <div className="flex gap-4">
+                                                                        {/* Trust Icon */}
+                                                                        <div className="shrink-0 mt-0.5">
+                                                                            <CheckCircle2 size={20} className="text-[#FF5C00]" />
+                                                                        </div>
+
+                                                                        {/* Text Block */}
+                                                                        <div className="flex flex-col gap-2">
+                                                                            {/* Headline */}
+                                                                            <h4 className="text-sm font-bold text-gray-900 dark:text-white">
+                                                                                {t?.pricing_roadmap?.payment_popover_title || "Keine Knebelverträge"}
+                                                                            </h4>
+
+                                                                            {/* Bullet Points */}
+                                                                            <ul className="space-y-1.5">
+                                                                                <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
+                                                                                    <span className="text-[#FF5C00] mt-0.5">•</span>
+                                                                                    <span>{t?.pricing_roadmap?.payment_point_1 || "Sie zahlen heute nur den ersten Monat."}</span>
+                                                                                </li>
+                                                                                <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
+                                                                                    <span className="text-[#FF5C00] mt-0.5">•</span>
+                                                                                    <span>{t?.pricing_roadmap?.payment_point_2 || "Danach entscheiden Sie flexibel weiter."}</span>
+                                                                                </li>
+                                                                                <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
+                                                                                    <span className="text-[#FF5C00] mt-0.5">•</span>
+                                                                                    <span>{t?.pricing_roadmap?.payment_point_3 || "Kündbar bis zum 25. des Monats."}</span>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </motion.div>
+                                                            </>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="col-span-1 lg:col-span-2 bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full justify-center">
+                                                {/* Header */}
+                                                <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-6", monoClassName)}>
+                                                    {trialT?.select_day || "Tag für Ihre Probestunde wählen"}
+                                                </span>
+
+                                                {selectedCourseIds.length === 0 ? (
+                                                    <div className="flex-1 flex flex-col items-center justify-center text-center">
                                                         <div className="w-16 h-16 mb-4 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center">
-                                                            <Monitor size={32} className="text-gray-300 dark:text-gray-600" />
+                                                            <CalendarDays size={32} className="text-gray-300 dark:text-gray-600" />
                                                         </div>
                                                         <p className={cn("text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium max-w-[200px]", monoClassName)}>
                                                             {formLabels?.select_course_hint || "Wählen Sie unten einen Kurs, um Details zu sehen"}
                                                         </p>
-                                                    </motion.div>
+                                                    </div>
                                                 ) : (
-                                                    /* Active State - PricingRoadmap */
-                                                    <motion.div
-                                                        key="content"
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        exit={{ opacity: 0 }}
-                                                        className="flex-1 w-full flex flex-col justify-center"
-                                                    >
-                                                        <PricingRoadmap
-                                                            dictionary={dictionary}
-                                                            lang={lang}
-                                                            startDate={startDate}
-                                                            selectedCourses={selectedCoursesFull}
-                                                            currentMonthPrice={totalMonthlyPrice}
-                                                            exceptions={exceptions}
-                                                        />
-                                                    </motion.div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                                        {trialDates.map(d => (
+                                                            <button
+                                                                key={d.iso}
+                                                                type="button"
+                                                                onClick={() => setTrialDate(d.iso)}
+                                                                className={cn(
+                                                                    "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
+                                                                    trialDate === d.iso
+                                                                        ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
+                                                                        : "bg-white dark:bg-[#202225] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
+                                                                )}
+                                                            >
+                                                                {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
+                                                                {d.label}
+                                                            </button>
+                                                        ))}
+                                                        {trialDates.length === 0 && (
+                                                            <p className="text-xs text-gray-500 font-mono italic mt-2 col-span-full">
+                                                                {trialT?.no_dates || "Keine verfügbaren Termine für diesen Kurs."}
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 )}
-                                            </AnimatePresence>
-
-                                            {/* Footer Link - Anchored to bottom */}
-                                            <button
-                                                onClick={() => setShowPaymentInfo(prev => !prev)}
-                                                className="mt-auto text-xs text-black/40 dark:text-white/40 underline decoration-dotted hover:text-[#FF5C00] transition-colors text-left"
-                                            >
-                                                {t?.pricing_roadmap?.how_payment_works || "Wie funktioniert die Bezahlung?"}
-                                            </button>
-
-                                            {/* Payment Info Floating Glass Card Popover */}
-                                            <AnimatePresence>
-                                                {showPaymentInfo && (
-                                                    <>
-                                                        {/* Invisible Overlay to close on click outside */}
-                                                        <div
-                                                            className="fixed inset-0 z-40"
-                                                            onClick={() => setShowPaymentInfo(false)}
-                                                        />
-
-                                                        {/* Floating Glass Card */}
-                                                        <motion.div
-                                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                            exit={{ opacity: 0, scale: 0.95 }}
-                                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                                                            className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white/90 dark:bg-[#1A1C1E]/90 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)]"
-                                                        >
-                                                            {/* Content Layout */}
-                                                            <div className="flex gap-4">
-                                                                {/* Trust Icon */}
-                                                                <div className="shrink-0 mt-0.5">
-                                                                    <CheckCircle2 size={20} className="text-[#FF5C00]" />
-                                                                </div>
-
-                                                                {/* Text Block */}
-                                                                <div className="flex flex-col gap-2">
-                                                                    {/* Headline */}
-                                                                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                                                                        {t?.pricing_roadmap?.payment_popover_title || "Keine Knebelverträge"}
-                                                                    </h4>
-
-                                                                    {/* Bullet Points */}
-                                                                    <ul className="space-y-1.5">
-                                                                        <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
-                                                                            <span className="text-[#FF5C00] mt-0.5">•</span>
-                                                                            <span>{t?.pricing_roadmap?.payment_point_1 || "Sie zahlen heute nur den ersten Monat."}</span>
-                                                                        </li>
-                                                                        <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
-                                                                            <span className="text-[#FF5C00] mt-0.5">•</span>
-                                                                            <span>{t?.pricing_roadmap?.payment_point_2 || "Danach entscheiden Sie flexibel weiter."}</span>
-                                                                        </li>
-                                                                        <li className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2">
-                                                                            <span className="text-[#FF5C00] mt-0.5">•</span>
-                                                                            <span>{t?.pricing_roadmap?.payment_point_3 || "Kündbar bis zum 25. des Monats."}</span>
-                                                                        </li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </motion.div>
-                                                    </>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* === COURSE LIST (Full Width Below Control Deck) === */}
@@ -1229,41 +1276,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </section>
                                     ))}
 
-                                    {/* === TRIAL DAY PICKER (only in trial mode, after course list) === */}
-                                    {isTrialMode && selectedCourseIds.length > 0 && (
-                                        <section className="mb-8 mt-4">
-                                            <div className="flex items-center gap-3 mb-6 opacity-80">
-                                                <CalendarDays size={14} className="text-[#FF5C00]" />
-                                                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF5C00]">
-                                                    {trialT?.select_day || "Tag für Ihre Probestunde wählen"}
-                                                </span>
-                                                <div className="h-px bg-[#FF5C00]/20 flex-1" />
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                {trialDates.map(d => (
-                                                    <button
-                                                        key={d.iso}
-                                                        type="button"
-                                                        onClick={() => setTrialDate(d.iso)}
-                                                        className={cn(
-                                                            "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
-                                                            trialDate === d.iso
-                                                                ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
-                                                                : "bg-[#F0EFE9] dark:bg-[#1A1C1E] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
-                                                        )}
-                                                    >
-                                                        {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
-                                                        {d.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            {trialDates.length === 0 && selectedCourseIds.length > 0 && (
-                                                <p className="text-xs text-gray-500 font-mono italic mt-2">
-                                                    {trialT?.no_dates || "Keine verfügbaren Termine für diesen Kurs."}
-                                                </p>
-                                            )}
-                                        </section>
-                                    )}
+
                                 </motion.div>
                             )}
 
