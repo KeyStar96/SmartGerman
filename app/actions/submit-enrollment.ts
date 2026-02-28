@@ -20,6 +20,7 @@ export async function submitEnrollment(
         privacy: boolean;
         agb: boolean;
         revocation: boolean;
+        videoRecording?: boolean;
     },
     coursePrices: Record<string, number> // Map of courseId -> price
 ): Promise<SubmitEnrollmentResult> {
@@ -137,6 +138,7 @@ export async function submitEnrollment(
                 privacy_accepted: consents.privacy,
                 agb_accepted: consents.agb,
                 revocation_waiver_accepted: consents.revocation,
+                video_recording_accepted: consents.videoRecording ?? null,
                 status: 'pending',
 
                 // NEW: Save selected courses here instead of creating enrollments immediately

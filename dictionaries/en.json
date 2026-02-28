@@ -736,7 +736,8 @@
     "legal": {
       "privacy": "I agree that my data will be stored and used to process my request in accordance with the Privacy Policy. The data is stored with our EU service provider Supabase (Frankfurt).*",
       "agb": "I have read and accept the General Terms and Conditions (AGB).*",
-      "revocation": "I expressly request and agree that you begin the execution of the service (start of the course) before the end of the withdrawal period. I am aware that I lose my right of withdrawal upon complete performance of the contract and that I must pay compensation for the services already rendered if I withdraw after the course has started.*"
+      "revocation": "I expressly request and agree that you begin the execution of the service (start of the course) before the end of the withdrawal period. I am aware that I lose my right of withdrawal upon complete performance of the contract and that I must pay compensation for the services already rendered if I withdraw after the course has started.*",
+      "video_recording": "I consent to the recording of online sessions via Microsoft Teams (audio and video) exclusively for internal teaching purposes.*"
     },
     "pricing_roadmap": {
       "due_today": "Invoice Amount",

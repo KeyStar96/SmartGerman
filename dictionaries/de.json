@@ -738,7 +738,8 @@
     "legal": {
       "privacy": "Ich stimme zu, dass meine Daten gemäß der Datenschutzerklärung zur Bearbeitung meiner Anfrage gespeichert und verwendet werden. Die Daten werden bei unserem EU-Dienstleister Supabase (Frankfurt) gespeichert.*",
       "agb": "Ich habe die AGB gelesen und akzeptiere diese.*",
-      "revocation": "Ich verlange ausdrücklich und stimme zu, dass Sie mit der Ausführung der Dienstleistung (Kursbeginn) vor Ablauf der Widerrufsfrist beginnen. Mir ist bekannt, dass ich bei vollständiger Vertragserfüllung mein Widerrufsrecht verliere und bei einem Widerruf nach Kursbeginn Wertersatz für die bereits erbrachten Leistungen zahlen muss.*"
+      "revocation": "Ich verlange ausdrücklich und stimme zu, dass Sie mit der Ausführung der Dienstleistung (Kursbeginn) vor Ablauf der Widerrufsfrist beginnen. Mir ist bekannt, dass ich bei vollständiger Vertragserfüllung mein Widerrufsrecht verliere und bei einem Widerruf nach Kursbeginn Wertersatz für die bereits erbrachten Leistungen zahlen muss.*",
+      "video_recording": "Ich willige in die Aufzeichnung der Online-Sitzungen via Microsoft Teams (Audio und Video) ausschließlich zu internen Lehrzwecken ein.*"
     },
     "pricing_roadmap": {
       "due_today": "Rechnungsbetrag",

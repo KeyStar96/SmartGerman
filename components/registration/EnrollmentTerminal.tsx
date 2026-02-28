@@ -773,10 +773,14 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [consents, setConsents] = useState({
         privacy: false,
         agb: false,
-        revocation: false
+        revocation: false,
+        videoRecording: false
     });
 
-    const isLegalValid = consents.privacy && consents.agb && consents.revocation;
+    // Determine if any selected course is an online course
+    const hasOnlineCourse = selectedCoursesFull.some(c => c.type === 'online');
+
+    const isLegalValid = consents.privacy && consents.agb && consents.revocation && (!hasOnlineCourse || consents.videoRecording);
 
     // --- DARK MODE LOGIC ---
     const [isDarkMode, setIsDarkMode] = useState(false); // Default to light until mounted check
@@ -838,6 +842,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                 city: data.personal.city || undefined,
                 courseId: courseId,
                 trialDate: trialDate,
+                videoRecordingAccepted: hasOnlineCourse ? consents.videoRecording : undefined,
             });
 
             if (result.success) {
@@ -1412,6 +1417,14 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 checked={consents.revocation}
                                                 onChange={(v) => setConsents(prev => ({ ...prev, revocation: v }))}
                                             />
+                                            {hasOnlineCourse && (
+                                                <LegalCheckbox
+                                                    id="videoRecording"
+                                                    label={t?.legal?.video_recording || "I consent to the recording of online sessions via Microsoft Teams (audio and video) exclusively for internal teaching purposes.*"}
+                                                    checked={consents.videoRecording}
+                                                    onChange={(v) => setConsents(prev => ({ ...prev, videoRecording: v }))}
+                                                />
+                                            )}
                                         </div>
                                         <p className="text-xs md:text-sm font-medium text-gray-400 dark:text-gray-400 text-right mt-6">
                                             {formLabels?.required_hint}

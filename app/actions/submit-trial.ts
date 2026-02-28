@@ -21,6 +21,7 @@ interface TrialFormData {
     city?: string;
     courseId: string;
     trialDate: string; // ISO date string YYYY-MM-DD
+    videoRecordingAccepted?: boolean;
 }
 
 export async function submitTrialLesson(data: TrialFormData): Promise<SubmitTrialResult> {
@@ -77,6 +78,7 @@ export async function submitTrialLesson(data: TrialFormData): Promise<SubmitTria
                 city: data.city?.trim() || null,
                 course_id: data.courseId,
                 trial_date: data.trialDate,
+                video_recording_accepted: data.videoRecordingAccepted ?? null,
                 status: 'pending',
             });
 

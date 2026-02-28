@@ -175,7 +175,7 @@ describe("Database Integration Tests (Mocked)", () => {
                 ["c_1", "c_2"],
                 "01.01.2026", // Valid date
                 500,
-                { privacy: true, agb: true, revocation: true },
+                { privacy: true, agb: true, revocation: true, videoRecording: true },
                 { "c_1": 250, "c_2": 250 } // Course prices
             );
 
@@ -222,7 +222,7 @@ describe("Database Integration Tests (Mocked)", () => {
                 ["c_1"],
                 "01.01.2026",
                 100,
-                { privacy: true, agb: true, revocation: true },
+                { privacy: true, agb: true, revocation: true, videoRecording: true },
                 { "c_1": 100 }
             );
 
@@ -258,7 +258,7 @@ describe("Database Integration Tests (Mocked)", () => {
                 ["c_1"],
                 "01.01.2026",
                 100,
-                { privacy: true, agb: true, revocation: true },
+                { privacy: true, agb: true, revocation: true, videoRecording: true },
                 { "c_1": 100 }
             );
 
@@ -283,7 +283,7 @@ describe("Database Integration Tests (Mocked)", () => {
                 ["c_1"],
                 "01.01.2026",
                 100,
-                { privacy: true, agb: true, revocation: true },
+                { privacy: true, agb: true, revocation: true, videoRecording: true },
                 { "c_1": 100 }
             );
 
