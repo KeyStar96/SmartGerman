@@ -34,10 +34,11 @@ export function middleware(request: NextRequest) {
     (locale) => !pathname.startsWith(`${locale}/`) && pathname !== locale
   )
 
-  // Falls die Sprache im Pfad fehlt, leiten wir auf /de weiter
+  // Falls die Sprache im Pfad fehlt, leiten wir auf /de weiter (301 = permanent)
   if (pathnameIsMissingLocale) {
     return NextResponse.redirect(
-      new URL(`/de${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url)
+      new URL(`/de${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url),
+      { status: 301 }
     )
   }
 }
