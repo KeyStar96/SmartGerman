@@ -7,11 +7,15 @@ export interface CourseSession {
     day: Day;
     startTime: string; // HH:MM
     endTime: string; // HH:MM
+    isAlternating?: boolean;
+    altStartTime?: string; // HH:MM
+    altEndTime?: string; // HH:MM
 }
 
 export interface CourseConfig {
     id: string;
     translationKey: string;
+    title?: string;
     type: CourseType;
     price: number;
     highlight?: boolean;

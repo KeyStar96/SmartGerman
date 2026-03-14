@@ -393,7 +393,9 @@
       "di": "Sal",
       "mi": "Çar",
       "do": "Per",
-      "fr": "Cum"
+      "fr": "Cum",
+      "sa": "Cmt",
+      "so": "Paz"
     },
     "course_types": {
       "presence": "Yüz Yüze",
@@ -411,6 +413,7 @@
       "time": "Saat",
       "course": "Ders",
       "room": "Oda",
+      "alternating": "dönüşümlü",
       "no_courses_scheduled": "Planlanmış kurs yok"
     }
   },
@@ -811,7 +814,8 @@
         "content": [
           "(1) Sözleşmenin konusu, ilgili kurs açıklamasında belirtilen hizmetlerdir (hizmet kapsamı, kurs süresi, tarihler, öğretim materyalleri). Kurs açıklaması, sözleşmenin ayrılmaz bir parçasıdır.",
           "(2) Kursun genel karakteri önemli ölçüde bozulmadığı sürece, kursun akışında, eğitmenlerde veya ders saatlerinde küçük değişiklikler yapılmasına izin verilir.",
-          "(3) Online dersler, yaygın video konferans yazılımları (örneğin, Microsoft Teams) üzerinden gerçekleştirilir. Katılımcı, uygun bir internet bağlantısı ve teknik donanımdan sorumludur."
+          "(3) Online dersler, yaygın video konferans yazılımları (örneğin, Microsoft Teams) üzerinden gerçekleştirilir. Katılımcı, uygun bir internet bağlantısı ve teknik donanımdan sorumludur.",
+          "(4) Kalite güvencesi ve katılımcılar tarafından tekrar amacıyla çevrimiçi oturumlar kaydedilir. Bu kayıtların kullanımına ilişkin ayrıntılar bu GİK'in § 9'unda düzenlenmiştir."
         ]
       },
       {
@@ -881,9 +885,11 @@
         ]
       },
       {
-        "title": "§ 9 Telif Hakkı / Kurs Materyalleri",
+        "title": "§ 9 Telif Hakkı ve Video Kayıtları",
         "content": [
-          "Kurs materyalleri telif hakkıyla korunmaktadır ve yalnızca kişisel kullanım içindir. Dil Okulu'nun açık yazılı izni olmaksızın devredilmesi, çoğaltılması veya yayınlanması yasaktır."
+          "(1) Kurs materyalleri telif hakkıyla korunmaktadır ve yalnızca kişisel kullanım içindir. Dil Okulu'nun açık yazılı izni olmaksızın devredilmesi, çoğaltılması veya yayınlanması yasaktır.",
+          "(2) Çevrimiçi kurslar kapsamında oluşturulan video ve ses kayıtları da telif hakkıyla korunmaktadır. Telif hakları münhasıran Dil Okulu'na aittir. Kayıtlar, ilgili kursun katılımcılarına öğrenme amacıyla sınırlı bir süre için sunulur.",
+          "(3) Kayıtların, erişim bilgilerinin paylaşılması veya katılımcı tarafından kamuya açık gösterimi (örn. sosyal medyada) kesinlikle yasaktır ve kurstan çıkarmaya yol açabilir. Katılımcının hatasız bir kayıt veya kalıcı erişilebilirlik talep etme hakkı yoktur."
         ]
       },
       {
@@ -1138,15 +1144,25 @@
         ]
       },
       {
-        "title": "9. Video Konferans Araçları (Microsoft Teams)",
+        "title": "9. Video Konferans Araçları ve Ders Kayıtları (Microsoft Teams)",
         "content": [
-          "Çevrimiçi kurslarımızın uygulanması için üçüncü taraf sağlayıcıların hizmetlerini kullanıyoruz. Microsoft Teams kullanımına GTC'mizde (AGB) işaret ettik.",
-          "Sağlayıcı: Microsoft Teams: Microsoft Corporation, One Microsoft Way, Redmond, WA 98052-6399, ABD.",
-          "Bu araçları kullanırken çeşitli veriler işlenir (örneğin toplantı meta verileri, ses ve video verileri, metin girişleri). Microsoft ile veri işleme sözleşmeleri (AVV) veya ilgili Veri İşleme Ekleri (DPA) imzaladık.",
-          "Yasal dayanak: Bu araçların kurs hizmetimizin sağlanması için kullanımı DSGVO Madde 6 Fıkra 1 bent b'ye (sözleşmenin ifası) dayanmaktadır.",
-          "Üçüncü ülkelere veri aktarımı (ABD): Microsoft Teams kullanılırken ABD'de veri işleme gerçekleşebilir. Aktarım, Temmuz 2023'ten bu yana bir yeterlilik kararı olarak kabul edilen EU-US Data Privacy Framework'e (DPF) dayanmaktadır. Microsoft DPF sertifikalıdır. Ayrıca, Microsoft ile Standart Sözleşme Maddeleri (SCC'ler) imzaladık. Lütfen dikkat: ABD'de AB'den daha düşük bir veri koruma düzeyi vardır ve ABD makamları belirli durumlarda verilere erişebilir (örneğin FISA 702). DPF şu anda yasal olarak itiraz edilmektedir.",
-          "Saklama süresi: Ses ve video verileri tarafımızca kaydedilmez veya saklanmaz. Microsoft verileri yalnızca canlı aktarım sırasında işler. Toplantı meta verileri, saklama politikalarına uygun olarak Microsoft tarafından saklanır.",
-          "Daha fazla bilgi sağlayıcıların gizlilik politikalarında bulunabilir: Microsoft: https://privacy.microsoft.com/de-de/privacystatement"
+          "Çevrimiçi kurslarımızın yürütülmesi için Microsoft Teams kullanıyoruz.",
+          "Sağlayıcı: Microsoft Ireland Operations Limited, One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, İrlanda (ana şirket: Microsoft Corporation, ABD).",
+          "9.1 İşlemenin Türü ve Amacı",
+          "Microsoft Teams kullanılırken çeşitli veri türleri işlenir. Verilerin kapsamı, çevrimiçi bir oturuma katılmadan önce veya katılım sırasında hangi bilgileri sağladığınıza da bağlıdır.",
+          "İşlenen veriler: Toplantı meta verileri (örn. tarih, saat, toplantı kimliği), ses ve video verileri (sesiniz ve görüntünüz), metin girişleri (sohbet işlevi) ve ders oturumlarının video kayıtları.",
+          "Kaydın amacı: Kayıtlar, yalnızca ilgili kursun katılımcılarına öğrenme içeriklerini tekrarlama ve pekiştirme amacıyla hizmet eder.",
+          "9.2 Yasal Dayanak",
+          "Microsoft Teams'in genel ders yürütümü için kullanımı DSGVO Madde 6 Fıkra 1 bent b'ye (sözleşmenin ifası) dayanmaktadır.",
+          "Oturumların video kaydı, yalnızca kurs kaydı sırasında zorunlu bir onay kutusu aracılığıyla verdiğiniz DSGVO Madde 6 Fıkra 1 bent a uyarınca açık rızanıza dayanmaktadır.",
+          "9.3 Saklama Süresi ve Erişim",
+          "Video kayıtları korumalı bir ortamda (örn. Microsoft'un parola korumalı bulut depolaması) saklanır. Erişim, yalnızca eğitmenle ve aynı kursun kayıtlı katılımcılarıyla sınırlıdır. Üçüncü taraflara ifşa edilmez.",
+          "Kayıtlar, ilgili kursun tamamlanmasından en geç 30 gün sonra kalıcı olarak silinir.",
+          "9.4 Rızanın Geri Çekilmesi",
+          "Kayda ilişkin rızanızı gelecek için geçerli olmak üzere istediğiniz zaman geri çekebilirsiniz. Lütfen çevrimiçi B1 kurslarımızın kurs konseptinin bu kayıtlara dayandığını unutmayın; geri çekilme, çevrimiçi derslere daha fazla katılımın teknik veya organizasyonel olarak artık mümkün olmamasına yol açabilir.",
+          "9.5 Üçüncü Ülkelere Veri Aktarımı (ABD)",
+          "Microsoft Teams kullanılırken ABD'de veri işleme gerçekleşebilir. Aktarım, EU-US Data Privacy Framework (DPF) ve ek olarak Standart Sözleşme Maddeleri (SCC'ler) temelinde yapılmaktadır. Microsoft DPF sertifikalıdır. Lütfen üçüncü ülke transferlerinin genel risklerini (ABD makamlarının teorik erişim olasılıkları) dikkate alın.",
+          "Daha fazla bilgi: https://privacy.microsoft.com/de-de/privacystatement"
         ]
       },
       {

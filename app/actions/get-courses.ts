@@ -32,6 +32,7 @@ export async function getCourses(): Promise<CourseConfig[]> {
         return courses.map((record: any) => ({
             id: record.id,
             translationKey: record.translation_key,
+            title: record.title,
             type: record.type as CourseType,
             price: Number(record.price), // ensure number
             sessions: record.sessions as CourseSession[],

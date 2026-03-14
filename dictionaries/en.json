@@ -319,7 +319,9 @@
       "di": "Tue",
       "mi": "Wed",
       "do": "Thu",
-      "fr": "Fri"
+      "fr": "Fri",
+      "sa": "Sat",
+      "so": "Sun"
     },
     "course_types": {
       "presence": "In-Person",
@@ -337,6 +339,7 @@
       "time": "Time",
       "course": "Course",
       "room": "Room",
+      "alternating": "alternating",
       "no_courses_scheduled": "No courses scheduled"
     }
   },
@@ -805,7 +808,8 @@
         "content": [
           "(1) The subject of the contract is the services specified in the respective course description (scope of services, course duration, dates, teaching materials). The course description is an integral part of the contract.",
           "(2) Minor changes in the course schedule, teaching staff, or class times are permissible, provided that the overall character of the course is not significantly impaired.",
-          "(3) Online instruction is conducted via common video conferencing software (e.g., Microsoft Teams). The participant is responsible for a suitable internet connection and technical equipment."
+          "(3) Online instruction is conducted via common video conferencing software (e.g., Microsoft Teams). The participant is responsible for a suitable internet connection and technical equipment.",
+          "(4) For quality assurance and review purposes for participants, online sessions are recorded. The details regarding the use of these recordings are set out in § 9 of these GTC."
         ]
       },
       {
@@ -878,9 +882,11 @@
         ]
       },
       {
-        "title": "§ 9 Copyright / Course Materials",
+        "title": "§ 9 Copyright and Video Recordings",
         "content": [
-          "Course materials are protected by copyright and may be used exclusively for personal use. Passing on, duplication, or publication is prohibited without the express written consent of the Language School."
+          "(1) Course materials are protected by copyright and may be used exclusively for personal use. Passing on, duplication, or publication is prohibited without the express written consent of the Language School.",
+          "(2) Video and audio recordings created as part of online courses are also protected by copyright. The copyrights belong exclusively to the Language School. The recordings are made available to participants of the respective course for a limited time for learning purposes.",
+          "(3) Sharing of the recordings, access credentials, or public display (e.g., on social media) by the participant is strictly prohibited and may result in exclusion from the course. The participant has no claim to an error-free recording or permanent availability."
         ]
       },
       {
@@ -1135,15 +1141,25 @@
         ]
       },
       {
-        "title": "9. Video Conferencing Tools (Microsoft Teams)",
+        "title": "9. Video Conferencing Tools and Lesson Recordings (Microsoft Teams)",
         "content": [
-          "For the implementation of our online courses, we use services from third-party providers. We have pointed out the use of Microsoft Teams in our GTC.",
-          "Provider: Microsoft Teams: Microsoft Corporation, One Microsoft Way, Redmond, WA 98052-6399, USA.",
-          "When using these tools, various data are processed (e.g. meeting metadata, audio and video data, text inputs). We have concluded data processing agreements (DPA) or corresponding Data Processing Addenda (DPA) with Microsoft.",
-          "Legal basis: The use of these tools for the provision of our course service is based on Art. 6 Para. 1 lit. b GDPR (performance of contract).",
-          "Data transfer to third countries (USA): When using Microsoft Teams, data processing in the USA may occur. The transfer is based on the EU-US Data Privacy Framework (DPF), which has been considered an adequacy decision since July 2023. Microsoft is DPF-certified. In addition, we have concluded Standard Contractual Clauses (SCCs) with Microsoft. Please note: In the USA there is a lower level of data protection than in the EU, and US authorities may access data under certain circumstances (e.g. FISA 702). The DPF is currently being legally challenged.",
-          "Storage period: Audio and video data are not recorded or stored by us. Microsoft processes the data only during the live transmission. Meeting metadata are stored by Microsoft in accordance with their retention policies.",
-          "Further information can be found in the privacy policies of the providers: Microsoft: https://privacy.microsoft.com/de-de/privacystatement"
+          "For the delivery of our online courses, we use Microsoft Teams.",
+          "Provider: Microsoft Ireland Operations Limited, One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Ireland (parent company: Microsoft Corporation, USA).",
+          "9.1 Type and Purpose of Processing",
+          "When using Microsoft Teams, various types of data are processed. The scope of data also depends on the information you provide before or during participation in an online session.",
+          "Processed data: Meeting metadata (e.g. date, time, meeting ID), audio and video data (your voice and image), text inputs (chat function) as well as video recordings of the teaching sessions.",
+          "Purpose of recording: The recordings serve exclusively the participants of the respective course for review and revision of the learning content.",
+          "9.2 Legal Basis",
+          "The use of Microsoft Teams for the general delivery of instruction is based on Art. 6 Para. 1 lit. b GDPR (performance of contract).",
+          "The video recording of sessions takes place exclusively on the basis of your express consent pursuant to Art. 6 Para. 1 lit. a GDPR, which you grant during course registration via a mandatory checkbox.",
+          "9.3 Storage Duration and Access",
+          "The video recordings are stored in a protected environment (e.g. password-protected cloud storage from Microsoft). Access is strictly limited to the instructor and the registered participants of the same course. No disclosure to third parties takes place.",
+          "The recordings are permanently deleted no later than 30 days after the completion of the respective course.",
+          "9.4 Withdrawal of Consent",
+          "You may withdraw your consent to recording at any time with effect for the future. Please note that the course concept of our online B1 courses is based on these recordings; a withdrawal may therefore result in further participation in online instruction being technically or organizationally no longer possible.",
+          "9.5 Data Transfer to Third Countries (USA)",
+          "When using Microsoft Teams, data processing in the USA may occur. The transfer is based on the EU-US Data Privacy Framework (DPF) as well as supplementary Standard Contractual Clauses (SCCs). Microsoft is DPF-certified. Please note the general risks of third-country transfers (theoretical access possibilities by US authorities).",
+          "Further information: https://privacy.microsoft.com/de-de/privacystatement"
         ]
       },
       {

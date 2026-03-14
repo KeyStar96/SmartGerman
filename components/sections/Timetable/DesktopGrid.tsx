@@ -7,7 +7,7 @@ import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
 import { isCourseLive } from "@/lib/time-utils";
 
-const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr"];
+const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
 interface DesktopGridProps {
     dictionary: any;
@@ -66,10 +66,23 @@ export default function DesktopGrid({ dictionary, courses }: DesktopGridProps) {
                         id: `${course.id}-${session.day}-${session.startTime}`,
                         startTime: session.startTime,
                         endTime: session.endTime,
-                        title: courseTexts[course.translationKey]?.title || course.id,
+                        title: course.title || courseTexts[course.translationKey]?.title || course.id,
                         instructorKey: course.instructor,
-                        locationKey: course.type
+                        locationKey: course.type,
+                        isAlternating: session.isAlternating
                     });
+
+                    if (session.isAlternating && session.altStartTime && session.altEndTime) {
+                        dayCourses.push({
+                            id: `${course.id}-${session.day}-${session.altStartTime}-alt`,
+                            startTime: session.altStartTime,
+                            endTime: session.altEndTime,
+                            title: course.title || courseTexts[course.translationKey]?.title || course.id,
+                            instructorKey: course.instructor,
+                            locationKey: course.type,
+                            isAlternating: true
+                        });
+                    }
                 }
             });
         });

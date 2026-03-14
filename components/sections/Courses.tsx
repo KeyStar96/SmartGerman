@@ -80,8 +80,11 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
 
   const sectionData = dictionary?.courses_v2;
   const courseTexts = dictionary?.CourseData;
-  const t_days = dictionary?.timetable?.days;
-  const t_instructors = dictionary?.timetable?.instructors;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const timetable = (dictionary?.timetable || {}) as any;
+  const t_days = timetable?.days;
+  const t_labels = timetable?.labels;
+  const t_instructors = timetable?.instructors;
 
   // Memoize displayed courses AND their formatted data to ensure stable props for children
   const displayedCourses = React.useMemo(() => {
@@ -93,6 +96,9 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
       const formattedSchedule = sessions.map((s) => {
         const dayKey = s.day.toLowerCase();
         const localizedDay = t_days?.[dayKey] || s.day;
+        if (s.isAlternating && s.altStartTime) {
+          return `${localizedDay} ${s.startTime} & ${s.altStartTime} (${t_labels?.alternating || 'Wechsel'})`;
+        }
         return `${localizedDay} ${s.startTime}-${s.endTime}`;
       });
 
@@ -178,8 +184,15 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
               className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pl-px pt-px"
             >
               {displayedCourses.map((courseConfig) => {
-                const textData = courseTexts[courseConfig.translationKey];
-                if (!textData) return null; // Safe guard
+                const dictTextData = courseTexts[courseConfig.translationKey];
+                // Fallback struct so we don't break if neither exists (though we shouldn't render null entirely if possible)
+                if (!dictTextData && !courseConfig.title) return null;
+
+                // Merge the dictionary text data with the dynamic title
+                const textData = {
+                  ...(dictTextData || {}),
+                  title: courseConfig.title || dictTextData?.title || courseConfig.translationKey,
+                } as CourseText;
 
                 return (
                   <CourseCard

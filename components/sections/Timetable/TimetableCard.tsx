@@ -15,6 +15,7 @@ export interface TimetableCourse {
     title: string;
     instructorKey: string;
     locationKey: string;
+    isAlternating?: boolean;
 }
 
 interface TimetableCardProps {
@@ -74,9 +75,18 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                     isLive && "border-[#FF5C00]/40 dark:border-[#FF5C00]/40 shadow-sm"
                 )}
             >
+                {/* ALTERNATING Badge */}
+                {course.isAlternating && (
+                    <div className="absolute top-0 right-0 px-2 py-1 bg-black/10 dark:bg-white/10 text-black/60 dark:text-white/60 text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20">
+                        {t.labels?.alternating || "Wechsel"}
+                    </div>
+                )}
                 {/* LIVE Badge */}
                 {isLive && (
-                    <div className="absolute top-0 right-0 px-2 py-1 bg-[#FF5C00] text-white text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20">
+                    <div className={cn(
+                        "absolute top-0 right-0 px-2 py-1 bg-[#FF5C00] text-white text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20",
+                        course.isAlternating && "right-[60px] rounded-br-sm" // shift left if alternating is present
+                    )}>
                         LIVE
                     </div>
                 )}

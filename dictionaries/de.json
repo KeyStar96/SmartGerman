@@ -334,7 +334,9 @@
       "di": "Di",
       "mi": "Mi",
       "do": "Do",
-      "fr": "Fr"
+      "fr": "Fr",
+      "sa": "Sa",
+      "so": "So"
     },
     "course_types": {
       "presence": "Präsenz",
@@ -352,6 +354,7 @@
       "time": "Uhrzeit",
       "course": "Kurs",
       "room": "Raum",
+      "alternating": "im Wechsel",
       "no_courses_scheduled": "Keine Kurse geplant"
     }
   },
@@ -807,7 +810,8 @@
         "content": [
           "(1) Vertragsgegenstand sind die in der jeweiligen Kursbeschreibung angegebenen Leistungen (Leistungsumfang, Kursdauer, Termine, Lehrmaterialien). Die Kursbeschreibung ist Bestandteil des Vertrags.",
           "(2) Geringfügige Änderungen im Kursablauf, bei Dozent:innen oder Unterrichtszeiten sind zulässig, sofern der Gesamtcharakter des Kurses nicht wesentlich beeinträchtigt wird.",
-          "(3) Online-Unterricht wird über gängige Videokonferenz-Software (z. B. Microsoft Teams) durchgeführt. Der Teilnehmer ist für eine geeignete Internetverbindung und technische Ausstattung selbst verantwortlich."
+          "(3) Online-Unterricht wird über gängige Videokonferenz-Software (z. B. Microsoft Teams) durchgeführt. Der Teilnehmer ist für eine geeignete Internetverbindung und technische Ausstattung selbst verantwortlich.",
+          "(4) Zur Qualitätsbegleitung und zur Nachbereitung für die Teilnehmer werden Online-Sitzungen aufgezeichnet. Die Einzelheiten zur Nutzung dieser Aufzeichnungen ergeben sich aus § 9 dieser AGB."
         ]
       },
       {
@@ -877,9 +881,11 @@
         ]
       },
       {
-        "title": "§ 9 Urheberrecht / Kursmaterialien",
+        "title": "§ 9 Urheberrecht und Videoaufzeichnungen",
         "content": [
-          "Kursunterlagen sind urheberrechtlich geschützt und dürfen ausschließlich zum persönlichen Gebrauch verwendet werden. Eine Weitergabe, Vervielfältigung oder Veröffentlichung ist ohne ausdrückliche schriftliche Zustimmung der Sprachschule untersagt."
+          "(1) Kursunterlagen sind urheberrechtlich geschützt und dürfen ausschließlich zum persönlichen Gebrauch verwendet werden. Eine Weitergabe, Vervielfältigung oder Veröffentlichung ist ohne ausdrückliche schriftliche Zustimmung der Sprachschule untersagt.",
+          "(2) Im Rahmen von Online-Kursen erstellte Video- und Audioaufzeichnungen sind ebenfalls urheberrechtlich geschützt. Die Urheberrechte liegen ausschließlich bei der Sprachschule. Die Aufzeichnungen werden den Teilnehmern des jeweiligen Kurses zeitlich befristet zu Lernzwecken zur Verfügung gestellt.",
+          "(3) Eine Weitergabe der Aufnahmen, der Zugangsdaten oder eine öffentliche Vorführung (z. B. auf Social Media) durch den Teilnehmer ist streng untersagt und kann zum Ausschluss vom Kurs führen. Ein Anspruch des Teilnehmers auf eine fehlerfreie Aufzeichnung oder dauerhafte Verfügbarkeit besteht nicht."
         ]
       },
       {
@@ -1134,15 +1140,25 @@
         ]
       },
       {
-        "title": "9. Videokonferenz-Tools (Microsoft Teams)",
+        "title": "9. Videokonferenz-Tools und Unterrichtsaufzeichnungen (Microsoft Teams)",
         "content": [
-          "Für die Durchführung unserer Online-Kurse nutzen wir Dienste von Drittanbietern. Wir haben in unseren AGB auf die Nutzung von Microsoft Teams hingewiesen.",
-          "Anbieter: Microsoft Teams: Microsoft Corporation, One Microsoft Way, Redmond, WA 98052-6399, USA.",
-          "Bei der Nutzung dieser Tools werden verschiedene Daten verarbeitet (z.B. Meeting-Metadaten, Audio- und Videodaten, Texteingaben). Wir haben mit Microsoft Auftragsverarbeitungsverträge (AVV) bzw. entsprechende Data Processing Addenda (DPA) abgeschlossen.",
-          "Rechtsgrundlage: Die Nutzung dieser Tools zur Erbringung unserer Kursleistung basiert auf Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).",
-          "Datenübertragung in Drittländer (USA): Bei der Nutzung von Microsoft Teams kann es zu einer Datenverarbeitung in den USA kommen. Die Übermittlung basiert auf dem EU-US Data Privacy Framework (DPF), das seit Juli 2023 als Angemessenheitsbeschluss gilt. Microsoft ist DPF-zertifiziert. Zusätzlich haben wir mit Microsoft Standardvertragsklauseln (SCCs) abgeschlossen. Bitte beachten Sie: In den USA besteht ein niedrigeres Datenschutzniveau als in der EU, und US-Behörden können unter bestimmten Umständen (z.B. FISA 702) auf Daten zugreifen. Das DPF wird derzeit rechtlich angefochten.",
-          "Speicherdauer: Audio- und Videodaten werden von uns nicht aufgezeichnet oder gespeichert. Microsoft verarbeitet die Daten nur während der Live-Übertragung. Meeting-Metadaten werden von Microsoft gemäß deren Aufbewahrungsrichtlinien gespeichert.",
-          "Weitere Informationen finden Sie in den Datenschutzerklärungen der Anbieter: Microsoft: https://privacy.microsoft.com/de-de/privacystatement"
+          "Für die Durchführung unserer Online-Kurse nutzen wir Microsoft Teams.",
+          "Anbieter: Microsoft Ireland Operations Limited, One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Irland (Mutterunternehmen: Microsoft Corporation, USA).",
+          "9.1 Art und Zweck der Verarbeitung",
+          "Bei der Nutzung von Microsoft Teams werden verschiedene Datenarten verarbeitet. Der Umfang der Daten hängt dabei auch davon ab, welche Angaben zu Daten Sie vor bzw. bei der Teilnahme an einer Online-Sitzung machen.",
+          "Verarbeitete Daten: Meeting-Metadaten (z.B. Datum, Uhrzeit, Meeting-ID), Audio- und Videodaten (Ihre Stimme und Ihr Bild), Texteingaben (Chatfunktion) sowie Videoaufzeichnungen der Unterrichtssitzungen.",
+          "Zweck der Aufzeichnung: Die Aufzeichnungen dienen ausschließlich den Teilnehmern des jeweiligen Kurses zur Nachbereitung und Wiederholung der Lerninhalte.",
+          "9.2 Rechtsgrundlage",
+          "Die Nutzung von Microsoft Teams zur allgemeinen Durchführung des Unterrichts basiert auf Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).",
+          "Die Videoaufzeichnung der Sitzungen erfolgt ausschließlich auf Grundlage Ihrer ausdrücklichen Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO, die Sie im Rahmen der Kursanmeldung über eine verpflichtende Checkbox erteilen.",
+          "9.3 Speicherdauer und Zugriff",
+          "Die Videoaufzeichnungen werden in einer geschützten Umgebung (z.B. passwortgeschützter Cloud-Speicher von Microsoft) gespeichert. Der Zugriff ist streng auf die Lehrkraft und die angemeldeten Teilnehmer desselben Kurses beschränkt. Eine Weitergabe an Dritte erfolgt nicht.",
+          "Die Aufnahmen werden spätestens 30 Tage nach Abschluss des jeweiligen Kurses dauerhaft gelöscht.",
+          "9.4 Widerruf der Einwilligung",
+          "Sie können Ihre Einwilligung zur Aufzeichnung jederzeit mit Wirkung für die Zukunft widerrufen. Bitte beachten Sie, dass das Kurskonzept unserer Online-B1-Kurse auf diesen Aufzeichnungen basiert; ein Widerruf kann daher dazu führen, dass eine weitere Teilnahme am Online-Unterricht technisch oder organisatorisch nicht mehr möglich ist.",
+          "9.5 Datenübertragung in Drittländer (USA)",
+          "Bei der Nutzung von Microsoft Teams kann es zu einer Datenverarbeitung in den USA kommen. Die Übermittlung basiert auf dem EU-US Data Privacy Framework (DPF) sowie ergänzend auf Standardvertragsklauseln (SCCs). Microsoft ist nach dem DPF zertifiziert. Bitte beachten Sie die allgemeinen Risiken eines Drittlandtransfers (theoretische Zugriffsmöglichkeiten durch US-Behörden).",
+          "Weitere Informationen: https://privacy.microsoft.com/de-de/privacystatement"
         ]
       },
       {

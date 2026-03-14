@@ -214,6 +214,7 @@ const MaskedDateInput = ({
 const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatted, level, dictionary }: CourseRowProps) => {
     const t = dictionary?.registration?.course_card;
     const daysDict = dictionary?.timetable?.days;
+    const timetableLabels = dictionary?.timetable?.labels;
 
     return (
         <motion.div
@@ -321,7 +322,7 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
 
                     return (
                         <span key={i} className="text-[10px] font-mono uppercase text-gray-400">
-                            {shortWeekdays[dayKey] || s.day} {s.startTime}
+                            {shortWeekdays[dayKey] || s.day} {s.startTime} {s.isAlternating && s.altStartTime ? `& ${s.altStartTime} (${timetableLabels?.alternating || 'Wechsel'})` : ''}
                         </span>
                     );
                 })}
@@ -647,12 +648,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         // Note: For the CARD DISPLAY, user wants "Price per Unit".
         // The Monthly Total is calculated separately in `totalMonthlyPrice`.
         return {
-            title: dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
+            title: c.title || dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
             priceFormatted: isTrialMode ? (trialT?.price_label || "Kostenlos") : new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
             level: dictionary?.CourseData?.[c.translationKey]?.level,
             dictionary // Pass dictionary down
         };
-    }, [dictionary, lang]);
+    }, [dictionary, lang, isTrialMode, trialT]);
 
     const selectedCoursesFull = (courses || []).filter(c => selectedCourseIds.includes(c.id));
 
