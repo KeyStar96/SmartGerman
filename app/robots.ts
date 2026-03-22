@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
                 disallow: ['/private/', '/admin/', '/api/', '/registration'], // Disallow sensitive paths
             },
         ],
-        sitemap: 'https://www.smart-german.com/sitemap.xml',
-        host: 'https://www.smart-german.com',
+        sitemap: 'https://smart-german.com/sitemap.xml',
+        host: 'https://smart-german.com',
     };
 }
