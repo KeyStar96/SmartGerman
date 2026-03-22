@@ -12,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         { path: '/imprint', changeFrequency: 'monthly' as const, priority: 0.4 },
         { path: '/cancellation', changeFrequency: 'monthly' as const, priority: 0.3 },
     ];
-    si
+
     return pages.flatMap(page =>
         locales.map(locale => ({
             url: `${baseUrl}/${locale}${page.path}`,
