@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://smart-german.com';
+    const baseUrl = 'https://www.smart-german.com';
     const locales = ['de', 'en', 'uk', 'ru', 'tr'];
 
     // All public pages (excluding /registration which is disallowed in robots.txt)
@@ -12,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         { path: '/imprint', changeFrequency: 'monthly' as const, priority: 0.4 },
         { path: '/cancellation', changeFrequency: 'monthly' as const, priority: 0.3 },
     ];
-
+    si
     return pages.flatMap(page =>
         locales.map(locale => ({
             url: `${baseUrl}/${locale}${page.path}`,
