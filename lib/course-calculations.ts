@@ -1,7 +1,7 @@
 import { CourseConfig, Day, CourseException } from "@/lib/course-config";
 
 export const DAY_MAP: Record<Day, number> = {
-    "So": 0, "Mo": 1, "Di": 2, "Mi": 3, "Do": 4, "Fr": 5, "Sa": 6
+    "Mo": 1, "Di": 2, "Mi": 3, "Do": 4, "Fr": 5
 };
 
 // Helper: Minuten berechnen
