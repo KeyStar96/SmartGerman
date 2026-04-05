@@ -7,7 +7,7 @@ import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
 import { isCourseLive } from "@/lib/time-utils";
 
-const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr"];
 
 interface DesktopGridProps {
     dictionary: any;

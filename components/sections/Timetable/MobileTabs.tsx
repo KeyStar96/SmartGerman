@@ -7,7 +7,7 @@ import TimetableCard, { TimetableCourse } from "./TimetableCard";
 import { cn } from "@/lib/utils";
 import { getCurrentDayName, isCourseLive } from "@/lib/time-utils";
 
-const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+const DAYS: Day[] = ["Mo", "Di", "Mi", "Do", "Fr"];
 
 interface MobileTabsProps {
     dictionary: any;
