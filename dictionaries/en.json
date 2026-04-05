@@ -13,7 +13,7 @@
       "A2 course Hannover",
       "B1 course Hannover",
       "online German course",
-      "German 50 Plus",
+      "German for Adults",
       "German course for seniors Hannover",
       "learn German as a refugee",
       "affordable German course Hannover",
@@ -57,7 +57,7 @@
     "badge": "Evidence-Based • Neuro-Didactics • Master Expertise",
     "headline": "Smart German: With Experience and Science to a New Language.",
     "claim": "With Experience and Science to a New Language.",
-    "subline": "Discover a method that values your knowledge and respects your learning pace. Language learning over 50 is not a question of age – it is a question of the right connection.",
+    "subline": "Discover a method that values your knowledge and respects your learning pace. Language learning in later life is not a question of age – it is a question of the right connection.",
     "cta_primary": "Discover the Method",
     "cta_secondary": "Course Schedule 2026"
   },
@@ -100,7 +100,7 @@
           {
             "id": "de50_a1_1",
             "group": "Group 1: In-Person (Senior Focus)",
-            "title": "German 50+ A1.1",
+            "title": "German A1.1",
             "level": "A1.1",
             "instructor": "Anastasia Sitov",
             "time": "Mon 9:00-10:30 & Tue 10:30-12:00",
@@ -108,14 +108,14 @@
             "price": "2,50€",
             "price_unit": "/ 45 Min",
             "price_note": "(Social Rate)",
-            "description": "Specially designed for learners 50+. Slow pace, relaxed atmosphere.",
+            "description": "Specially designed for mature learners. Slow pace, relaxed atmosphere.",
             "max_participants": "Max: 20 People",
             "badge": "In-Person"
           },
           {
             "id": "de50_a1_2",
             "group": "Group 1: In-Person (Senior Focus)",
-            "title": "German 50+ A1.2",
+            "title": "German A1.2",
             "level": "A1.2",
             "instructor": "Anastasia Sitov",
             "time": "Tue 9:00-10:30 & Wed 10:30-12:00",
@@ -130,7 +130,7 @@
           {
             "id": "de50_a2",
             "group": "Group 1: In-Person (Senior Focus)",
-            "title": "German 50+ A2",
+            "title": "German A2",
             "level": "A2",
             "instructor": "Anastasia Sitov",
             "time": "Mon 10:30-12:00 & Wed 9:00-10:30",
@@ -347,7 +347,7 @@
     "protocol": "Scientific Foundation",
     "title_part1": "WHY LANGUAGE LEARNING",
     "title_part2": "Works Differently at the Best Age.",
-    "description_1": "Scientifically proven: Your brain learns lifelong. Contrary to outdated myths, the brain over 50 is by no means less capable – it is more specialized. While conventional methods often rely on the fast processing of young brains, I use your greatest strength: your crystalline intelligence and your lifelong accumulated knowledge.",
+    "description_1": "Scientifically proven: Your brain learns lifelong. Contrary to outdated myths, the mature brain is by no means less capable – it is more specialized. While conventional methods often rely on the fast processing of young brains, I use your greatest strength: your crystalline intelligence and your lifelong accumulated knowledge.",
     "description_2": "Successful learning in old age requires methods that use the natural adaptability (neuroplasticity) of your brain. I create new neural connections by linking new words directly with your valuable life experiences. This way, what is learned stays not only in your head but becomes part of your everyday life.",
     "layer_active": "Neural Plasticity",
     "data_points": {
@@ -393,7 +393,7 @@
     "card1": {
       "category": "University Research",
       "title": "Learning Without Pressure: Why Our Specialization Makes the Difference.",
-      "text": "State standard courses are often designed for a broad spectrum of learners but rarely take into account the changed perception channels and the individual learning pace of the generation 50+. I know that diminishing hearing in loud classrooms or too fast speaking tempo of teachers can trigger stress. My method starts where others stop: I create a quiet, barrier-free learning environment with clear structures and plenty of room for repetition. I use modern geragogy (age didactics) to ensure that you not only learn German but also find joy in progress – completely without performance pressure.",
+      "text": "State standard courses are often designed for a broad spectrum of learners but rarely take into account the changed perception channels and the individual learning pace of the mature learners. I know that diminishing hearing in loud classrooms or too fast speaking tempo of teachers can trigger stress. My method starts where others stop: I create a quiet, barrier-free learning environment with clear structures and plenty of room for repetition. I use modern geragogy (age didactics) to ensure that you not only learn German but also find joy in progress – completely without performance pressure.",
       "specialization": "Specialization: GFL / GSL & Biology"
     },
     "card2": {
@@ -548,19 +548,19 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "German 50+ A1.1",
-      "description": "Specially designed for learners 50+. Slow pace, relaxed atmosphere.",
+      "title": "German A1.1",
+      "description": "Specially designed for mature learners. Slow pace, relaxed atmosphere.",
       "level": "A1.1",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a1_2": {
-      "title": "German 50+ A1.2",
+      "title": "German A1.2",
       "description": "Advanced beginners. Deepening the basics.",
       "level": "A1.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a2": {
-      "title": "German 50+ A2",
+      "title": "German A2",
       "description": "Independent communication (doctors, authorities).",
       "level": "A2",
       "location": "Freizeitheim Vahrenwald"

@@ -13,9 +13,9 @@
       "A2 Kurs Hannover",
       "B1 Kurs Hannover",
       "Online Deutschkurs",
-      "Deutsch 50 Plus",
+      "Deutsch im besten Alter",
       "Deutschkurs für Senioren Hannover",
-      "Deutsch lernen ab 50",
+      "Deutsch lernen im besten Alter",
       "Sprachschule Vahrenwald",
       "Deutschkurs Ukrainer Hannover",
       "Deutschkurs Russischsprachige Hannover",
@@ -59,7 +59,7 @@
     "badge": "Evidenzbasiert • Neuro-Didaktik • Master-Expertise",
     "headline": "<<SmartGerman>>: Mit Erfahrung und Wissenschaft zur neuen Sprache.",
     "claim": "Mit Erfahrung und Wissenschaft zur neuen Sprache.",
-    "subline": "Entdecken Sie eine Methode, die Ihr Wissen wertschätzt und Ihr Lerntempo respektiert. Sprachenlernen ab 50 ist keine Frage des Alters – es ist eine Frage der richtigen Verbindung.",
+    "subline": "Entdecken Sie eine Methode, die Ihr Wissen wertschätzt und Ihr Lerntempo respektiert. Sprachenlernen im besten Alter ist keine Frage des Alters – es ist eine Frage der richtigen Verbindung.",
     "cta_primary": "Die Methode entdecken",
     "cta_secondary": "Kursplan 2026"
   },
@@ -102,7 +102,7 @@
           {
             "id": "de50_a1_1",
             "group": "Gruppe 1: Präsenz (Senioren-Fokus)",
-            "title": "Deutsch 50+ A1.1",
+            "title": "Deutsch A1.1",
             "level": "A1.1",
             "instructor": "Anastasia Sitov",
             "time": "Mo 9:00-10:30 & Di 10:30-12:00",
@@ -110,14 +110,14 @@
             "price": "2,50€",
             "price_unit": "/ 45 Min",
             "price_note": "(Sozialtarif)",
-            "description": "Speziell für Lernende ab 50. Langsames Tempo, entspannte Atmosphäre.",
+            "description": "Speziell für Lernende im besten Alter. Langsames Tempo, entspannte Atmosphäre.",
             "max_participants": "Max: 20 Pers.",
             "badge": "Präsenz"
           },
           {
             "id": "de50_a1_2",
             "group": "Gruppe 1: Präsenz (Senioren-Fokus)",
-            "title": "Deutsch 50+ A1.2",
+            "title": "Deutsch A1.2",
             "level": "A1.2",
             "instructor": "Anastasia Sitov",
             "time": "Di 9:00-10:30 & Mi 10:30-12:00",
@@ -132,7 +132,7 @@
           {
             "id": "de50_a2",
             "group": "Gruppe 1: Präsenz (Senioren-Fokus)",
-            "title": "Deutsch 50+ A2",
+            "title": "Deutsch A2",
             "level": "A2",
             "instructor": "Anastasia Sitov",
             "time": "Mo 10:30-12:00 & Mi 9:00-10:30",
@@ -362,7 +362,7 @@
     "protocol": "Wissenschaftliches Fundament",
     "title_part1": "WARUM SPRACHENLERNEN",
     "title_part2": "IM BESTEN ALTER ANDERS FUNKTIONIERT.",
-    "description_1": "Wissenschaftlich belegt: Ihr Gehirn lernt lebenslang. Entgegen veralteter Mythen ist das Gehirn über 50 keineswegs weniger leistungsfähig – es ist spezialisierter. Während herkömmliche Methoden oft auf die schnelle Verarbeitung junger Gehirne setzen, nutze ich Ihre größte Stärke: Ihre kristalline Intelligenz und Ihr lebenslang aufgebautes Wissen.",
+    "description_1": "Wissenschaftlich belegt: Ihr Gehirn lernt lebenslang. Entgegen veralteter Mythen ist das Gehirn im reiferen Alter keineswegs weniger leistungsfähig – es ist spezialisierter. Während herkömmliche Methoden oft auf die schnelle Verarbeitung junger Gehirne setzen, nutze ich Ihre größte Stärke: Ihre kristalline Intelligenz und Ihr lebenslang aufgebautes Wissen.",
     "description_2": "Erfolgreiches Lernen im Alter erfordert Methoden, die die natürliche Anpassungsfähigkeit (Neuroplastizität) Ihres Gehirns nutzen. Ich schaffe neue neuronale Verbindungen, indem ich neue Wörter direkt mit Ihren wertvollen Lebenserfahrungen verknüpfe. So bleibt das Gelernte nicht nur im Kopf, sondern wird Teil Ihres Alltags.",
     "layer_active": "Neuronale Plastizität",
     "data_points": {
@@ -408,7 +408,7 @@
     "card1": {
       "category": "Universitäre Forschung",
       "title": "Lernen ohne Druck: Warum unsere Spezialisierung den Unterschied macht.",
-      "text": "Staatliche Standard-Kurse sind oft für ein breites Spektrum an Lernenden konzipiert, nehmen aber selten Rücksicht auf die veränderten Wahrnehmungskanäle und das individuelle Lerntempo der Generation 50+. Ich weiß, dass ein nachlassendes Hörvermögen in lauten Klassenräumen oder zu schnelles Sprechtempo von Lehrkräften Stress auslösen können. Meine Methode setzt dort an, wo andere aufhören: Ich schaffe eine ruhige, barrierefreie Lernumgebung mit klaren Strukturen und viel Raum für Wiederholung. Ich nutze moderne Geragogik (Altersdidaktik), um sicherzustellen, dass Sie nicht nur Deutsch lernen, sondern Freude am Fortschritt empfinden – ganz ohne Leistungsdruck.",
+      "text": "Staatliche Standard-Kurse sind oft für ein breites Spektrum an Lernenden konzipiert, nehmen aber selten Rücksicht auf die veränderten Wahrnehmungskanäle und das individuelle Lerntempo lebenserfahrener Lernender. Ich weiß, dass ein nachlassendes Hörvermögen in lauten Klassenräumen oder zu schnelles Sprechtempo von Lehrkräften Stress auslösen können. Meine Methode setzt dort an, wo andere aufhören: Ich schaffe eine ruhige, barrierefreie Lernumgebung mit klaren Strukturen und viel Raum für Wiederholung. Ich nutze moderne Geragogik (Altersdidaktik), um sicherzustellen, dass Sie nicht nur Deutsch lernen, sondern Freude am Fortschritt empfinden – ganz ohne Leistungsdruck.",
       "specialization": "Spezialisierung: DaF / DaZ & Biologie"
     },
     "card2": {
@@ -550,19 +550,19 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "Deutsch 50+ A1.1",
-      "description": "Speziell für Lernende ab 50. Langsames Tempo, viel Wiederholung.",
+      "title": "Deutsch A1.1",
+      "description": "Speziell für Lernende im besten Alter. Langsames Tempo, viel Wiederholung.",
       "level": "A1.1",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a1_2": {
-      "title": "Deutsch 50+ A1.2",
+      "title": "Deutsch A1.2",
       "description": "Aufbaukurs. Vertiefen Sie Grundlagen und Wortschatz.",
       "level": "A1.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a2": {
-      "title": "Deutsch 50+ A2",
+      "title": "Deutsch A2",
       "description": "Für selbstständige Kommunikation im Alltag.",
       "level": "A2",
       "location": "Freizeitheim Vahrenwald"

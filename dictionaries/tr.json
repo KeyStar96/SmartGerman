@@ -13,7 +13,7 @@
       "Hannover A2 kursu",
       "Hannover B1 kursu",
       "online Almanca kursu",
-      "Almanca 50 Plus",
+      "Yetişkinler için Almanca",
       "yaşlılar için Almanca kursu Hannover",
       "Hannover'de Almanca öğretmeni",
       "uygun fiyatlı Almanca kursu Hannover",
@@ -56,7 +56,7 @@
     "badge": "Kanıta Dayalı • Nöro-Didaktik • Uzmanlık",
     "headline": "Smart German: Deneyim ve Bilimle Yeni Bir Dile.",
     "claim": "Deneyim ve Bilimle Yeni Bir Dile.",
-    "subline": "Bilginize değer veren ve öğrenme hızınıza saygı duyan bir yöntemi keşfedin. 50 yaşından sonra dil öğrenmek bir yaş meselesi değil, doğru bağlantı meselesidir.",
+    "subline": "Bilginize değer veren ve öğrenme hızınıza saygı duyan bir yöntemi keşfedin. İleri yaşlarda dil öğrenmek bir yaş meselesi değil, doğru bağlantı meselesidir.",
     "cta_primary": "Yöntemi Keşfet",
     "cta_secondary": "2026 Kurs Programı"
   },
@@ -99,7 +99,7 @@
           {
             "id": "de50_a1_1",
             "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
-            "title": "Almanca 50+ A1.1",
+            "title": "Almanca A1.1",
             "level": "A1.1",
             "instructor": "Anastasia Sitov",
             "time": "Pzt 9:00-10:30 & Sal 10:30-12:00",
@@ -107,14 +107,14 @@
             "price": "2,50€",
             "price_unit": "/ 45 Dk",
             "price_note": "(Sosyal Tarife)",
-            "description": "Özellikle 50 yaş üstü kişiler için. Yavaş tempo, rahat atmosfer.",
+            "description": "Özellikle yetişkinler için. Yavaş tempo, rahat atmosfer.",
             "max_participants": "Maks: 20 Kişi",
             "badge": "Yüz Yüze"
           },
           {
             "id": "de50_a1_2",
             "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
-            "title": "Almanca 50+ A1.2",
+            "title": "Almanca A1.2",
             "level": "A1.2",
             "instructor": "Anastasia Sitov",
             "time": "Sal 9:00-10:30 & Çar 10:30-12:00",
@@ -129,7 +129,7 @@
           {
             "id": "de50_a2",
             "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
-            "title": "Almanca 50+ A2",
+            "title": "Almanca A2",
             "level": "A2",
             "instructor": "Anastasia Sitov",
             "time": "Pzt 10:30-12:00 & Çar 9:00-10:30",
@@ -287,19 +287,19 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "Almanca 50+ A1.1",
-      "description": "50 yaş üstü öğrenciler için özel. Yavaş tempo, rahat atmosfer.",
+      "title": "Almanca A1.1",
+      "description": "yetişkin öğrenciler için özel. Yavaş tempo, rahat atmosfer.",
       "level": "A1.1",
       "location": "Yüz yüze"
     },
     "de50_a1_2": {
-      "title": "Almanca 50+ A1.2",
+      "title": "Almanca A1.2",
       "description": "Geliştirme kursu. Temellerin derinleştirilmesi.",
       "level": "A1.2",
       "location": "Yüz yüze"
     },
     "de50_a2": {
-      "title": "Almanca 50+ A2",
+      "title": "Almanca A2",
       "description": "Bağımsız iletişim (doktor, resmi daireler).",
       "level": "A2",
       "location": "Yüz yüze"
@@ -432,7 +432,7 @@
     "protocol": "Bilimsel Temel",
     "title_part1": "NEDEN DİL ÖĞRENİMİ",
     "title_part2": "EN İYİ YAŞTA FARKLI ÇALIŞIR.",
-    "description_1": "Bilimsel olarak kanıtlanmış: Beyniniz yaşam boyu öğrenir. Eskimiş mitlerin aksine, 50 yaşın üzerindeki beyin daha az yetenekli değildir — daha uzmanlaşmıştır. Geleneksel yöntemler genellikle genç beyinlerin hızlı işlemlemesine dayanırken, en büyük gücünüzü kullanıyorum: kristalize zekanız ve yaşam boyu birikmiş bilginiz.",
+    "description_1": "Bilimsel olarak kanıtlanmış: Beyniniz yaşam boyu öğrenir. Eskimiş mitlerin aksine, olgun beyin daha az yetenekli değildir — daha uzmanlaşmıştır. Geleneksel yöntemler genellikle genç beyinlerin hızlı işlemlemesine dayanırken, en büyük gücünüzü kullanıyorum: kristalize zekanız ve yaşam boyu birikmiş bilginiz.",
     "description_2": "İleri yaşta başarılı öğrenme, doğal uyum yeteneğini (nöroplastisite) kullanan yöntemler gerektirir. Yeni kelimeleri doğrudan değerli yaşam deneyimlerinizle ilişkilendirerek yeni nöronal bağlantılar oluşturuyorum. Böylece öğrenilenler sadece kafanızda kalmaz, günlük yaşamınızın bir parçası olur.",
     "layer_active": "Nöronal Plastisite",
     "data_points": {
@@ -468,7 +468,7 @@
     "card1": {
       "category": "Üniversite Araştırması",
       "title": "Baskısız Öğrenme: Uzmanlığımız Neden Fark Yaratıyor.",
-      "text": "Devlet standart kursları genellikle geniş bir öğrenci yelpazesi için tasarlanmıştır, ancak nadiren 50+ neslinin değişen algı kanallarını ve bireysel öğrenme hızını dikkate alır. Gürültülü sınıflarda azalan işitme yeteneğinin veya öğretmenlerin çok hızlı konuşma temposunun stres tetikleyebileceğini biliyorum. Benim yöntemim diğerlerinin durduğu yerde başlar: Net yapılar ve tekrar için bolca alan ile sakin, engelsiz bir öğrenme ortamı yaratıyorum. Sadece Almanca öğrenmenizi değil, aynı zamanda ilerlemeden keyif almanızı sağlamak için modern geragoji (yaşlılık didaktiği) kullanıyorum — tamamen performans baskısı olmadan.",
+      "text": "Devlet standart kursları genellikle geniş bir öğrenci yelpazesi için tasarlanmıştır, ancak nadiren yetişkinlerin değişen algı kanallarını ve bireysel öğrenme hızını dikkate alır. Gürültülü sınıflarda azalan işitme yeteneğinin veya öğretmenlerin çok hızlı konuşma temposunun stres tetikleyebileceğini biliyorum. Benim yöntemim diğerlerinin durduğu yerde başlar: Net yapılar ve tekrar için bolca alan ile sakin, engelsiz bir öğrenme ortamı yaratıyorum. Sadece Almanca öğrenmenizi değil, aynı zamanda ilerlemeden keyif almanızı sağlamak için modern geragoji (yaşlılık didaktiği) kullanıyorum — tamamen performans baskısı olmadan.",
       "specialization": "Uzmanlık: DaF / DaZ & Biyoloji"
     },
     "card2": {
