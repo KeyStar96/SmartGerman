@@ -123,6 +123,9 @@ export default function Header({ lang, dictionary }: HeaderProps) {
       setIsHidden(false);
       element.scrollIntoView({ behavior: "smooth" });
 
+      // Update the URL hash so users can copy the exact link
+      window.history.pushState(null, "", `#${id}`);
+
       // 3. Unlock after animation (approx 1s)
       setTimeout(() => {
         isLockedRef.current = false;
