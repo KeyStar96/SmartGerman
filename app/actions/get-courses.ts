@@ -29,7 +29,7 @@ export async function getCourses(): Promise<CourseConfig[]> {
         if (!courses) return [];
 
         // 3. Map DB Snake_Case to CamelCase Types
-        return courses.map((record: any) => ({
+        const mappedCourses = courses.map((record: any) => ({
             id: record.id,
             translationKey: record.translation_key,
             title: record.title,
@@ -42,6 +42,35 @@ export async function getCourses(): Promise<CourseConfig[]> {
             highlight: false,
             level: undefined
         }));
+
+        // 4. Sort courses
+        // Order: Intensivkurse (not speech) first, then Sprechtraining (speech).
+        // Then by level: A1.1, A1.2, A2, B1, B2, C1...
+        const getLevelRank = (id: string) => {
+            if (id.includes('a1_1')) return 1;
+            if (id.includes('a1_2')) return 2;
+            if (id.includes('a2')) return 3;
+            if (id.includes('b1')) return 4;
+            if (id.includes('b2')) return 5;
+            if (id.includes('c1')) return 6;
+            return 99;
+        };
+
+        const getTypeRank = (id: string, type: string) => {
+            if (type === 'online') return 1; // Online courses have their own isolated tab
+            if (id.includes('speech')) return 2; // Sprechtraining comes second
+            return 1; // Intensivkurse comes first
+        };
+
+        return mappedCourses.sort((a, b) => {
+            const typeRankA = getTypeRank(a.id, a.type);
+            const typeRankB = getTypeRank(b.id, b.type);
+            if (typeRankA !== typeRankB) return typeRankA - typeRankB;
+            
+            const levelRankA = getLevelRank(a.id);
+            const levelRankB = getLevelRank(b.id);
+            return levelRankA - levelRankB;
+        });
     } catch (err) {
         console.error("Unexpected error in getCourses:", err);
         return [];
