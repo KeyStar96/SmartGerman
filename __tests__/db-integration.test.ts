@@ -1,12 +1,17 @@
 
-import { getCourses } from "../app/actions/get-courses";
 import { submitEnrollment } from "../app/actions/submit-enrollment";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/utils/supabase/admin";
 
-// Mock the Supabase client creator
-jest.mock("@/utils/supabase/server", () => ({
-    createClient: jest.fn(),
+// Mock @supabase/supabase-js (stateless client used by getCourses)
+const mockSupabaseInstance = { from: jest.fn() };
+jest.mock("@supabase/supabase-js", () => ({
+    createClient: jest.fn(() => mockSupabaseInstance),
+}));
+
+// Mock next/cache so unstable_cache just passes through the function
+jest.mock("next/cache", () => ({
+    unstable_cache: (fn: Function) => fn,
 }));
 jest.mock("@/utils/supabase/admin", () => ({
     createAdminClient: jest.fn(),
@@ -55,19 +60,22 @@ describe("Database Integration Tests (Mocked)", () => {
     const mockUserUpdate = jest.fn();
     const mockUserUpdateEq = jest.fn();
 
-    // From Mock
-    const mockFrom = jest.fn();
-
-    const mockSupabase = {
-        from: mockFrom,
-    };
+    // mockFrom is referenced from mockSupabaseInstance above
 
     // ... (inside describe) ...
 
+    // Import getCourses AFTER mocks are set up
+    let getCourses: typeof import("../app/actions/get-courses").getCourses;
+    beforeAll(async () => {
+        const mod = await import("../app/actions/get-courses");
+        getCourses = mod.getCourses;
+    });
+
+    const mockFrom = mockSupabaseInstance.from;
+
     beforeEach(() => {
         jest.clearAllMocks();
-        (createClient as jest.Mock).mockResolvedValue(mockSupabase);
-        (createAdminClient as jest.Mock).mockReturnValue(mockSupabase);
+        (createAdminClient as jest.Mock).mockReturnValue(mockSupabaseInstance);
 
         // SETUP DEFAULT BEHAVIOR
         mockFrom.mockImplementation((table) => {
