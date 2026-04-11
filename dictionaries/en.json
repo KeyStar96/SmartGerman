@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Learn German in Hannover | Specialized for Ukrainians & Russian Speakers | SmartGerman",
-    "description": "German courses in Hannover with native teacher. For everyone who wants to learn German. A1-B2 courses, Online & In-person. Sign up now!",
+    "description": "German courses in Hannover with native teacher. For everyone who wants to learn German. A1-B1 courses, Online & In-person. Sign up now!",
     "keywords": [
       "German courses Hannover",
       "language school Hannover",
@@ -218,21 +218,6 @@
             "description": "Intermediate level for advanced learners.",
             "max_participants": "",
             "badge": "Online Course"
-          },
-          {
-            "id": "online_b2",
-            "group": "Group 3: Online (Start March 2026)",
-            "title": "German B2 (Online)",
-            "level": "B2",
-            "instructor": "Lisa Kahl",
-            "time": "Mon & Wed 16:00-17:30",
-            "freq": "",
-            "price": "15€",
-            "price_unit": "/ 90 Min",
-            "price_note": "",
-            "description": "For Career & Studies.",
-            "max_participants": "",
-            "badge": "Online Course"
           }
         ]
       },
@@ -280,10 +265,6 @@
     "a1": {
       "name": "A1 Beginner",
       "desc": "The ideal start without prior knowledge."
-    },
-    "b2": {
-      "name": "B2 Advanced",
-      "desc": "Confident performance in work and everyday life."
     }
   },
   "schedule": {
@@ -594,12 +575,6 @@
       "description": "Intermediate level for advanced learners.",
       "level": "B1",
       "location": "Microsoft Teams"
-    },
-    "online_b2": {
-      "title": "German B2 (Online)",
-      "description": "For Career & Studies.",
-      "level": "B2",
-      "location": "Microsoft Teams"
     }
   },
   "registration": {
@@ -676,7 +651,7 @@
     "course_card": {
       "online_label": "Online Course",
       "presence_label": "IN-PERSON",
-      "level_range": "A1 - C1",
+      "level_range": "A1 - B1",
       "units_suffix": "/ Units"
     },
     "receipt": {

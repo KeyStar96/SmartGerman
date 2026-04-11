@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Hannover'de Almanca Öğrenin | Ukraynalılar ve Rusça Konuşanlar İçin Uzmanlaşmış | SmartGerman",
-    "description": "Hannover'de ana dili öğretmen ile Almanca kursları. Almanca öğrenmek isteyen herkes için. A1-B2 kursları, Online ve Yüz yüze. Hemen kaydolun!",
+    "description": "Hannover'de ana dili öğretmen ile Almanca kursları. Almanca öğrenmek isteyen herkes için. A1-B1 kursları, Online ve Yüz yüze. Hemen kaydolun!",
     "keywords": [
       "Hannover Almanca kursları",
       "Hannover dil okulu",
@@ -217,21 +217,6 @@
             "description": "İleri düzey öğrenciler için orta seviye.",
             "max_participants": "",
             "badge": "Çevrimiçi"
-          },
-          {
-            "id": "online_b2",
-            "group": "Grup 3: Çevrimiçi (Başlangıç Mart 2026)",
-            "title": "Almanca B2 (Çevrimiçi)",
-            "level": "B2",
-            "instructor": "Lisa Kahl",
-            "time": "Pzt & Çar 16:00-17:30",
-            "freq": "",
-            "price": "15€",
-            "price_unit": "/ 90 Dk",
-            "price_note": "",
-            "description": "Kariyer ve Eğitim İçin.",
-            "max_participants": "",
-            "badge": "Çevrimiçi"
           }
         ]
       },
@@ -279,10 +264,6 @@
     "a1": {
       "name": "A1 Başlangıç",
       "desc": "Ön bilgi olmadan ideal başlangıç."
-    },
-    "b2": {
-      "name": "B2 İleri",
-      "desc": "İş ve günlük yaşamda güvenli performans."
     }
   },
   "CourseData": {
@@ -334,14 +315,6 @@
       "title": "Almanca B1 (Çevrimiçi)",
       "description": "İleri seviye için orta düzey.",
       "level": "B1",
-      "location": "Çevrimiçi",
-      "price": "15€",
-      "price_unit": "/ 90 Dak"
-    },
-    "online_b2": {
-      "title": "Almanca B2 (Çevrimiçi)",
-      "description": "İş ve Eğitim için.",
-      "level": "B2",
       "location": "Çevrimiçi",
       "price": "15€",
       "price_unit": "/ 90 Dak"
@@ -682,7 +655,7 @@
     "course_card": {
       "online_label": "ÇEVRİMİÇİ",
       "presence_label": "YÜZ YÜZE",
-      "level_range": "A1 - C1",
+      "level_range": "A1 - B1",
       "units_suffix": "/ Birim"
     },
     "receipt": {

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Deutsch lernen in Hannover | Spezialisiert auf Ukrainer & Russischsprachige | SmartGerman",
-    "description": "Deutschkurse in Hannover mit muttersprachlicher Lehrerin. Für alle, die Deutsch lernen möchten. A1-B2 Kurse, Online & Präsenz. Jetzt anmelden!",
+    "description": "Deutschkurse in Hannover mit muttersprachlicher Lehrerin. Für alle, die Deutsch lernen möchten. A1-B1 Kurse, Online & Präsenz. Jetzt anmelden!",
     "keywords": [
       "Deutschkurse Hannover",
       "Sprachschule Hannover",
@@ -220,21 +220,6 @@
             "description": "Mittelstufe für Fortgeschrittene.",
             "max_participants": "",
             "badge": "Online"
-          },
-          {
-            "id": "online_b2",
-            "group": "Gruppe 3: Online (Start März 2026)",
-            "title": "Deutsch B2 (Online)",
-            "level": "B2",
-            "instructor": "Lisa Kahl",
-            "time": "Mo & Mi 16:00-17:30",
-            "freq": "",
-            "price": "15€",
-            "price_unit": "/ 90 Min",
-            "price_note": "",
-            "description": "Für Beruf & Studium.",
-            "max_participants": "",
-            "badge": "Online"
           }
         ]
       },
@@ -282,10 +267,6 @@
     "a1": {
       "name": "A1 Anfänger",
       "desc": "Der ideale Einstieg ohne Vorkenntnisse."
-    },
-    "b2": {
-      "name": "B2 Fortgeschrittene",
-      "desc": "Sicheres Auftreten im Beruf und Alltag."
     }
   },
   "courses_v2": {
@@ -596,12 +577,6 @@
       "description": "Vertiefung der Kenntnisse für Beruf und Alltag.",
       "level": "B1",
       "location": "Microsoft Teams"
-    },
-    "online_b2": {
-      "title": "Deutsch B2 (Online)",
-      "description": "Gezielter Ausbau für Beruf oder Studium.",
-      "level": "B2",
-      "location": "Microsoft Teams"
     }
   },
   "registration": {
@@ -678,7 +653,7 @@
     "course_card": {
       "online_label": "Online",
       "presence_label": "PRÄSENZ",
-      "level_range": "A1 - C1",
+      "level_range": "A1 - B1",
       "units_suffix": "/ Einheiten"
     },
     "receipt": {
