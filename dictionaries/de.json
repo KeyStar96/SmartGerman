@@ -722,14 +722,14 @@
     "pricing_roadmap": {
       "due_today": "Rechnungsbetrag",
       "optional_continuation": "Optionale Fortführung",
-      "cancel_anytime": "Jederzeit zum Monatsende kündbar",
-      "how_payment_works": "Wie funktioniert die Bezahlung?",
-      "payment_explanation": "Sie zahlen heute nur den ersten Monat. Wenn es Ihnen gefällt, läuft der Kurs einfach weiter. Wenn nicht, genügt eine kurze Nachricht bis zum 25. des Monats und wir beenden die Teilnahme automatisch. Keine Knebelverträge.",
+      "cancel_anytime": "Jederzeit kündbar – einfach nicht zahlen",
+      "how_payment_works": "Wie funktioniert das Abo?",
+      "payment_explanation": "Sie zahlen heute den ersten Monat. Danach läuft Ihr Kurs automatisch weiter. Möchten Sie aufhören, genügt es, die nächste Rechnung nicht zu bezahlen – das gilt als automatische Kündigung. Keine versteckten Kosten, kein Papierkram.",
       "total_today": "Gesamtbetrag",
-      "payment_popover_title": "Keine Knebelverträge",
-      "payment_point_1": "Sie zahlen heute nur den ersten Monat.",
-      "payment_point_2": "Danach entscheiden Sie flexibel weiter.",
-      "payment_point_3": "Kündbar bis zum 25. des Monats."
+      "payment_popover_title": "Entspanntes Abo-Modell",
+      "payment_point_1": "Kurs verlängert sich monatlich automatisch.",
+      "payment_point_2": "Rechnung bezahlen = Zustimmung zur Teilnahme.",
+      "payment_point_3": "Nicht bezahlen = automatische Kündigung, keine Extrakosten."
     }
   },
   "cancellation": {
@@ -765,7 +765,7 @@
   "agb": {
     "title": "Allgemeine Geschäftsbedingungen",
     "school_name": "SmartGerman Sprachschule",
-    "status_date": "Stand: Oktober 2025",
+    "status_date": "Stand: April 2026",
     "sections": [
       {
         "title": "§ 1 Geltungsbereich, Anbieter",
@@ -799,19 +799,20 @@
         ]
       },
       {
-        "title": "§ 4 Preise, Zahlungsbedingungen, Verzug",
+        "title": "§ 4 Preise, Zahlungsbedingungen, Abo-Modell",
         "content": [
           "(1) Die jeweils gültigen Preise ergeben sich aus der auf der Webseite veröffentlichten Preisübersicht. Alle Preise sind Endpreise. Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
-          "(2) Die Kursgebühr ist jeweils im Voraus für den kommenden Monat zu entrichten. Mit Zahlung erwirbt der Teilnehmer den Zugang zu den Kursen dieses Monats. Eine automatische Verlängerung des Vertrags erfolgt nicht.",
-          "(3) Die Zahlung erfolgt per Überweisung nach Rechnungserhalt, sofern nicht anders vereinbart.",
+          "(2) Die Kursgebühr wird monatlich im Voraus in Rechnung gestellt. Der Vertrag verlängert sich automatisch um jeweils einen weiteren Monat, sofern der Teilnehmer nicht aktiv kündigt oder die Rechnung für den Folgemonat nicht fristgerecht begleicht.",
+          "(3) Die Bezahlung der Folgerechnung gilt als aktive Zustimmung zur Fortsetzung der Kursteilnahme im jeweiligen Folgemonat.",
+          "(4) Die Nichtzahlung einer Folgerechnung innerhalb von 14 Tagen nach Rechnungserhalt wird als automatische Kündigung zum Ende des laufenden Abrechnungsmonats gewertet. In diesem Fall entstehen dem Teilnehmer keine weiteren Kosten.",
+          "(5) Die Zahlung erfolgt per Überweisung nach Rechnungserhalt, sofern nicht anders vereinbart.",
           "Bankverbindung:",
           "Kontoinhaber: Anastasia Sitov",
           "IBAN: DE98 1001 1001 2273 5332 29",
           "BIC: NTSBDEB1XXX",
           "Bank: N26 Bank SE",
           "Verwendungszweck: Rechnungsnummer",
-          "(4) Rechnungen sind spätestens 14 Tage nach Erhalt zu begleichen. Bei Nichteinhaltung dieser Frist drohen Verzugszinsen gemäß gesetzlicher Regelung.",
-          "(5) Gerät der Teilnehmer in Zahlungsverzug, gelten die gesetzlichen Verzugsregelungen (§ 288 BGB). Die Sprachschule ist berechtigt, die Teilnahme bis zur Begleichung offener Beträge auszusetzen."
+          "(6) Bei verspäteter Zahlung gelten die gesetzlichen Verzugsregelungen (§ 288 BGB) nur dann, wenn die Zahlung angekündigt, aber nicht fristgerecht geleistet wurde."
         ]
       },
       {
@@ -864,10 +865,13 @@
         ]
       },
       {
-        "title": "§ 10 Vertragsdauer",
+        "title": "§ 10 Vertragsdauer und Kündigung",
         "content": [
-          "(1) Mit Zahlung der Kursgebühr wird ein Vertrag über die Teilnahme am Kursangebot des betreffenden Monats geschlossen.",
-          "(2) Eine automatische Verlängerung findet nicht statt. Für jeden weiteren Monat ist eine erneute Anmeldung und Zahlung erforderlich."
+          "(1) Mit der erstmaligen Zahlung der Kursgebühr wird ein fortlaufender Vertrag über die Teilnahme am Kursangebot geschlossen.",
+          "(2) Der Vertrag verlängert sich automatisch jeweils um einen weiteren Monat, es sei denn, der Teilnehmer kündigt aktiv oder die Rechnung für den Folgemonat wird nicht fristgerecht beglichen. Die Nichtzahlung der Folgerechnung gilt als automatische Kündigung (vgl. § 4 Abs. 4).",
+          "(3) Die Kündigung kann jederzeit formlos (z. B. per E-Mail, über das Kündigungsformular auf der Webseite oder per Nachricht über einen Messenger-Dienst) erklärt werden und wird zum Ende des laufenden Abrechnungsmonats wirksam.",
+          "(4) Nach einer Kündigung – gleich ob aktiv oder durch Nichtzahlung – kann die Kursteilnahme nur durch eine erneute Anmeldung wiederaufgenommen werden.",
+          "(5) Durch dieses Abo-Modell sollen unnötiger Verwaltungsaufwand für beide Seiten vermieden und die Kursteilnahme so unkompliziert wie möglich gestaltet werden."
         ]
       },
       {

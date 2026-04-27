@@ -720,14 +720,14 @@
     "pricing_roadmap": {
       "due_today": "Invoice Amount",
       "optional_continuation": "Optional continuation",
-      "cancel_anytime": "Cancel anytime at month-end",
-      "how_payment_works": "How does payment work?",
-      "payment_explanation": "You only pay the first month today. If you like it, the course simply continues. If not, a short message by the 25th of the month is enough and we will automatically end your participation. No binding contracts.",
+      "cancel_anytime": "Cancel anytime – simply don't pay",
+      "how_payment_works": "How does the subscription work?",
+      "payment_explanation": "You pay the first month today. After that, your course continues automatically. Want to stop? Simply don't pay the next invoice – this counts as automatic cancellation. No hidden costs, no paperwork.",
       "total_today": "Total Amount",
-      "payment_popover_title": "No Binding Contracts",
-      "payment_point_1": "You only pay the first month today.",
-      "payment_point_2": "Then you decide flexibly how to continue.",
-      "payment_point_3": "Cancellable until the 25th of the month."
+      "payment_popover_title": "Relaxed Subscription Model",
+      "payment_point_1": "Course renews automatically every month.",
+      "payment_point_2": "Paying the invoice = consent to participate.",
+      "payment_point_3": "Not paying = automatic cancellation, no extra costs."
     }
   },
   "cancellation": {
@@ -763,7 +763,7 @@
   "agb": {
     "title": "General Terms and Conditions (GTC)",
     "school_name": "SmartGerman Language School",
-    "status_date": "Status: October 2025",
+    "status_date": "Status: April 2026",
     "sections": [
       {
         "title": "§ 1 Scope of Application, Provider",
@@ -797,19 +797,20 @@
         ]
       },
       {
-        "title": "§ 4 Prices, Payment Conditions, Default",
+        "title": "§ 4 Prices, Payment Conditions, Subscription Model",
         "content": [
           "(1) The currently valid prices are those listed in the price overview published on the website. All prices are final prices. According to § 19 UStG, no sales tax is charged.",
-          "(2) The course fee is to be paid in advance for the upcoming month. Upon payment, the participant acquires access to the courses of this month. An automatic extension of the contract does not take place.",
-          "(3) Payment is made by bank transfer after receipt of invoice, unless otherwise agreed.",
+          "(2) The course fee is invoiced monthly in advance. The contract is automatically renewed for one additional month unless the participant actively cancels or fails to pay the invoice for the following month within the specified period.",
+          "(3) Payment of the follow-up invoice constitutes active consent to continued course participation for the respective following month.",
+          "(4) Non-payment of a follow-up invoice within 14 days of receipt is treated as automatic cancellation effective at the end of the current billing month. In this case, no additional costs are incurred by the participant.",
+          "(5) Payment is made by bank transfer after receipt of invoice, unless otherwise agreed.",
           "Bank details:",
           "Account holder: Anastasia Sitov",
           "IBAN: DE98 1001 1001 2273 5332 29",
           "BIC: NTSBDEB1XXX",
           "Bank: N26 Bank SE",
           "Reason for payment: Invoice number",
-          "(4) Invoices must be paid within 14 days of receipt. Failure to comply with this deadline may result in default interest in accordance with statutory regulations.",
-          "(5) If the participant is in default of payment, the statutory default regulations (§ 288 BGB) apply. The Language School is entitled to suspend participation until outstanding amounts are settled."
+          "(6) In case of late payment, statutory default regulations (§ 288 BGB) apply only if the payment was announced but not made within the specified period."
         ]
       },
       {
@@ -865,10 +866,13 @@
         ]
       },
       {
-        "title": "§ 10 Contract Duration",
+        "title": "§ 10 Contract Duration and Cancellation",
         "content": [
-          "(1) With payment of the course fee, a contract for participation in the course offer of the respective month is concluded.",
-          "(2) An automatic extension does not take place. For every further month, a new registration and payment is required."
+          "(1) With the initial payment of the course fee, an ongoing contract for participation in the course programme is concluded.",
+          "(2) The contract is automatically renewed for one additional month at a time, unless the participant actively cancels or the invoice for the following month is not paid within the specified period. Non-payment of the follow-up invoice constitutes automatic cancellation (cf. § 4 para. 4).",
+          "(3) Cancellation may be declared at any time without any particular form (e.g. by e-mail, via the cancellation form on the website, or by message via a messenger service) and takes effect at the end of the current billing month.",
+          "(4) After cancellation — whether active or by non-payment — course participation can only be resumed through a new registration.",
+          "(5) This subscription model is designed to minimise unnecessary administrative effort for both parties and to make course participation as straightforward as possible."
         ]
       },
       {
