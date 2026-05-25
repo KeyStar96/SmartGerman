@@ -69,7 +69,8 @@ export default function DesktopGrid({ dictionary, courses }: DesktopGridProps) {
                         title: course.title || courseTexts[course.translationKey]?.title || course.id,
                         instructorKey: course.instructor,
                         locationKey: course.type,
-                        isAlternating: session.isAlternating
+                        isAlternating: session.isAlternating,
+                        startDate: course.startDate
                     });
 
                     if (session.isAlternating && session.altStartTime && session.altEndTime) {
