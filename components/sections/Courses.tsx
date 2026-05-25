@@ -32,6 +32,7 @@ interface Dictionary {
     tabs: Record<string, string>;
     footer_note: string;
     trial_cta?: string;
+    start_prefix?: string;
   };
   CourseData: Record<string, CourseText>;
   timetable: {
