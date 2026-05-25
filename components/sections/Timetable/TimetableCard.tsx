@@ -104,7 +104,7 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                 {/* START Badge */}
                 {startBadge && !isLive && (
                     <div className={cn(
-                        "absolute top-0 right-0 px-2 py-1 bg-[#111111] dark:bg-white text-white dark:text-black text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20",
+                        "absolute top-0 right-0 px-3 py-1 bg-[#FF5C00] text-white text-[10px] font-black tracking-widest uppercase rounded-bl-sm z-20 shadow-[0_2px_10px_rgba(255,92,0,0.4)]",
                         course.isAlternating && "right-[60px] rounded-br-sm"
                     )}>
                         {startBadge}

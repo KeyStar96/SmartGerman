@@ -338,7 +338,11 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
                 <span className={`
                       ${jetbrainsMono.className}
                       bg-[#FF5C00] text-white
-                      px-2 py-0.5 text-[9px] uppercase tracking-wider
+                      px-3 py-1 md:px-4 md:py-1.5
+                      text-[10px] md:text-xs font-black uppercase tracking-widest
+                      shadow-[0_4px_14px_rgba(255,92,0,0.4)]
+                      dark:shadow-[0_4px_20px_rgba(255,92,0,0.6)]
+                      rounded-sm ring-1 ring-[#FF5C00]/50 dark:ring-[#FF5C00]
                     `}>
                   {config.computedStartBadge || text.start_badge}
                 </span>
