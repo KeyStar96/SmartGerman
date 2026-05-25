@@ -129,7 +129,8 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
       if (course.startDate) {
         const start = new Date(course.startDate);
         if (start > today) {
-          computedStartBadge = `Start: ${start.toLocaleDateString(localeTag, { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+          const startPrefix = sectionData?.start_prefix || "Start";
+          computedStartBadge = `${startPrefix}: ${start.toLocaleDateString(localeTag, { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
         }
       }
 

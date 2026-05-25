@@ -525,7 +525,8 @@
       "online": "ONLINE CLASS"
     },
     "footer_note": "All courses are monthly cancellable. Telegram support included. All prices incl. VAT.",
-    "trial_cta": "★ Free Trial Lesson"
+    "trial_cta": "★ Free Trial Lesson",
+    "start_prefix": "Start"
   },
   "CourseData": {
     "de50_a1_1": {

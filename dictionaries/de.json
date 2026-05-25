@@ -280,7 +280,8 @@
       "online": "ONLINE"
     },
     "footer_note": "Alle Kurse sind monatlich kündbar. Telegram-Support inklusive. Alle Preise inkl. MwSt.",
-    "trial_cta": "★ Kostenlose Probestunde"
+    "trial_cta": "★ Kostenlose Probestunde",
+    "start_prefix": "Start"
   },
   "schedule": {
     "title": "Dein Weg zum Erfolg – Der Wochenplan",

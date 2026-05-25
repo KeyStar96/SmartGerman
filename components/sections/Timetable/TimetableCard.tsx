@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { MapPin, User, Monitor, Sun, Moon } from "lucide-react";
 import { JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
@@ -38,13 +39,25 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
     const [hour] = course.startTime.split(":").map(Number);
     const isEvening = hour >= 17;
 
+    const params = useParams();
+    const lang = (params?.lang as string) || "de";
+    const localeMap: Record<string, string> = {
+        'de': 'de-DE',
+        'en': 'en-US',
+        'ru': 'ru-RU',
+        'uk': 'uk-UA',
+        'tr': 'tr-TR'
+    };
+    const localeTag = localeMap[lang] || 'de-DE';
+
     let startBadge = undefined;
     if (course.startDate) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const start = new Date(course.startDate);
         if (start > today) {
-            startBadge = `Start: ${start.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+            const startPrefix = dictionary?.courses_v2?.start_prefix || "Start";
+            startBadge = `${startPrefix}: ${start.toLocaleDateString(localeTag, { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
         }
     }
 
@@ -63,7 +76,9 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                         "w-3 h-3 rounded-full border-2 z-10 mt-[0.6rem] transition-all duration-300",
                         isLive
                             ? "bg-[#FF5C00] border-[#FF5C00] animate-pulse shadow-[0_0_10px_rgba(255,92,0,0.6)]"
-                            : "bg-[var(--background)] border-[#FF5C00] group-hover:bg-[#FF5C00] group-hover:scale-110"
+                            : startBadge
+                                ? "bg-black/10 border-black/20 dark:bg-white/10 dark:border-white/20" // Inactive dot for upcoming
+                                : "bg-[var(--background)] border-[#FF5C00] group-hover:bg-[#FF5C00] group-hover:scale-110"
                     )}
                 />
             </div>
@@ -87,7 +102,7 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                 )}
             >
                 {/* ALTERNATING Badge */}
-                {course.isAlternating && (
+                {course.isAlternating && !startBadge && (
                     <div className="absolute top-0 right-0 px-2 py-1 bg-black/10 dark:bg-white/10 text-black/60 dark:text-white/60 text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20">
                         {t.labels?.alternating || "Wechsel"}
                     </div>
@@ -101,17 +116,21 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                         LIVE
                     </div>
                 )}
-                {/* START Badge */}
+                {/* START Badge (Matching Courses.tsx Design) */}
                 {startBadge && !isLive && (
                     <div className={cn(
-                        "absolute top-0 right-0 px-3 py-1 bg-[#FF5C00] text-white text-[10px] font-black tracking-widest uppercase rounded-bl-sm z-20 shadow-[0_2px_10px_rgba(255,92,0,0.4)]",
-                        course.isAlternating && "right-[60px] rounded-br-sm"
+                        "absolute top-3 right-3 px-3 py-1 md:px-4 md:py-1.5 bg-[#FF5C00] text-white",
+                        "text-[10px] md:text-xs font-black tracking-widest uppercase rounded-sm z-30",
+                        "shadow-[0_4px_14px_rgba(255,92,0,0.4)] dark:shadow-[0_4px_20px_rgba(255,92,0,0.6)] ring-1 ring-[#FF5C00]/50 dark:ring-[#FF5C00]"
                     )}>
                         {startBadge}
                     </div>
                 )}
 
-                <div className="relative z-10 flex flex-col gap-3">
+                <div className={cn(
+                    "relative z-10 flex flex-col gap-3 transition-all duration-300",
+                    startBadge ? "opacity-50 grayscale group-hover:opacity-100 group-hover:grayscale-0" : ""
+                )}>
                     {/* Header: Time & Icon */}
                     <div className="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2 mb-1">
                         <div className={cn(

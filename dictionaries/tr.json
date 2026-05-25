@@ -349,7 +349,8 @@
       "online": "ÇEVRİMİÇİ"
     },
     "footer_note": "Tüm kurslar aylık iptal edilebilir. Telegram desteği dahil. Fiyatlar KDV dahil.",
-    "trial_cta": "★ Ücretsiz Deneme Dersi"
+    "trial_cta": "★ Ücretsiz Deneme Dersi",
+    "start_prefix": "Başlangıç"
   },
   "schedule": {
     "title": "Başarıya Giden Yolunuz – Haftalık Program",
