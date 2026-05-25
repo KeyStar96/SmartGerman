@@ -328,6 +328,24 @@
       "description": "Средний уровень для продвинутых.",
       "level": "B1",
       "location": "Онлайн"
+    },
+    "de50_a1_1_replacement_2026_07": {
+      "title": "Немецкий A1.1",
+      "description": "Специально для учащихся старшего возраста. Медленный темп, много повторений. Начинаем с самого нуля!",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "speech_a1_1_replacement_2026_07": {
+      "title": "Разговорная практика A1.1",
+      "description": "Избавьтесь от страха говорить. Идеальное дополнение к курсу A1.1.",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "online_a1_1_2026_09": {
+      "title": "Немецкий A1.1 (Онлайн)",
+      "description": "Удобно из дома. Включая группу в Telegram. Начинаем с самого нуля!",
+      "level": "A1.1",
+      "location": "Microsoft Teams"
     }
   },
   "courses_v2": {

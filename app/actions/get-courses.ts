@@ -80,6 +80,6 @@ export const getCourses = unstable_cache(
             return [];
         }
     },
-    ['courses'],           // cache key
+    ['courses_v2'],        // cache key
     { revalidate: 3600 }   // 1 hour
 );

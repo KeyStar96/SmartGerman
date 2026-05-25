@@ -318,6 +318,24 @@
       "location": "Çevrimiçi",
       "price": "15€",
       "price_unit": "/ 90 Dak"
+    },
+    "de50_a1_1_replacement_2026_07": {
+      "title": "Almanca A1.1",
+      "description": "Özellikle ileri yaşta öğrenenler için. Yavaş tempo, bol tekrar. Tamamen baştan başlıyoruz!",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "speech_a1_1_replacement_2026_07": {
+      "title": "Konuşma Pratiği A1.1",
+      "description": "Konuşma korkunuzu yenin. A1.1 kursu için ideal bir eklenti.",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "online_a1_1_2026_09": {
+      "title": "Almanca A1.1 (Çevrimiçi)",
+      "description": "Ev rahatlığında. Telegram grubu dahildir. Tamamen baştan başlıyoruz!",
+      "level": "A1.1",
+      "location": "Microsoft Teams"
     }
   },
   "courses_v2": {

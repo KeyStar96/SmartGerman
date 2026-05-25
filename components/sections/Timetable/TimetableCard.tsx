@@ -16,6 +16,7 @@ export interface TimetableCourse {
     instructorKey: string;
     locationKey: string;
     isAlternating?: boolean;
+    startDate?: string;
 }
 
 interface TimetableCardProps {
@@ -36,6 +37,16 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
     // Time Coding
     const [hour] = course.startTime.split(":").map(Number);
     const isEvening = hour >= 17;
+
+    let startBadge = undefined;
+    if (course.startDate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const start = new Date(course.startDate);
+        if (start > today) {
+            startBadge = `Start: ${start.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+        }
+    }
 
     return (
         <motion.div
@@ -88,6 +99,15 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                         course.isAlternating && "right-[60px] rounded-br-sm" // shift left if alternating is present
                     )}>
                         LIVE
+                    </div>
+                )}
+                {/* START Badge */}
+                {startBadge && !isLive && (
+                    <div className={cn(
+                        "absolute top-0 right-0 px-2 py-1 bg-[#111111] dark:bg-white text-white dark:text-black text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20",
+                        course.isAlternating && "right-[60px] rounded-br-sm"
+                    )}>
+                        {startBadge}
                     </div>
                 )}
 

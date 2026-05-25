@@ -577,6 +577,24 @@
       "description": "Vertiefung der Kenntnisse für Beruf und Alltag.",
       "level": "B1",
       "location": "Microsoft Teams"
+    },
+    "de50_a1_1_replacement_2026_07": {
+      "title": "Deutsch A1.1",
+      "description": "Speziell für Lernende im besten Alter. Langsames Tempo, viel Wiederholung. Wir fangen komplett von vorne an!",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "speech_a1_1_replacement_2026_07": {
+      "title": "Sprechtraining A1.1",
+      "description": "Verlieren Sie die Scheu vorm Sprechen. Ideale Ergänzung zum A1.1 Kurs.",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "online_a1_1_2026_09": {
+      "title": "Deutsch A1.1 (Online)",
+      "description": "Bequem von zu Hause. Inklusive Telegram-Gruppe. Wir fangen komplett von vorne an!",
+      "level": "A1.1",
+      "location": "Microsoft Teams"
     }
   },
   "registration": {

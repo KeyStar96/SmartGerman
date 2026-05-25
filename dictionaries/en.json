@@ -575,6 +575,24 @@
       "description": "Intermediate level for advanced learners.",
       "level": "B1",
       "location": "Microsoft Teams"
+    },
+    "de50_a1_1_replacement_2026_07": {
+      "title": "German A1.1",
+      "description": "Especially for learners in their prime. Slow pace, lots of repetition. We start completely from scratch!",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "speech_a1_1_replacement_2026_07": {
+      "title": "Speech Training A1.1",
+      "description": "Lose your fear of speaking. Ideal addition to the A1.1 course.",
+      "level": "A1.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
+    "online_a1_1_2026_09": {
+      "title": "German A1.1 (Online)",
+      "description": "Comfortably from home. Telegram group included. We start completely from scratch!",
+      "level": "A1.1",
+      "location": "Microsoft Teams"
     }
   },
   "registration": {
