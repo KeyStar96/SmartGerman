@@ -86,11 +86,32 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
   const t_labels = timetable?.labels;
   const t_instructors = timetable?.instructors;
 
+  const params = useParams();
+  const lang = (params?.lang as string) || "de";
+  const localeMap: Record<string, string> = {
+    'de': 'de-DE',
+    'en': 'en-US',
+    'ru': 'ru-RU',
+    'uk': 'uk-UA',
+    'tr': 'tr-TR'
+  };
+  const localeTag = localeMap[lang] || 'de-DE';
+
   // Memoize displayed courses AND their formatted data to ensure stable props for children
   const displayedCourses = React.useMemo(() => {
     // Fallback to empty array if courses not passed yet
     const sourceData = courses || [];
-    return sourceData.filter((c) => c.type === filter).map(course => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return sourceData.filter((c) => {
+      if (c.type !== filter) return false;
+      if (c.endDate) {
+        const end = new Date(c.endDate);
+        if (end < today) return false;
+      }
+      return true;
+    }).map(course => {
       // Pre-calculate derived data here to keep props stable
       const sessions = course.sessions;
       const formattedSchedule = sessions.map((s) => {
@@ -104,13 +125,22 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
 
       const formattedPrice = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(course.price);
 
+      let computedStartBadge = undefined;
+      if (course.startDate) {
+        const start = new Date(course.startDate);
+        if (start > today) {
+          computedStartBadge = `Start: ${start.toLocaleDateString(localeTag, { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+        }
+      }
+
       return {
         ...course,
         formattedSchedule,
-        formattedPrice
+        formattedPrice,
+        computedStartBadge
       };
     });
-  }, [filter, t_days]);
+  }, [filter, t_days, localeTag]);
 
   if (!sectionData || !courseTexts) return null;
 
@@ -228,7 +258,7 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
 
 // --- Component: Academic Index Card (Final Accessible Version) ---
 interface CourseCardProps {
-  config: CourseConfig;
+  config: CourseConfig & { computedStartBadge?: string };
   text: CourseText;
   formattedSchedule: string[];
   formattedPrice: string;
@@ -304,13 +334,13 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
               ) : <div />}
 
               {/* Start Badge - ONLY restricted logic or from text */}
-              {text.start_badge && (
+              {(text.start_badge || config.computedStartBadge) && (
                 <span className={`
                       ${jetbrainsMono.className}
                       bg-[#FF5C00] text-white
                       px-2 py-0.5 text-[9px] uppercase tracking-wider
                     `}>
-                  {text.start_badge}
+                  {config.computedStartBadge || text.start_badge}
                 </span>
               )}
             </div>
@@ -391,6 +421,7 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
       </Link>
 
       {/* Trial Lesson CTA Strip → Registration in Trial Mode */}
+      {config.trialLessons !== false && (
       <Link
         href={`/${lang}/registration?courseId=${config.id}&trial=1`}
         className={`
@@ -419,6 +450,7 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
           </span>
         </div>
       </Link>
+      )}
     </motion.div>
   );
 });

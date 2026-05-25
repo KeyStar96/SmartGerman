@@ -33,9 +33,15 @@ export const getCourses = unstable_cache(
                 sessions: record.sessions as CourseSession[],
                 instructor: record.instructor as InstructorKey,
                 unitDuration: record.unit_duration,
+                startDate: record.start_date,
+                endDate: record.end_date,
+                trialLessons: record.trial_lessons !== false, // default to true if null
                 highlight: false,
                 level: undefined
             }));
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
             // Sort: Intensivkurse first, then Sprechtraining, then by level
             const getLevelRank = (id: string) => {
@@ -62,6 +68,12 @@ export const getCourses = unstable_cache(
                 const levelRankA = getLevelRank(a.id);
                 const levelRankB = getLevelRank(b.id);
                 return levelRankA - levelRankB;
+            }).filter((c) => {
+                if (c.endDate) {
+                    const end = new Date(c.endDate);
+                    if (end < today) return false;
+                }
+                return true;
             });
         } catch (err) {
             console.error("Unexpected error in getCourses:", err);

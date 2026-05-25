@@ -23,6 +23,9 @@ export interface CourseConfig {
     instructor: InstructorKey; // For logic if needed, or specific name lookup
     level?: string;
     unitDuration: number;
+    startDate?: string;
+    endDate?: string;
+    trialLessons?: boolean;
 }
 
 

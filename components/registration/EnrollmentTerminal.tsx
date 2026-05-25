@@ -568,17 +568,41 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         return new Date(y, m - 1, d);
     }, [startDate]);
 
-    // Grouping Logic - MEMOIZED
+    // Push startDate forward if a selected course starts later
+    useEffect(() => {
+        if (selectedCourseIds.length === 0) return;
+        const selected = (courses || []).filter(c => selectedCourseIds.includes(c.id));
+        let maxStartDate = new Date(0);
+        let hasStartDate = false;
+
+        selected.forEach(c => {
+            if (c.startDate) {
+                const sDate = new Date(c.startDate);
+                if (sDate > maxStartDate) {
+                    maxStartDate = sDate;
+                    hasStartDate = true;
+                }
+            }
+        });
+
+        if (hasStartDate && startDateObj < maxStartDate) {
+            const day = String(maxStartDate.getDate()).padStart(2, '0');
+            const month = String(maxStartDate.getMonth() + 1).padStart(2, '0');
+            const year = maxStartDate.getFullYear();
+            setStartDate(`${day}.${month}.${year}`);
+        }
+    }, [selectedCourseIds, courses, startDateObj]);
 
     // Grouping Logic - MEMOIZED
     const { presenceCourses, onlineCourses, speechCourses } = React.useMemo(() => {
         const sourceData = courses || [];
+        const filteredData = isTrialMode ? sourceData.filter(c => c.trialLessons !== false) : sourceData;
         return {
-            presenceCourses: sourceData.filter(c => c.type === 'presence' && !c.id.includes('speech')),
-            onlineCourses: sourceData.filter(c => c.type === 'online'),
-            speechCourses: sourceData.filter(c => c.id.includes('speech'))
+            presenceCourses: filteredData.filter(c => c.type === 'presence' && !c.id.includes('speech')),
+            onlineCourses: filteredData.filter(c => c.type === 'online'),
+            speechCourses: filteredData.filter(c => c.id.includes('speech'))
         };
-    }, [courses]);
+    }, [courses, isTrialMode]);
 
     // Label for current selection
     const localeMap: Record<string, string> = {
