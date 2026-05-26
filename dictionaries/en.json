@@ -530,39 +530,39 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "German A1.1",
+      "title": "German A1.2",
       "description": "Specially designed for mature learners. Slow pace, relaxed atmosphere.",
-      "level": "A1.1",
+      "level": "A1.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a1_2": {
-      "title": "German A1.2",
+      "title": "German A2.1",
       "description": "Advanced beginners. Deepening the basics.",
-      "level": "A1.2",
+      "level": "A2.1",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a2": {
-      "title": "German A2",
+      "title": "German A2.2",
       "description": "Independent communication (doctors, authorities).",
-      "level": "A2",
+      "level": "A2.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1": {
-      "title": "Speaking Training A1.1",
+      "title": "Speech Training A1.2",
       "description": "Lose shyness, gain confidence.",
-      "level": "A1.1",
-      "location": "Freizeitheim Vahrenwald"
-    },
-    "speech_a1_2": {
-      "title": "Speaking Training A1.2",
-      "description": "Deepening speaking skills.",
       "level": "A1.2",
       "location": "Freizeitheim Vahrenwald"
     },
+    "speech_a1_2": {
+      "title": "Speech Training A2.1",
+      "description": "Deepening speaking skills.",
+      "level": "A2.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
     "speech_a2": {
-      "title": "Speaking Training A2",
+      "title": "Speech Training A2.2",
       "description": "Confident speaking in everyday situations.",
-      "level": "A2",
+      "level": "A2.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1": {

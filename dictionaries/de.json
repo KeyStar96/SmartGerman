@@ -532,39 +532,39 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "Deutsch A1.1",
+      "title": "Deutsch A1.2",
       "description": "Speziell für Lernende im besten Alter. Langsames Tempo, viel Wiederholung.",
-      "level": "A1.1",
+      "level": "A1.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a1_2": {
-      "title": "Deutsch A1.2",
+      "title": "Deutsch A2.1",
       "description": "Aufbaukurs. Vertiefen Sie Grundlagen und Wortschatz.",
-      "level": "A1.2",
+      "level": "A2.1",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a2": {
-      "title": "Deutsch A2",
+      "title": "Deutsch A2.2",
       "description": "Für selbstständige Kommunikation im Alltag.",
-      "level": "A2",
+      "level": "A2.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1": {
-      "title": "Sprechtraining A1.1",
-      "description": "Verlieren Sie die Scheu vorm Sprechen.",
-      "level": "A1.1",
-      "location": "Freizeitheim Vahrenwald"
-    },
-    "speech_a1_2": {
       "title": "Sprechtraining A1.2",
-      "description": "Fokus auf Aussprache und Wortfluss.",
+      "description": "Verlieren Sie die Scheu vorm Sprechen.",
       "level": "A1.2",
       "location": "Freizeitheim Vahrenwald"
     },
+    "speech_a1_2": {
+      "title": "Sprechtraining A2.1",
+      "description": "Fokus auf Aussprache und Wortfluss.",
+      "level": "A2.1",
+      "location": "Freizeitheim Vahrenwald"
+    },
     "speech_a2": {
-      "title": "Sprechtraining A2",
+      "title": "Sprechtraining A2.2",
       "description": "Sicherheit im freien Sprechen gewinnen.",
-      "level": "A2",
+      "level": "A2.2",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1": {

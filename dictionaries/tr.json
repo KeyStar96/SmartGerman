@@ -268,39 +268,39 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "Almanca A1.1",
+      "title": "Almanca A1.2",
       "description": "yetişkin öğrenciler için özel. Yavaş tempo, rahat atmosfer.",
-      "level": "A1.1",
+      "level": "A1.2",
       "location": "Yüz yüze"
     },
     "de50_a1_2": {
-      "title": "Almanca A1.2",
+      "title": "Almanca A2.1",
       "description": "Geliştirme kursu. Temellerin derinleştirilmesi.",
-      "level": "A1.2",
+      "level": "A2.1",
       "location": "Yüz yüze"
     },
     "de50_a2": {
-      "title": "Almanca A2",
+      "title": "Almanca A2.2",
       "description": "Bağımsız iletişim (doktor, resmi daireler).",
-      "level": "A2",
+      "level": "A2.2",
       "location": "Yüz yüze"
     },
     "speech_a1_1": {
-      "title": "Konuşma Eğitimi A1.1",
+      "title": "Konuşma Pratiği A1.2",
       "description": "Çekingenliği yenmek, özgüven kazanmak.",
-      "level": "A1.1",
-      "location": "Yüz yüze"
-    },
-    "speech_a1_2": {
-      "title": "Konuşma Eğitimi A1.2",
-      "description": "Konuşma becerilerini derinleştirme.",
       "level": "A1.2",
       "location": "Yüz yüze"
     },
+    "speech_a1_2": {
+      "title": "Konuşma Pratiği A2.1",
+      "description": "Konuşma becerilerini derinleştirme.",
+      "level": "A2.1",
+      "location": "Yüz yüze"
+    },
     "speech_a2": {
-      "title": "Konuşma Eğitimi A2",
+      "title": "Konuşma Pratiği A2.2",
       "description": "Günlük durumlarda özgüvenli konuşma.",
-      "level": "A2",
+      "level": "A2.2",
       "location": "Yüz yüze"
     },
     "online_a1_1": {
