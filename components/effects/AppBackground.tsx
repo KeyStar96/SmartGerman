@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export default function AppBackground({ className }: { className?: string }) {
@@ -13,30 +12,34 @@ export default function AppBackground({ className }: { className?: string }) {
             )}
         >
             {/* Light Mode Image - High Priority */}
-            <div className="absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out dark:opacity-0 opacity-100">
-                <Image
+            <picture className="absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out dark:opacity-0 opacity-100">
+                <source media="(max-width: 767px)" srcSet="/Bilder/SG_Background_Light_Mobile.webp" type="image/webp" />
+                <source media="(min-width: 768px)" srcSet="/Bilder/SG_Background_Light.webp" type="image/webp" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                     src="/Bilder/SG_Background_Light.webp"
                     alt="Background"
-                    fill
-                    priority
-                    quality={90}
-                    sizes="100vw"
-                    className="object-cover scale-[1.02]"
+                    // @ts-expect-error fetchpriority is a valid HTML attribute but React types might not be updated
+                    fetchpriority="high"
+                    decoding="sync"
+                    className="object-cover w-full h-full scale-[1.02]"
                 />
-            </div>
+            </picture>
 
             {/* Dark Mode Image - High Priority */}
-            <div className="absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out opacity-0 dark:opacity-100">
-                <Image
+            <picture className="absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out opacity-0 dark:opacity-100">
+                <source media="(max-width: 767px)" srcSet="/Bilder/SG_Background_Dark_Mobile.webp" type="image/webp" />
+                <source media="(min-width: 768px)" srcSet="/Bilder/SG_Background_Dark.webp" type="image/webp" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                     src="/Bilder/SG_Background_Dark.webp"
                     alt="Background"
-                    fill
-                    priority
-                    quality={90}
-                    sizes="100vw"
-                    className="object-cover scale-[1.02]"
+                    // @ts-expect-error fetchpriority is a valid HTML attribute but React types might not be updated
+                    fetchpriority="high"
+                    decoding="sync"
+                    className="object-cover w-full h-full scale-[1.02]"
                 />
-            </div>
+            </picture>
         </div>
     );
 }
