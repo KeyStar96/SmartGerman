@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import { getDictionary } from "@/lib/dictionary";
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
 };
 
-const outfit = Outfit({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: 'swap',
   preload: true,
@@ -102,7 +102,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`${outfit.className} ${jetbrainsMono.variable} text-foreground antialiased font-sans`}>
+      <body className={`${plusJakarta.className} ${jetbrainsMono.variable} text-foreground antialiased font-sans`}>
         {/* Navigation progress bar — instant visual feedback during page transitions */}
         <NavigationProgress />
         {/* 
