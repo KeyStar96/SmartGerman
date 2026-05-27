@@ -78,6 +78,7 @@ const cardVariants = {
 
 export default function Courses({ dictionary, courses }: CoursesProps) {
   const [filter, setFilter] = useState<CourseType>("presence");
+  const [isPending, startTransition] = React.useTransition();
 
   const sectionData = dictionary?.courses_v2;
   const courseTexts = dictionary?.CourseData;
@@ -105,6 +106,11 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // PERFORMANCE: Initialize Intl objects ONCE outside the loop!
+    const priceFormatter = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
+    const dateFormatter = new Intl.DateTimeFormat(localeTag, { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const startPrefix = sectionData?.start_prefix || "Start";
+
     return sourceData.filter((c) => {
       if (c.type !== filter) return false;
       if (c.endDate) {
@@ -124,14 +130,13 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
         return `${localizedDay} ${s.startTime}-${s.endTime}`;
       });
 
-      const formattedPrice = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(course.price);
+      const formattedPrice = priceFormatter.format(course.price);
 
       let computedStartBadge = undefined;
       if (course.startDate) {
         const start = new Date(course.startDate);
         if (start > today) {
-          const startPrefix = sectionData?.start_prefix || "Start";
-          computedStartBadge = `${startPrefix}: ${start.toLocaleDateString(localeTag, { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+          computedStartBadge = `${startPrefix}: ${dateFormatter.format(start)}`;
         }
       }
 
@@ -142,7 +147,7 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
         computedStartBadge
       };
     });
-  }, [filter, t_days, localeTag]);
+  }, [filter, courses, t_days, localeTag, sectionData, t_labels]);
 
   if (!sectionData || !courseTexts) return null;
 
@@ -174,7 +179,7 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
               return (
                 <button
                   key={tab}
-                  onClick={() => setFilter(tab)}
+                  onClick={() => startTransition(() => setFilter(tab))}
                   className={`
                     relative z-10 px-8 h-full rounded-full 
                     text-sm font-bold uppercase tracking-widest 
@@ -183,6 +188,7 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
                       ? "text-[#1A1A1A] dark:text-[#1A1A1A]"
                       : "text-[#2D3436]/60 hover:text-[#2D3436] dark:text-white/60 dark:hover:text-white"
                     }
+                    ${isPending ? "opacity-80" : ""}
                     ${jetbrainsMono.className}
                   `}
                 >
