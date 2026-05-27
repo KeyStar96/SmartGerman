@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
@@ -15,6 +15,14 @@ interface ScienceSectionProps {
 
 export default function ScienceSection({ dictionary }: ScienceSectionProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
+        checkDesktop(); // Init
+        window.addEventListener('resize', checkDesktop);
+        return () => window.removeEventListener('resize', checkDesktop);
+    }, []);
 
     return (
         <section
@@ -115,7 +123,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                         transform: 'rotate(0deg)',
                                     }}
                                 >
-                                    <NeuralBrain />
+                                    {isDesktop && <NeuralBrain />}
                                 </div>
                             </div>
                         </div>

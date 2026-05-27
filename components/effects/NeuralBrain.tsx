@@ -653,7 +653,9 @@ export default function NeuralBrain() {
                 // Randomized chance to pick this connection, or force if we run out of time
                 if (Math.random() < 0.5 || (n.connections.length - i) <= (targetCount - fired)) {
                     // Propagate type!
-                    spawnPulse(idx, n.connections[i], 3.0, 0.0, n.type);
+                    // Introduce a random delay (negative start progress) so pulses from the same neuron fire asynchronously
+                    const asyncDelay = -(Math.random() * 0.6); 
+                    spawnPulse(idx, n.connections[i], 3.0, asyncDelay, n.type);
                     fired++;
                 }
             }
