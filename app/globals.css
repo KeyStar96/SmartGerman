@@ -999,3 +999,6 @@ html.dark {
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+p {
+  @apply text-justify hyphens-auto;
+}
