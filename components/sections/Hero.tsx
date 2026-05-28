@@ -215,7 +215,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
     <section
       id="hero"
       ref={container}
-      className="relative min-h-[90vh] flex items-start overflow-hidden z-10 pt-24 pb-20 w-full"
+      className="relative min-h-[80vh] flex items-start overflow-hidden z-10 pt-16 pb-12 w-full"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -235,7 +235,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Block A: Brand Split (Masked Reveal) — 3 Lines ─── */}
           <h1
             ref={brandRef}
-            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-[0.9] font-sans mb-4 will-change-transform"
+            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-[0.85] font-sans mb-3 will-change-transform"
             style={{ visibility: 'hidden' }}
             onMouseEnter={handleBrandEnter}
             onMouseLeave={handleBrandLeave}
@@ -265,7 +265,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Block B: Claim (Masked Reveal) ─── */}
           <h2
             ref={claimRef}
-            className="hero-line-mask text-2xl md:text-3xl font-medium leading-tight text-[#2D3436] dark:text-[#E2D7CE] opacity-90 mb-12 min-h-[2em] will-change-transform"
+            className="hero-line-mask text-2xl md:text-3xl font-medium leading-tight text-[#2D3436] dark:text-[#E2D7CE] opacity-90 mb-6 min-h-[1.5em] will-change-transform"
             style={{ visibility: 'hidden' }}
           >
             <span className="hero-line-inner block">
@@ -276,7 +276,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Subline (Masked Reveal) ─── */}
           <p
             ref={sublineRef}
-            className="hero-line-mask text-lg md:text-xl font-light tracking-wide leading-relaxed mb-12 max-w-xl text-[#2D3436] dark:text-[#E2D7CE] hyphens-none will-change-transform"
+            className="hero-line-mask text-lg md:text-xl font-light tracking-wide leading-relaxed mb-6 max-w-xl text-[#2D3436] dark:text-[#E2D7CE] hyphens-none will-change-transform"
             style={{ visibility: 'hidden' }}
           >
             <span className="hero-line-inner block">
@@ -290,7 +290,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
             className="hero-line-mask will-change-transform"
             style={{ visibility: 'hidden' }}
           >
-            <span className="hero-line-inner flex flex-col sm:flex-row gap-8 items-start sm:items-center mt-8">
+            <span className="hero-line-inner flex flex-col sm:flex-row gap-6 items-start sm:items-center mt-2">
               {/* Primary Button */}
               <button
                 onClick={() => scrollToSection('science')}
