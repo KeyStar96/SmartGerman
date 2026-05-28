@@ -202,7 +202,7 @@
             "price": "15€",
             "price_unit": "/ 90 Min",
             "price_note": "",
-            "description": "Bequem von zu Hause. Inkl. Telegram-Support.",
+            "description": "Bequem von zu Hause. In kleinen Gruppen (max. 10 Personen), inklusive Unterrichtsaufzeichnung für die eigene Wiederholung im Anschluss und intensivem 24/7 Telegram-Support durch die Lehrerin bei Fragen zur Grammatik und Sprache.",
             "max_participants": "Max: 10 Pers.",
             "badge": "Online"
           },
@@ -217,7 +217,7 @@
             "price": "15€",
             "price_unit": "/ 90 Min",
             "price_note": "",
-            "description": "Mittelstufe für Fortgeschrittene.",
+            "description": "Mittelstufe für Fortgeschrittene. In kleinen Gruppen (max. 10 Personen), inklusive Unterrichtsaufzeichnung für die eigene Wiederholung im Anschluss und intensivem 24/7 Telegram-Support durch die Lehrerin bei Fragen zur Grammatik und Sprache.",
             "max_participants": "",
             "badge": "Online"
           }
@@ -569,13 +569,13 @@
     },
     "online_a1_1": {
       "title": "Grundlagen A1.1 (Online)",
-      "description": "Bequem von zu Hause. Inklusive Telegram-Gruppe.",
+      "description": "Bequem von zu Hause. In kleinen Gruppen (max. 10 Personen), inklusive Unterrichtsaufzeichnung für die eigene Wiederholung im Anschluss und intensivem 24/7 Telegram-Support durch die Lehrerin bei Fragen zur Grammatik und Sprache.",
       "level": "A1.1",
       "location": "Microsoft Teams"
     },
     "online_b1": {
       "title": "Deutsch B1 (Online)",
-      "description": "Vertiefung der Kenntnisse für Beruf und Alltag.",
+      "description": "Vertiefung der Kenntnisse für Beruf und Alltag. In kleinen Gruppen (max. 10 Personen), inklusive Unterrichtsaufzeichnung für die eigene Wiederholung im Anschluss und intensivem 24/7 Telegram-Support durch die Lehrerin bei Fragen zur Grammatik und Sprache.",
       "level": "B1",
       "location": "Microsoft Teams"
     },
@@ -593,7 +593,7 @@
     },
     "online_a1_1_2026_09": {
       "title": "Deutsch A1.1 (Online)",
-      "description": "Bequem von zu Hause. Inklusive Telegram-Gruppe. Wir fangen komplett von vorne an!",
+      "description": "Bequem von zu Hause. Wir fangen komplett von vorne an! In kleinen Gruppen (max. 10 Personen), inklusive Unterrichtsaufzeichnung für die eigene Wiederholung im Anschluss und intensivem 24/7 Telegram-Support durch die Lehrerin bei Fragen zur Grammatik und Sprache.",
       "level": "A1.1",
       "location": "Microsoft Teams"
     }

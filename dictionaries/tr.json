@@ -199,7 +199,7 @@
             "price": "15€",
             "price_unit": "/ 90 Dk",
             "price_note": "",
-            "description": "Evden rahatça. Telegram desteği dahil.",
+            "description": "Evinizin rahatlığında. Küçük gruplar halinde (en fazla 10 kişi), dersin kaydını daha sonra tekrar izlemeniz için dahil ve gramer ve dil ile ilgili sorularınız için öğretmen tarafından 7/24 yoğun Telegram desteği.",
             "max_participants": "Maks: 10 Kişi",
             "badge": "Çevrimiçi"
           },
@@ -214,7 +214,7 @@
             "price": "15€",
             "price_unit": "/ 90 Dk",
             "price_note": "",
-            "description": "İleri düzey öğrenciler için orta seviye.",
+            "description": "İleri seviye orta düzey. Küçük gruplar halinde (en fazla 10 kişi), dersin kaydını daha sonra kendi başınıza tekrar edebilmeniz için sunuyoruz; ayrıca gramer ve dil ile ilgili sorularınız için öğretmenimizden 7/24 Telegram üzerinden yoğun destek alabilirsiniz.",
             "max_participants": "",
             "badge": "Çevrimiçi"
           }
@@ -305,7 +305,7 @@
     },
     "online_a1_1": {
       "title": "Temeller A1.1 (Çevrimiçi)",
-      "description": "Evinizden rahatça. Telegram desteği dahil.",
+      "description": "Evinizin rahatlığında. Küçük gruplar halinde (en fazla 10 kişi), dersin kaydını daha sonra tekrar izlemeniz için dahil ve gramer ve dil ile ilgili sorularınız için öğretmenin 7/24 Telegram üzerinden sunduğu yoğun destek.",
       "level": "A1.1",
       "location": "Çevrimiçi",
       "price": "15€",
@@ -313,7 +313,7 @@
     },
     "online_b1": {
       "title": "Almanca B1 (Çevrimiçi)",
-      "description": "İleri seviye için orta düzey.",
+      "description": "Mesleki ve günlük yaşamda bilgilerin pekiştirilmesi. Küçük gruplar halinde (en fazla 10 kişi), derslerin kaydını içeren (dersi daha sonra tekrarlamak için) ve gramer ve dil ile ilgili sorularınız için öğretmenin 7/24 Telegram üzerinden sunduğu yoğun destek.",
       "level": "B1",
       "location": "Çevrimiçi",
       "price": "15€",
@@ -333,7 +333,7 @@
     },
     "online_a1_1_2026_09": {
       "title": "Almanca A1.1 (Çevrimiçi)",
-      "description": "Ev rahatlığında. Telegram grubu dahildir. Tamamen baştan başlıyoruz!",
+      "description": "Evinizin rahatlığında. Tamamen sıfırdan başlıyoruz! Küçük gruplar halinde (en fazla 10 kişi), derslerin kaydını daha sonra kendi başınıza tekrar edebilmeniz için sunuyoruz ve gramer ve dil ile ilgili sorularınız için öğretmenimizden 7/24 yoğun Telegram desteği alabilirsiniz.",
       "level": "A1.1",
       "location": "Microsoft Teams"
     }

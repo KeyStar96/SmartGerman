@@ -200,7 +200,7 @@
             "price": "15€",
             "price_unit": "/ 90 Min",
             "price_note": "",
-            "description": "Comfortably from home. Incl. Telegram support.",
+            "description": "Comfortably from home. In small groups (max. 10 people), including lesson recordings for your own review afterwards and intensive 24/7 Telegram support from the teacher for questions about grammar and language.",
             "max_participants": "Max: 10 People",
             "badge": "Online Course"
           },
@@ -215,7 +215,7 @@
             "price": "15€",
             "price_unit": "/ 90 Min",
             "price_note": "",
-            "description": "Intermediate level for advanced learners.",
+            "description": "Intermediate level for advanced learners. In small groups (max. 10 people), including lesson recordings for your own review afterwards and intensive 24/7 Telegram support from the teacher for questions about grammar and language.",
             "max_participants": "",
             "badge": "Online Course"
           }
@@ -567,13 +567,13 @@
     },
     "online_a1_1": {
       "title": "Basics A1.1 (Online)",
-      "description": "Comfortably from home. Incl. Telegram support.",
+      "description": "Comfortably from home. In small groups (max. 10 people), including lesson recordings for your own review afterwards and intensive 24/7 Telegram support from the teacher for questions about grammar and language.",
       "level": "A1.1",
       "location": "Microsoft Teams"
     },
     "online_b1": {
       "title": "German B1 (Online)",
-      "description": "Intermediate level for advanced learners.",
+      "description": "Intermediate level for advanced learners. In small groups (max. 10 people), including lesson recordings for your own review afterwards and intensive 24/7 Telegram support from the teacher for questions about grammar and language.",
       "level": "B1",
       "location": "Microsoft Teams"
     },
@@ -591,7 +591,7 @@
     },
     "online_a1_1_2026_09": {
       "title": "German A1.1 (Online)",
-      "description": "Comfortably from home. Telegram group included. We start completely from scratch!",
+      "description": "Comfortably from home. We start completely from scratch! In small groups (max. 10 people), including lesson recordings for your own review afterwards and intensive 24/7 Telegram support from the teacher for questions about grammar and language.",
       "level": "A1.1",
       "location": "Microsoft Teams"
     }
