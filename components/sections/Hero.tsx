@@ -25,17 +25,20 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
 
   // Refs for masked reveal targets
   const brandRef = useRef<HTMLHeadingElement>(null);
-  const smartRef = useRef<HTMLSpanElement>(null);
-  const germanRef = useRef<HTMLSpanElement>(null);
+  const sitovRef = useRef<HTMLSpanElement>(null);
+  const languageRef = useRef<HTMLSpanElement>(null);
+  const academyRef = useRef<HTMLSpanElement>(null);
   const claimRef = useRef<HTMLHeadingElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
 
   // Magnetic quickTo refs (stable across renders)
-  const smartQuickX = useRef<gsap.QuickToFunc | null>(null);
-  const smartQuickY = useRef<gsap.QuickToFunc | null>(null);
-  const germanQuickX = useRef<gsap.QuickToFunc | null>(null);
-  const germanQuickY = useRef<gsap.QuickToFunc | null>(null);
+  const sitovQuickX = useRef<gsap.QuickToFunc | null>(null);
+  const sitovQuickY = useRef<gsap.QuickToFunc | null>(null);
+  const languageQuickX = useRef<gsap.QuickToFunc | null>(null);
+  const languageQuickY = useRef<gsap.QuickToFunc | null>(null);
+  const academyQuickX = useRef<gsap.QuickToFunc | null>(null);
+  const academyQuickY = useRef<gsap.QuickToFunc | null>(null);
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [canHover, setCanHover] = useState(false);
@@ -132,11 +135,13 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
     }
 
     // ── Magnetic Headline quickTo Setup ──────────
-    if (canHover && !prefersReduced && smartRef.current && germanRef.current) {
-      smartQuickX.current = gsap.quickTo(smartRef.current, "x", { duration: 0.6, ease: "power3.out" });
-      smartQuickY.current = gsap.quickTo(smartRef.current, "y", { duration: 0.6, ease: "power3.out" });
-      germanQuickX.current = gsap.quickTo(germanRef.current, "x", { duration: 0.6, ease: "power3.out" });
-      germanQuickY.current = gsap.quickTo(germanRef.current, "y", { duration: 0.6, ease: "power3.out" });
+    if (canHover && !prefersReduced && sitovRef.current && languageRef.current && academyRef.current) {
+      sitovQuickX.current = gsap.quickTo(sitovRef.current, "x", { duration: 0.6, ease: "power3.out" });
+      sitovQuickY.current = gsap.quickTo(sitovRef.current, "y", { duration: 0.6, ease: "power3.out" });
+      languageQuickX.current = gsap.quickTo(languageRef.current, "x", { duration: 0.6, ease: "power3.out" });
+      languageQuickY.current = gsap.quickTo(languageRef.current, "y", { duration: 0.6, ease: "power3.out" });
+      academyQuickX.current = gsap.quickTo(academyRef.current, "x", { duration: 0.6, ease: "power3.out" });
+      academyQuickY.current = gsap.quickTo(academyRef.current, "y", { duration: 0.6, ease: "power3.out" });
     }
 
     // Cleanup ScrollTriggers on unmount
@@ -158,19 +163,23 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
     const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
 
     const factor = 12; // max pixel offset
-    // "Smart" follows, "German" mirrors → depth illusion
-    smartQuickX.current?.(nx * factor);
-    smartQuickY.current?.(ny * factor * 0.5);
-    germanQuickX.current?.(nx * -factor);
-    germanQuickY.current?.(ny * -factor * 0.5);
+    // "Sitov" follows, "Language" slight, "Academy" mirrors → depth illusion
+    sitovQuickX.current?.(nx * factor);
+    sitovQuickY.current?.(ny * factor * 0.5);
+    languageQuickX.current?.(nx * factor * 0.4);
+    languageQuickY.current?.(ny * factor * 0.3);
+    academyQuickX.current?.(nx * -factor);
+    academyQuickY.current?.(ny * -factor * 0.5);
   }, [canHover]);
 
   const handleMouseLeave = useCallback(() => {
     // Reset to origin
-    smartQuickX.current?.(0);
-    smartQuickY.current?.(0);
-    germanQuickX.current?.(0);
-    germanQuickY.current?.(0);
+    sitovQuickX.current?.(0);
+    sitovQuickY.current?.(0);
+    languageQuickX.current?.(0);
+    languageQuickY.current?.(0);
+    academyQuickX.current?.(0);
+    academyQuickY.current?.(0);
   }, []);
 
   // Hover Pop handlers for brand line
@@ -223,27 +232,32 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           className="col-span-1 lg:col-span-7 flex flex-col justify-start text-left"
         >
 
-          {/* ─── Block A: Brand Split (Masked Reveal) ─── */}
+          {/* ─── Block A: Brand Split (Masked Reveal) — 3 Lines ─── */}
           <h1
             ref={brandRef}
-            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-none font-sans mb-4 will-change-transform"
+            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-[0.9] font-sans mb-4 will-change-transform"
             style={{ visibility: 'hidden' }}
             onMouseEnter={handleBrandEnter}
             onMouseLeave={handleBrandLeave}
           >
-            <span className="hero-line-inner flex items-baseline whitespace-nowrap">
+            <span className="hero-line-inner flex flex-col">
               <span
-                ref={smartRef}
+                ref={sitovRef}
                 className="font-bold text-[#2D3436] dark:text-[#E2D7CE] inline-block will-change-transform"
               >
-                Smart
+                Sitov
               </span>
               <span
-                ref={germanRef}
-                className="font-bold text-[#FF5C00] inline-block will-change-transform"
-                style={{ paddingLeft: '2px' }}
+                ref={languageRef}
+                className="font-bold text-[#2D3436] dark:text-[#E2D7CE] inline-block will-change-transform"
               >
-                German
+                Language
+              </span>
+              <span
+                ref={academyRef}
+                className="font-bold text-[#FF5C00] inline-block will-change-transform"
+              >
+                Academy
               </span>
             </span>
           </h1>

@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
 <body>
     <div class="container">
         <div class="header">
-            <img src="${logoUrl}" alt="SmartGerman Logo" class="logo">
+            <img src="${logoUrl}" alt="Sitov Language Academy Logo" class="logo">
         </div>
         <div class="content">
             <h1 class="h1">Deine Probestunde ist bestätigt! 🎉</h1>
@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
             </p>
             
             <p class="text">
-                wir freuen uns sehr, dass du eine Probestunde bei SmartGerman ausprobieren möchtest!
+                wir freuen uns sehr, dass du eine Probestunde bei Sitov Language Academy ausprobieren möchtest!
             </p>
 
             <div class="highlight-box">
@@ -121,23 +121,23 @@ Deno.serve(async (req) => {
             </p>
 
             <p class="text" style="font-weight: 600; margin-top: 32px;">
-                Dein SmartGerman Team
+                Dein Sitov Language Academy Team
             </p>
         </div>
         <div class="footer">
             <p style="margin-bottom: 16px;">
-                <strong>SmartGerman Sprachschule</strong><br>
+                <strong>Sitov Language Academy</strong><br>
                 Vahrenwalder Straße 92 • 30165 Hannover
             </p>
             <p style="margin-bottom: 8px;">
-                <a href="mailto:info@smart-german.com">info@smart-german.com</a> • +49 171 4758620
+                <a href="mailto:info@sitov-academy.com">info@sitov-academy.com</a> • +49 171 4758620
             </p>
             <div class="copyright">
-                &copy; 2025 SmartGerman. Alle Rechte vorbehalten.<br>
+                &copy; 2026 Sitov Language Academy. Alle Rechte vorbehalten.<br>
                 Vertretungsberechtigt: Anastasia Sitov<br><br>
-                <a href="https://www.smart-german.com/imprint">Impressum</a> • 
-                <a href="https://www.smart-german.com/privacy">Datenschutz</a> • 
-                <a href="https://www.smart-german.com/agb">AGB</a>
+                <a href="https://www.sitov-academy.com/imprint">Impressum</a> • 
+                <a href="https://www.sitov-academy.com/privacy">Datenschutz</a> • 
+                <a href="https://www.sitov-academy.com/agb">AGB</a>
             </div>
         </div>
     </div>
@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
             `
 
             const { data: emailData, error: emailError } = await resend.emails.send({
-                from: 'SmartGerman <info@smart-german.com>',
+                from: 'Sitov Language Academy <info@sitov-academy.com>',
                 to: [trial.email],
                 subject: `Deine Probestunde ist bestätigt – ${formattedDate}`,
                 html: emailHtml,

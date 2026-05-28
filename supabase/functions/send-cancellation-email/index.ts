@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deine Anmeldung bei SmartGerman</title>
+    <title>Deine Anmeldung bei Sitov Language Academy</title>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #374151; }
         .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
         
         <!-- Header -->
         <div class="header">
-            <img src="${logoUrl}" alt="SmartGerman Logo" class="logo">
+            <img src="${logoUrl}" alt="Sitov Language Academy Logo" class="logo">
         </div>
 
         <!-- Content -->
@@ -116,25 +116,25 @@ Deno.serve(async (req) => {
             </p>
 
             <p class="text" style="font-weight: 600; margin-top: 32px;">
-                Dein SmartGerman Team
+                Dein Sitov Language Academy Team
             </p>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <p style="margin-bottom: 16px;">
-                <strong>SmartGerman Sprachschule</strong><br>
+                <strong>Sitov Language Academy</strong><br>
                 Hüttenstraße 24a • 30165 Hannover
             </p>
             <p style="margin-bottom: 8px;">
-                <a href="mailto:info@smart-german.com">info@smart-german.com</a> • +49 171 4758620
+                <a href="mailto:info@sitov-academy.com">info@sitov-academy.com</a> • +49 171 4758620
             </p>
             <div class="copyright">
-                &copy; 2025 SmartGerman. Alle Rechte vorbehalten.<br>
+                &copy; 2026 Sitov Language Academy. Alle Rechte vorbehalten.<br>
                 Vertretungsberechtigt: Anastasia Sitov<br><br>
-                <a href="https://www.smart-german.com/imprint">Impressum</a> • 
-                <a href="https://www.smart-german.com/privacy">Datenschutz</a> • 
-                <a href="https://www.smart-german.com/agb">AGB</a>
+                <a href="https://www.sitov-academy.com/imprint">Impressum</a> • 
+                <a href="https://www.sitov-academy.com/privacy">Datenschutz</a> • 
+                <a href="https://www.sitov-academy.com/agb">AGB</a>
             </div>
         </div>
     </div>
@@ -143,9 +143,9 @@ Deno.serve(async (req) => {
             `;
 
             const { data: emailData, error: emailError } = await resend.emails.send({
-                from: 'SmartGerman <info@smart-german.com>',
+                from: 'Sitov Language Academy <info@sitov-academy.com>',
                 to: [user.email],
-                subject: 'Deine Anmeldung bei SmartGerman',
+                subject: 'Deine Anmeldung bei Sitov Language Academy',
                 html: emailHtml,
             })
 

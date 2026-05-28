@@ -22,7 +22,7 @@ const OG_LOCALE_MAP: Record<string, string> = {
   tr: 'tr_TR',
 };
 
-const BASE_URL = "https://www.smart-german.com";
+const BASE_URL = "https://www.sitov-academy.com";
 
 export async function generateMetadata({
   params
@@ -41,11 +41,11 @@ export async function generateMetadata({
       title: dictionary.meta.title,
       description: dictionary.meta.description,
       url: `${BASE_URL}/${lang}`,
-      siteName: "SmartGerman",
+      siteName: "Sitov Language Academy",
       type: "website",
       locale: OG_LOCALE_MAP[lang] || 'de_DE',
       images: [{
-        url: `${BASE_URL}/Bilder/og-smartgerman.jpg`,
+        url: `${BASE_URL}/Bilder/og-sitov-academy.jpg`,
         width: 1200,
         height: 630,
         alt: dictionary.meta.og_image_alt || dictionary.meta.title,
@@ -55,7 +55,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: dictionary.meta.title,
       description: dictionary.meta.description,
-      images: [`${BASE_URL}/Bilder/og-smartgerman.jpg`],
+      images: [`${BASE_URL}/Bilder/og-sitov-academy.jpg`],
     },
     alternates: {
       canonical: `${BASE_URL}/${lang}`,
@@ -89,13 +89,13 @@ export default async function HomePage({
       {
         "@type": ["EducationalOrganization", "LocalBusiness"],
         "@id": `${BASE_URL}/#organization`,
-        "name": "SmartGerman",
-        "alternateName": "SmartGerman Sprachschule",
+        "name": "Sitov Language Academy",
+        "alternateName": "Sitov Language Academy Hannover",
         "url": BASE_URL,
         "logo": `${BASE_URL}/Bilder/SG_Logo_Lightmode.png`,
-        "image": `${BASE_URL}/Bilder/og-smartgerman.jpg`,
+        "image": `${BASE_URL}/Bilder/og-sitov-academy.jpg`,
         "description": dictionary.meta.description,
-        "email": "info@smart-german.com",
+        "email": "info@sitov-academy.com",
         "telephone": "+49 171 4758620",
         "priceRange": "€€",
         "currenciesAccepted": "EUR",
@@ -172,7 +172,7 @@ export default async function HomePage({
         "@type": "WebSite",
         "@id": `${BASE_URL}/#website`,
         "url": BASE_URL,
-        "name": "SmartGerman",
+        "name": "Sitov Language Academy",
         "inLanguage": lang,
         "publisher": { "@id": `${BASE_URL}/#organization` },
       },
@@ -184,7 +184,7 @@ export default async function HomePage({
           {
             "@type": "ListItem",
             "position": 1,
-            "name": "SmartGerman",
+            "name": "Sitov Language Academy",
             "item": BASE_URL,
           },
           {

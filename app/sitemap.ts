@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://www.smart-german.com';
+    const baseUrl = 'https://www.sitov-academy.com';
     const locales = ['de', 'en', 'uk', 'ru', 'tr'];
 
     // All public pages (excluding /registration which is disallowed in robots.txt)

@@ -322,7 +322,7 @@ function LogoImage() {
   return (
     <Image
       src={isDark ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
-      alt="SmartGerman Logo"
+      alt="Sitov Language Academy Logo"
       width={140}
       height={32}
       className="h-8 w-auto object-contain"
@@ -424,7 +424,7 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
         <Link href={`/${lang}`} className="relative z-10 block h-8 w-auto">
           {/* Small Logo Icon for Mobile - utilizing LogoImage but maybe we want just the icon? 
                  LogoImage is full text. Let's use LogoImage for now, might be small. 
-                 Actually user requested "SmartGerman-Logo". 
+                 Actually user requested "Sitov Language Academy Logo". 
                  Let's stick to LogoImage but constrained. 
              */}
           <div className="scale-75 origin-center">

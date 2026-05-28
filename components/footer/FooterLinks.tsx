@@ -21,7 +21,7 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
 
     // OPTIMIZATION: Memoized handler
     const handleCopyEmail = useCallback(() => {
-        navigator.clipboard.writeText("info@smart-german.com");
+        navigator.clipboard.writeText("info@sitov-academy.com");
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
     }, []);
@@ -79,8 +79,9 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                            Dot = White (or Orange, depending on taste - here White as closure)
                         */}
                         <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter mb-4 lg:mb-6">
-                            <span className="text-white block">Smart</span>
-                            <span className="text-[#FF5C00] block">German</span>
+                            <span className="text-white block">Sitov</span>
+                            <span className="text-white block">Language</span>
+                            <span className="text-[#FF5C00] block">Academy</span>
                         </h2>
                         <p className="hidden md:block text-white/50 max-w-sm text-sm font-mono uppercase tracking-wide leading-relaxed">
                             {t.Hero?.mission || "Language acquisition based on science."}
@@ -138,7 +139,7 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
 
             {/* BOTTOM ROW: Footer Meta */}
             <div className="mt-8 lg:mt-16 pt-8 border-t border-white/10 flex flex-col items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
-                <span>{t.Legal?.copyright || "© 2026 SmartGerman"}</span>
+                <span>{t.Legal?.copyright || "© 2026 Sitov Language Academy"}</span>
 
                 <div className="flex flex-wrap justify-center gap-8">
                     <Link href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</Link>

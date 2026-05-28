@@ -1048,7 +1048,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         </Link>
                         <Image
                             src={isDarkMode ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
-                            alt="SmartGerman"
+                            alt="Sitov Language Academy"
                             width={100}
                             height={28}
                             priority

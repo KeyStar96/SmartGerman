@@ -6,7 +6,7 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const NOTIFY_EMAIL = 'info@smart-german.com'
+const NOTIFY_EMAIL = 'info@sitov-academy.com'
 
 /**
  * Format a timestamptz string to a readable German date/time.
@@ -194,7 +194,7 @@ Deno.serve(async (req) => {
         </div>
         <div class="footer">
             Diese Nachricht wurde automatisch generiert.<br>
-            SmartGerman Sprachschule
+            Sitov Language Academy
         </div>
     </div>
 </body>
@@ -205,7 +205,7 @@ Deno.serve(async (req) => {
         console.log(`Sending notification email. Subject: "${subject}"`)
 
         const { data: emailData, error: emailError } = await resend.emails.send({
-            from: 'SmartGerman <info@smart-german.com>',
+            from: 'Sitov Language Academy <info@sitov-academy.com>',
             to: [NOTIFY_EMAIL],
             subject: subject,
             html: emailHtml,

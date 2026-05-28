@@ -22,7 +22,7 @@ export async function generateMetadata({
     const dictionary = await getDictionary(lang);
 
     return {
-        title: `${dictionary.cancellation.title} | SmartGerman`,
+        title: `${dictionary.cancellation.title} | Sitov Language Academy`,
         description: dictionary.cancellation.description,
     };
 }
