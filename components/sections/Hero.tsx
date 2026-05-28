@@ -215,7 +215,7 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
     <section
       id="hero"
       ref={container}
-      className="relative min-h-[80vh] flex items-start overflow-hidden z-10 pt-16 pb-12 w-full"
+      className="relative min-h-[80vh] flex items-center overflow-hidden z-10 pt-12 pb-24 w-full"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
