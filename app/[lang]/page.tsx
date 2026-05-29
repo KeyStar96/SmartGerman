@@ -5,6 +5,7 @@ import ScienceSection from "@/components/sections/ScienceSection";
 import { getDictionary } from "@/lib/dictionary";
 import Header from "@/components/layout/Header";
 import { getCourses } from "@/app/actions/get-courses"; // Use Server Action
+import GoogleReviews from "@/components/sections/GoogleReviews";
 
 const WhyUsBento = dynamic(() => import("@/components/sections/WhyUsBento"));
 const AboutContainer = dynamic(() => import("@/components/sections/About/AboutContainer"));
@@ -211,6 +212,7 @@ export default async function HomePage({
       <div className="w-full bg-transparent">
         <div className="relative w-full pt-28">
           <Hero dictionary={dictionary} lang={lang} />
+          <GoogleReviews title={dictionary.reviews_title || "Erfahrungen unserer Schüler"} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
           <WhyUsBento dictionary={dictionary} />
