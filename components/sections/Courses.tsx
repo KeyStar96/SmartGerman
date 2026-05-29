@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { JetBrains_Mono } from "next/font/google";
-import { User, Clock, Gift } from "lucide-react";
+import { User, Clock, Gift, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CourseConfig, Day } from "@/lib/course-config";
 import { useRouter, useParams } from "next/navigation";
