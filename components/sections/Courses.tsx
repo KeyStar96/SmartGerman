@@ -432,10 +432,9 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
         </div>
       </Link>
 
-      {/* Trial Lesson CTA Strip → Registration in Trial Mode */}
-      {config.trialLessons !== false && (
+      {/* Bottom CTA Strip → Registration in Trial or Normal Mode */}
       <Link
-        href={`/${lang}/registration?courseId=${config.id}&trial=1`}
+        href={`/${lang}/registration?courseId=${config.id}${config.trialLessons !== false ? '&trial=1' : ''}`}
         className={`
           group/trial relative block w-full
           bg-black/[0.03] dark:bg-white/[0.03] backdrop-blur-md
@@ -447,22 +446,29 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
         `}
       >
         <div className="flex items-center justify-center gap-2">
-          <Gift
-            size={14}
-            strokeWidth={2}
-            className="text-[#FF5C00] group-hover/trial:text-white transition-colors duration-300"
-          />
+          {config.trialLessons !== false ? (
+            <Gift
+              size={14}
+              strokeWidth={2}
+              className="text-[#FF5C00] group-hover/trial:text-white transition-colors duration-300"
+            />
+          ) : (
+            <ArrowRight
+              size={14}
+              strokeWidth={2}
+              className="text-[#FF5C00] group-hover/trial:text-white transition-colors duration-300 group-hover/trial:translate-x-1"
+            />
+          )}
           <span className={`
             ${jetbrainsMono.className}
             text-[11px] font-bold uppercase tracking-widest
             text-[#FF5C00] group-hover/trial:text-white
             transition-colors duration-300
           `}>
-            {trialCtaText}
+            {config.trialLessons !== false ? trialCtaText : (dictionary?.courses?.labels?.book_now || "JETZT BUCHEN")}
           </span>
         </div>
       </Link>
-      )}
     </motion.div>
   );
 });

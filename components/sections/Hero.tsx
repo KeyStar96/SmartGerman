@@ -297,17 +297,16 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
               {/* Primary Button */}
               <button
                 onClick={() => scrollToSection('science')}
-                className="relative overflow-hidden group bg-gradient-to-r from-[#FF5C00] to-orange-500 text-white px-10 py-4 rounded-full font-mono text-xs uppercase tracking-widest transition-all duration-500 shadow-[0_0_40px_rgba(255,92,0,0.3)] hover:shadow-[0_0_60px_rgba(255,92,0,0.5)] hover:-translate-y-1"
+                className="relative overflow-hidden group bg-[#FF5C00] text-white px-10 py-4 rounded-full font-mono text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_8px_25px_rgba(255,92,0,0.3)] hover:shadow-[0_12px_35px_rgba(255,92,0,0.45)] hover:-translate-y-1 hover:bg-[#E65300]"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 <span className="relative z-10">{dictionary.hero.cta_primary}</span>
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
               </button>
 
               {/* Secondary Button */}
               <button
                 onClick={() => scrollToSection('courses')}
-                className="group flex items-center gap-3 bg-white/40 dark:bg-[#1a1a1a]/40 backdrop-blur-xl border border-gray-200/50 dark:border-white/10 text-[#2D3436] dark:text-[#E2D7CE] hover:bg-white/80 dark:hover:bg-white/10 px-8 py-4 rounded-full transition-all duration-500 font-mono text-xs uppercase tracking-widest hover:-translate-y-1 shadow-sm"
+                className="group flex items-center gap-3 bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-[#2D3436]/10 dark:border-white/10 text-[#2D3436] dark:text-[#E2D7CE] hover:text-[#FF5C00] dark:hover:text-[#FF5C00] hover:border-[#FF5C00]/30 hover:bg-white dark:hover:bg-[#111111] px-8 py-4 rounded-full transition-all duration-300 font-mono text-xs uppercase tracking-widest hover:-translate-y-1 shadow-[0_8px_25px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_35px_rgba(255,92,0,0.15)]"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
                 <span>{dictionary.hero.cta_secondary}</span>
