@@ -91,9 +91,11 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                     className="max-w-4xl mb-16 md:mb-24 text-center md:text-left"
                 >
                     {/* Label */}
-                    <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4">
-                        {t.label || "Standort"}
-                    </span>
+                    <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-[#FF5C00]/30 bg-[#FF5C00]/5 backdrop-blur-md">
+                        <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase font-bold">
+                            {t.label || "Standort"}
+                        </span>
+                    </div>
 
                     {/* Headline */}
                     <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-lm-text-espresso dark:text-dm-text-main leading-none mb-6">

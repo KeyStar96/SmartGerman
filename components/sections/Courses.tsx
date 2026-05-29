@@ -164,9 +164,11 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
 
           {/* Headline - High Contrast & Authority */}
           <div className="text-center md:text-left">
-            <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4">
-              {sectionData.label_small}
-            </span>
+            <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-[#FF5C00]/30 bg-[#FF5C00]/5 backdrop-blur-md">
+                <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase font-bold">
+                  {sectionData.label_small}
+                </span>
+            </div>
             <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#111111] dark:text-[#E2D7CE] leading-none">
               {sectionData.headline.line1} <br />
               <span className="text-[#FF5C00]">{sectionData.headline.line2}</span>

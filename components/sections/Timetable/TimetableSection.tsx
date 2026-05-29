@@ -55,9 +55,11 @@ export default function TimetableSection({ dictionary, courses }: TimetableSecti
 
                 {/* Header - Aligned with Courses.tsx */}
                 <div className="text-center md:text-left mb-16 md:mb-24">
-                    <span className={`${jetbrainsMono.className} text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase block mb-4`}>
-                        {t.subtitle || "ALL COURSES AT A GLANCE"}
-                    </span>
+                    <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-[#FF5C00]/30 bg-[#FF5C00]/5 backdrop-blur-md">
+                        <span className={`${jetbrainsMono.className} text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase font-bold`}>
+                            {t.subtitle || "ALL COURSES AT A GLANCE"}
+                        </span>
+                    </div>
                     <h2 className="text-4xl md:text-6xl font-bold tracking-tighter uppercase text-[#111111] dark:text-[#E2D7CE] leading-none">
                         {t.title_line1 || "THE CURRENT"} <br />
                         <span className="text-[#FF5C00]">{t.title_line2 || "TIMETABLE"}</span>

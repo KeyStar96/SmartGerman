@@ -58,9 +58,9 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                         initial={{ opacity: 0, x: -20 }}
                         animate={isInView ? { opacity: 1, x: 0 } : {}}
                         transition={{ delay: 0.2 }}
-                        className="inline-block mb-4"
+                        className="inline-block mb-6 px-4 py-1.5 rounded-full border border-[#FF5C00]/30 bg-[#FF5C00]/5 backdrop-blur-md"
                     >
-                        <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
+                        <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase font-bold">
                             {data.header?.label || "PROFIL"}
                         </span>
                     </motion.div>
