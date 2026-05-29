@@ -16,6 +16,7 @@ import { createSchema, EnrollmentFormData } from "@/lib/registration-schema";
 import PricingRoadmap from "@/components/registration/PricingRoadmap";
 import { CustomSelect } from "@/components/ui/CustomSelect";
 import { DateDropdowns } from "@/components/ui/DateDropdowns";
+import { PremiumDatePicker } from "@/components/ui/PremiumDatePicker";
 import { submitEnrollment } from "@/app/actions/submit-enrollment";
 import { submitTrialLesson } from "@/app/actions/submit-trial";
 import { checkTrialEligibility } from "@/app/actions/check-trial-eligibility";
@@ -1151,7 +1152,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                             maxDate.setHours(23, 59, 59, 999);
 
                                                             return (
-                                                                <DateDropdowns
+                                                                <PremiumDatePicker
                                                                     label=""
                                                                     value={startDate}
                                                                     minDate={minDate}
@@ -1175,8 +1176,6 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                                         }
                                                                         setStartDate(val);
                                                                     }}
-                                                                    futureYears={true}
-                                                                    referenceDate={now}
                                                                 />
                                                             );
                                                         })()}
