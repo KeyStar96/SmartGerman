@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Manrope, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import { getDictionary } from "@/lib/dictionary";
@@ -28,13 +28,13 @@ export const metadata: Metadata = {
   },
 };
 
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
+const manrope = Manrope({
+  subsets: ["latin", "cyrillic"],
   display: 'swap',
   preload: true,
 });
 const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   variable: '--font-mono',
   display: 'swap',
   preload: true,
@@ -102,7 +102,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`${plusJakarta.className} ${jetbrainsMono.variable} text-foreground antialiased font-sans`}>
+      <body className={`${manrope.className} ${jetbrainsMono.variable} bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-500 overflow-x-hidden w-full selection:bg-[#FF5C00]/20 selection:text-[#FF5C00]`}>
         {/* Navigation progress bar — instant visual feedback during page transitions */}
         <NavigationProgress />
         {/* 
