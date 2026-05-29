@@ -58,7 +58,7 @@ export default function BioReveal({ headline, subline, body, className, imageUrl
                     transition={{ duration: 0.8, delay: 0.3 }}
                     className="max-w-md"
                 >
-                    <p className="text-lg md:text-xl leading-relaxed text-[#2D3436] dark:text-[#E2D7CE] font-medium tracking-tight">
+                    <p className="text-lg md:text-xl leading-relaxed text-[#2D3436] dark:text-[#E2D7CE] font-normal tracking-tight">
                         {body}
                     </p>
                 </motion.div>

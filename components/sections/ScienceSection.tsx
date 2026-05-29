@@ -79,7 +79,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         >
                             {/* Subtle inner glow (Performance Optimized) */}
                             <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150" />
-                            <p className="text-lg md:text-xl font-medium tracking-tight leading-relaxed text-[#2D3436] dark:text-gray-200 relative z-10">
+                            <p className="text-lg md:text-xl font-normal tracking-tight leading-relaxed text-[#2D3436] dark:text-gray-200 relative z-10">
                                 {dictionary.science.description_1}
                             </p>
                         </motion.div>
@@ -94,7 +94,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                         >
                             {/* Subtle inner glow (Performance Optimized) */}
                             <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150" />
-                            <p className="text-lg md:text-xl font-medium tracking-tight leading-relaxed text-[#4a5568] dark:text-gray-400 relative z-10">
+                            <p className="text-lg md:text-xl font-normal tracking-tight leading-relaxed text-[#4a5568] dark:text-gray-400 relative z-10">
                                 {dictionary.science.description_2}
                             </p>
                         </motion.div>

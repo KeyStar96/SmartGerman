@@ -54,11 +54,11 @@ const TimelinePoint = ({ item, index }: { item: TimelineItem; index: number }) =
                     <h4 className="text-lg font-bold text-[#1A1A1A] dark:text-[#FAFAFA] group-hover:text-[#FF6B00] transition-colors duration-300">
                         {item.title}
                     </h4>
-                    <p className="text-sm text-[#1A1A1A]/70 dark:text-[#FAFAFA]/70 mt-1 font-medium leading-relaxed">
+                    <p className="text-sm text-[#1A1A1A]/70 dark:text-[#FAFAFA]/70 mt-1 font-normal leading-relaxed">
                         {item.institution}
                     </p>
                     {item.desc && (
-                        <p className="text-xs text-[#1A1A1A]/50 dark:text-[#FAFAFA]/50 mt-2 italic font-sans font-medium">
+                        <p className="text-xs text-[#1A1A1A]/50 dark:text-[#FAFAFA]/50 mt-2 italic font-sans font-normal">
                             {item.desc}
                         </p>
                     )}
