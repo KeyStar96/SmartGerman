@@ -24,7 +24,7 @@ const GlassCard = React.memo(function GlassCard({ children, className, isOrange 
     return (
         <div
             className={cn(
-                "relative w-full h-full overflow-hidden transition-all duration-700 ease-out group/card rounded-3xl backdrop-blur-xl",
+                "relative w-full h-full overflow-hidden transition-all duration-700 ease-out group/card rounded-3xl backdrop-blur-md",
                 isOrange 
                     ? "bg-[#FF5C00]/80 dark:bg-[#FF5C00]/70 border-white/40 shadow-[0_8px_30px_rgb(255,92,0,0.2)]" 
                     : "bg-white/60 dark:bg-[#1a1a1a]/60 border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",

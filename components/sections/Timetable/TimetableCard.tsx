@@ -92,7 +92,7 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                 className={cn(
                     "flex-1 relative overflow-hidden rounded-3xl p-6 border transition-all duration-500",
                     // Glassmorphism Base
-                    "bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl",
+                    "bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md",
                     "border-white/40 dark:border-white/10",
                     "shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",
                     // Hover State

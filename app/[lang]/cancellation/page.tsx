@@ -43,7 +43,7 @@ export default async function CancellationPage({
             <main className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 pt-28 md:pt-32">
                 <div className="w-full max-w-lg">
                     {/* Glass Card */}
-                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 md:p-10 relative overflow-hidden">
+                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 md:p-10 relative overflow-hidden">
                         {/* Ambient Glow */}
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none" />
 

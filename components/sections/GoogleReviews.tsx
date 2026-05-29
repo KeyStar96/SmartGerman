@@ -39,7 +39,7 @@ const Stars = ({ rating }: { rating: number }) => {
 const ReviewCard = ({ review }: { review: Review }) => {
     return (
         <div className="relative flex flex-col justify-between w-[320px] sm:w-[380px] p-6 rounded-3xl mx-3 
-                        bg-white/60 dark:bg-[#1A1A1A]/60 backdrop-blur-xl border border-white/20 dark:border-white/10 
+                        bg-white/60 dark:bg-[#1A1A1A]/60 backdrop-blur-md border border-white/20 dark:border-white/10 
                         shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] 
                         transition-all duration-300 hover:scale-[1.02] hover:bg-white/80 dark:hover:bg-[#222222]/80">
             

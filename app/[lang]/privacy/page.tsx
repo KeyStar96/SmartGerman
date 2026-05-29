@@ -48,7 +48,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ lang: 
                     {dictionary.privacy?.sections?.map((section: any, index: number) => (
                         <section
                             key={index}
-                            className={`relative overflow-hidden bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl p-8 md:p-10 rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all duration-300 hover:shadow-xl hover:border-white/80 dark:hover:border-white/30`}
+                            className={`relative overflow-hidden bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md p-8 md:p-10 rounded-3xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all duration-300 hover:shadow-xl hover:border-white/80 dark:hover:border-white/30`}
                         >
                             {/* Ambient Glow */}
                             <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none" />

@@ -156,9 +156,6 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
       id="courses"
       className="relative py-24 md:py-32 bg-transparent text-[#2D3436] dark:text-[#E2D7CE] overflow-hidden"
     >
-      {/* Ambient Background Glows (Performance Optimized) */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(255,92,0,0.15)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(255,92,0,0.08)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(59,130,246,0.1)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
 
       <div className="container mx-auto px-6 md:px-12 relative z-10">
 
@@ -177,7 +174,7 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
           </div>
 
           {/* The Glassmorphism Toggle Switch */}
-          <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 p-2 rounded-full flex relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] h-[60px] items-center">
+          <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 p-2 rounded-full flex relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] h-[60px] items-center">
             {(["presence", "online"] as const).map((tab) => {
               const isActive = filter === tab;
               return (
@@ -293,7 +290,7 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
       variants={cardVariants}
       className="group/card h-full flex flex-col
         rounded-3xl overflow-hidden
-        bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl
+        bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md
         border border-white/40 dark:border-white/10
         transition-all duration-500 ease-out
         hover:z-20 hover:-translate-y-2

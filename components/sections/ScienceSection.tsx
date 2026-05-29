@@ -75,7 +75,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true, margin: "-50px" }}
                             transition={{ duration: 0.7, delay: 0.1 }}
-                            className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] relative overflow-hidden group"
+                            className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] relative overflow-hidden group"
                         >
                             {/* Subtle inner glow (Performance Optimized) */}
                             <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150" />
@@ -90,7 +90,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true, margin: "-50px" }}
                             transition={{ duration: 0.7, delay: 0.3 }}
-                            className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] ml-0 md:ml-12 relative overflow-hidden group"
+                            className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] ml-0 md:ml-12 relative overflow-hidden group"
                         >
                             {/* Subtle inner glow (Performance Optimized) */}
                             <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150" />

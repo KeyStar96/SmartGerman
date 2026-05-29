@@ -224,7 +224,7 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
             className={cn(
                 "group relative w-full cursor-pointer rounded-3xl p-4 md:p-6 border transition-all duration-500 overflow-hidden",
                 // Base Glassmorphism
-                "bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl",
+                "bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md",
                 "shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",
                 selected
                     ? "border-[#FF5C00] shadow-sm bg-orange-50/80 dark:bg-[#FF5C00]/20"
@@ -1140,7 +1140,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         {!isTrialMode ? (
                                             <>
                                                 {/* LEFT BOX: Startdatum (Date Selection) */}
-                                                <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full overflow-hidden">
+                                                <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full overflow-hidden">
                                                     {/* Ambient Glow */}
                                                     <div className="absolute -top-24 -left-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
                                                     {/* Header */}
@@ -1191,9 +1191,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 </div>
 
                                                 {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
-                                                <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full min-h-[294px] overflow-hidden">
+                                                <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full min-h-[294px]">
                                                     {/* Ambient Glow */}
-                                                    <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
+                                                    <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+                                                        <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full" />
+                                                    </div>
                                                     {/* Header */}
                                                     <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
                                                         {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
@@ -1263,7 +1265,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                                                     exit={{ opacity: 0, scale: 0.95 }}
                                                                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                                                                    className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white/90 dark:bg-[#1A1C1E]/90 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)]"
+                                                                    className="absolute top-[calc(100%+8px)] left-0 w-full z-50 bg-white/90 dark:bg-[#1A1C1E]/90 backdrop-blur-md border border-black/5 dark:border-white/10 rounded-xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.2)]"
                                                                 >
                                                                     {/* Content Layout */}
                                                                     <div className="flex gap-4">
@@ -1303,7 +1305,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="col-span-1 lg:col-span-2 bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full overflow-hidden">
+                                            <div className="col-span-1 lg:col-span-2 bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full overflow-hidden">
                                                 {/* Ambient Glow */}
                                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none" />
                                                 {/* Header */}
@@ -1432,7 +1434,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     className="flex flex-col gap-8 h-full"
                                 >
                                     {/* LEGAL CONSENTS (Moved to Top) */}
-                                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-8 relative overflow-hidden">
+                                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-8 relative overflow-hidden">
                                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
                                         <div className="relative z-10">
                                         <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
@@ -1469,7 +1471,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         </p>
                                     </div>
                                     </div>
-                                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-8 rounded-3xl h-full flex flex-col justify-between relative overflow-hidden">
+                                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-8 rounded-3xl h-full flex flex-col justify-between relative overflow-hidden">
                                         <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none" />
                                         <div className="relative z-10 flex flex-col h-full">
                                         <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
