@@ -8,49 +8,15 @@ import { cn } from "@/lib/utils";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
-// Dummy Data for the placeholder design
-const dummyReviews = [
-    {
-        id: 1,
-        author: "Sarah M.",
-        rating: 5,
-        text: "The best language school I've ever attended! The teachers are incredibly patient and the online platform is flawless. I learned so much in just 3 months.",
-        date: "Vor 2 Wochen",
-        avatar: "S"
-    },
-    {
-        id: 2,
-        author: "Alexey V.",
-        rating: 5,
-        text: "Sitov Academy completely changed my perspective on learning German. It used to be so hard, but their method makes it logical and fun. Highly recommended!",
-        date: "Vor 1 Monat",
-        avatar: "A"
-    },
-    {
-        id: 3,
-        author: "Elena R.",
-        rating: 5,
-        text: "Ich habe hier meinen B2-Kurs absolviert. Die Vorbereitung auf die Prüfung war exzellent. Sehr professionelles und freundliches Team.",
-        date: "Vor 3 Monaten",
-        avatar: "E"
-    },
-    {
-        id: 4,
-        author: "David K.",
-        rating: 5,
-        text: "Amazing experience! The trial lesson was free and convinced me instantly. The hybrid model (online + presence) works perfectly for my busy schedule.",
-        date: "Vor 1 Woche",
-        avatar: "D"
-    },
-    {
-        id: 5,
-        author: "Maria S.",
-        rating: 5,
-        text: "Прекрасная школа! Преподаватели очень внимательные, атмосфера на уроках дружелюбная. Мой немецкий стал намного лучше.",
-        date: "Vor 2 Monaten",
-        avatar: "M"
-    }
-];
+// Type for review
+interface Review {
+    id: number;
+    author: string;
+    rating: number;
+    text: string;
+    date: string;
+    avatar: string;
+}
 
 // Helper to render stars
 const Stars = ({ rating }: { rating: number }) => {
@@ -70,7 +36,7 @@ const Stars = ({ rating }: { rating: number }) => {
 };
 
 // Review Card Component
-const ReviewCard = ({ review }: { review: typeof dummyReviews[0] }) => {
+const ReviewCard = ({ review }: { review: Review }) => {
     return (
         <div className="relative flex flex-col justify-between w-[320px] sm:w-[380px] p-6 rounded-3xl mx-3 
                         bg-white/60 dark:bg-[#1A1A1A]/60 backdrop-blur-xl border border-white/20 dark:border-white/10 
@@ -110,12 +76,15 @@ const ReviewCard = ({ review }: { review: typeof dummyReviews[0] }) => {
 
 interface GoogleReviewsProps {
     title: string;
+    dictionary: any;
 }
 
-export default function GoogleReviews({ title }: GoogleReviewsProps) {
+export default function GoogleReviews({ title, dictionary }: GoogleReviewsProps) {
+    const reviews: Review[] = dictionary?.reviews_data || [];
+    
     // Split the dummy reviews into two rows for the marquee effect
-    const firstRow = dummyReviews.slice(0, 3);
-    const secondRow = dummyReviews.slice(2, 5);
+    const firstRow = reviews.slice(0, 3);
+    const secondRow = reviews.slice(2, 5);
 
     return (
         <section className="relative py-24 sm:py-32 overflow-hidden bg-transparent">
@@ -128,11 +97,11 @@ export default function GoogleReviews({ title }: GoogleReviewsProps) {
                 </h2>
                 <div className="flex items-center justify-center gap-2">
                     <span className={cn("text-sm tracking-widest uppercase text-gray-500 font-semibold", jetbrainsMono.className)}>
-                        Excellent
+                        {dictionary?.reviews_excellent || "EXCELLENT"}
                     </span>
                     <Stars rating={5} />
                     <span className={cn("text-sm text-gray-500", jetbrainsMono.className)}>
-                        5.0 out of 5 based on Google Reviews
+                        {dictionary?.reviews_subtitle || "5.0 out of 5 based on Google Reviews"}
                     </span>
                 </div>
             </div>

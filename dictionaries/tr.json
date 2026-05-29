@@ -1175,5 +1175,49 @@
       }
     ]
   },
-  "reviews_title": "Öğrencilerimizin Deneyimleri"
+  "reviews_title": "Öğrencilerimizin Deneyimleri",
+  "reviews_excellent": "MÜKEMMEL",
+  "reviews_subtitle": "Google Yorumlarına göre 5 üzerinden 5,0",
+  "reviews_data": [
+    {
+      "id": 1,
+      "author": "Sarah M.",
+      "rating": 5,
+      "text": "Şimdiye kadar katıldığım en iyi dil okulu! Öğretmenler inanılmaz derecede sabırlı ve çevrimiçi platform kusursuz. Sadece 3 ayda çok şey öğrendim.",
+      "date": "2 hafta önce",
+      "avatar": "S"
+    },
+    {
+      "id": 2,
+      "author": "Alexey V.",
+      "rating": 5,
+      "text": "Sitov Academy Almanca öğrenmeye bakış açımı tamamen değiştirdi. Eskiden çok zordu ama yöntemleri bunu mantıklı ve eğlenceli hale getiriyor. Şiddetle tavsiye edilir!",
+      "date": "1 ay önce",
+      "avatar": "A"
+    },
+    {
+      "id": 3,
+      "author": "Elena R.",
+      "rating": 5,
+      "text": "Burada B2 kursumu tamamladım. Sınava hazırlık mükemmeldi. Çok profesyonel ve güler yüzlü bir ekip.",
+      "date": "3 ay önce",
+      "avatar": "E"
+    },
+    {
+      "id": 4,
+      "author": "David K.",
+      "rating": 5,
+      "text": "Harika bir deneyim! Deneme dersi ücretsizdi ve beni anında ikna etti. Hibrit model (çevrimiçi + yüz yüze) yoğun programım için mükemmel çalışıyor.",
+      "date": "1 hafta önce",
+      "avatar": "D"
+    },
+    {
+      "id": 5,
+      "author": "Maria S.",
+      "rating": 5,
+      "text": "Harika bir okul! Öğretmenler çok özenli, derslerdeki atmosfer dostça. Almancam çok daha iyi oldu.",
+      "date": "2 ay önce",
+      "avatar": "M"
+    }
+  ]
 }

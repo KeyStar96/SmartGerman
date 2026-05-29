@@ -1174,5 +1174,49 @@
       }
     ]
   },
-  "reviews_title": "Our Students' Experiences"
+  "reviews_title": "Our Students' Experiences",
+  "reviews_excellent": "EXCELLENT",
+  "reviews_subtitle": "5.0 out of 5 based on Google Reviews",
+  "reviews_data": [
+    {
+      "id": 1,
+      "author": "Sarah M.",
+      "rating": 5,
+      "text": "The best language school I've ever attended! The teachers are incredibly patient and the online platform is flawless. I learned so much in just 3 months.",
+      "date": "2 weeks ago",
+      "avatar": "S"
+    },
+    {
+      "id": 2,
+      "author": "Alexey V.",
+      "rating": 5,
+      "text": "Sitov Academy completely changed my perspective on learning German. It used to be so hard, but their method makes it logical and fun. Highly recommended!",
+      "date": "1 month ago",
+      "avatar": "A"
+    },
+    {
+      "id": 3,
+      "author": "Elena R.",
+      "rating": 5,
+      "text": "I completed my B2 course here. The exam preparation was excellent. Very professional and friendly team.",
+      "date": "3 months ago",
+      "avatar": "E"
+    },
+    {
+      "id": 4,
+      "author": "David K.",
+      "rating": 5,
+      "text": "Amazing experience! The trial lesson was free and convinced me instantly. The hybrid model (online + presence) works perfectly for my busy schedule.",
+      "date": "1 week ago",
+      "avatar": "D"
+    },
+    {
+      "id": 5,
+      "author": "Maria S.",
+      "rating": 5,
+      "text": "Wonderful school! The teachers are very attentive, the atmosphere in the lessons is friendly. My German has gotten much better.",
+      "date": "2 months ago",
+      "avatar": "M"
+    }
+  ]
 }

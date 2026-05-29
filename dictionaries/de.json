@@ -1173,5 +1173,49 @@
       }
     ]
   },
-  "reviews_title": "Erfahrungen unserer Schüler"
+  "reviews_title": "Erfahrungen unserer Schüler",
+  "reviews_excellent": "HERVORRAGEND",
+  "reviews_subtitle": "5,0 von 5 basierend auf Google Rezensionen",
+  "reviews_data": [
+    {
+      "id": 1,
+      "author": "Sarah M.",
+      "rating": 5,
+      "text": "Die beste Sprachschule, die ich je besucht habe! Die Lehrer sind unglaublich geduldig und die Online-Plattform ist fehlerfrei. Ich habe in nur 3 Monaten so viel gelernt.",
+      "date": "Vor 2 Wochen",
+      "avatar": "S"
+    },
+    {
+      "id": 2,
+      "author": "Alexey V.",
+      "rating": 5,
+      "text": "Sitov Academy hat meine Sichtweise auf das Deutschlernen komplett verändert. Früher war es so schwer, aber ihre Methode macht es logisch und macht Spaß. Sehr zu empfehlen!",
+      "date": "Vor 1 Monat",
+      "avatar": "A"
+    },
+    {
+      "id": 3,
+      "author": "Elena R.",
+      "rating": 5,
+      "text": "Ich habe hier meinen B2-Kurs absolviert. Die Vorbereitung auf die Prüfung war exzellent. Sehr professionelles und freundliches Team.",
+      "date": "Vor 3 Monaten",
+      "avatar": "E"
+    },
+    {
+      "id": 4,
+      "author": "David K.",
+      "rating": 5,
+      "text": "Erstaunliche Erfahrung! Die Probestunde war kostenlos und hat mich sofort überzeugt. Das hybride Modell (Online + Präsenz) passt perfekt zu meinem vollen Terminkalender.",
+      "date": "Vor 1 Woche",
+      "avatar": "D"
+    },
+    {
+      "id": 5,
+      "author": "Maria S.",
+      "rating": 5,
+      "text": "Wunderbare Schule! Die Lehrer sind sehr aufmerksam und die Atmosphäre im Unterricht ist freundlich. Mein Deutsch ist viel besser geworden.",
+      "date": "Vor 2 Monaten",
+      "avatar": "M"
+    }
+  ]
 }

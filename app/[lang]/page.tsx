@@ -212,7 +212,7 @@ export default async function HomePage({
       <div className="w-full bg-transparent">
         <div className="relative w-full pt-28">
           <Hero dictionary={dictionary} lang={lang} />
-          <GoogleReviews title={dictionary.reviews_title || "Erfahrungen unserer Schüler"} />
+          <GoogleReviews title={dictionary.reviews_title || "Erfahrungen unserer Schüler"} dictionary={dictionary} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
           <WhyUsBento dictionary={dictionary} />
