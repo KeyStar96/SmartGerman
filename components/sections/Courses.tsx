@@ -288,7 +288,7 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
   return (
     <motion.div
       variants={cardVariants}
-      className="group/card h-full flex flex-col
+      className="group/card relative h-full flex flex-col
         rounded-3xl overflow-hidden
         bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md
         border border-white/40 dark:border-white/10
