@@ -219,9 +219,9 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Ambient Background Glows */}
-      <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      {/* Ambient Background Glows (Performance Optimized for macOS) */}
+      <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(255,92,0,0.15)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(255,92,0,0.08)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(59,130,246,0.08)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(59,130,246,0.05)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
 
       {/* 12-Column Grid Container */}
       <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-30">
@@ -238,12 +238,12 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Block A: Brand Split (Masked Reveal) — 3 Lines ─── */}
           <h1
             ref={brandRef}
-            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-[0.85] font-sans mb-3 will-change-transform"
+            className="hero-line-mask text-5xl sm:text-6xl md:text-8xl tracking-tighter leading-[0.85] font-sans mb-3"
             style={{ visibility: 'hidden' }}
             onMouseEnter={handleBrandEnter}
             onMouseLeave={handleBrandLeave}
           >
-            <span className="hero-line-inner flex flex-col">
+            <span className="hero-line-inner flex flex-col will-change-transform">
               <span
                 ref={sitovRef}
                 className="font-bold text-[#2D3436] dark:text-[#E2D7CE] inline-block will-change-transform"
@@ -268,10 +268,10 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── Block B: Claim (Masked Reveal) ─── */}
           <h2
             ref={claimRef}
-            className="hero-line-mask text-2xl md:text-3xl font-medium leading-tight text-[#2D3436] dark:text-[#E2D7CE] opacity-90 mb-6 min-h-[1.5em] will-change-transform"
+            className="hero-line-mask text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[#111111]/80 dark:text-white/80 mb-6"
             style={{ visibility: 'hidden' }}
           >
-            <span className="hero-line-inner block">
+            <span className="hero-line-inner block will-change-transform">
               {claimText}
             </span>
           </h2>
@@ -290,10 +290,10 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
           {/* ─── CTAs (Masked Reveal) ─── */}
           <div
             ref={ctaRef}
-            className="hero-line-mask will-change-transform"
+            className="hero-line-mask flex flex-col sm:flex-row gap-4 items-start sm:items-center"
             style={{ visibility: 'hidden' }}
           >
-            <span className="hero-line-inner flex flex-col sm:flex-row gap-6 items-start sm:items-center mt-6">
+            <span className="hero-line-inner flex flex-col sm:flex-row gap-4 will-change-transform">
               {/* Primary Button */}
               <button
                 onClick={() => scrollToSection('science')}
