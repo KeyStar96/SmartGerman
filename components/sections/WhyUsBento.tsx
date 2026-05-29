@@ -79,7 +79,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
 
     // Body: Dry Ink (#333) -> Wet Ink (#000)
     // Dark: Sand (#E2D7CE) -> White on Hover
-    const bodyStyle = "text-xl text-[#2D3436] dark:text-[#E2D7CE] leading-relaxed font-bold tracking-tight transition-colors duration-500 ease-out group-hover/card:text-[#111111] dark:group-hover/card:text-[#F0EFE9]";
+    const bodyStyle = "text-xl text-[#2D3436] dark:text-[#E2D7CE] leading-relaxed font-normal tracking-tight transition-colors duration-500 ease-out group-hover/card:text-[#111111] dark:group-hover/card:text-[#F0EFE9]";
 
     const t = dictionary?.WhyUs;
 
@@ -138,7 +138,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                         {t.card1.title}
                                     </h3>
                                     <div className={bodyStyle}>
-                                        <p className="opacity-100 leading-relaxed text-lg font-bold">
+                                        <p className="opacity-100 leading-relaxed text-lg font-normal">
                                             {t.card1.text}
                                         </p>
                                     </div>
@@ -173,7 +173,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                                     <CheckCircle2 size={18} strokeWidth={2.5} className="mt-0.5 flex-shrink-0 text-[#F0EFE9]" />
                                                     <span className="text-base font-bold uppercase tracking-wide text-[#F0EFE9] group-hover/card:text-[#F0EFE9] transition-colors duration-500">{item.name}</span>
                                                 </div>
-                                                <p className="pl-8 text-[#F0EFE9]/90 font-bold text-xs leading-relaxed group-hover/card:text-[#F0EFE9] transition-colors duration-500">{item.desc}</p>
+                                                <p className="pl-8 text-[#F0EFE9]/90 font-normal text-xs leading-relaxed group-hover/card:text-[#F0EFE9] transition-colors duration-500">{item.desc}</p>
                                             </li>
                                         ))}
                                     </ul>
@@ -193,7 +193,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                 <div className="flex-1 flex flex-col justify-center">
                                     <h3 className={headingStyle}>{t.card3.title}</h3>
                                     <div className={bodyStyle}>
-                                        <p className="opacity-100 leading-relaxed text-lg font-bold">
+                                        <p className="opacity-100 leading-relaxed text-lg font-normal">
                                             {t.card3.text}
                                         </p>
                                     </div>
@@ -213,7 +213,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                 <div className="flex-1 flex flex-col justify-center">
                                     <h3 className={headingStyle}>{t.card4.title}</h3>
                                     <div className={bodyStyle}>
-                                        <p className="opacity-100 leading-relaxed text-lg font-bold">
+                                        <p className="opacity-100 leading-relaxed text-lg font-normal">
                                             {t.card4.text}
                                         </p>
                                     </div>
