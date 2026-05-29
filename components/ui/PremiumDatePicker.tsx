@@ -126,8 +126,7 @@ export const PremiumDatePicker = ({
             
             {/* Months Scroll */}
             <div 
-                className="flex items-center gap-2 overflow-x-auto pb-4 mb-4 w-full [&::-webkit-scrollbar]:hidden"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                className="flex items-center gap-2 overflow-x-auto pb-4 mb-4 w-full premium-scrollbar"
             >
                 {availableMonths.map((m) => {
                     const isActive = viewMonth === m.month && viewYear === m.year;
@@ -155,8 +154,7 @@ export const PremiumDatePicker = ({
 
             {/* Days Scroll */}
             <div 
-                className="flex items-center gap-3 overflow-x-auto pb-6 pt-1 w-full [&::-webkit-scrollbar]:hidden"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                className="flex items-center gap-3 overflow-x-auto pb-6 pt-1 w-full premium-scrollbar"
             >
                 {availableDays.map((d) => {
                     const isActive = currentSelectedDay === d.day && viewMonth === parseInt(mStr) && viewYear === parseInt(yStr);
