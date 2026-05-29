@@ -7,6 +7,7 @@ import { User, Clock, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CourseConfig, Day } from "@/lib/course-config";
 import { useRouter, useParams } from "next/navigation";
+import { MouseGlow } from "@/components/ui/MouseGlow";
 
 import Link from "next/link";
 
@@ -302,8 +303,8 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
         hover:shadow-2xl
       "
     >
-      {/* Ambient hover glow inside card (Performance Optimized) */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover/card:scale-150 z-0 pointer-events-none" />
+      {/* Ambient hover glow inside card (Premium Mouse Tracking) */}
+      <MouseGlow color="rgba(251,146,60,0.15)" />
 
       {/* Main Card Area → Regular Registration */}
       <Link

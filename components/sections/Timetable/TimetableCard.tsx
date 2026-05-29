@@ -6,6 +6,7 @@ import { MapPin, User, Monitor, Sun, Moon } from "lucide-react";
 import { JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
+import { MouseGlow } from "@/components/ui/MouseGlow";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
@@ -101,8 +102,8 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                     isLive && "border-[#FF5C00]/40 dark:border-[#FF5C00]/40 shadow-sm"
                 )}
             >
-                {/* Ambient hover glow inside card (Performance Optimized) */}
-                <div className="absolute -top-12 -right-12 w-32 h-32 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150 z-0 pointer-events-none" />
+                {/* Ambient hover glow inside card (Premium Mouse Tracking) */}
+                <MouseGlow color="rgba(251,146,60,0.15)" />
                 {/* ALTERNATING Badge */}
                 {course.isAlternating && !startBadge && (
                     <div className="absolute top-0 right-0 px-2 py-1 bg-black/10 dark:bg-white/10 text-black/60 dark:text-white/60 text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20">
