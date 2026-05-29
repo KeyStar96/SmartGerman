@@ -47,8 +47,8 @@ export default function TimetableSection({ dictionary, courses }: TimetableSecti
 
     return (
         <section className="relative w-full py-24 md:py-32 bg-transparent" id="timetable">
-            {/* Ambient Background Glows */}
-            <div className="absolute top-[20%] left-0 w-[500px] h-[500px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+            {/* Ambient Background Glows (Performance Optimized) */}
+            <div className="absolute top-[20%] left-0 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(255,92,0,0.15)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(255,92,0,0.08)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
 
             {/* Container */}
             <div className="container mx-auto px-4 md:px-8 relative z-10">

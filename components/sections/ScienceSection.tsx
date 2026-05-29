@@ -37,8 +37,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
             ref={containerRef}
             className="relative min-h-screen py-24 sm:py-32 overflow-hidden bg-transparent"
         >
-            {/* Ambient Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+            {/* Ambient Background Glow (Performance Optimized) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(255,92,0,0.15)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(255,92,0,0.08)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
 
             <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-7xl">
                 
@@ -77,8 +77,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             transition={{ duration: 0.7, delay: 0.1 }}
                             className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] relative overflow-hidden group"
                         >
-                            {/* Subtle inner glow */}
-                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-400/20 blur-3xl rounded-full transition-all duration-700 group-hover:scale-150" />
+                            {/* Subtle inner glow (Performance Optimized) */}
+                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150" />
                             <p className="text-lg md:text-xl font-medium tracking-tight leading-relaxed text-[#2D3436] dark:text-gray-200 relative z-10">
                                 {dictionary.science.description_1}
                             </p>
@@ -92,8 +92,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                             transition={{ duration: 0.7, delay: 0.3 }}
                             className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] ml-0 md:ml-12 relative overflow-hidden group"
                         >
-                            {/* Subtle inner glow */}
-                            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-orange-400/20 blur-3xl rounded-full transition-all duration-700 group-hover:scale-150" />
+                            {/* Subtle inner glow (Performance Optimized) */}
+                            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150" />
                             <p className="text-lg md:text-xl font-medium tracking-tight leading-relaxed text-[#4a5568] dark:text-gray-400 relative z-10">
                                 {dictionary.science.description_2}
                             </p>

@@ -222,13 +222,19 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
             onClick={onToggle}
             layout
             className={cn(
-                "group relative w-full cursor-pointer rounded-sm p-4 md:p-6 border transition-all duration-300",
+                "group relative w-full cursor-pointer rounded-3xl p-4 md:p-6 border transition-all duration-500 overflow-hidden",
+                // Base Glassmorphism
+                "bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl",
+                "shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",
                 selected
-                    ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] shadow-sm"
-                    : "bg-[#F0EFE9] dark:bg-[#1A1C1E] border-black/10 dark:border-white/10 hover:border-[#FF5C00] dark:hover:border-[#FF5C00] hover:shadow-md"
+                    ? "border-[#FF5C00] shadow-sm bg-orange-50/80 dark:bg-[#FF5C00]/20"
+                    : "border-white/40 dark:border-white/10 hover:border-white/80 dark:hover:border-white/30 hover:shadow-xl"
             )}
         >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            {/* Ambient hover glow inside card (Performance Optimized) */}
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover:scale-150 z-0 pointer-events-none opacity-0 group-hover:opacity-100" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 {/* 1. Top Row: Checkbox + Title (Left) / Price (Right) */}
                 <div className="flex items-start w-full md:w-auto justify-between md:justify-start">
 
@@ -301,13 +307,13 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
                 </div>
 
                 {/* Desktop: Price (Hidden on Mobile) */}
-                <div className="hidden md:block text-right pl-9 md:pl-0 w-full md:w-auto">
-                    <span className="font-mono text-sm text-gray-900 dark:text-[#E2D7CE]">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase">{t?.units_suffix || "/ Units"}</span></span>
+                <div className="hidden md:block text-right pl-9 md:pl-0 w-full md:w-auto shrink-0">
+                    <span className="font-mono text-sm text-gray-900 dark:text-[#E2D7CE] font-bold">{priceFormatted} <span className="text-gray-400 text-[10px] uppercase font-normal">{t?.units_suffix || "/ Units"}</span></span>
                 </div>
             </div>
 
             {/* Expanded Details when selected */}
-            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 pl-9 md:pl-[44px]">
+            <div className="relative z-10 flex flex-wrap gap-x-3 gap-y-1 mt-3 pl-9 md:pl-[44px]">
                 {course.sessions.map((s: CourseSession, i: number) => {
                     // Properly access day properties
                     const shortWeekdays: Record<string, string> = {
@@ -1134,7 +1140,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         {!isTrialMode ? (
                                             <>
                                                 {/* LEFT BOX: Startdatum (Date Selection) */}
-                                                <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
+                                                <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full overflow-hidden">
+                                                    {/* Ambient Glow */}
+                                                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
                                                     {/* Header */}
                                                     <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
                                                         {t?.start_date_label || "STARTDATUM"}
@@ -1183,7 +1191,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 </div>
 
                                                 {/* RIGHT BOX: Kostenübersicht (Price Preview) */}
-                                                <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full min-h-[294px]">
+                                                <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full min-h-[294px] overflow-hidden">
+                                                    {/* Ambient Glow */}
+                                                    <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
                                                     {/* Header */}
                                                     <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-0", monoClassName)}>
                                                         {wizard?.sidebar_hint_title || "KOSTENÜBERSICHT"}
@@ -1293,7 +1303,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="col-span-1 lg:col-span-2 bg-[#F0EFE9] dark:bg-[#1A1C1E] border border-black/10 dark:border-white/10 rounded-xl p-6 relative flex flex-col h-full">
+                                            <div className="col-span-1 lg:col-span-2 bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 relative flex flex-col h-full overflow-hidden">
+                                                {/* Ambient Glow */}
+                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none" />
                                                 {/* Header */}
                                                 <span className={cn("font-mono text-[10px] tracking-[0.2em] text-[#FF5C00] uppercase mb-6", monoClassName)}>
                                                     {trialT?.select_day || "Tag für Ihre Probestunde wählen"}
@@ -1320,7 +1332,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                                         "text-left px-4 py-3 rounded-sm border transition-all duration-200 font-mono text-sm",
                                                                         trialDate === d.iso
                                                                             ? "bg-[#FFF4EC] dark:bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00] font-bold shadow-sm"
-                                                                            : "bg-white dark:bg-[#202225] border-black/10 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
+                                                                            : "border-black/5 dark:border-white/5 text-gray-700 dark:text-gray-300 hover:border-[#FF5C00] dark:hover:border-[#FF5C00]"
                                                                     )}
                                                                 >
                                                                     {trialDate === d.iso && <Check size={12} className="inline mr-2" />}
@@ -1420,7 +1432,9 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                     className="flex flex-col gap-8 h-full"
                                 >
                                     {/* LEGAL CONSENTS (Moved to Top) */}
-                                    <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] p-8 border border-black/10 dark:border-white/10 rounded-sm">
+                                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-8 relative overflow-hidden">
+                                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full pointer-events-none" />
+                                        <div className="relative z-10">
                                         <h3 className="font-bold text-lg uppercase tracking-wider mb-2 border-b dark:border-white/10 pb-4">Rechtliches</h3>
                                         <div className="space-y-4 pt-2">
                                             <LegalCheckbox
@@ -1454,7 +1468,10 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                             {formLabels?.required_hint}
                                         </p>
                                     </div>
-                                    <div className="bg-[#F0EFE9] dark:bg-[#1A1C1E] dark:border dark:border-white/10 p-8 rounded-sm shadow-sm h-full flex flex-col justify-between">
+                                    </div>
+                                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] p-8 rounded-3xl h-full flex flex-col justify-between relative overflow-hidden">
+                                        <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none" />
+                                        <div className="relative z-10 flex flex-col h-full">
                                         <div><h3 className="font-bold text-lg uppercase tracking-wider mb-6 border-b dark:border-white/10 pb-4">{wizard?.summary_data_title}</h3></div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 text-sm">
                                             <div className="text-gray-500">{wizard?.summary_labels?.name || "Name"}</div>

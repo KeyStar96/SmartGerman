@@ -156,9 +156,9 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
       id="courses"
       className="relative py-24 md:py-32 bg-transparent text-[#2D3436] dark:text-[#E2D7CE] overflow-hidden"
     >
-      {/* Ambient Background Glows */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      {/* Ambient Background Glows (Performance Optimized) */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(255,92,0,0.15)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(255,92,0,0.08)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(59,130,246,0.1)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
 
       <div className="container mx-auto px-6 md:px-12 relative z-10">
 
@@ -303,8 +303,8 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
         hover:shadow-2xl
       "
     >
-      {/* Ambient hover glow inside card */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-400/20 blur-3xl rounded-full transition-all duration-700 group-hover/card:scale-150 z-0 pointer-events-none" />
+      {/* Ambient hover glow inside card (Performance Optimized) */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)] rounded-full transition-all duration-700 group-hover/card:scale-150 z-0 pointer-events-none" />
 
       {/* Main Card Area → Regular Registration */}
       <Link

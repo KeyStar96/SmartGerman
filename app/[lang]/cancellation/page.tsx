@@ -43,16 +43,20 @@ export default async function CancellationPage({
             <main className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 pt-28 md:pt-32">
                 <div className="w-full max-w-lg">
                     {/* Glass Card */}
-                    <div className="glass-panel backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-10 shadow-2xl relative">
+                    <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-6 md:p-10 relative overflow-hidden">
+                        {/* Ambient Glow */}
+                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none" />
+
                         {/* Back Button */}
-                        <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
-                            <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2 font-mono")}>
-                                <ChevronLeft size={14} /> {dictionary.cancellation.back_home || "Back"}
+                        <div className="relative z-10 mb-8">
+                            <Link href={`/${lang}`} className="inline-flex items-center px-4 py-2 bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-full text-foreground/60 hover:text-[#FF5C00] hover:shadow-lg transition-all duration-300 gap-2 group">
+                                <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
+                                <span className="text-[10px] font-bold tracking-widest uppercase font-mono">{dictionary.cancellation.back_home || "Back"}</span>
                             </Link>
                         </div>
 
                         {/* Header Section */}
-                        <div className="mb-8 text-center space-y-4">
+                        <div className="mb-8 text-center space-y-4 relative z-10">
 
 
                             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
@@ -65,7 +69,9 @@ export default async function CancellationPage({
                         </div>
 
                         {/* Form Component */}
-                        <CancellationForm dictionary={dictionary} lang={lang} />
+                        <div className="relative z-10">
+                            <CancellationForm dictionary={dictionary} lang={lang} />
+                        </div>
 
                     </div>
                 </div>

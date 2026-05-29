@@ -77,8 +77,8 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
             ref={containerRef}
             className="relative w-full py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500"
         >
-            {/* Ambient Background Glows */}
-            <div className="absolute top-[30%] left-[20%] w-[600px] h-[600px] bg-[#FF5C00]/5 dark:bg-[#FF5C00]/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+            {/* Ambient Background Glows (Performance Optimized) */}
+            <div className="absolute top-[30%] left-[20%] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(255,92,0,0.1)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(255,92,0,0.08)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
             
             {/* Background Noise/Gradient - Adaptive */}
             <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none mix-blend-multiply dark:mix-blend-overlay" />

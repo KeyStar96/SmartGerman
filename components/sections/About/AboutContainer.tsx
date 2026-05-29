@@ -25,10 +25,12 @@ const GlassCard = ({ children, className, isOrange = false }: { children: React.
                 className
             )}
         >
-            {/* Ambient hover glow inside card */}
+            {/* Ambient hover glow inside card (Performance Optimized) */}
             <div className={cn(
-                "absolute -top-24 -right-24 w-48 h-48 blur-3xl rounded-full transition-all duration-700 group-hover/card:scale-150 z-0",
-                isOrange ? "bg-white/30" : "bg-orange-400/20"
+                "absolute -top-24 -right-24 w-48 h-48 rounded-full transition-all duration-700 group-hover/card:scale-150 z-0",
+                isOrange 
+                    ? "bg-[radial-gradient(circle,rgba(255,255,255,0.4)_0%,transparent_70%)]" 
+                    : "bg-[radial-gradient(circle,rgba(251,146,60,0.4)_0%,transparent_70%)]"
             )} />
             <div className="relative z-10 h-full">
                 {children}
@@ -45,8 +47,8 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
 
     return (
         <section id="about" ref={containerRef} className="relative w-full min-h-screen py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500">
-            {/* Ambient Background Glow */}
-            <div className="absolute top-1/3 right-0 -translate-y-1/2 w-[500px] h-[500px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+            {/* Ambient Background Glow (Performance Optimized) */}
+            <div className="absolute top-1/3 right-0 -translate-y-1/2 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(255,92,0,0.15)_0%,transparent_60%)] dark:bg-[radial-gradient(circle,rgba(255,92,0,0.08)_0%,transparent_60%)] rounded-full pointer-events-none -z-10" />
 
             <div className="container mx-auto px-6 md:px-12 relative z-10 pointer-events-none">
 
