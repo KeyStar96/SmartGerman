@@ -465,7 +465,7 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
             text-[#FF5C00] group-hover/trial:text-white
             transition-colors duration-300
           `}>
-            {config.trialLessons !== false ? trialCtaText : (dictionary?.courses?.labels?.book_now || "JETZT BUCHEN")}
+            {config.trialLessons !== false ? trialCtaText : (((dictionary as any)?.courses?.labels?.book_now) || "JETZT BUCHEN")}
           </span>
         </div>
       </Link>
