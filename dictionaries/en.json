@@ -1180,43 +1180,51 @@
   "reviews_data": [
     {
       "id": 1,
-      "author": "Sarah M.",
+      "author": "Vitalii Raevskii",
       "rating": 5,
-      "text": "The best language school I've ever attended! The teachers are incredibly patient and the online platform is flawless. I learned so much in just 3 months.",
-      "date": "2 weeks ago",
-      "avatar": "S"
+      "text": "I am very glad I found Smart German. After several unsuccessful attempts to learn German, I had almost lost faith in myself and my motivation. But thanks to the teacher's approach, everything changed: learning became understandable, at a comfortable pace, and really very interesting.",
+      "date": "5 days ago",
+      "avatar": "V"
     },
     {
       "id": 2,
-      "author": "Alexey V.",
+      "author": "Viktoriia Viktoriia",
       "rating": 5,
-      "text": "Sitov Academy completely changed my perspective on learning German. It used to be so hard, but their method makes it logical and fun. Highly recommended!",
-      "date": "1 month ago",
-      "avatar": "A"
+      "text": "Anastasia is a very good and attentive German teacher. The lessons are always interesting and never boring, the material is explained calmly and understandably. I recommend the course to everyone who wants to improve their German skills.",
+      "date": "7 days ago",
+      "avatar": "V"
     },
     {
       "id": 3,
-      "author": "Elena R.",
+      "author": "Valeriia Varych",
       "rating": 5,
-      "text": "I completed my B2 course here. The exam preparation was excellent. Very professional and friendly team.",
-      "date": "3 months ago",
-      "avatar": "E"
+      "text": "An excellent school opened by an excellent German teacher! Thanks to her and her approach, German opens up from a completely different side. She explains the logic and structure of the language. I am studying at the B2 level, and even during grammar explanations, I was not bored at all.",
+      "date": "1 week ago",
+      "avatar": "V"
     },
     {
       "id": 4,
-      "author": "David K.",
+      "author": "Оксана Абрамович",
       "rating": 5,
-      "text": "Amazing experience! The trial lesson was free and convinced me instantly. The hybrid model (online + presence) works perfectly for my busy schedule.",
-      "date": "1 week ago",
-      "avatar": "D"
+      "text": "In just 4 months of lessons, I have noticed great progress in the German language. The most amazing thing for me is that the words are memorized naturally, without endless rote learning. Thank you for the patience, support, and the great teaching method!",
+      "date": "7 days ago",
+      "avatar": "О"
     },
     {
       "id": 5,
-      "author": "Maria S.",
+      "author": "Maksym",
       "rating": 5,
-      "text": "Wonderful school! The teachers are very attentive, the atmosphere in the lessons is friendly. My German has gotten much better.",
-      "date": "2 months ago",
+      "text": "A huge thank you to Anastasia for this fantastic language training! Nastia does a great job of involving you in the conversation and totally motivates you to speak in German. After every meeting, you just have positive emotions and gain self-confidence.",
+      "date": "7 days ago",
       "avatar": "M"
+    },
+    {
+      "id": 6,
+      "author": "Андрей Иванов",
+      "rating": 5,
+      "text": "I am very satisfied with these courses! The material is explained simply and accessibly, and the lessons help to adapt faster in the country. There is noticeable progress in learning the German language. Highly recommended.",
+      "date": "6 days ago",
+      "avatar": "А"
     }
   ]
 }

@@ -1181,43 +1181,51 @@
   "reviews_data": [
     {
       "id": 1,
-      "author": "Sarah M.",
+      "author": "Vitalii Raevskii",
       "rating": 5,
-      "text": "Şimdiye kadar katıldığım en iyi dil okulu! Öğretmenler inanılmaz derecede sabırlı ve çevrimiçi platform kusursuz. Sadece 3 ayda çok şey öğrendim.",
-      "date": "2 hafta önce",
-      "avatar": "S"
+      "text": "Smart German'ı bulduğuma çok sevindim. Birkaç başarısız Almanca öğrenme girişiminden sonra kendime olan inancımı ve motivasyonumu neredeyse kaybetmiştim. Ancak öğretmenin yaklaşımı sayesinde her şey değişti: öğrenmek anlaşılır, rahat bir tempoda ve gerçekten çok ilginç hale geldi.",
+      "date": "5 gün önce",
+      "avatar": "V"
     },
     {
       "id": 2,
-      "author": "Alexey V.",
+      "author": "Viktoriia Viktoriia",
       "rating": 5,
-      "text": "Sitov Academy Almanca öğrenmeye bakış açımı tamamen değiştirdi. Eskiden çok zordu ama yöntemleri bunu mantıklı ve eğlenceli hale getiriyor. Şiddetle tavsiye edilir!",
-      "date": "1 ay önce",
-      "avatar": "A"
+      "text": "Anastasia çok iyi ve dikkatli bir Almanca öğretmeni. Dersler her zaman ilginç ve asla sıkıcı değil, materyal sakin ve anlaşılır bir şekilde açıklanıyor. Almanca becerilerini geliştirmek isteyen herkese bu kursu tavsiye ederim.",
+      "date": "7 gün önce",
+      "avatar": "V"
     },
     {
       "id": 3,
-      "author": "Elena R.",
+      "author": "Valeriia Varych",
       "rating": 5,
-      "text": "Burada B2 kursumu tamamladım. Sınava hazırlık mükemmeldi. Çok profesyonel ve güler yüzlü bir ekip.",
-      "date": "3 ay önce",
-      "avatar": "E"
+      "text": "Mükemmel bir Almanca öğretmeni tarafından açılan mükemmel bir okul! Onun ve yaklaşımı sayesinde Almanca bambaşka bir yönünden açılıyor. Dilin mantığını ve yapısını açıklıyor. B2 seviyesinde çalışıyorum ve dilbilgisi açıklamalarında bile hiç sıkılmadım.",
+      "date": "1 hafta önce",
+      "avatar": "V"
     },
     {
       "id": 4,
-      "author": "David K.",
+      "author": "Оксана Абрамович",
       "rating": 5,
-      "text": "Harika bir deneyim! Deneme dersi ücretsizdi ve beni anında ikna etti. Hibrit model (çevrimiçi + yüz yüze) yoğun programım için mükemmel çalışıyor.",
-      "date": "1 hafta önce",
-      "avatar": "D"
+      "text": "Sadece 4 aylık derslerde Almanca dilinde büyük bir ilerleme fark ettim. Benim için en şaşırtıcı şey, kelimelerin sonsuz ezberlemeler olmadan doğal bir şekilde hafızada kalması. Sabrınız, desteğiniz ve harika öğretim yönteminiz için teşekkür ederim!",
+      "date": "7 gün önce",
+      "avatar": "О"
     },
     {
       "id": 5,
-      "author": "Maria S.",
+      "author": "Maksym",
       "rating": 5,
-      "text": "Harika bir okul! Öğretmenler çok özenli, derslerdeki atmosfer dostça. Almancam çok daha iyi oldu.",
-      "date": "2 ay önce",
+      "text": "Bu harika dil eğitimi için Anastasia'ya kocaman bir teşekkürler! Nastia sizi sohbete dahil etme konusunda harika bir iş çıkarıyor ve Almanca konuşmanız için tamamen motive ediyor. Her buluşmadan sonra sadece olumlu duygular yaşar ve özgüven kazanırsınız.",
+      "date": "7 gün önce",
       "avatar": "M"
+    },
+    {
+      "id": 6,
+      "author": "Андрей Иванов",
+      "rating": 5,
+      "text": "Bu kurslardan çok memnunum! Materyal basit ve anlaşılır bir şekilde açıklanıyor ve dersler ülkeye daha hızlı adapte olmaya yardımcı oluyor. Almanca öğrenmede gözle görülür bir ilerleme var. Şiddetle tavsiye edilir.",
+      "date": "6 gün önce",
+      "avatar": "А"
     }
   ]
 }

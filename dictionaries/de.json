@@ -1179,43 +1179,51 @@
   "reviews_data": [
     {
       "id": 1,
-      "author": "Sarah M.",
+      "author": "Vitalii Raevskii",
       "rating": 5,
-      "text": "Die beste Sprachschule, die ich je besucht habe! Die Lehrer sind unglaublich geduldig und die Online-Plattform ist fehlerfrei. Ich habe in nur 3 Monaten so viel gelernt.",
-      "date": "Vor 2 Wochen",
-      "avatar": "S"
+      "text": "Ich bin sehr froh, Smart German gefunden zu haben. Nach mehreren erfolglosen Versuchen, Deutsch zu lernen, hatte ich den Glauben an mich selbst und die Motivation fast verloren. Aber dank des Ansatzes der Lehrerin hat sich alles geändert: Das Lernen wurde verständlich, in einem angenehmen Tempo und wirklich sehr interessant.",
+      "date": "Vor 5 Tagen",
+      "avatar": "V"
     },
     {
       "id": 2,
-      "author": "Alexey V.",
+      "author": "Viktoriia Viktoriia",
       "rating": 5,
-      "text": "Sitov Academy hat meine Sichtweise auf das Deutschlernen komplett verändert. Früher war es so schwer, aber ihre Methode macht es logisch und macht Spaß. Sehr zu empfehlen!",
-      "date": "Vor 1 Monat",
-      "avatar": "A"
+      "text": "Anastasia ist eine sehr gute und aufmerksame Deutschlehrerin. Der Unterricht ist immer interessant und nie langweilig, der Stoff wird ruhig und verständlich erklärt. Ich empfehle den Kurs allen, die ihre Deutschkenntnisse verbessern möchten.",
+      "date": "Vor 7 Tagen",
+      "avatar": "V"
     },
     {
       "id": 3,
-      "author": "Elena R.",
+      "author": "Valeriia Varych",
       "rating": 5,
-      "text": "Ich habe hier meinen B2-Kurs absolviert. Die Vorbereitung auf die Prüfung war exzellent. Sehr professionelles und freundliches Team.",
-      "date": "Vor 3 Monaten",
-      "avatar": "E"
+      "text": "Eine ausgezeichnete Schule, eröffnet von einer exzellenten Deutschlehrerin! Dank ihr und ihrem Ansatz zeigt sich Deutsch von einer ganz anderen Seite. Sie erklärt die Logik und Struktur der Sprache und nutzt einprägsame Assoziationen. Ich lerne auf B2-Niveau und selbst bei Grammatik war mir nie langweilig.",
+      "date": "Vor 1 Woche",
+      "avatar": "V"
     },
     {
       "id": 4,
-      "author": "David K.",
+      "author": "Оксана Абрамович",
       "rating": 5,
-      "text": "Erstaunliche Erfahrung! Die Probestunde war kostenlos und hat mich sofort überzeugt. Das hybride Modell (Online + Präsenz) passt perfekt zu meinem vollen Terminkalender.",
-      "date": "Vor 1 Woche",
-      "avatar": "D"
+      "text": "In nur 4 Monaten Unterricht habe ich einen großen Fortschritt in der deutschen Sprache bemerkt. Das Erstaunlichste für mich ist, dass sich die Wörter ganz natürlich einprägen, ohne endloses Auswendiglernen. Vielen Dank für die Geduld, die Unterstützung und die großartige Unterrichtsmethode!",
+      "date": "Vor 7 Tagen",
+      "avatar": "О"
     },
     {
       "id": 5,
-      "author": "Maria S.",
+      "author": "Maksym",
       "rating": 5,
-      "text": "Wunderbare Schule! Die Lehrer sind sehr aufmerksam und die Atmosphäre im Unterricht ist freundlich. Mein Deutsch ist viel besser geworden.",
-      "date": "Vor 2 Monaten",
+      "text": "Ein riesiges Dankeschön an Anastasia für dieses fantastische Sprachtraining! Nastia schafft es super, einen in die Konversation einzubinden und motiviert total dazu, auf Deutsch zu sprechen. Nach jedem Treffen hat man einfach nur positive Emotionen und gewinnt an Selbstvertrauen.",
+      "date": "Vor 7 Tagen",
       "avatar": "M"
+    },
+    {
+      "id": 6,
+      "author": "Андрей Иванов",
+      "rating": 5,
+      "text": "Ich bin sehr zufrieden mit diesen Kursen! Das Material wird einfach und zugänglich erklärt, und die Lektionen helfen, sich schneller im Land zu integrieren. Es gibt sichtbare Fortschritte beim Erlernen der deutschen Sprache. Sehr empfehlenswert.",
+      "date": "Vor 6 Tagen",
+      "avatar": "А"
     }
   ]
 }
