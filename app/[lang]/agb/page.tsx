@@ -6,7 +6,7 @@ import { Metadata } from "next";
 
 export async function generateStaticParams() {
     return [
-        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tu' },
+        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tr' },
     ];
 }
 
@@ -16,6 +16,17 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     return {
         title: dictionary.agb?.title || "AGB",
         description: dictionary.agb?.title || "AGB",
+        alternates: {
+            canonical: `https://www.sitov-academy.com/${lang}/agb`,
+            languages: {
+                'x-default': `https://www.sitov-academy.com/de/agb`,
+                de: `https://www.sitov-academy.com/de/agb`,
+                en: `https://www.sitov-academy.com/en/agb`,
+                uk: `https://www.sitov-academy.com/uk/agb`,
+                ru: `https://www.sitov-academy.com/ru/agb`,
+                tr: `https://www.sitov-academy.com/tr/agb`,
+            },
+        },
     };
 }
 

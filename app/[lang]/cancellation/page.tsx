@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 export async function generateStaticParams() {
     return [
-        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tu' },
+        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tr' },
     ];
 }
 
@@ -24,6 +24,17 @@ export async function generateMetadata({
     return {
         title: `${dictionary.cancellation.title} | Sitov Language Academy`,
         description: dictionary.cancellation.description,
+        alternates: {
+            canonical: `https://www.sitov-academy.com/${lang}/cancellation`,
+            languages: {
+                'x-default': `https://www.sitov-academy.com/de/cancellation`,
+                de: `https://www.sitov-academy.com/de/cancellation`,
+                en: `https://www.sitov-academy.com/en/cancellation`,
+                uk: `https://www.sitov-academy.com/uk/cancellation`,
+                ru: `https://www.sitov-academy.com/ru/cancellation`,
+                tr: `https://www.sitov-academy.com/tr/cancellation`,
+            },
+        },
     };
 }
 

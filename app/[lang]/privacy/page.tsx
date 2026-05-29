@@ -6,7 +6,7 @@ import { Metadata } from "next";
 
 export async function generateStaticParams() {
     return [
-        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tu' },
+        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tr' },
     ];
 }
 
@@ -16,6 +16,17 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     return {
         title: dictionary.privacy?.title || "Privacy Policy",
         description: dictionary.privacy?.title || "Privacy Policy",
+        alternates: {
+            canonical: `https://www.sitov-academy.com/${lang}/privacy`,
+            languages: {
+                'x-default': `https://www.sitov-academy.com/de/privacy`,
+                de: `https://www.sitov-academy.com/de/privacy`,
+                en: `https://www.sitov-academy.com/en/privacy`,
+                uk: `https://www.sitov-academy.com/uk/privacy`,
+                ru: `https://www.sitov-academy.com/ru/privacy`,
+                tr: `https://www.sitov-academy.com/tr/privacy`,
+            },
+        },
     };
 }
 

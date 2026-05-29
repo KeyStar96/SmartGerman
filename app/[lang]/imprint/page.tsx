@@ -6,7 +6,7 @@ import { Metadata } from "next";
 
 export async function generateStaticParams() {
     return [
-        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tu' },
+        { lang: 'de' }, { lang: 'en' }, { lang: 'uk' }, { lang: 'ru' }, { lang: 'tr' },
     ];
 }
 
@@ -16,6 +16,17 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     return {
         title: dictionary.imprint?.title || "Imprint",
         description: dictionary.imprint?.title || "Imprint",
+        alternates: {
+            canonical: `https://www.sitov-academy.com/${lang}/imprint`,
+            languages: {
+                'x-default': `https://www.sitov-academy.com/de/imprint`,
+                de: `https://www.sitov-academy.com/de/imprint`,
+                en: `https://www.sitov-academy.com/en/imprint`,
+                uk: `https://www.sitov-academy.com/uk/imprint`,
+                ru: `https://www.sitov-academy.com/ru/imprint`,
+                tr: `https://www.sitov-academy.com/tr/imprint`,
+            },
+        },
     };
 }
 
