@@ -1147,7 +1147,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                             minDate.setDate(minDate.getDate() + 1);
                                                             minDate.setHours(0, 0, 0, 0);
                                                             const maxDate = new Date(now);
-                                                            maxDate.setMonth(maxDate.getMonth() + 3);
+                                                            maxDate.setMonth(maxDate.getMonth() + 6);
                                                             maxDate.setHours(23, 59, 59, 999);
 
                                                             return (
