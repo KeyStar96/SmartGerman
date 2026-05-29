@@ -77,8 +77,11 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
             ref={containerRef}
             className="relative w-full py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500"
         >
+            {/* Ambient Background Glows */}
+            <div className="absolute top-[30%] left-[20%] w-[600px] h-[600px] bg-[#FF5C00]/5 dark:bg-[#FF5C00]/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+            
             {/* Background Noise/Gradient - Adaptive */}
-            <div className="absolute inset-0 bg-noise opacity-[0.05] pointer-events-none mix-blend-multiply dark:mix-blend-overlay" />
+            <div className="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none mix-blend-multiply dark:mix-blend-overlay" />
             <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-transparent to-transparent z-10 transition-colors duration-500" />
 
             <div className="container mx-auto px-6 md:px-12 relative z-20">
@@ -137,7 +140,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                                 href={`https://www.google.com/maps/dir/?api=1&destination=${LOCATION_DATA.lat},${LOCATION_DATA.lng}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-[#FF5C00] hover:bg-[#e05200] text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 overflow-hidden" // removed rounded-full
+                                className="group relative inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#FF5C00] to-orange-500 text-white rounded-full transition-all duration-500 shadow-[0_0_40px_rgba(255,92,0,0.3)] hover:shadow-[0_0_60px_rgba(255,92,0,0.5)] hover:-translate-y-1 overflow-hidden"
                             >
                                 <span className="relative z-10 font-mono text-sm tracking-wide uppercase font-bold">
                                     {t.get_directions}
@@ -153,7 +156,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                         whileInView={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                         viewport={{ once: true }}
-                        className="lg:col-span-8 h-[500px] md:h-[600px] relative overflow-hidden shadow-2xl border border-lm-text-espresso/5 dark:border-dm-text-main/5 bg-transparent" // removed rounded-3xl
+                        className="lg:col-span-8 h-[500px] md:h-[600px] relative overflow-hidden shadow-2xl border border-lm-text-espresso/5 dark:border-dm-text-main/5 bg-transparent rounded-3xl"
                     >
                         {/* Privacy Shield */}
                         {!mapConsent && (
@@ -165,7 +168,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="relative z-10 max-w-md bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/60 dark:border-white/10 p-8 shadow-2xl" // removed rounded-2xl
+                                    className="relative z-10 max-w-md bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 p-8 shadow-2xl rounded-3xl"
                                 >
                                     <Lock className="w-8 h-8 text-primary-orange mx-auto mb-4" />
                                     <h3 className="text-xl font-sans font-bold tracking-tight text-lm-text-espresso dark:text-white mb-2">{t.privacy_title}</h3>
@@ -173,7 +176,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ dictionary }) 
 
                                     <button
                                         onClick={() => setMapConsent(true)}
-                                        className="w-full py-4 bg-primary-orange text-white font-bold uppercase tracking-widest text-xs hover:bg-orange-600 transition-colors duration-300 shadow-lg flex items-center justify-center gap-2" // removed rounded-lg
+                                        className="w-full py-4 bg-gradient-to-r from-[#FF5C00] to-orange-500 text-white font-bold uppercase tracking-widest text-xs hover:shadow-lg transition-all duration-500 rounded-full flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,92,0,0.3)] hover:-translate-y-1"
                                     >
                                         <CheckCircle2 size={16} />
                                         {t.load_map}

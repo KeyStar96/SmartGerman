@@ -20,27 +20,24 @@ interface WhyUsDictionary {
 // Removed "Tilt" 3D logic for a flatter, more solid print aesthetic
 // --- TACTILE CARDBOARD COMPONENT. ---
 // Memoized to prevent re-renders when parent state changes
-const PaperCard = React.memo(function PaperCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
+const GlassCard = React.memo(function GlassCard({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) {
     return (
         <div
             className={cn(
-                "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card",
-                isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9] dark:bg-[#1E2024]",
-                "border-[0.5px] border-black/10 dark:border-white/5",
-                "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]",
+                "relative w-full h-full overflow-hidden transition-all duration-700 ease-out group/card rounded-3xl backdrop-blur-xl",
+                isOrange 
+                    ? "bg-[#FF5C00]/80 dark:bg-[#FF5C00]/70 border-white/40 shadow-[0_8px_30px_rgb(255,92,0,0.2)]" 
+                    : "bg-white/60 dark:bg-[#1a1a1a]/60 border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",
+                "border",
+                "hover:shadow-2xl hover:-translate-y-1",
                 className
             )}
         >
-            {/* Paper Texture Overlay */}
-            <div
-                className={cn(
-                    "absolute inset-0 pointer-events-none z-0",
-                    "bg-noise-paper",
-                    isOrange
-                        ? "opacity-50 mix-blend-overlay brightness-110"
-                        : "opacity-20 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5"
-                )}
-            />
+            {/* Ambient hover glow inside card */}
+            <div className={cn(
+                "absolute -top-24 -right-24 w-48 h-48 blur-3xl rounded-full transition-all duration-700 group-hover/card:scale-150 z-0",
+                isOrange ? "bg-white/30" : "bg-orange-400/20"
+            )} />
 
             {/* Content Container */}
             <div className="relative z-10 h-full">
@@ -49,7 +46,7 @@ const PaperCard = React.memo(function PaperCard({ children, className, isOrange 
         </div>
     );
 });
-PaperCard.displayName = 'PaperCard';
+GlassCard.displayName = 'GlassCard';
 
 const itemVariants = {
     hidden: { opacity: 0, scale: 1.02 },
@@ -88,8 +85,8 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
 
     return (
         <section ref={containerRef} className="relative py-32 bg-transparent">
-            {/* Global Grain Texture Overlay - Removed to avoid conflict with card textures */}
-            {/* <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-[0.08] mix-blend-overlay"></div> */}
+            {/* Ambient Background Glow */}
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[600px] h-[600px] bg-[#FF5C00]/5 dark:bg-[#FF5C00]/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
             <div className="container mx-auto px-6 md:px-12 relative z-10">
 
@@ -126,7 +123,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
 
                     {/* KARTE 1: Forschung & Biologie (7 Spalten, 3 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-7 relative z-40">
-                        <PaperCard className="h-full">
+                        <GlassCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col justify-between relative z-10">
                                 <div>
                                     <div className="flex items-center gap-4 mb-2">
@@ -148,12 +145,12 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                     {t.card1.specialization}
                                 </div>
                             </div>
-                        </PaperCard>
+                        </GlassCard>
                     </motion.div>
 
                     {/* KARTE 2: Akademischer Werdegang (5 Spalten, 3 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-5 z-30">
-                        <PaperCard className="h-full" isOrange={true}>
+                        <GlassCard className="h-full" isOrange={true}>
                             <div className="h-full text-[#F0EFE9] p-10 lg:p-12 flex flex-col justify-between relative">
                                 {/* No extra Scan-Lines, just noise from PaperCard component */}
 
@@ -180,12 +177,12 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                     </ul>
                                 </div>
                             </div>
-                        </PaperCard>
+                        </GlassCard>
                     </motion.div>
 
                     {/* KARTE 3: Praxiserfahrung (6 Spalten, 2 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-6 z-20">
-                        <PaperCard className="h-full">
+                        <GlassCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-20">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Users size={28} strokeWidth={2} className="text-[#FF5C00] transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
@@ -200,12 +197,12 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                     </div>
                                 </div>
                             </div>
-                        </PaperCard>
+                        </GlassCard>
                     </motion.div>
 
                     {/* KARTE 4: Sprachen & Empathie (6 Spalten, 2 Zeilen) */}
                     <motion.div variants={itemVariants} className="md:col-span-6 z-10">
-                        <PaperCard className="h-full">
+                        <GlassCard className="h-full">
                             <div className="p-10 lg:p-12 h-full flex flex-col relative z-20">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Globe2 size={28} strokeWidth={2} className="text-[#FF5C00] transition-transform duration-500 ease-out group-hover/card:scale-[0.98]" />
@@ -220,7 +217,7 @@ export default function WhyUsBento({ dictionary }: { dictionary: WhyUsDictionary
                                     </div>
                                 </div>
                             </div>
-                        </PaperCard>
+                        </GlassCard>
                     </motion.div>
 
                 </motion.div>

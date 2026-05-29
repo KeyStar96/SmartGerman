@@ -90,17 +90,19 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
                     tap: { scale: 0.98 }
                 }}
                 className={cn(
-                    "flex-1 relative overflow-hidden rounded-sm p-5 border transition-all duration-300",
-                    // Light Mode: Clinical White/Base
-                    "bg-[#F0EFE9] border-black/10",
-                    // Dark Mode: Technical Dark
-                    "dark:bg-[#1E2024] dark:border-white/10",
+                    "flex-1 relative overflow-hidden rounded-3xl p-6 border transition-all duration-500",
+                    // Glassmorphism Base
+                    "bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl",
+                    "border-white/40 dark:border-white/10",
+                    "shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",
                     // Hover State
-                    "group-hover:border-[#FF5C00] dark:group-hover:border-[#FF5C00] group-hover:shadow-md",
+                    "group-hover:border-white/80 dark:group-hover:border-white/30 group-hover:shadow-xl",
                     // Live State Border
                     isLive && "border-[#FF5C00]/40 dark:border-[#FF5C00]/40 shadow-sm"
                 )}
             >
+                {/* Ambient hover glow inside card */}
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-orange-400/20 blur-2xl rounded-full transition-all duration-700 group-hover:scale-150 z-0 pointer-events-none" />
                 {/* ALTERNATING Badge */}
                 {course.isAlternating && !startBadge && (
                     <div className="absolute top-0 right-0 px-2 py-1 bg-black/10 dark:bg-white/10 text-black/60 dark:text-white/60 text-[9px] font-bold tracking-widest uppercase rounded-bl-sm z-20">

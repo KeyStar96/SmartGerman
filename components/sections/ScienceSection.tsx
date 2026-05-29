@@ -101,7 +101,7 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
 
                     {/* Right side: Brain (Static image on mobile, WebGL on desktop) */}
-                    <div className="lg:col-span-6 relative flex justify-center lg:justify-end mt-12 lg:mt-0">
+                    <div className="hidden lg:flex lg:col-span-6 relative justify-end mt-12 lg:mt-0">
                         
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.9, rotate: -5 }}

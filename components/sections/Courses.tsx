@@ -156,6 +156,10 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
       id="courses"
       className="relative py-24 md:py-32 bg-transparent text-[#2D3436] dark:text-[#E2D7CE] overflow-hidden"
     >
+      {/* Ambient Background Glows */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 dark:bg-blue-500/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+
       <div className="container mx-auto px-6 md:px-12 relative z-10">
 
         {/* --- Header / Toggle Section --- */}
@@ -172,8 +176,8 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
             </h2>
           </div>
 
-          {/* The Physical Toggle Switch */}
-          <div className="bg-white dark:bg-[#2D3436] p-2 rounded-full flex relative shadow-2xl h-[60px] items-center">
+          {/* The Glassmorphism Toggle Switch */}
+          <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 p-2 rounded-full flex relative shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] h-[60px] items-center">
             {(["presence", "online"] as const).map((tab) => {
               const isActive = filter === tab;
               return (
@@ -288,23 +292,26 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
     <motion.div
       variants={cardVariants}
       className="group/card h-full flex flex-col
-        rounded-xl overflow-hidden
-        border-[1.5px] border-black/8 dark:border-transparent
-        transition-all duration-300 ease-out
+        rounded-3xl overflow-hidden
+        bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl
+        border border-white/40 dark:border-white/10
+        transition-all duration-500 ease-out
         hover:z-20 hover:-translate-y-2
-        hover:border-[#FF5C00] dark:hover:border-[#FF5C00]
-        hover:shadow-[0_25px_50px_-12px_rgba(255,92,0,0.15)]
-        dark:hover:shadow-[0_25px_50px_-12px_rgba(255,92,0,0.25)]
-        shadow-[0_1px_3px_0_rgba(0,0,0,0.08)]
-        dark:shadow-[0_1px_3px_0_rgba(0,0,0,0.4)]
+        hover:border-white/80 dark:hover:border-white/30
+        shadow-[0_8px_30px_rgb(0,0,0,0.04)]
+        dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]
+        hover:shadow-2xl
       "
     >
+      {/* Ambient hover glow inside card */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-400/20 blur-3xl rounded-full transition-all duration-700 group-hover/card:scale-150 z-0 pointer-events-none" />
+
       {/* Main Card Area → Regular Registration */}
       <Link
         href={`/${lang}/registration?courseId=${config.id}`}
         className={`
             group relative w-full flex-1 min-h-[380px] 
-            bg-[#F9F8F6] dark:bg-[#1E2024]
+            bg-transparent
             cursor-pointer
             block
             
@@ -312,13 +319,6 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
             transition-all duration-300 ease-out
           `}
       >
-        {/* Paper Texture Overlay (3% Opacity) */}
-        <div
-          className={cn(
-            "absolute inset-0 pointer-events-none z-0 bg-noise-paper",
-            "opacity-[0.03] mix-blend-multiply dark:mix-blend-overlay dark:opacity-[0.05]"
-          )}
-        />
 
         {/* Content Container */}
         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -438,11 +438,11 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
         href={`/${lang}/registration?courseId=${config.id}&trial=1`}
         className={`
           group/trial relative block w-full
-          bg-[#F0EDE8] dark:bg-[#181A1D]
-          border-t border-t-black/5 dark:border-t-white/5
-          group-hover/card:border-t-[#FF5C00]/30
-          px-7 py-4
-          transition-all duration-300 ease-out
+          bg-black/[0.03] dark:bg-white/[0.03] backdrop-blur-md
+          border-t border-t-white/20 dark:border-t-white/5
+          group-hover/card:border-t-white/40
+          px-7 py-5
+          transition-all duration-500 ease-out
           hover:bg-[#FF5C00] dark:hover:bg-[#FF5C00]
         `}
       >

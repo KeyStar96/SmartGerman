@@ -112,7 +112,7 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                     <div className="flex flex-col gap-3 w-full sm:w-auto">
                         <button
                             onClick={handleCopyEmail}
-                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 lg:hover:bg-white/10 text-white flex items-center justify-between px-6 transition-all group"
+                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 backdrop-blur-md lg:hover:bg-white/10 lg:hover:border-white/40 text-white flex items-center justify-between px-6 transition-all duration-500 group shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
                         >
                             <span className="font-mono text-xs uppercase tracking-widest relative z-10">
                                 {isCopied ? (t.Contact?.copied || "Copied!") : (t.Contact?.email_button || "Email Me")}
@@ -121,14 +121,14 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                                 {isCopied ? <Check size={14} /> : <ArrowUpRight size={14} />}
                             </div>
                             {/* Subtle Hover Gradient Background */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-[100%] lg:group-hover:translate-x-[100%] transition-transform duration-700" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[100%] lg:group-hover:translate-x-[100%] transition-transform duration-700" />
                         </button>
 
                         <a
                             href="https://t.me/Sprachschule_Anastasia"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 lg:hover:bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-between px-6 transition-all group"
+                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 backdrop-blur-md lg:hover:bg-[#229ED9]/20 lg:hover:border-[#229ED9]/50 text-[#229ED9] flex items-center justify-between px-6 transition-all duration-500 group shadow-[0_4px_30px_rgba(34,158,217,0.1)]"
                         >
                             <span className="font-mono text-xs uppercase tracking-widest relative z-10">{t.Contact?.telegram_button || "Telegram"}</span>
                             <MessageCircle size={20} className="lg:group-hover:rotate-12 transition-transform relative z-10" />

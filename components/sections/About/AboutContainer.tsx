@@ -12,26 +12,24 @@ interface AboutContainerProps {
     dictionary: any;
 }
 
-const PaperCard = ({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) => {
+const GlassCard = ({ children, className, isOrange = false }: { children: React.ReactNode; className?: string; isOrange?: boolean }) => {
     return (
         <div
             className={cn(
-                "relative w-full h-full overflow-hidden transition-all duration-500 ease-out group/card", // removed rounded-xl
-                isOrange ? "bg-[#FF5C00] shadow-[inset_0_0_40px_rgba(0,0,0,0.1)]" : "bg-[#F0EFE9] dark:bg-[#1E2024]",
-                "border-[0.5px] border-black/10 dark:border-white/5",
-                "hover:shadow-xl hover:-translate-y-1 hover:rotate-[0.5deg]",
+                "relative w-full h-full overflow-hidden transition-all duration-700 ease-out group/card rounded-3xl backdrop-blur-xl",
+                isOrange 
+                    ? "bg-[#FF5C00]/80 dark:bg-[#FF5C00]/70 border-white/40 shadow-[0_8px_30px_rgb(255,92,0,0.2)]" 
+                    : "bg-white/60 dark:bg-[#1a1a1a]/60 border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",
+                "border",
+                "hover:shadow-2xl hover:-translate-y-1",
                 className
             )}
         >
-            <div
-                className={cn(
-                    "absolute inset-0 pointer-events-none z-0",
-                    "bg-noise-paper",
-                    isOrange
-                        ? "opacity-50 mix-blend-overlay brightness-110"
-                        : "opacity-20 mix-blend-multiply dark:mix-blend-overlay dark:opacity-5"
-                )}
-            />
+            {/* Ambient hover glow inside card */}
+            <div className={cn(
+                "absolute -top-24 -right-24 w-48 h-48 blur-3xl rounded-full transition-all duration-700 group-hover/card:scale-150 z-0",
+                isOrange ? "bg-white/30" : "bg-orange-400/20"
+            )} />
             <div className="relative z-10 h-full">
                 {children}
             </div>
@@ -47,6 +45,8 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
 
     return (
         <section id="about" ref={containerRef} className="relative w-full min-h-screen py-24 md:py-32 overflow-hidden bg-transparent transition-colors duration-500">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-1/3 right-0 -translate-y-1/2 w-[500px] h-[500px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
             <div className="container mx-auto px-6 md:px-12 relative z-10 pointer-events-none">
 
@@ -78,14 +78,14 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                         transition={{ duration: 0.8 }}
                         className="lg:col-span-7 h-full pointer-events-auto" // removed old classes
                     >
-                        <PaperCard className="overflow-hidden"> {/* Ensure overflow hidden for image cutoff */}
+                        <GlassCard className="overflow-hidden"> {/* Ensure overflow hidden for image cutoff */}
                             <BioReveal
                                 headline={data.headline}
                                 subline={data.subline}
                                 body={data.body}
                                 imageUrl="/Bilder/Nastja.png"
                             />
-                        </PaperCard>
+                        </GlassCard>
                     </motion.div>
 
                     {/* Language Matrix */}
@@ -110,7 +110,7 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                         transition={{ delay: 0.4, duration: 0.8 }}
                         className="lg:col-span-12 h-full pointer-events-auto"
                     >
-                        <PaperCard className="overflow-hidden">
+                        <GlassCard className="overflow-hidden">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-full">
                                 {/* Visual Label */}
                                 <div className="p-12 md:border-r border-black/10 dark:border-white/5 bg-transparent">
@@ -128,7 +128,7 @@ export default function AboutContainer({ dictionary }: AboutContainerProps) {
                                     />
                                 </div>
                             </div>
-                        </PaperCard>
+                        </GlassCard>
                     </motion.div>
 
                 </div>
