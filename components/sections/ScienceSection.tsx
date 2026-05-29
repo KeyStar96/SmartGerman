@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const NeuralBrain = dynamic(() => import("../effects/NeuralBrain"), {
     ssr: false,
@@ -24,94 +25,108 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
         return () => window.removeEventListener('resize', checkDesktop);
     }, []);
 
+    // Animation variants
+    const fadeIn = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+    };
+
     return (
         <section
             id="science"
             ref={containerRef}
-            className="relative min-h-screen py-32 overflow-hidden bg-transparent"
+            className="relative min-h-screen py-24 sm:py-32 overflow-hidden bg-transparent"
         >
-            {/* ═══════════════════════════════════════════════════════
-                MOBILE LAYOUT: "AMBIENT LAYER" 
-                Brain is absolute background, content overlays it.
-                Only visible below lg breakpoint.
-                ═══════════════════════════════════════════════════════ */}
-            {/* ═══════════════════════════════════════════════════════
-                MOBILE LAYOUT: TEXT-ONLY (Clean Editorial)
-                NeuralBrain & Visuals hidden.
-                ═══════════════════════════════════════════════════════ */}
-            {/* ═══════════════════════════════════════════════════════
-                MOBILE LAYOUT: TEXT-ONLY (Clean Editorial)
-                NeuralBrain & Visuals hidden.
-                ═══════════════════════════════════════════════════════ */}
-            <div className="md:hidden relative px-6 max-w-lg mx-auto">
-                {/* Protocol label */}
-                <div className="mb-6 text-center">
-                    <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
-                        {dictionary.science.protocol}
-                    </span>
-                </div>
+            {/* Ambient Background Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#FF5C00]/10 dark:bg-[#FF5C00]/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
-                {/* Title */}
-                <h2 className="text-4xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-none mb-8 text-center">
-                    {dictionary.science.title_part1} <br />
-                    <span className="text-[#FF5C00]">{dictionary.science.title_part2}</span>
-                </h2>
-
-                {/* Description text */}
-                <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
-                    <p>{dictionary.science.description_1}</p>
-                    <p className="text-lg opacity-90">{dictionary.science.description_2}</p>
-                </div>
-            </div>
-
-            {/* ═══════════════════════════════════════════════════════
-                DESKTOP LAYOUT: Original 2-column grid (UNCHANGED)
-                Only visible at md breakpoint and above.
-                ═══════════════════════════════════════════════════════ */}
-            <div className="hidden md:block">
-                <div className="container mx-auto px-6 md:px-12 relative z-10">
-
-                    {/* Header Row: Spans full width */}
-                    <div className="mb-12 max-w-5xl">
-                        <div className="inline-block mb-6">
-                            <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase">
-                                {dictionary.science.protocol}
-                            </span>
-                        </div>
-
-                        <h2 className="text-4xl md:text-6xl tracking-tighter uppercase font-bold text-[#2D3436] dark:text-[#E2D7CE] leading-none">
-                            {dictionary.science.title_part1} <br />
-                            <span className="text-[#FF5C00]">{dictionary.science.title_part2}</span>
-                        </h2>
+            <div className="container mx-auto px-6 md:px-12 relative z-10 max-w-7xl">
+                
+                {/* Header */}
+                <motion.div 
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={fadeIn}
+                    className="mb-16 md:mb-24 text-center lg:text-left"
+                >
+                    <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-[#FF5C00]/30 bg-[#FF5C00]/5 backdrop-blur-md">
+                        <span className="font-mono text-[10px] tracking-[0.3em] text-[#FF5C00] uppercase font-bold">
+                            {dictionary.science.protocol}
+                        </span>
                     </div>
 
-                    {/* Content Grid: 60/40 Split - CHANGED items-start to items-center for better alignment */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
+                    <h2 className="text-4xl md:text-5xl lg:text-7xl tracking-tighter uppercase font-extrabold text-[#2D3436] dark:text-[#E2D7CE] leading-[1.1]">
+                        {dictionary.science.title_part1} <br className="hidden lg:block" />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5C00] to-orange-400">
+                            {dictionary.science.title_part2}
+                        </span>
+                    </h2>
+                </motion.div>
 
-                        {/* Left: Scientific Text (60%) */}
-                        <div className="md:col-span-7">
-                            <div className="space-y-8 text-xl font-bold tracking-tight leading-relaxed text-[#2D3436] dark:text-[#E2D7CE]">
-                                <p>{dictionary.science.description_1}</p>
-                                <p>{dictionary.science.description_2}</p>
-                            </div>
-                        </div>
+                {/* Content Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative">
+                    
+                    {/* Left side: Glass Cards */}
+                    <div className="lg:col-span-6 space-y-6 relative z-20">
+                        {/* Card 1 */}
+                        <motion.div 
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.7, delay: 0.1 }}
+                            className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] relative overflow-hidden group"
+                        >
+                            {/* Subtle inner glow */}
+                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-400/20 blur-3xl rounded-full transition-all duration-700 group-hover:scale-150" />
+                            <p className="text-lg md:text-xl font-medium tracking-tight leading-relaxed text-[#2D3436] dark:text-gray-200 relative z-10">
+                                {dictionary.science.description_1}
+                            </p>
+                        </motion.div>
 
-                        {/* Right: The Brain Composition (40%) */}
-                        <div className="md:col-span-5 relative w-full flex justify-end">
+                        {/* Card 2 */}
+                        <motion.div 
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.7, delay: 0.3 }}
+                            className="p-8 md:p-10 rounded-3xl bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] ml-0 md:ml-12 relative overflow-hidden group"
+                        >
+                            {/* Subtle inner glow */}
+                            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-orange-400/20 blur-3xl rounded-full transition-all duration-700 group-hover:scale-150" />
+                            <p className="text-lg md:text-xl font-medium tracking-tight leading-relaxed text-[#4a5568] dark:text-gray-400 relative z-10">
+                                {dictionary.science.description_2}
+                            </p>
+                        </motion.div>
+                    </div>
 
-                            {/* Sandwich Wrapper: Responsive size */}
-                            <div className="relative w-full max-w-[320px] lg:max-w-[420px] mr-[-40px]">
-                                {/* Layer 2 (Top): Head Image with Transparency */}
+                    {/* Right side: Brain (Static image on mobile, WebGL on desktop) */}
+                    <div className="lg:col-span-6 relative flex justify-center lg:justify-end mt-12 lg:mt-0">
+                        
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1.2, ease: "easeOut" }}
+                            className="relative w-full max-w-[320px] md:max-w-[400px] lg:max-w-[500px]"
+                        >
+                            {/* Floating animation for the whole brain container */}
+                            <motion.div
+                                animate={{ y: [0, -15, 0] }}
+                                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                            >
+                                {/* Static Image */}
                                 <Image
                                     src="/Bilder/SG_Brain-Compressed.webp"
                                     alt="Human Head Structure"
                                     width={2838}
                                     height={3162}
-                                    sizes="(max-width: 1024px) 320px, 420px"
-                                    className="relative z-20 w-full h-auto pointer-events-none select-none scale-x-[-1]"
+                                    sizes="(max-width: 1024px) 320px, 500px"
+                                    className="relative z-20 w-full h-auto pointer-events-none select-none scale-x-[-1] drop-shadow-2xl"
                                     priority={false}
                                 />
-                                {/* Layer 1 (Bottom): Neural Brain Container */}
+                                
+                                {/* WebGL Neural Brain (Only renders on Desktop) */}
                                 <div
                                     className="absolute z-10 overflow-hidden"
                                     style={{
@@ -125,8 +140,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                                 >
                                     {isDesktop && <NeuralBrain />}
                                 </div>
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
                     </div>
                 </div>
             </div>
