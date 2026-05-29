@@ -1486,6 +1486,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                         <button onClick={() => setStep(2)} className="text-[#FF5C00] text-xs uppercase font-bold tracking-widest hover:underline mt-4">
                                             {wizard?.edit}
                                         </button>
+                                        </div>
                                     </div>
 
                                     {/* Summary: Courses */}
