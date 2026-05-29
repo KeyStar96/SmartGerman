@@ -7,6 +7,81 @@ import { JetBrains_Mono } from "next/font/google";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
+// Hook for adding drag-to-scroll and mouse-wheel scrolling
+const useHorizontalScroll = () => {
+    const elRef = useRef<HTMLDivElement>(null);
+    
+    useEffect(() => {
+        const el = elRef.current;
+        if (!el) return;
+
+        let isDragging = false;
+        let startX = 0;
+        let scrollLeft = 0;
+
+        const onWheel = (e: WheelEvent) => {
+            if (e.deltaY === 0) return;
+            // Prevent default vertical scroll if we can scroll horizontally
+            if (
+                (e.deltaY < 0 && el.scrollLeft > 0) ||
+                (e.deltaY > 0 && Math.ceil(el.scrollLeft) < el.scrollWidth - el.clientWidth)
+            ) {
+                e.preventDefault();
+                el.scrollLeft += e.deltaY;
+            }
+        };
+
+        const onPointerDown = (e: PointerEvent) => {
+            isDragging = true;
+            startX = e.pageX - el.offsetLeft;
+            scrollLeft = el.scrollLeft;
+            el.style.cursor = 'grabbing';
+            el.style.userSelect = 'none';
+        };
+
+        const onPointerMove = (e: PointerEvent) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - el.offsetLeft;
+            const walk = (x - startX) * 2;
+            
+            // If scrolled more than 5px, disable clicks on children so we don't accidentally select a date
+            if (Math.abs(walk) > 5) {
+                el.classList.add('pointer-events-none-children');
+            }
+            
+            el.scrollLeft = scrollLeft - walk;
+        };
+
+        const onPointerUpOrLeave = () => {
+            isDragging = false;
+            el.style.cursor = '';
+            el.style.removeProperty('user-select');
+            // Timeout ensures that the click event is fired before we re-enable pointer events
+            setTimeout(() => {
+                el.classList.remove('pointer-events-none-children');
+            }, 0);
+        };
+
+        el.addEventListener('wheel', onWheel, { passive: false });
+        el.addEventListener('pointerdown', onPointerDown);
+        el.addEventListener('pointermove', onPointerMove);
+        el.addEventListener('pointerup', onPointerUpOrLeave);
+        el.addEventListener('pointerleave', onPointerUpOrLeave);
+
+        return () => {
+            el.removeEventListener('wheel', onWheel);
+            el.removeEventListener('pointerdown', onPointerDown);
+            el.removeEventListener('pointermove', onPointerMove);
+            el.removeEventListener('pointerup', onPointerUpOrLeave);
+            el.removeEventListener('pointerleave', onPointerUpOrLeave);
+        };
+    }, []);
+
+    return elRef;
+};
+
+
 interface PremiumDatePickerProps {
     value: string; // "DD.MM.YYYY"
     onChange: (val: string) => void;
@@ -26,6 +101,9 @@ export const PremiumDatePicker = ({
     minDate,
     maxDate,
 }: PremiumDatePickerProps) => {
+    const monthsRef = useHorizontalScroll();
+    const daysRef = useHorizontalScroll();
+
     // Helper to format/parse
     const [dStr, mStr, yStr] = (value || "").split(".");
     
@@ -126,7 +204,8 @@ export const PremiumDatePicker = ({
             
             {/* Months Scroll */}
             <div 
-                className="flex items-center gap-2 overflow-x-auto pb-4 mb-4 w-full premium-scrollbar"
+                ref={monthsRef}
+                className="flex items-center gap-2 overflow-x-auto pb-4 mb-4 w-full premium-scrollbar scroll-smooth-disabled"
             >
                 {availableMonths.map((m) => {
                     const isActive = viewMonth === m.month && viewYear === m.year;
@@ -154,7 +233,8 @@ export const PremiumDatePicker = ({
 
             {/* Days Scroll */}
             <div 
-                className="flex items-center gap-3 overflow-x-auto pb-6 pt-1 w-full premium-scrollbar"
+                ref={daysRef}
+                className="flex items-center gap-3 overflow-x-auto pb-6 pt-1 w-full premium-scrollbar scroll-smooth-disabled"
             >
                 {availableDays.map((d) => {
                     const isActive = currentSelectedDay === d.day && viewMonth === parseInt(mStr) && viewYear === parseInt(yStr);

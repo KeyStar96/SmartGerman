@@ -533,6 +533,11 @@ html.dark {
     scrollbar-color: rgba(255, 92, 0, 0.5) transparent;
   }
 
+  /* Helper class for drag-to-scroll */
+  .pointer-events-none-children * {
+    pointer-events: none !important;
+  }
+
   /* GLASS CARD BACKGROUND - PERFORMANCE OPTIMIERT
        Mobile: Solides RGBA ohne backdrop-filter (spart GPU)
        Desktop: Sanfter Blur als Enhancement
