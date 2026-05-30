@@ -57,8 +57,8 @@ export default function ScienceSection({ dictionary }: ScienceSectionProps) {
                     </div>
 
                     <h2 className="text-4xl md:text-5xl lg:text-7xl tracking-tighter uppercase font-extrabold text-[#2D3436] dark:text-[#E2D7CE] leading-[1.1]">
-                        {dictionary.science.title_part1} <br className="hidden lg:block" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5C00] to-orange-400">
+                        {dictionary.science.title_part1}
+                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#FF5C00] to-orange-400 mt-1 md:mt-2">
                             {dictionary.science.title_part2}
                         </span>
                     </h2>
