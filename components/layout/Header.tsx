@@ -519,14 +519,13 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
           <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none blur-3xl" />
 
           {/* Navigation Links */}
-          <div className="flex-1 flex flex-col justify-center items-start gap-8 relative z-10 mx-auto w-full max-w-[280px]">
+          <div className="flex-1 flex flex-col justify-center items-center gap-8 relative z-10 w-full">
             {links.map((link: any, i: number) => (
               <motion.div
                 key={link.id}
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 + i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full"
               >
                 <a
                   href={`#${link.id}`}
@@ -534,12 +533,9 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
                     e.preventDefault();
                     onNavClick(link.id);
                   }}
-                  className="group flex items-baseline gap-4 w-full active:scale-[0.98] transition-transform duration-200"
+                  className="group block active:scale-[0.95] transition-transform duration-200"
                 >
-                  <span className="text-sm md:text-base font-mono font-bold text-primary-orange/60">
-                    0{i + 1}
-                  </span>
-                  <span className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground transition-colors duration-200 group-active:text-primary-orange">
+                  <span className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground transition-colors duration-200 group-active:text-primary-orange text-center block">
                     {link.label}
                   </span>
                 </a>
