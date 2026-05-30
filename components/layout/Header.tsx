@@ -501,27 +501,31 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
   );
 }
 
-// --- MOBILE: Full Screen Menu (Swiss Style) ---
+// --- MOBILE: Full Screen Menu (Premium Style) ---
 function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: any) {
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, y: "-100%" }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: "-100%" }}
+          initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+          animate={{ opacity: 1, backdropFilter: "blur(40px)" }}
+          exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[90] bg-background/70 backdrop-blur-3xl pt-28 pb-10 px-6 flex flex-col pointer-events-auto overflow-hidden"
+          className="fixed inset-0 z-[90] bg-white/90 dark:bg-[#050505]/90 pt-28 pb-10 px-6 flex flex-col pointer-events-auto overflow-hidden"
           style={{ WebkitBackdropFilter: "blur(40px)" }}
         >
+          {/* Ambient Glow */}
+          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[radial-gradient(circle,rgba(251,146,60,0.15)_0%,transparent_70%)] rounded-full pointer-events-none blur-3xl" />
+          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-[radial-gradient(circle,rgba(251,146,60,0.1)_0%,transparent_70%)] rounded-full pointer-events-none blur-3xl" />
+
           {/* Navigation Links */}
-          <div className="flex-1 flex flex-col justify-center items-center gap-6">
+          <div className="flex-1 flex flex-col justify-center items-center gap-8 relative z-10">
             {links.map((link: any, i: number) => (
               <motion.div
                 key={link.id}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.1, duration: 0.5, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.1 + i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               >
                 <a
                   href={`#${link.id}`}
@@ -529,9 +533,10 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
                     e.preventDefault();
                     onNavClick(link.id);
                   }}
-                  className="text-5xl font-black tracking-tighter text-foreground hover:text-primary-orange transition-colors"
+                  className="group relative text-4xl md:text-5xl font-extrabold tracking-tight text-foreground transition-all duration-500"
                 >
-                  {link.label}
+                  <span className="relative z-10">{link.label}</span>
+                  <span className="absolute -bottom-2 left-0 w-0 h-1 bg-primary-orange transition-all duration-500 group-hover:w-full rounded-full" />
                 </a>
               </motion.div>
             ))}
@@ -539,36 +544,35 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
 
           {/* Footer Actions */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-col items-center gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="flex flex-col items-center gap-8 relative z-10 w-full max-w-sm mx-auto"
           >
-            {/* Note: Theme and Language controls moved to header bar as requested */}
-
             <Link
               href={`/${lang}/registration`}
-              className="w-full max-w-xs bg-primary-orange text-white text-center py-4 rounded-2xl text-lg font-bold uppercase tracking-widest shadow-xl shadow-orange-500/20"
+              onClick={onClose}
+              className="group relative w-full overflow-hidden rounded-full p-[1px] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
-              {dictionary.header.nav.enroll}
+              <span className="absolute inset-0 bg-gradient-to-r from-[#FF5C00] to-orange-400 opacity-100 transition-opacity duration-300" />
+              <div className="relative flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#FF5C00] to-orange-500 px-8 py-4">
+                <span className="text-sm font-bold uppercase tracking-widest text-white">{dictionary.header.nav.enroll}</span>
+              </div>
             </Link>
 
-            {/* Settings Zone in Menu */}
-            <div className="flex items-center justify-center gap-4 mt-6 p-4 rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase text-gray-500">{dictionary?.header?.menu?.theme || "Theme"}</span>
+            {/* Settings Zone in Menu (Sleek Capsule) */}
+            <div className="flex items-center justify-center gap-6 px-6 py-3 rounded-full border border-black/5 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md shadow-sm">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">{dictionary?.header?.menu?.theme || "THEMA"}</span>
                 <ThemeToggle />
               </div>
-              <div className="w-px h-6 bg-gray-300 dark:bg-gray-700" />
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase text-gray-500">{dictionary?.header?.menu?.language || "Lang"}</span>
-                {/* Inline Simple Selector or compacted */}
+              <div className="w-px h-8 bg-black/10 dark:bg-white/10" />
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">{dictionary?.header?.menu?.language || "SPRACHE"}</span>
                 <LanguageSelector lang={lang} upwards />
               </div>
             </div>
-
           </motion.div>
-
         </motion.div>
       )}
     </AnimatePresence>
