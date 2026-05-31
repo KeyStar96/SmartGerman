@@ -96,7 +96,7 @@ export default function WhyUsHorizontal({ dictionary }: { dictionary: WhyUsDicti
                         <motion.div ref={trackRef} style={{ x }} className="flex gap-8 lg:gap-12 w-max px-8 lg:px-16 xl:px-32 pb-12 items-center">
                             
                             {/* Card 1 */}
-                            <div className="w-[450px] xl:w-[500px] h-[550px] xl:h-[600px] shrink-0">
+                            <div className="w-[650px] xl:w-[750px] h-[550px] xl:h-[600px] shrink-0">
                                 <GlassCard>
                                     <div className="p-10 xl:p-12 h-full flex flex-col justify-center">
                                         <Brain size={48} strokeWidth={1.5} className="text-[#FF5C00] mb-8" />
