@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { GraduationCap, Brain, Users, Globe2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -63,7 +63,12 @@ export default function WhyUsHorizontal({ dictionary }: { dictionary: WhyUsDicti
         return () => window.removeEventListener("resize", updateDistance);
     }, []);
 
-    const x = useTransform(scrollYProgress, [0, 1], [0, -scrollDistance]);
+    const rawX = useTransform(scrollYProgress, [0, 1], [0, -scrollDistance]);
+    const x = useSpring(rawX, {
+        stiffness: 70, // Softer stiffness for cinematic start
+        damping: 25,   // Higher damping to prevent bouncy overshoots
+        mass: 0.5      // Lighter mass for quicker initial responsiveness
+    });
 
     const t = dictionary?.WhyUs;
     if (!t) return null;
