@@ -49,7 +49,21 @@ export default function WhyUsHorizontal({ dictionary }: { dictionary: WhyUsDicti
         offset: ["start start", "end end"]
     });
 
-    const x = useTransform(scrollYProgress, [0, 1], ["0%", "calc(-100% + 100vw)"]);
+    const trackRef = useRef<HTMLDivElement>(null);
+    const [scrollDistance, setScrollDistance] = useState(0);
+
+    useEffect(() => {
+        const updateDistance = () => {
+            if (trackRef.current) {
+                setScrollDistance(trackRef.current.scrollWidth - window.innerWidth);
+            }
+        };
+        updateDistance();
+        window.addEventListener("resize", updateDistance);
+        return () => window.removeEventListener("resize", updateDistance);
+    }, []);
+
+    const x = useTransform(scrollYProgress, [0, 1], [0, -scrollDistance]);
 
     const t = dictionary?.WhyUs;
     if (!t) return null;
@@ -79,7 +93,7 @@ export default function WhyUsHorizontal({ dictionary }: { dictionary: WhyUsDicti
 
                     {/* Scrolling Track for Cards */}
                     <div className="w-full relative z-10 overflow-visible">
-                        <motion.div style={{ x }} className="flex gap-8 lg:gap-12 w-max px-8 lg:px-16 xl:px-32 pb-12 items-center">
+                        <motion.div ref={trackRef} style={{ x }} className="flex gap-8 lg:gap-12 w-max px-8 lg:px-16 xl:px-32 pb-12 items-center">
                             
                             {/* Card 1 */}
                             <div className="w-[450px] xl:w-[500px] h-[550px] xl:h-[600px] shrink-0">
