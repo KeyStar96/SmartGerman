@@ -2,8 +2,74 @@
 
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Check, MessageCircle } from 'lucide-react';
+import { ArrowUpRight, Check, MessageCircle, Mail, Phone } from 'lucide-react';
+import { motion } from 'framer-motion';
 import TimeStatus from './TimeStatus';
+
+const SocialButton = ({ href, icon: Icon, label, themeClass, onClick, isCopied }: any) => {
+    const themes = {
+        email: {
+            hoverBg: "lg:hover:bg-[#FF5C00]/10",
+            textColor: "lg:group-hover:text-[#FF5C00]",
+            borderColor: "lg:hover:border-[#FF5C00]/30",
+            iconBg: "lg:group-hover:bg-[#FF5C00]/20",
+        },
+        telegram: {
+            hoverBg: "lg:hover:bg-[#229ED9]/10",
+            textColor: "lg:group-hover:text-[#229ED9]",
+            borderColor: "lg:hover:border-[#229ED9]/30",
+            iconBg: "lg:group-hover:bg-[#229ED9]/20",
+        },
+        whatsapp: {
+            hoverBg: "lg:hover:bg-[#25D366]/10",
+            textColor: "lg:group-hover:text-[#25D366]",
+            borderColor: "lg:hover:border-[#25D366]/30",
+            iconBg: "lg:group-hover:bg-[#25D366]/20",
+        }
+    };
+    
+    const theme = themes[themeClass as keyof typeof themes];
+
+    // Using either 'a' tag or 'button' depending on if href is provided
+    const Component = href ? motion.a : motion.button;
+
+    return (
+        <Component
+            href={href}
+            onClick={onClick}
+            target={href ? "_blank" : undefined}
+            rel={href ? "noopener noreferrer" : undefined}
+            whileHover="hover"
+            className={`w-full sm:w-[240px] h-[64px] relative overflow-hidden rounded-full border border-white/5 bg-[#1E2024]/80 backdrop-blur-2xl flex items-center justify-between px-6 transition-all duration-500 group shadow-xl cursor-pointer ${theme.hoverBg} ${theme.borderColor}`}
+        >
+            <div className="absolute inset-0 bg-noise-paper opacity-10 mix-blend-overlay pointer-events-none" />
+            
+            {/* Text Area */}
+            <div className="relative h-4 overflow-hidden z-10 flex-1 flex items-center">
+                <motion.div
+                    variants={{ hover: { y: "-100%" } }}
+                    transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+                    className="flex flex-col"
+                >
+                    <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-white/70 h-4 flex items-center leading-none">
+                        {label}
+                    </span>
+                    <span className={`font-mono text-[11px] font-bold uppercase tracking-widest h-4 flex items-center leading-none mt-4 transition-colors duration-500 ${theme.textColor}`}>
+                        {label}
+                    </span>
+                </motion.div>
+            </div>
+
+            {/* Icon Area */}
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center border border-white/5 bg-white/5 transition-colors duration-500 relative z-10 ${theme.iconBg}`}>
+                <Icon size={16} className={`text-white/50 transition-all duration-500 lg:group-hover:scale-110 ${theme.textColor}`} />
+            </div>
+            
+            {/* Hover Indicator Arrow */}
+            <ArrowUpRight size={14} className={`absolute right-4 opacity-0 lg:group-hover:opacity-100 lg:group-hover:translate-x-1 lg:group-hover:-translate-y-1 transition-all duration-500 z-10 ${theme.textColor}`} />
+        </Component>
+    );
+};
 
 interface FooterLinksProps {
     dictionary: any;
@@ -105,34 +171,29 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                     {navList}
                 </div>
 
-                {/* 3. Contact & Actions (Right Column) - HIDDEN ON MOBILE (SWISS COMPACT) */}
-                <div className="hidden lg:flex lg:col-span-3 flex-col gap-6 lg:items-end">
+                {/* 3. Contact & Actions (Right Column) */}
+                <div className="hidden lg:flex lg:col-span-3 flex-col gap-4 lg:items-end">
 
-                    {/* Standard Buttons (No Magnetic) */}
+                    {/* Premium Contact Buttons */}
                     <div className="flex flex-col gap-3 w-full sm:w-auto">
-                        <button
+                        <SocialButton 
+                            label={isCopied ? (t.Contact?.copied || "Copied!") : (t.Contact?.email_button || "Email Me")}
+                            icon={isCopied ? Check : Mail}
+                            themeClass="email"
                             onClick={handleCopyEmail}
-                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-white/5 backdrop-blur-md lg:hover:bg-white/10 lg:hover:border-white/40 text-white flex items-center justify-between px-6 transition-all duration-500 group shadow-[0_4px_30px_rgba(0,0,0,0.1)]"
-                        >
-                            <span className="font-mono text-xs uppercase tracking-widest relative z-10">
-                                {isCopied ? (t.Contact?.copied || "Copied!") : (t.Contact?.email_button || "Email Me")}
-                            </span>
-                            <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center lg:group-hover:scale-110 transition-transform relative z-10">
-                                {isCopied ? <Check size={14} /> : <ArrowUpRight size={14} />}
-                            </div>
-                            {/* Subtle Hover Gradient Background */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-[100%] lg:group-hover:translate-x-[100%] transition-transform duration-700" />
-                        </button>
-
-                        <a
+                        />
+                        <SocialButton 
                             href="https://t.me/Sprachschule_Anastasia"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full sm:w-[220px] h-[60px] relative overflow-hidden rounded-full border border-white/20 bg-[#229ED9]/10 backdrop-blur-md lg:hover:bg-[#229ED9]/20 lg:hover:border-[#229ED9]/50 text-[#229ED9] flex items-center justify-between px-6 transition-all duration-500 group shadow-[0_4px_30px_rgba(34,158,217,0.1)]"
-                        >
-                            <span className="font-mono text-xs uppercase tracking-widest relative z-10">{t.Contact?.telegram_button || "Telegram"}</span>
-                            <MessageCircle size={20} className="lg:group-hover:rotate-12 transition-transform relative z-10" />
-                        </a>
+                            label={t.Contact?.telegram_button || "Telegram"}
+                            icon={MessageCircle}
+                            themeClass="telegram"
+                        />
+                        <SocialButton 
+                            href="https://wa.me/491714758620"
+                            label={t.Contact?.whatsapp_button || "WhatsApp"}
+                            icon={Phone}
+                            themeClass="whatsapp"
+                        />
                     </div>
                 </div>
             </div>
