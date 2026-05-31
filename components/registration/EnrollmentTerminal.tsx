@@ -49,6 +49,7 @@ interface TerminalInputProps extends React.InputHTMLAttributes<HTMLInputElement>
     label: string;
     error?: string;
     registration?: ReturnType<ReturnType<typeof useForm>['register']>;
+    isDimmed?: boolean;
 }
 
 interface PhoneInputProps {
@@ -346,11 +347,11 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
     );
 });
 
-const TerminalInput = ({ label, error, registration, ...props }: TerminalInputProps) => {
+const TerminalInput = ({ label, error, registration, isDimmed, ...props }: TerminalInputProps) => {
     const defaultId = React.useId();
     const id = props.id || registration?.name || defaultId;
     return (
-        <div className="relative group">
+        <div className={cn("relative group transition-opacity duration-500", isDimmed ? "opacity-30" : "opacity-100")}>
             <input
                 id={id}
                 {...registration}
@@ -399,12 +400,24 @@ const COUNTRY_CODES = [
     { value: "+48", label: "🇵🇱 +48" },
 ];
 
+interface PhoneInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    label: string;
+    error?: string;
+    required?: boolean;
+    isDimmed?: boolean;
+    onFocus?: () => void;
+    onBlur?: () => void;
+}
+
 const PhoneInput = ({
     value,
     onChange,
     label,
     error,
-    required
+    required,
+    ...props
 }: PhoneInputProps) => {
     // Value format: "+49 12345678" or just "12345678" (if no code selected yet, though we default to DE)
     // We split by space if we assume "Code Number" format. 
@@ -441,7 +454,7 @@ const PhoneInput = ({
     };
 
     return (
-        <div className="relative group z-30">
+        <div className={cn("relative group z-30 transition-opacity duration-500", props.isDimmed ? "opacity-30" : "opacity-100")}>
             <span className={cn(
                 "absolute left-0 top-0 text-xs uppercase tracking-widest text-[#FF5C00] transition-all",
                 monoClassName,
@@ -457,6 +470,8 @@ const PhoneInput = ({
                         onChange={(v: string) => updateValue(v, number)}
                         options={COUNTRY_CODES}
                         placeholder="+49"
+                        onFocus={props.onFocus}
+                        onBlur={props.onBlur}
                     />
                 </div>
 
@@ -464,6 +479,8 @@ const PhoneInput = ({
                     <input
                         value={number}
                         onChange={(e) => updateValue(code, e.target.value)}
+                        onFocus={props.onFocus}
+                        onBlur={props.onBlur}
                         className={cn(
                             "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors placeholder-gray-300 autofill:bg-transparent",
                             "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#FCF4E6_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
@@ -507,6 +524,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [isSuccess, setIsSuccess] = useState(false);
     const [isAlreadyUsed, setIsAlreadyUsed] = useState(false);
     const [showPaymentInfo, setShowPaymentInfo] = useState(false);
+    
+    // Focus State for Cinematic UI
+    const [focusedField, setFocusedField] = useState<string | null>(null);
+
+    // Premium Animations
+    const stepVariants = {
+        initial: { opacity: 0, y: 40, filter: "blur(10px)" },
+        animate: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+        exit: { opacity: 0, y: -40, filter: "blur(10px)", transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }
+    };
 
     // --- TRIAL MODE STATE ---
     const [trialDate, setTrialDate] = useState<string>(""); // ISO YYYY-MM-DD
@@ -1027,6 +1054,22 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
     return (
         <div className="min-h-screen lg:h-screen w-full bg-transparent text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
+            
+            {/* GIANT WATERMARK TYPOGRAPHY */}
+            <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden mix-blend-overlay opacity-[0.03] dark:opacity-[0.04]">
+                <AnimatePresence mode="wait">
+                    <motion.span
+                        key={step}
+                        initial={{ y: 50, opacity: 0, filter: "blur(20px)", scale: 0.9 }}
+                        animate={{ y: 0, opacity: 1, filter: "blur(0px)", scale: 1 }}
+                        exit={{ y: -50, opacity: 0, filter: "blur(20px)", scale: 1.1 }}
+                        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="text-[60vw] md:text-[50vw] font-black tracking-tighter leading-none"
+                    >
+                        0{step}
+                    </motion.span>
+                </AnimatePresence>
+            </div>
 
             {/* SCROLL INDICATOR (Mobile Mostly) */}
             <AnimatePresence>
@@ -1078,7 +1121,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 className="h-full bg-[#FF5C00]"
                                 initial={{ width: "33%" }}
                                 animate={{ width: step === 1 ? "33%" : step === 2 ? "66%" : "100%" }}
-                                transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+                                transition={{ type: "spring", stiffness: 60, damping: 15 }}
                             />
                         </div>
                         <span className={cn("text-xs text-gray-600 dark:text-gray-500", monoClassName)}>{wizard?.step_label || "SCHRITT"} {step} / 3</span>
@@ -1129,10 +1172,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             {step === 1 && (
                                 <motion.div
                                     key="step1"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="space-y-12 py-4"
+                                    variants={stepVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    className="space-y-12 py-4 relative z-10"
                                 >
                                     {/* === CONTROL DECK: Top Fixed Container === */}
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto lg:h-[294px] mb-8 relative z-30">
@@ -1380,41 +1424,101 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             {step === 2 && (
                                 <motion.div
                                     key="step2"
-                                    initial={{ opacity: 1 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="py-8 max-w-2xl"
+                                    variants={stepVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    className="py-8 max-w-2xl relative z-10"
                                 >
                                     <div className="space-y-12">
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.firstname || "First Name"} required registration={register("personal.firstName")} error={errors.personal?.firstName?.message} />
-                                            <TerminalInput label={formLabels?.lastname || "Last Name"} required registration={register("personal.lastName")} error={errors.personal?.lastName?.message} />
+                                            <TerminalInput 
+                                                label={formLabels?.firstname || "First Name"} 
+                                                required 
+                                                registration={register("personal.firstName")} 
+                                                error={errors.personal?.firstName?.message} 
+                                                onFocus={() => setFocusedField('firstName')}
+                                                onBlur={() => setFocusedField(null)}
+                                                isDimmed={focusedField !== null && focusedField !== 'firstName'}
+                                            />
+                                            <TerminalInput 
+                                                label={formLabels?.lastname || "Last Name"} 
+                                                required 
+                                                registration={register("personal.lastName")} 
+                                                error={errors.personal?.lastName?.message} 
+                                                onFocus={() => setFocusedField('lastName')}
+                                                onBlur={() => setFocusedField(null)}
+                                                isDimmed={focusedField !== null && focusedField !== 'lastName'}
+                                            />
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <TerminalInput label={formLabels?.email || "Email"} type="email" required registration={register("personal.email")} error={errors.personal?.email?.message} />
-                                            <DateDropdowns
-                                                label={formLabels?.birthdate || "Birthdate"}
-                                                required
-                                                value={watch("personal.birthDate")}
-                                                onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
-                                                error={errors.personal?.birthDate?.message}
-                                                referenceDate={new Date()}
+                                            <TerminalInput 
+                                                label={formLabels?.email || "Email"} 
+                                                type="email" 
+                                                required 
+                                                registration={register("personal.email")} 
+                                                error={errors.personal?.email?.message} 
+                                                onFocus={() => setFocusedField('email')}
+                                                onBlur={() => setFocusedField(null)}
+                                                isDimmed={focusedField !== null && focusedField !== 'email'}
                                             />
+                                            {/* DateDropdowns might need a wrapper to support dimming, applying simple class here */}
+                                            <div className={cn("transition-opacity duration-500", focusedField !== null && focusedField !== 'birthDate' ? "opacity-30" : "opacity-100")} 
+                                                 onFocusCapture={() => setFocusedField('birthDate')} 
+                                                 onBlurCapture={() => setFocusedField(null)}>
+                                                <DateDropdowns
+                                                    label={formLabels?.birthdate || "Birthdate"}
+                                                    required
+                                                    value={watch("personal.birthDate")}
+                                                    onChange={(val: string) => form.setValue("personal.birthDate", val, { shouldValidate: true })}
+                                                    error={errors.personal?.birthDate?.message}
+                                                    referenceDate={new Date()}
+                                                />
+                                            </div>
                                         </div>
+                                        
                                         <PhoneInput
                                             label={formLabels?.phone || "Phone"}
                                             value={watch("personal.phone")}
                                             onChange={(val: string) => form.setValue("personal.phone", val, { shouldValidate: true })}
                                             error={errors.personal?.phone?.message}
+                                            onFocus={() => setFocusedField('phone')}
+                                            onBlur={() => setFocusedField(null)}
+                                            isDimmed={focusedField !== null && focusedField !== 'phone'}
                                         />
 
                                         <div className="grid grid-cols-[3fr_1fr] gap-8">
-                                            <TerminalInput label={formLabels?.street || "Street"} required registration={register("personal.street")} error={errors.personal?.street?.message} />
-                                            <TerminalInput label={formLabels?.zip || "ZIP"} required registration={register("personal.zip")} maxLength={5} error={errors.personal?.zip?.message} />
+                                            <TerminalInput 
+                                                label={formLabels?.street || "Street"} 
+                                                required 
+                                                registration={register("personal.street")} 
+                                                error={errors.personal?.street?.message} 
+                                                onFocus={() => setFocusedField('street')}
+                                                onBlur={() => setFocusedField(null)}
+                                                isDimmed={focusedField !== null && focusedField !== 'street'}
+                                            />
+                                            <TerminalInput 
+                                                label={formLabels?.zip || "ZIP"} 
+                                                required 
+                                                registration={register("personal.zip")} 
+                                                maxLength={5} 
+                                                error={errors.personal?.zip?.message} 
+                                                onFocus={() => setFocusedField('zip')}
+                                                onBlur={() => setFocusedField(null)}
+                                                isDimmed={focusedField !== null && focusedField !== 'zip'}
+                                            />
                                         </div>
-                                        <TerminalInput label={formLabels?.city || "City"} required registration={register("personal.city")} error={errors.personal?.city?.message} />
+                                        <TerminalInput 
+                                            label={formLabels?.city || "City"} 
+                                            required 
+                                            registration={register("personal.city")} 
+                                            error={errors.personal?.city?.message} 
+                                            onFocus={() => setFocusedField('city')}
+                                            onBlur={() => setFocusedField(null)}
+                                            isDimmed={focusedField !== null && focusedField !== 'city'}
+                                        />
 
                                         <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider text-right">
                                             {formLabels?.required_hint}
@@ -1428,10 +1532,12 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             {/* --- SUMMARY (STEP 3) --- */}
                             {step === 3 && (
                                 <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    className="flex flex-col gap-8 h-full"
+                                    key="step3"
+                                    variants={stepVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    className="flex flex-col gap-8 h-full relative z-10"
                                 >
                                     {/* LEGAL CONSENTS (Moved to Top) */}
                                     <div className="bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] rounded-3xl p-8 relative overflow-hidden">
