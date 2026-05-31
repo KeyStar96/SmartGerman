@@ -209,16 +209,16 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
             </div>
 
             {/* BOTTOM ROW: Footer Meta */}
-            <div className="mt-12 lg:mt-24 pt-8 border-t border-white/10 relative flex flex-col items-center">
+            <div className="mt-12 lg:mt-24 pt-8 border-t border-white/10 relative flex flex-col items-start">
                 {/* Legal & Copyright */}
-                <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-white/40 uppercase tracking-widest relative z-10 mb-8 lg:mb-12">
+                <div className="w-full flex flex-col lg:flex-row items-center lg:items-center justify-start gap-6 lg:gap-12 text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-widest relative z-10 mb-8 lg:mb-12">
                     <span>{t.Legal?.copyright || "© 2026 Sitov Language Academy"}</span>
 
-                    <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-                        <Link href={`/${lang}/imprint`} className="lg:hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</Link>
-                        <Link href={`/${lang}/privacy`} className="lg:hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</Link>
-                        <Link href={`/${lang}/agb`} className="lg:hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</Link>
-                        <Link href={`/${lang}/cancellation`} className="lg:hover:text-[#FF5C00] transition-colors">
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-6 md:gap-8">
+                        <Link href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</Link>
+                        <Link href={`/${lang}/privacy`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</Link>
+                        <Link href={`/${lang}/agb`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</Link>
+                        <Link href={`/${lang}/cancellation`} className="hover:text-[#FF5C00] transition-colors">
                             {t.Legal?.cancellation || "Cancel Contract"}
                         </Link>
                     </div>
