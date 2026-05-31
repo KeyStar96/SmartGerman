@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Mail, X, HelpCircle, ArrowUpRight, Phone } from "lucide-react";
+import { MessageCircle, Mail, X, MessageSquareText, ArrowUpRight, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
@@ -212,7 +212,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                                     transition={{ duration: 0.3 }}
                                     className="flex items-center justify-center"
                                 >
-                                    <HelpCircle size={28} strokeWidth={2.5} className="group-hover:scale-110 transition-transform duration-500" />
+                                    <MessageSquareText size={28} strokeWidth={2.5} className="group-hover:scale-110 transition-transform duration-500" />
                                 </motion.div>
                             )}
                         </AnimatePresence>

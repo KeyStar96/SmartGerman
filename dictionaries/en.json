@@ -486,7 +486,9 @@
       "telegram_button": "Telegram",
       "email_button": "Email Me",
       "copied": "Copied!",
-      "copySuccess": "Email copied!"
+      "copySuccess": "Email copied!",
+      "contact_title": "Contact",
+      "phone_label": "Phone"
     },
     "Status": {
       "title": "Opening Hours",

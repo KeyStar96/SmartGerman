@@ -572,7 +572,9 @@
       "telegram_button": "Telegram",
       "email_button": "E-posta Gönder",
       "copied": "Kopyalandı!",
-      "copySuccess": "E-posta kopyalandı!"
+      "copySuccess": "E-posta kopyalandı!",
+      "contact_title": "İletişim",
+      "phone_label": "Telefon"
     },
     "Status": {
       "title": "Çalışma Saatleri",

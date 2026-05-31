@@ -571,7 +571,9 @@
       "telegram_button": "Telegram",
       "email_button": "Написати",
       "copied": "Скопійовано!",
-      "copySuccess": "Email скопійовано!"
+      "copySuccess": "Email скопійовано!",
+      "contact_title": "Контакти",
+      "phone_label": "Телефон"
     },
     "Status": {
       "title": "Години роботи",

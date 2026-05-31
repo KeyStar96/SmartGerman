@@ -502,7 +502,9 @@
       "telegram_button": "Telegram",
       "email_button": "E-Mail",
       "copied": "Kopiert!",
-      "copySuccess": "Email kopiert!"
+      "copySuccess": "Email kopiert!",
+      "contact_title": "Kontakt",
+      "phone_label": "Telefon"
     },
     "Status": {
       "title": "Öffnungszeiten",

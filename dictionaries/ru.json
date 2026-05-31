@@ -570,7 +570,9 @@
       "telegram_button": "Telegram",
       "email_button": "Написать",
       "copied": "Скопировано!",
-      "copySuccess": "Email скопирован!"
+      "copySuccess": "Email скопирован!",
+      "contact_title": "Контакты",
+      "phone_label": "Телефон"
     },
     "Status": {
       "title": "Часы работы",

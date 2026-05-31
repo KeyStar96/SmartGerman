@@ -131,19 +131,14 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
     ), [navItems, t.Nav]);
 
     return (
-        <div className="w-full h-full px-6 md:px-12 pt-12 pb-24 md:py-12 flex flex-col justify-end gap-12 md:justify-between md:gap-0">
+        <div className="w-full h-full px-6 md:px-12 pt-8 pb-12 lg:py-12 flex flex-col justify-end gap-10 md:justify-between md:gap-0">
 
             {/* TOP ROW */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 lg:h-full items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 lg:h-full items-start">
 
                 {/* 1. Brand / Mission (Left Column) */}
-                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-2 lg:space-y-8">
+                <div className="lg:col-span-5 flex flex-col justify-between h-full space-y-8 lg:space-y-8">
                     <div>
-                        {/* OPTIMIZATION 1: Brand Colors as in Hero 
-                           "Smart" = White (on Dark Background)
-                           "German" = Orange (#FF5C00)
-                           Dot = White (or Orange, depending on taste - here White as closure)
-                        */}
                         <h2 className="text-[12vw] lg:text-[6vw] font-bold leading-[0.85] tracking-tighter mb-4 lg:mb-6">
                             <span className="text-white block">Sitov</span>
                             <span className="text-white block">Language</span>
@@ -154,11 +149,26 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                         </p>
                     </div>
 
-                    {/* Status Indicator (Isolated Component) */}
-                    <TimeStatus
-                        openLabel={t.Status?.open_label}
-                        closedLabel={t.Status?.closed_label}
-                    />
+                    <div className="flex flex-col gap-8">
+                        {/* Status Indicator */}
+                        <TimeStatus
+                            openLabel={t.Status?.open_label}
+                            closedLabel={t.Status?.closed_label}
+                        />
+
+                        {/* Contact Information */}
+                        <div className="flex flex-col gap-2 text-white/70 text-[11px] sm:text-[12px] font-mono uppercase tracking-widest">
+                            <span className="text-white/30 mb-1">{t.Contact?.contact_title || "Contact"}</span>
+                            <a href="tel:+491714758620" className="hover:text-[#FF5C00] transition-colors inline-flex items-center gap-2">
+                                <Phone size={14} className="opacity-50" />
+                                {t.Contact?.phone_label || "Phone"}: +49 171 4758620
+                            </a>
+                            <a href="mailto:info@sitov-academy.com" className="hover:text-[#FF5C00] transition-colors inline-flex items-center gap-2">
+                                <Mail size={14} className="opacity-50" />
+                                info@sitov-academy.com
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 {/* 2. Navigation (Middle) */}
