@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { JetBrains_Mono } from "next/font/google";
-import { CustomSelect } from "./CustomSelect";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 
@@ -13,138 +12,67 @@ export const DateDropdowns = ({
     label,
     error,
     required,
-    referenceDate,
-    futureYears = false,
-    minDate,
-    maxDate
 }: any) => {
-    // Value format: DD.MM.YYYY
-    const [day, month, year] = (value || "..").split(".");
+    const defaultId = React.useId();
+    const id = defaultId;
+    
+    // Local state for the input text
+    const [inputValue, setInputValue] = useState(value || "");
 
-    // Parse current selection as numbers for comparison
-    const selYear = parseInt(year);
-    const selMonth = parseInt(month);
-
-    // Dynamic Year Options
-    const years = React.useMemo(() => {
-        const currentYear = new Date(referenceDate || new Date()).getFullYear();
-        let yList = [];
-
-        if (futureYears) {
-            // Default Future logic (if no strict maxDate provided, show 3 years)
-            const endYear = maxDate ? maxDate.getFullYear() : currentYear + 2;
-            const startYear = minDate ? minDate.getFullYear() : currentYear;
-
-            for (let y = startYear; y <= endYear; y++) {
-                yList.push({ value: String(y), label: String(y) });
-            }
-        } else {
-            // Birthdate Mode: Past 100+ Years
-            for (let i = 0; i <= 100; i++) {
-                const y = currentYear - i;
-                yList.push({ value: String(y), label: String(y) });
-            }
+    useEffect(() => {
+        if (value !== undefined && value !== inputValue) {
+            setInputValue(value);
         }
-        return yList;
-    }, [futureYears, minDate, maxDate, referenceDate]);
+    }, [value]);
 
-    // Dynamic Month Options
-    const months = React.useMemo(() => {
-        const allMonths = Array.from({ length: 12 }, (_, i) => {
-            const m = String(i + 1).padStart(2, '0');
-            return { value: m, label: m };
-        });
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/\D/g, ''); // Remove all non-digits
+        
+        // Truncate to maximum 8 digits (DDMMYYYY)
+        if (val.length > 8) {
+            val = val.slice(0, 8);
+        }
+        
+        // Auto-format as DD.MM.YYYY
+        let formatted = val;
+        if (val.length >= 3 && val.length <= 4) {
+            formatted = `${val.slice(0, 2)}.${val.slice(2)}`;
+        } else if (val.length >= 5) {
+            formatted = `${val.slice(0, 2)}.${val.slice(2, 4)}.${val.slice(4)}`;
+        }
 
-        if (!selYear) return allMonths;
-
-        // Filter based on Min/Max
-        return allMonths.filter(mBtn => {
-            const m = parseInt(mBtn.value);
-
-            // Min Check
-            if (minDate && selYear === minDate.getFullYear()) {
-                if (m < minDate.getMonth() + 1) return false;
-            }
-            // Max Check
-            if (maxDate && selYear === maxDate.getFullYear()) {
-                if (m > maxDate.getMonth() + 1) return false;
-            }
-            return true;
-        });
-    }, [selYear, minDate, maxDate]);
-
-    // Dynamic Day Options
-    const days = React.useMemo(() => {
-        const allDays = Array.from({ length: 31 }, (_, i) => {
-            const d = String(i + 1).padStart(2, '0');
-            return { value: d, label: d };
-        });
-
-        if (!selYear || !selMonth) return allDays;
-
-        return allDays.filter(dBtn => {
-            const d = parseInt(dBtn.value);
-
-            // Min Check
-            if (minDate && selYear === minDate.getFullYear() && selMonth === minDate.getMonth() + 1) {
-                if (d < minDate.getDate()) return false;
-            }
-
-            // Max Check
-            if (maxDate && selYear === maxDate.getFullYear() && selMonth === maxDate.getMonth() + 1) {
-                if (d > maxDate.getDate()) return false;
-            }
-            return true;
-        });
-    }, [selYear, selMonth, minDate, maxDate]);
-
-    const handleUpdate = (type: 'day' | 'month' | 'year', val: string) => {
-        const nD = type === 'day' ? val : (day || "");
-        const nM = type === 'month' ? val : (month || "");
-        const nY = type === 'year' ? val : (year || "");
-
-        onChange(`${nD}.${nM}.${nY}`);
+        setInputValue(formatted);
+        onChange(formatted);
     };
 
     return (
-        <div className="relative group z-40">
-            <span className={cn(
-                "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 transition-all",
-                jetbrainsMono.className
-                // Keep label distinct (always visible at top for dropdowns)
-            )}>
+        <div className="relative group z-40 w-full">
+            <input
+                id={id}
+                type="text"
+                inputMode="numeric"
+                value={inputValue}
+                onChange={handleInputChange}
+                placeholder="DD.MM.YYYY"
+                maxLength={10}
+                className={cn(
+                    "block w-full bg-transparent border-b border-gray-400/30 dark:border-white/20 py-4 pt-6 text-lg font-sans text-gray-900 dark:text-[#E2D7CE] focus:outline-none focus:border-[#FF5C00] dark:focus:border-[#FF5C00] transition-colors peer placeholder-transparent focus:placeholder-gray-400 dark:focus:placeholder-gray-600 autofill:bg-transparent",
+                    "[&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:shadow-[0_0_0_100px_#FCF4E6_inset] dark:[&:-webkit-autofill]:shadow-[0_0_0_100px_#1A1C1E_inset]",
+                    "[&:-webkit-autofill]:[-webkit-text-fill-color:#111827] dark:[&:-webkit-autofill]:[-webkit-text-fill-color:#E2D7CE]",
+                    error && "border-red-500 dark:border-red-400"
+                )}
+            />
+            <label
+                htmlFor={id}
+                className={cn(
+                    "absolute left-0 top-0 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 transition-all pointer-events-none",
+                    jetbrainsMono.className,
+                    "peer-placeholder-shown:top-5 peer-placeholder-shown:text-lg peer-placeholder-shown:normal-case peer-placeholder-shown:font-sans peer-placeholder-shown:text-gray-500 dark:peer-placeholder-shown:text-gray-500",
+                    "peer-focus:top-0 peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-[#FF5C00]"
+                )}>
                 {label} {required && <span className="text-[#FF5C00]">*</span>}
-            </span>
-
-            <div className="flex gap-4 pt-6">
-                <div className="relative w-[80px]">
-                    <CustomSelect
-                        value={day}
-                        onChange={(v: string) => handleUpdate('day', v)}
-                        options={days}
-                        placeholder="DD"
-                    />
-                </div>
-
-                <div className="relative w-[80px]">
-                    <CustomSelect
-                        value={month}
-                        onChange={(v: string) => handleUpdate('month', v)}
-                        options={months}
-                        placeholder="MM"
-                    />
-                </div>
-
-                <div className="relative w-[100px]">
-                    <CustomSelect
-                        value={year}
-                        onChange={(v: string) => handleUpdate('year', v)}
-                        options={years}
-                        placeholder="YYYY"
-                    />
-                </div>
-            </div>
-            {error && <span className={cn("text-red-500 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
+            </label>
+            {error && <span className={cn("text-red-500 dark:text-red-400 text-[10px] absolute right-0 top-2", jetbrainsMono.className)}>{error}</span>}
         </div>
     );
 };
