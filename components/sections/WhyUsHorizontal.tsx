@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { GraduationCap, Brain, Users, Globe2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
