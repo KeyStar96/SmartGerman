@@ -214,13 +214,6 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                     </div>
                 </div>
             </div>
-
-            {/* Massive Typography - Absolute positioned as a watermark so it doesn't inflate footer height */}
-            <div className="absolute bottom-[-10%] left-0 w-full flex justify-center items-end overflow-hidden select-none pointer-events-none -z-10">
-                <h1 className="text-[25vw] leading-[0.75] font-black uppercase tracking-tighter text-white/5 whitespace-nowrap">
-                    SITOV
-                </h1>
-            </div>
         </div>
     );
 }
