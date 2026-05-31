@@ -70,97 +70,101 @@ export default function WhyUsHorizontal({ dictionary }: { dictionary: WhyUsDicti
                     <motion.div style={{ x }} className="flex w-[400vw] h-full relative z-10">
                         
                         {/* SLIDE 1 */}
-                        <div className="w-[100vw] h-full flex items-center justify-center px-24">
-                            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] xl:grid-cols-2 gap-12 xl:gap-20 w-full max-w-[1400px]">
-                                <div className="flex flex-col justify-center">
-                                    <span className="font-mono text-xs tracking-[0.3em] text-[#FF5C00] uppercase font-bold mb-6 block border border-[#FF5C00]/30 bg-[#FF5C00]/5 px-4 py-1.5 rounded-full w-max backdrop-blur-sm">
-                                        {t.header.label}
-                                    </span>
-                                    <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-[1.05] break-words pr-8">
-                                        {t.header.title_Line1} <br />
-                                        <span className="text-[#FF5C00]">{t.header.title_Line2}</span>
-                                    </h2>
-                                </div>
-                                <div className="h-[600px]">
-                                    <GlassCard>
-                                        <div className="p-12 h-full flex flex-col justify-center">
-                                            <Brain size={40} strokeWidth={1.5} className="text-[#FF5C00] mb-8" />
-                                            <span className={labelStyle}>{t.card1.category}</span>
-                                            <h3 className={headingStyle}>{t.card1.title}</h3>
-                                            <div className={bodyStyle}><p>{t.card1.text}</p></div>
-                                            <div className="mt-8 text-xs font-mono text-[#FF5C00] font-bold uppercase tracking-widest pl-4 border-l-2 border-[#FF5C00]">
-                                                {t.card1.specialization}
-                                            </div>
+                        <div className="w-[100vw] h-full flex items-center justify-between px-8 lg:px-16 xl:px-32 gap-8 xl:gap-16">
+                            <div className="flex-1 flex flex-col justify-center">
+                                <span className="font-mono text-xs tracking-[0.3em] text-[#FF5C00] uppercase font-bold mb-6 block border border-[#FF5C00]/30 bg-[#FF5C00]/5 px-4 py-1.5 rounded-full w-max backdrop-blur-sm">
+                                    {t.header.label}
+                                </span>
+                                <h2 className="text-[clamp(2rem,3.2vw,4.5rem)] font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-[1.1] whitespace-nowrap">
+                                    {t.header.title_Line1} <br />
+                                    <span className="text-[#FF5C00]">{t.header.title_Line2}</span>
+                                </h2>
+                            </div>
+                            <div className="flex-1 max-w-[800px] h-[650px]">
+                                <GlassCard>
+                                    <div className="p-10 xl:p-16 h-full flex flex-col justify-center">
+                                        <Brain size={48} strokeWidth={1.5} className="text-[#FF5C00] mb-8 xl:mb-10" />
+                                        <span className={labelStyle}>{t.card1.category}</span>
+                                        <h3 className={headingStyle}>{t.card1.title}</h3>
+                                        <div className={bodyStyle + " text-xl xl:text-2xl leading-relaxed"}><p>{t.card1.text}</p></div>
+                                        <div className="mt-8 xl:mt-10 text-sm font-mono text-[#FF5C00] font-bold uppercase tracking-widest pl-4 border-l-2 border-[#FF5C00]">
+                                            {t.card1.specialization}
                                         </div>
-                                    </GlassCard>
-                                </div>
+                                    </div>
+                                </GlassCard>
                             </div>
                         </div>
 
                         {/* SLIDE 2 */}
-                        <div className="w-[100vw] h-full flex items-center justify-center px-24 relative">
+                        <div className="w-[100vw] h-full flex items-center justify-center px-8 lg:px-16 xl:px-32 relative">
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] mix-blend-overlay">
                                 <span className="text-[40vw] font-bold tracking-tighter">02</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-20 w-full max-w-[1400px] relative z-10">
-                                <div className="h-[600px] col-start-2">
-                                    <GlassCard isOrange>
-                                        <div className="p-12 h-full flex flex-col justify-center">
-                                            <GraduationCap size={40} strokeWidth={1.5} className="text-[#F0EFE9] mb-8" />
-                                            <span className={whiteLabelStyle}>{t.card2.category}</span>
-                                            <h3 className={whiteHeadingStyle}>{t.card2.title}</h3>
-                                            <ul className="space-y-6 mt-8">
-                                                {t.card2.items.map((item: any, idx: number) => (
-                                                    <li key={idx} className="group/item">
-                                                        <div className="flex items-start gap-3 mb-1">
-                                                            <CheckCircle2 size={20} strokeWidth={2} className="mt-0.5 flex-shrink-0 text-[#F0EFE9]" />
-                                                            <span className="text-lg font-bold uppercase tracking-wide text-[#F0EFE9]">{item.name}</span>
-                                                        </div>
-                                                        <p className="pl-8 text-[#F0EFE9]/90 font-normal text-sm leading-relaxed">{item.desc}</p>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                            <div className="w-full max-w-[1200px] h-[650px] relative z-10">
+                                <GlassCard isOrange>
+                                    <div className="p-10 xl:p-16 h-full flex flex-col justify-center">
+                                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 xl:gap-16 items-center h-full">
+                                            <div className="lg:col-span-2">
+                                                <GraduationCap size={64} strokeWidth={1.5} className="text-[#F0EFE9] mb-8 xl:mb-10" />
+                                                <span className={whiteLabelStyle}>{t.card2.category}</span>
+                                                <h3 className={whiteHeadingStyle + " text-4xl xl:text-5xl"}>{t.card2.title}</h3>
+                                            </div>
+                                            <div className="lg:col-span-3">
+                                                <ul className="space-y-6 xl:space-y-8">
+                                                    {t.card2.items.map((item: any, idx: number) => (
+                                                        <li key={idx} className="group/item">
+                                                            <div className="flex items-start gap-4 mb-2">
+                                                                <CheckCircle2 size={28} strokeWidth={2} className="mt-0.5 flex-shrink-0 text-[#F0EFE9]" />
+                                                                <span className="text-xl xl:text-2xl font-bold uppercase tracking-wide text-[#F0EFE9]">{item.name}</span>
+                                                            </div>
+                                                            <p className="pl-11 text-[#F0EFE9]/90 font-normal text-lg xl:text-xl leading-relaxed">{item.desc}</p>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
                                         </div>
-                                    </GlassCard>
-                                </div>
+                                    </div>
+                                </GlassCard>
                             </div>
                         </div>
 
                         {/* SLIDE 3 */}
-                        <div className="w-[100vw] h-full flex items-center justify-center px-24 relative">
+                        <div className="w-[100vw] h-full flex items-center justify-center px-8 lg:px-16 xl:px-32 relative">
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] mix-blend-overlay">
                                 <span className="text-[40vw] font-bold tracking-tighter">03</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-20 w-full max-w-[1400px] relative z-10">
-                                <div className="h-[600px] col-start-1">
-                                    <GlassCard>
-                                        <div className="p-12 h-full flex flex-col justify-center">
-                                            <Users size={40} strokeWidth={1.5} className="text-[#FF5C00] mb-8" />
-                                            <span className={labelStyle}>{t.card3.category}</span>
-                                            <h3 className={headingStyle}>{t.card3.title}</h3>
-                                            <div className={bodyStyle}><p>{t.card3.text}</p></div>
-                                        </div>
-                                    </GlassCard>
-                                </div>
+                            <div className="w-full max-w-[1000px] h-[650px] relative z-10">
+                                <GlassCard>
+                                    <div className="p-10 xl:p-20 h-full flex flex-col justify-center text-center items-center">
+                                        <Users size={64} strokeWidth={1.5} className="text-[#FF5C00] mb-8 xl:mb-10" />
+                                        <span className={labelStyle}>{t.card3.category}</span>
+                                        <h3 className={headingStyle + " text-4xl xl:text-6xl text-center"}>{t.card3.title}</h3>
+                                        <div className={bodyStyle + " text-2xl xl:text-3xl max-w-4xl text-center mt-6 xl:mt-8"}><p>{t.card3.text}</p></div>
+                                    </div>
+                                </GlassCard>
                             </div>
                         </div>
 
                         {/* SLIDE 4 */}
-                        <div className="w-[100vw] h-full flex items-center justify-center px-24 relative">
+                        <div className="w-[100vw] h-full flex items-center justify-center px-8 lg:px-16 xl:px-32 relative">
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] mix-blend-overlay">
                                 <span className="text-[40vw] font-bold tracking-tighter">04</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-20 w-full max-w-[1400px] relative z-10">
-                                <div className="h-[600px] col-start-2">
-                                    <GlassCard>
-                                        <div className="p-12 h-full flex flex-col justify-center">
-                                            <Globe2 size={40} strokeWidth={1.5} className="text-[#FF5C00] mb-8" />
-                                            <span className={labelStyle}>{t.card4.category}</span>
-                                            <h3 className={headingStyle}>{t.card4.title}</h3>
-                                            <div className={bodyStyle}><p>{t.card4.text}</p></div>
+                            <div className="w-full max-w-[1200px] h-[650px] relative z-10">
+                                <GlassCard>
+                                    <div className="p-10 xl:p-16 h-full flex flex-col justify-center">
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-center h-full">
+                                            <div>
+                                                <Globe2 size={64} strokeWidth={1.5} className="text-[#FF5C00] mb-8 xl:mb-10" />
+                                                <span className={labelStyle}>{t.card4.category}</span>
+                                                <h3 className={headingStyle + " text-4xl xl:text-5xl"}>{t.card4.title}</h3>
+                                            </div>
+                                            <div>
+                                                <div className={bodyStyle + " text-xl xl:text-2xl leading-relaxed"}><p>{t.card4.text}</p></div>
+                                            </div>
                                         </div>
-                                    </GlassCard>
-                                </div>
+                                    </div>
+                                </GlassCard>
                             </div>
                         </div>
 
