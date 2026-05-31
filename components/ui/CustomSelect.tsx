@@ -48,10 +48,10 @@ export const CustomSelect = ({ value, onChange, options, placeholder, label }: a
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute left-0 top-full w-full bg-[#FCF4E6] dark:bg-[#25282A] border border-black/10 dark:border-white/10 shadow-xl max-h-48 overflow-y-auto z-[100] rounded-sm scrollbar-thin scrollbar-thumb-[#FF5C00]/20 scrollbar-track-transparent divide-y divide-black/5 dark:divide-white/5"
+                        initial={{ opacity: 0, y: -10, filter: "blur(10px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: -10, filter: "blur(10px)" }}
+                        className="absolute left-0 top-[calc(100%+8px)] w-full bg-white/80 dark:bg-black/60 backdrop-blur-2xl border border-black/10 dark:border-white/10 shadow-2xl max-h-48 overflow-y-auto z-[100] rounded-xl premium-scrollbar divide-y divide-black/5 dark:divide-white/5"
                     >
                         {options.map((opt: any) => (
                             <div

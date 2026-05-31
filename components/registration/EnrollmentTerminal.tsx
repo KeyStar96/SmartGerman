@@ -1196,10 +1196,26 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                                     <div className="flex-1 flex items-center justify-center">
                                                         {(() => {
                                                             const now = serverTime ? new Date(serverTime) : new Date();
-                                                            const minDate = new Date(now);
+                                                            let minDate = new Date(now);
                                                             minDate.setDate(minDate.getDate() + 1);
                                                             minDate.setHours(0, 0, 0, 0);
-                                                            const maxDate = new Date(now);
+                                                            
+                                                            selectedCoursesFull.forEach(course => {
+                                                                if (course.startDate) {
+                                                                    const [d, m, y] = course.startDate.split('.').map(Number);
+                                                                    // Format in JSON might be YYYY-MM-DD or DD.MM.YYYY, assuming DD.MM.YYYY based on app context
+                                                                    let cDate = new Date(course.startDate);
+                                                                    if (d && m && y && String(y).length === 4) {
+                                                                        cDate = new Date(y, m - 1, d);
+                                                                    }
+                                                                    cDate.setHours(0,0,0,0);
+                                                                    if (cDate > minDate) {
+                                                                        minDate = cDate;
+                                                                    }
+                                                                }
+                                                            });
+
+                                                            const maxDate = new Date(minDate);
                                                             maxDate.setMonth(maxDate.getMonth() + 6);
                                                             maxDate.setHours(23, 59, 59, 999);
 
