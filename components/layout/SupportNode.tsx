@@ -45,7 +45,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
     if (!isHomePage) return null;
 
     // --- Framer Motion Variants ---
-    const containerVariants = {
+    const containerVariants: import("framer-motion").Variants = {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
@@ -57,7 +57,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
         }
     };
 
-    const itemVariants = {
+    const itemVariants: import("framer-motion").Variants = {
         hidden: { opacity: 0, y: 20, scale: 0.95 },
         show: { 
             opacity: 1, y: 0, scale: 1, 
