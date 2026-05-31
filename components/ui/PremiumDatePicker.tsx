@@ -18,6 +18,10 @@ const useHorizontalScroll = () => {
         let isDragging = false;
         let startX = 0;
         let scrollLeft = 0;
+        let velocity = 0;
+        let animationFrameId: number;
+        let lastTimestamp = 0;
+        let lastX = 0;
 
         const onWheel = (e: WheelEvent) => {
             if (e.deltaY === 0) return;
@@ -31,10 +35,23 @@ const useHorizontalScroll = () => {
             }
         };
 
+        const momentumLoop = () => {
+            if (isDragging) return;
+            el.scrollLeft += velocity;
+            velocity *= 0.95; // Friction factor
+            if (Math.abs(velocity) > 0.5) {
+                animationFrameId = requestAnimationFrame(momentumLoop);
+            }
+        };
+
         const onPointerDown = (e: PointerEvent) => {
             isDragging = true;
             startX = e.pageX - el.offsetLeft;
             scrollLeft = el.scrollLeft;
+            lastX = e.pageX;
+            lastTimestamp = performance.now();
+            velocity = 0;
+            cancelAnimationFrame(animationFrameId);
             el.style.cursor = 'grabbing';
             el.style.userSelect = 'none';
         };
@@ -45,6 +62,16 @@ const useHorizontalScroll = () => {
             const x = e.pageX - el.offsetLeft;
             const walk = (x - startX) * 2;
             
+            // Calculate velocity for inertia
+            const currentTimestamp = performance.now();
+            const dt = currentTimestamp - lastTimestamp;
+            if (dt > 0) {
+                const dx = lastX - e.pageX;
+                velocity = dx * (16 / dt) * 1.5; // normalize to 60fps
+            }
+            lastTimestamp = currentTimestamp;
+            lastX = e.pageX;
+            
             // If scrolled more than 5px, disable clicks on children so we don't accidentally select a date
             if (Math.abs(walk) > 5) {
                 el.classList.add('pointer-events-none-children');
@@ -54,9 +81,14 @@ const useHorizontalScroll = () => {
         };
 
         const onPointerUpOrLeave = () => {
+            if (!isDragging) return;
             isDragging = false;
             el.style.cursor = '';
             el.style.removeProperty('user-select');
+            
+            // Start momentum
+            animationFrameId = requestAnimationFrame(momentumLoop);
+            
             // Timeout ensures that the click event is fired before we re-enable pointer events
             setTimeout(() => {
                 el.classList.remove('pointer-events-none-children');
@@ -70,6 +102,7 @@ const useHorizontalScroll = () => {
         el.addEventListener('pointerleave', onPointerUpOrLeave);
 
         return () => {
+            cancelAnimationFrame(animationFrameId);
             el.removeEventListener('wheel', onWheel);
             el.removeEventListener('pointerdown', onPointerDown);
             el.removeEventListener('pointermove', onPointerMove);

@@ -1056,7 +1056,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         <div className="min-h-screen lg:h-screen w-full bg-transparent text-[#2D3436] dark:text-[#E2D7CE] flex flex-col lg:flex-row overflow-x-hidden font-sans relative transition-colors duration-500">
             
             {/* GIANT WATERMARK TYPOGRAPHY */}
-            <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden mix-blend-overlay opacity-[0.03] dark:opacity-[0.04]">
+            <div className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center overflow-hidden mix-blend-overlay opacity-[0.015] dark:opacity-[0.02]">
                 <AnimatePresence mode="wait">
                     <motion.span
                         key={step}
@@ -1635,8 +1635,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
             {/* --- RIGHT PANEL: LIVE TERMINAL --- */}
             {/* Desktop: Fixed width Right Side. Mobile: Full width at bottom (or sticky). Here: stacked at bottom. */}
-            <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E] text-white flex flex-col relative shadow-2xl shrink-0 z-20">
-                <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none mix-blend-overlay" />
+            <div className="w-full lg:w-[400px] xl:w-[450px] bg-[#1A1C1E]/80 backdrop-blur-3xl border-l border-white/10 text-white flex flex-col relative shadow-[0_0_50px_rgba(0,0,0,0.5)] shrink-0 z-20">
+                <div className="absolute inset-0 bg-noise opacity-5 pointer-events-none mix-blend-overlay" />
 
                 {/* RECEIPT HEADER */}
                 <div className="px-8 pt-8 pb-4 shrink-0 border-b border-white/10 hidden lg:block">
@@ -1740,7 +1740,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
                     {/* TOTAL Display */}
                     {isTrialMode ? (
-                        <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
+                        <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-black/20 backdrop-blur-md">
                             <div className="flex justify-between items-end mb-2">
                                 <span className="font-mono text-xs uppercase text-gray-400">{trialT?.price_label || "Kostenlos"}</span>
                                 <span className="text-2xl md:text-3xl font-bold tracking-tight tabular-nums text-green-400">0,00 €</span>
@@ -1750,7 +1750,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             </div>
                         </div>
                     ) : (
-                        <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-[#1A1C1E]">
+                        <div className="p-6 md:p-8 pb-4 pt-6 border-t border-white/10 bg-black/20 backdrop-blur-md">
                             <div className="flex justify-between items-end mb-2">
                                 <span className="font-mono text-xs uppercase text-gray-400">{wizard?.total_label}</span>
                                 <motion.span
