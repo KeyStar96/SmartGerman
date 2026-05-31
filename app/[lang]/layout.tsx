@@ -7,6 +7,7 @@ import SupportNode from "@/components/layout/SupportNode";
 import AppBackground from "@/components/effects/AppBackground";
 import { ThemeInit } from "@/components/effects/ThemeInit";
 import NavigationProgress from "@/components/effects/NavigationProgress";
+import Preloader from "@/components/effects/Preloader";
 
 /* ─── Global metadata defaults (inherited by all pages) ─── */
 export const metadata: Metadata = {
@@ -130,6 +131,7 @@ fbq('track', 'PageView');
         {/* End Meta Pixel Code */}
       </head>
       <body className={`${manrope.className} ${jetbrainsMono.variable} bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-500 overflow-x-hidden w-full selection:bg-[#FF5C00]/20 selection:text-[#FF5C00]`}>
+        <Preloader />
         {/* Navigation progress bar — instant visual feedback during page transitions */}
         <NavigationProgress />
         {/* 

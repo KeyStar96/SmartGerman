@@ -47,10 +47,20 @@ export default function Hero({ dictionary, lang = 'de' }: HeroProps) {
   const claimText = dictionary.hero.claim || "Spracherwerb durch Wissenschaft.";
 
   useEffect(() => {
-    setIsLoaded(true);
     // Detect hover capability (desktop)
     if (typeof window !== "undefined") {
       setCanHover(window.matchMedia("(hover: hover)").matches);
+      
+      const handlePreloader = () => setIsLoaded(true);
+      window.addEventListener('preloader-complete', handlePreloader);
+      
+      // Fallback in case preloader isn't there or already fired
+      const fallbackTimer = setTimeout(handlePreloader, 3000);
+
+      return () => {
+        window.removeEventListener('preloader-complete', handlePreloader);
+        clearTimeout(fallbackTimer);
+      };
     }
   }, []);
 

@@ -1,16 +1,16 @@
 import { type Metadata } from "next";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import Hero from "@/components/sections/Hero";
-import ScienceSection from "@/components/sections/ScienceSection";
 import { getDictionary } from "@/lib/dictionary";
 import Header from "@/components/layout/Header";
-import { getCourses } from "@/app/actions/get-courses"; // Use Server Action
-import GoogleReviews from "@/components/sections/GoogleReviews";
 
+// Dynamic Imports for below-the-fold components
+const GoogleReviews = dynamic(() => import("@/components/sections/GoogleReviews"));
+const ScienceSection = dynamic(() => import("@/components/sections/ScienceSection"));
 const WhyUsBento = dynamic(() => import("@/components/sections/WhyUsBento"));
 const AboutContainer = dynamic(() => import("@/components/sections/About/AboutContainer"));
-const Courses = dynamic(() => import("@/components/sections/Courses"));
-const TimetableSection = dynamic(() => import("@/components/sections/Timetable/TimetableSection"));
+const CourseDataWrapper = dynamic(() => import("@/components/sections/CourseDataWrapper"));
 const LocationSection = dynamic(() => import("@/components/sections/Location/LocationSection").then(mod => mod.LocationSection));
 import FooterLayout from "@/components/footer/FooterLayout";
 
@@ -80,8 +80,6 @@ export default async function HomePage({
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
-  const courses = await getCourses();
-
   /* ─── Rich JSON-LD: @graph with EducationalOrganization + Course + WebSite ─── */
   const jsonLd = {
     "@context": "https://schema.org",
@@ -139,34 +137,8 @@ export default async function HomePage({
         },
       },
 
-      /* ── 2. Courses ── */
-      ...courses.map(course => ({
-        "@type": "Course",
-        "@id": `${BASE_URL}/#course-${course.id}`,
-        "name": dictionary.CourseData?.[course.id]?.title || course.id,
-        "description": dictionary.CourseData?.[course.id]?.description || "",
-        "provider": { "@id": `${BASE_URL}/#organization` },
-        "inLanguage": "de",
-        "educationalLevel": dictionary.CourseData?.[course.id]?.level || "",
-        "courseMode": course.type === "online" ? "Online" : "Onsite",
-        "offers": {
-          "@type": "Offer",
-          "price": String(course.price),
-          "priceCurrency": "EUR",
-          "availability": "https://schema.org/InStock",
-          "url": `${BASE_URL}/${lang}`,
-        },
-        ...(course.sessions && course.sessions.length > 0 ? {
-          "hasCourseInstance": course.sessions.map(session => ({
-            "@type": "CourseInstance",
-            "courseMode": course.type === "online" ? "Online" : "Onsite",
-            "instructor": {
-              "@type": "Person",
-              "name": "Anastasia Sitov",
-            },
-          })),
-        } : {}),
-      })),
+      /* ── 2. Courses (JSON-LD removed from static generation to unblock HTML) ── */
+      // We can rely on SSR/Suspense to inject SEO for courses, or keep it basic here.
 
       /* ── 3. WebSite ── */
       {
@@ -216,8 +188,9 @@ export default async function HomePage({
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
           <WhyUsBento dictionary={dictionary} />
-          <Courses dictionary={dictionary} courses={courses} />
-          <TimetableSection dictionary={dictionary} courses={courses} />
+          <Suspense fallback={<div className="h-[50vh] flex items-center justify-center text-white/50 animate-pulse">Lade Kurse...</div>}>
+            <CourseDataWrapper dictionary={dictionary} />
+          </Suspense>
           <LocationSection dictionary={dictionary} />
         </div>
       </div>

@@ -50,11 +50,10 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     setMounted(true);
 
     const checkScrollMode = () => {
-      // Touch-Geräte, Mobile OS, macOS oder kleine Screens (< 1024px) → Natives Scrolling
-      // Kleine Screens müssen natives Scrolling nutzen, da das Layout auf Mobile umschaltet
+      // Touch-Geräte, Mobile OS oder kleine Screens (< 1024px) → Natives Scrolling
       const isSmallScreen = window.innerWidth < 1024;
 
-      if (isTouchDevice() || isMobileOS() || isMacOS() || isSmallScreen) {
+      if (isTouchDevice() || isMobileOS() || isSmallScreen) {
         setUseNativeScroll(true);
       } else {
         setUseNativeScroll(false);
