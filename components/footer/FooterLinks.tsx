@@ -40,7 +40,7 @@ const SocialButton = ({ href, icon: Icon, label, themeClass, onClick, isCopied }
             target={href ? "_blank" : undefined}
             rel={href ? "noopener noreferrer" : undefined}
             whileHover="hover"
-            className={`w-full sm:w-[240px] h-[64px] relative overflow-hidden rounded-full border border-white/5 bg-[#1E2024]/80 backdrop-blur-2xl flex items-center justify-between px-6 transition-all duration-500 group shadow-xl cursor-pointer ${theme.hoverBg} ${theme.borderColor}`}
+            className={`w-full sm:w-[240px] h-[52px] lg:h-[64px] relative overflow-hidden rounded-full border border-white/5 bg-[#1E2024]/80 backdrop-blur-2xl flex items-center justify-between px-5 lg:px-6 transition-all duration-500 group shadow-xl cursor-pointer ${theme.hoverBg} ${theme.borderColor}`}
         >
             <div className="absolute inset-0 bg-noise-paper opacity-10 mix-blend-overlay pointer-events-none" />
             
@@ -61,8 +61,8 @@ const SocialButton = ({ href, icon: Icon, label, themeClass, onClick, isCopied }
             </div>
 
             {/* Icon Area */}
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center border border-white/5 bg-white/5 transition-colors duration-500 relative z-10 ${theme.iconBg}`}>
-                <Icon size={16} className={`text-white/50 transition-all duration-500 lg:group-hover:scale-110 ${theme.textColor}`} />
+            <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center border border-white/5 bg-white/5 transition-colors duration-500 relative z-10 ${theme.iconBg}`}>
+                <Icon className={`w-3.5 h-3.5 lg:w-4 lg:h-4 text-white/50 transition-all duration-500 lg:group-hover:scale-110 ${theme.textColor}`} />
             </div>
             
             {/* Hover Indicator Arrow */}
@@ -131,7 +131,7 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
     ), [navItems, t.Nav]);
 
     return (
-        <div className="w-full h-full px-6 md:px-12 pt-8 pb-12 lg:py-12 flex flex-col justify-end gap-10 md:justify-between md:gap-0">
+        <div className="w-full h-full px-6 md:px-12 pt-8 pb-32 lg:pb-12 lg:py-12 flex flex-col justify-end gap-10 md:justify-between md:gap-0">
 
             {/* TOP ROW */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 lg:h-full items-start">
