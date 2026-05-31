@@ -171,8 +171,8 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                     {navList}
                 </div>
 
-                {/* 3. Contact & Actions (Right Column) */}
-                <div className="hidden lg:flex lg:col-span-3 flex-col gap-4 lg:items-end">
+                {/* 3. Contact & Actions (Right Column) - Now visible on mobile */}
+                <div className="flex lg:col-span-3 flex-col gap-4 lg:items-end mt-8 lg:mt-0">
 
                     {/* Premium Contact Buttons */}
                     <div className="flex flex-col gap-3 w-full sm:w-auto">
@@ -198,17 +198,27 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                 </div>
             </div>
 
-            {/* BOTTOM ROW: Footer Meta */}
-            <div className="mt-8 lg:mt-16 pt-8 border-t border-white/10 flex flex-col items-center gap-4 text-xs font-mono text-white/40 uppercase tracking-widest">
-                <span>{t.Legal?.copyright || "© 2026 Sitov Language Academy"}</span>
+            {/* BOTTOM ROW: Footer Meta & Giant Typography */}
+            <div className="mt-12 lg:mt-24 pt-8 border-t border-white/10 relative flex flex-col items-center">
+                {/* Legal & Copyright */}
+                <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-white/40 uppercase tracking-widest relative z-10 mb-8 lg:mb-12">
+                    <span>{t.Legal?.copyright || "© 2026 Sitov Language Academy"}</span>
 
-                <div className="flex flex-wrap justify-center gap-8">
-                    <Link href={`/${lang}/imprint`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</Link>
-                    <Link href={`/${lang}/privacy`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</Link>
-                    <Link href={`/${lang}/agb`} className="hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</Link>
-                    <Link href={`/${lang}/cancellation`} className="hover:text-[#FF5C00] transition-colors">
-                        {t.Legal?.cancellation || "Cancel Contract"}
-                    </Link>
+                    <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+                        <Link href={`/${lang}/imprint`} className="lg:hover:text-[#FF5C00] transition-colors">{t.Legal?.imprint || "Imprint"}</Link>
+                        <Link href={`/${lang}/privacy`} className="lg:hover:text-[#FF5C00] transition-colors">{t.Legal?.privacy || "Privacy"}</Link>
+                        <Link href={`/${lang}/agb`} className="lg:hover:text-[#FF5C00] transition-colors">{t.Legal?.terms || "Terms"}</Link>
+                        <Link href={`/${lang}/cancellation`} className="lg:hover:text-[#FF5C00] transition-colors">
+                            {t.Legal?.cancellation || "Cancel Contract"}
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Massive Typography - Breaking out of padding to span full width */}
+                <div className="w-[100vw] -mx-6 md:-mx-12 flex justify-center items-end overflow-hidden select-none pointer-events-none mt-auto">
+                    <h1 className="text-[25vw] leading-[0.72] font-black uppercase tracking-tighter text-white/5 whitespace-nowrap">
+                        SITOV
+                    </h1>
                 </div>
             </div>
         </div>
