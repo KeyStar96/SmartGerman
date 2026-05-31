@@ -102,7 +102,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                             href="https://wa.me/491714758620"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center justify-between p-4 bg-[#1E2024]/80 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl hover:bg-[#25D366]/10 hover:border-[#25D366]/30 transition-all duration-500 overflow-hidden relative"
+                            className="group flex items-center justify-between p-4 bg-[#1E2024]/80 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl hover:bg-[#25D366]/10 hover:border-[#25D366]/30 transition-colors duration-500 overflow-hidden relative"
                         >
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-[#25D366]/0 to-[#25D366]/10 transition-opacity duration-500" />
                             <div className="flex items-center gap-4 relative z-10">
@@ -111,7 +111,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                                 </div>
                                 <span className="text-[13px] font-bold text-white/90 group-hover:text-white transition-colors tracking-wide uppercase">{t.whatsapp}</span>
                             </div>
-                            <ArrowUpRight size={16} className="text-white/30 group-hover:text-[#25D366] group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500 relative z-10" />
+                            <ArrowUpRight size={16} className="text-white/30 group-hover:text-[#25D366] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-500 relative z-10" />
                         </motion.a>
 
                         {/* Option 2: Telegram */}
@@ -120,7 +120,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                             href="https://t.me/Sprachschule_Anastasia"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center justify-between p-4 bg-[#1E2024]/80 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl hover:bg-[#229ED9]/10 hover:border-[#229ED9]/30 transition-all duration-500 overflow-hidden relative"
+                            className="group flex items-center justify-between p-4 bg-[#1E2024]/80 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl hover:bg-[#229ED9]/10 hover:border-[#229ED9]/30 transition-colors duration-500 overflow-hidden relative"
                         >
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-[#229ED9]/0 to-[#229ED9]/10 transition-opacity duration-500" />
                             <div className="flex items-center gap-4 relative z-10">
@@ -129,7 +129,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                                 </div>
                                 <span className="text-[13px] font-bold text-white/90 group-hover:text-white transition-colors tracking-wide uppercase">{t.telegram}</span>
                             </div>
-                            <ArrowUpRight size={16} className="text-white/30 group-hover:text-[#229ED9] group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500 relative z-10" />
+                            <ArrowUpRight size={16} className="text-white/30 group-hover:text-[#229ED9] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-500 relative z-10" />
                         </motion.a>
 
                         {/* Option 3: Email */}
@@ -138,7 +138,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                             href="mailto:info@sitov-academy.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group flex items-center justify-between p-4 bg-[#1E2024]/80 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl hover:bg-[#FF5C00]/10 hover:border-[#FF5C00]/30 transition-all duration-500 overflow-hidden relative"
+                            className="group flex items-center justify-between p-4 bg-[#1E2024]/80 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl hover:bg-[#FF5C00]/10 hover:border-[#FF5C00]/30 transition-colors duration-500 overflow-hidden relative"
                         >
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-[#FF5C00]/0 to-[#FF5C00]/10 transition-opacity duration-500" />
                             <div className="flex items-center gap-4 relative z-10">
@@ -147,7 +147,7 @@ export default function SupportNode({ dictionary }: SupportNodeProps) {
                                 </div>
                                 <span className="text-[13px] font-bold text-white/90 group-hover:text-white transition-colors tracking-wide uppercase">{t.email}</span>
                             </div>
-                            <ArrowUpRight size={16} className="text-white/30 group-hover:text-[#FF5C00] group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-500 relative z-10" />
+                            <ArrowUpRight size={16} className="text-white/30 group-hover:text-[#FF5C00] group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-500 relative z-10" />
                         </motion.a>
                     </motion.div>
                 )}
