@@ -198,7 +198,7 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                 </div>
             </div>
 
-            {/* BOTTOM ROW: Footer Meta & Giant Typography */}
+            {/* BOTTOM ROW: Footer Meta */}
             <div className="mt-12 lg:mt-24 pt-8 border-t border-white/10 relative flex flex-col items-center">
                 {/* Legal & Copyright */}
                 <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono text-white/40 uppercase tracking-widest relative z-10 mb-8 lg:mb-12">
@@ -213,13 +213,13 @@ export default function FooterLinks({ dictionary, lang }: FooterLinksProps) {
                         </Link>
                     </div>
                 </div>
+            </div>
 
-                {/* Massive Typography - Breaking out of padding to span full width */}
-                <div className="w-[100vw] -mx-6 md:-mx-12 flex justify-center items-end overflow-hidden select-none pointer-events-none mt-auto">
-                    <h1 className="text-[25vw] leading-[0.72] font-black uppercase tracking-tighter text-white/5 whitespace-nowrap">
-                        SITOV
-                    </h1>
-                </div>
+            {/* Massive Typography - Absolute positioned as a watermark so it doesn't inflate footer height */}
+            <div className="absolute bottom-[-10%] left-0 w-full flex justify-center items-end overflow-hidden select-none pointer-events-none -z-10">
+                <h1 className="text-[25vw] leading-[0.75] font-black uppercase tracking-tighter text-white/5 whitespace-nowrap">
+                    SITOV
+                </h1>
             </div>
         </div>
     );
