@@ -45,16 +45,16 @@ const SocialButton = ({ href, icon: Icon, label, themeClass, onClick, isCopied }
             <div className="absolute inset-0 bg-noise-paper opacity-10 mix-blend-overlay pointer-events-none" />
             
             {/* Text Area */}
-            <div className="relative h-4 overflow-hidden z-10 flex-1 flex items-center">
+            <div className="relative h-[16px] overflow-hidden z-10 flex-1">
                 <motion.div
-                    variants={{ hover: { y: "-100%" } }}
+                    variants={{ hover: { y: "-16px" } }}
                     transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
                     className="flex flex-col"
                 >
-                    <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-white/70 h-4 flex items-center leading-none">
+                    <span className="font-mono text-[11px] sm:text-[12px] font-semibold uppercase tracking-widest text-white/70 h-[16px] flex items-center leading-none">
                         {label}
                     </span>
-                    <span className={`font-mono text-[11px] font-bold uppercase tracking-widest h-4 flex items-center leading-none mt-4 transition-colors duration-500 ${theme.textColor}`}>
+                    <span className={`font-mono text-[11px] sm:text-[12px] font-bold uppercase tracking-widest h-[16px] flex items-center leading-none transition-colors duration-500 ${theme.textColor}`}>
                         {label}
                     </span>
                 </motion.div>
