@@ -71,12 +71,12 @@ export default function WhyUsHorizontal({ dictionary }: { dictionary: WhyUsDicti
                         
                         {/* SLIDE 1 */}
                         <div className="w-[100vw] h-full flex items-center justify-center px-24">
-                            <div className="grid grid-cols-2 gap-20 w-full max-w-[1400px]">
+                            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] xl:grid-cols-2 gap-12 xl:gap-20 w-full max-w-[1400px]">
                                 <div className="flex flex-col justify-center">
                                     <span className="font-mono text-xs tracking-[0.3em] text-[#FF5C00] uppercase font-bold mb-6 block border border-[#FF5C00]/30 bg-[#FF5C00]/5 px-4 py-1.5 rounded-full w-max backdrop-blur-sm">
                                         {t.header.label}
                                     </span>
-                                    <h2 className="text-6xl xl:text-7xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-[1.05]">
+                                    <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tighter uppercase text-[#2D3436] dark:text-[#E2D7CE] leading-[1.05] break-words pr-8">
                                         {t.header.title_Line1} <br />
                                         <span className="text-[#FF5C00]">{t.header.title_Line2}</span>
                                     </h2>

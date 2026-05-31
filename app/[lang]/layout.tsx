@@ -130,7 +130,7 @@ fbq('track', 'PageView');
         </noscript>
         {/* End Meta Pixel Code */}
       </head>
-      <body className={`${manrope.className} ${jetbrainsMono.variable} bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-500 overflow-x-hidden w-full selection:bg-[#FF5C00]/20 selection:text-[#FF5C00]`}>
+      <body className={`${manrope.className} ${jetbrainsMono.variable} bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-500 overflow-x-clip w-full selection:bg-[#FF5C00]/20 selection:text-[#FF5C00]`}>
         <Preloader />
         {/* Navigation progress bar — instant visual feedback during page transitions */}
         <NavigationProgress />

@@ -73,7 +73,7 @@ body {
   min-height: 100dvh;
   min-height: 100vh;
   /* Fallback for older browsers */
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 18px;
   /* iOS SAFARI FIX: Prevent rubber-band revealing browser canvas */
