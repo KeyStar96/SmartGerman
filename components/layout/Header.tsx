@@ -319,13 +319,22 @@ function LogoImage() {
   const isDark = useIsDarkMode();
   if (typeof isDark !== 'boolean') return <div className="h-8 w-32" />;
 
+  // CSS Masterclass:
+  // For Dark Mode: mix-blend-screen makes the black background completely transparent.
+  // For Light Mode: invert(1) + hue-rotate(180deg) makes black->white, white->black, and keeps orange->orange. 
+  // Then mix-blend-multiply makes the new white background transparent!
   return (
     <Image
-      src={isDark ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
+      src="/Bilder/sitov-logo.jpg"
       alt="Sitov Language Academy Logo"
-      width={140}
+      width={180}
       height={32}
-      className="h-8 w-auto object-contain"
+      className={cn(
+        "h-10 w-auto object-contain", // Slightly larger height (10 = 40px) for the new detailed logo
+        isDark 
+          ? "mix-blend-screen" 
+          : "mix-blend-multiply invert hue-rotate-180"
+      )}
       priority
     />
   );

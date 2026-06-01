@@ -1097,12 +1097,17 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
                         <Image
-                            src={isDarkMode ? "/Bilder/SG_Logo_Darkmode3.png" : "/Bilder/SG_Logo_Lightmode.png"}
+                            src="/Bilder/sitov-logo.jpg"
                             alt="Sitov Language Academy"
-                            width={100}
-                            height={28}
+                            width={140}
+                            height={32}
                             priority
-                            className="object-contain md:w-[120px]"
+                            className={cn(
+                                "object-contain md:w-[160px] h-8",
+                                isDarkMode 
+                                    ? "mix-blend-screen" 
+                                    : "mix-blend-multiply invert hue-rotate-180"
+                            )}
                         />
                     </div>
 
