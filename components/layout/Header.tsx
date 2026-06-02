@@ -306,7 +306,7 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
           "transition-transform duration-300 hover:scale-105 group"
         )}
       >
-        <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-900 z-0" />
+        <div className="absolute inset-0 bg-[#010101] z-0" />
         <div className="relative z-10">
           <LogoImage />
         </div>
@@ -316,25 +316,13 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
 }
 
 function LogoImage() {
-  const isDark = useIsDarkMode();
-  if (typeof isDark !== 'boolean') return <div className="h-8 w-32" />;
-
-  // CSS Masterclass:
-  // For Dark Mode: mix-blend-screen makes the black background completely transparent.
-  // For Light Mode: invert(1) + hue-rotate(180deg) makes black->white, white->black, and keeps orange->orange. 
-  // Then mix-blend-multiply makes the new white background transparent!
   return (
     <Image
       src="/Bilder/sitov-logo.jpg"
       alt="Sitov Language Academy Logo"
       width={180}
       height={32}
-      className={cn(
-        "h-10 w-auto object-contain", // Slightly larger height (10 = 40px) for the new detailed logo
-        isDark 
-          ? "mix-blend-screen" 
-          : "mix-blend-multiply invert hue-rotate-180"
-      )}
+      className="h-10 w-auto object-contain"
       priority
     />
   );
@@ -429,7 +417,7 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
           "overflow-hidden"
         )}
       >
-        <div className="absolute inset-0 bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-md z-0" />
+        <div className="absolute inset-0 bg-[#010101] z-0" />
         <Link href={`/${lang}`} className="relative z-10 block h-8 w-auto">
           {/* Small Logo Icon for Mobile - utilizing LogoImage but maybe we want just the icon? 
                  LogoImage is full text. Let's use LogoImage for now, might be small. 

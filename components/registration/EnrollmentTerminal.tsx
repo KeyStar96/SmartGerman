@@ -1096,19 +1096,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", monoClassName)}>
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
-                        <Image
-                            src="/Bilder/sitov-logo.jpg"
-                            alt="Sitov Language Academy"
-                            width={140}
-                            height={32}
-                            priority
-                            className={cn(
-                                "object-contain md:w-[160px] h-8",
-                                isDarkMode 
-                                    ? "mix-blend-screen" 
-                                    : "mix-blend-multiply invert hue-rotate-180"
-                            )}
-                        />
+                        <div className="bg-[#010101] px-5 py-2 rounded-full border border-white/5 shadow-lg flex items-center justify-center">
+                            <Image
+                                src="/Bilder/sitov-logo.jpg"
+                                alt="Sitov Language Academy"
+                                width={140}
+                                height={32}
+                                priority
+                                className="object-contain md:w-[160px] h-8"
+                            />
+                        </div>
                     </div>
 
                     {/* Progress Bar */}
