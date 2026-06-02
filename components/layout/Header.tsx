@@ -322,7 +322,7 @@ function LogoImage() {
       alt="Sitov Language Academy Logo"
       width={240}
       height={48}
-      className="h-8 md:h-9 w-auto object-contain scale-[1.1] mix-blend-screen"
+      className="h-8 md:h-9 w-auto object-contain scale-95 mix-blend-screen"
       priority
     />
   );

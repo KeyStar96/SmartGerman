@@ -1103,7 +1103,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                                 width={240}
                                 height={48}
                                 priority
-                                className="object-contain w-auto h-7 md:h-9 scale-[1.1] mix-blend-screen"
+                                className="object-contain w-auto h-7 md:h-9 scale-95 mix-blend-screen"
                             />
                         </div>
                     </div>
