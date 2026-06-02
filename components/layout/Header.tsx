@@ -300,7 +300,7 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
         href={`/${lang}`}
         className={cn(
           "block flex items-center justify-center",
-          "relative px-4 py-2 rounded-full overflow-hidden",
+          "relative px-3 py-1.5 rounded-full overflow-hidden",
           "border border-white/10",
           "shadow-lg shadow-black/20",
           "transition-transform duration-300 hover:scale-105 group"
@@ -322,7 +322,7 @@ function LogoImage() {
       alt="Sitov Language Academy Logo"
       width={240}
       height={48}
-      className="h-10 md:h-12 w-auto object-contain scale-[1.35] mix-blend-screen"
+      className="h-8 md:h-9 w-auto object-contain scale-[1.1] mix-blend-screen"
       priority
     />
   );
