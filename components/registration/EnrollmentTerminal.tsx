@@ -521,6 +521,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingRef = useRef(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [isAlreadyUsed, setIsAlreadyUsed] = useState(false);
     const [showPaymentInfo, setShowPaymentInfo] = useState(false);
@@ -888,6 +889,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         if (!courseId || !trialDate) return;
         if (trialEligible === false) return;
 
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
         setIsSubmitting(true);
         try {
             const result = await submitTrialLesson({
@@ -915,6 +918,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             console.error("Trial submission error:", error);
             alert("Network error. Please try again.");
         } finally {
+            isSubmittingRef.current = false;
             setIsSubmitting(false);
         }
     };
@@ -922,6 +926,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     const onSubmit = async (data: EnrollmentFormData) => {
         if (!isLegalValid) return; // safety check
 
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
         setIsSubmitting(true);
 
         // Calculate individual prices for the map
@@ -954,6 +960,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             console.error("Submission error details:", error);
             alert("Network error. Please try again.");
         } finally {
+            isSubmittingRef.current = false;
             setIsSubmitting(false);
         }
     };
