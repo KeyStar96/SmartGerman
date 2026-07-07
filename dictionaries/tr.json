@@ -144,8 +144,8 @@
           {
             "id": "speech_a1_1",
             "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A1.1",
-            "level": "A1.1",
+            "title": "Konuşma Eğitimi A1-B1",
+            "level": "A1-B1",
             "instructor": "Anastasia Sitov",
             "time": "Sal 12:00-13:00",
             "freq": "1x 60 dk",
@@ -159,8 +159,8 @@
           {
             "id": "speech_a1_2",
             "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A1.2",
-            "level": "A1.2",
+            "title": "Konuşma Eğitimi A1-B1",
+            "level": "A1-B1",
             "instructor": "Anastasia Sitov",
             "time": "Çar 12:00-13:00",
             "freq": "1x 60 dk",
@@ -174,8 +174,8 @@
           {
             "id": "speech_a2",
             "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A2",
-            "level": "A2",
+            "title": "Konuşma Eğitimi A1-B1",
+            "level": "A1-B1",
             "instructor": "Anastasia Sitov",
             "time": "Pzt 12:00-13:00",
             "freq": "1x 60 dk",
@@ -286,21 +286,21 @@
       "location": "Yüz yüze"
     },
     "speech_a1_1": {
-      "title": "Konuşma Pratiği A1.2",
+      "title": "Konuşma Pratiği A1-B1",
       "description": "Çekingenliği yenmek, özgüven kazanmak.",
-      "level": "A1.2",
+      "level": "A1-B1",
       "location": "Yüz yüze"
     },
     "speech_a1_2": {
-      "title": "Konuşma Pratiği A2.1",
+      "title": "Konuşma Pratiği A1-B1",
       "description": "Konuşma becerilerini derinleştirme.",
-      "level": "A2.1",
+      "level": "A1-B1",
       "location": "Yüz yüze"
     },
     "speech_a2": {
-      "title": "Konuşma Pratiği A2.2",
+      "title": "Konuşma Pratiği A1-B1",
       "description": "Günlük durumlarda özgüvenli konuşma.",
-      "level": "A2.2",
+      "level": "A1-B1",
       "location": "Yüz yüze"
     },
     "online_a1_1": {
@@ -326,9 +326,9 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {
-      "title": "Konuşma Pratiği A1.1",
+      "title": "Konuşma Pratiği A1-B1",
       "description": "Konuşma korkunuzu yenin. A1.1 kursu için ideal bir eklenti.",
-      "level": "A1.1",
+      "level": "A1-B1",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1_2026_09": {

@@ -145,8 +145,8 @@
           {
             "id": "speech_a1_1",
             "group": "Group 2: In-Person (Speaking Training)",
-            "title": "Speaking Training A1.1",
-            "level": "A1.1",
+            "title": "Speaking Training A1-B1",
+            "level": "A1-B1",
             "instructor": "Anastasia Sitov",
             "time": "Tue 12:00-13:00",
             "freq": "1x 60 min",
@@ -160,8 +160,8 @@
           {
             "id": "speech_a1_2",
             "group": "Group 2: In-Person (Speaking Training)",
-            "title": "Speaking Training A1.2",
-            "level": "A1.2",
+            "title": "Speaking Training A1-B1",
+            "level": "A1-B1",
             "instructor": "Anastasia Sitov",
             "time": "Wed 12:00-13:00",
             "freq": "1x 60 min",
@@ -175,8 +175,8 @@
           {
             "id": "speech_a2",
             "group": "Group 2: In-Person (Speaking Training)",
-            "title": "Speaking Training A2",
-            "level": "A2",
+            "title": "Speaking Training A1-B1",
+            "level": "A1-B1",
             "instructor": "Anastasia Sitov",
             "time": "Mon 12:00-13:00",
             "freq": "1x 60 min",
@@ -550,21 +550,21 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1": {
-      "title": "Speech Training A1.2",
+      "title": "Speech Training A1-B1",
       "description": "Lose shyness, gain confidence.",
-      "level": "A1.2",
+      "level": "A1-B1",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_2": {
-      "title": "Speech Training A2.1",
+      "title": "Speech Training A1-B1",
       "description": "Deepening speaking skills.",
-      "level": "A2.1",
+      "level": "A1-B1",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a2": {
-      "title": "Speech Training A2.2",
+      "title": "Speech Training A1-B1",
       "description": "Confident speaking in everyday situations.",
-      "level": "A2.2",
+      "level": "A1-B1",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1": {
@@ -586,9 +586,9 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {
-      "title": "Speech Training A1.1",
+      "title": "Speech Training A1-B1",
       "description": "Lose your fear of speaking. Ideal addition to the A1.1 course.",
-      "level": "A1.1",
+      "level": "A1-B1",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1_2026_09": {
