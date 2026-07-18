@@ -101,7 +101,7 @@
             "id": "de50_a1_1",
             "group": "Group 1: In-Person (Senior Focus)",
             "title": "German Level 1",
-            "level": "A0 A1",
+            "level": "A0-A1",
             "instructor": "Anastasia Sitov",
             "time": "Mon 9:00-10:30 & Tue 10:30-12:00",
             "freq": "2x 90 min",
@@ -116,7 +116,7 @@
             "id": "de50_a1_2",
             "group": "Group 1: In-Person (Senior Focus)",
             "title": "German Level 2",
-            "level": "A1 A2",
+            "level": "A1-A2",
             "instructor": "Anastasia Sitov",
             "time": "Tue 9:00-10:30 & Wed 10:30-12:00",
             "freq": "2x 90 min",
@@ -131,7 +131,7 @@
             "id": "de50_a2",
             "group": "Group 1: In-Person (Senior Focus)",
             "title": "German Level 3",
-            "level": "A2 B1",
+            "level": "A2-B1",
             "instructor": "Anastasia Sitov",
             "time": "Mon 10:30-12:00 & Wed 9:00-10:30",
             "freq": "2x 90 min",
@@ -534,13 +534,13 @@
     "de50_a1_1": {
       "title": "German Level 2",
       "description": "Specially designed for mature learners. Slow pace, relaxed atmosphere.",
-      "level": "A1 A2",
+      "level": "A1-A2",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a1_2": {
       "title": "German Level 3",
       "description": "Advanced beginners. Deepening the basics.",
-      "level": "A2 B1",
+      "level": "A2-B1",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a2": {
@@ -582,7 +582,7 @@
     "de50_a1_1_replacement_2026_07": {
       "title": "German Level 1",
       "description": "Especially for learners in their prime. Slow pace, lots of repetition. We start completely from scratch!",
-      "level": "A0 A1",
+      "level": "A0-A1",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {
