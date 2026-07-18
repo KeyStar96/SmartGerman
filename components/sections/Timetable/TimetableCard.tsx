@@ -150,7 +150,7 @@ export default function TimetableCard({ course, dictionary, variant = "desktop",
 
                     {/* Title: Sans-Serif Bold Clinical */}
                     <h3 className={cn(
-                        "font-sans font-bold text-xl leading-tight transition-colors duration-300",
+                        "font-sans font-bold text-base md:text-lg tracking-tight leading-tight transition-colors duration-300",
                         isLive ? "text-[#FF5C00]" : "text-slate-900 dark:text-slate-100 group-hover:text-[#FF5C00]"
                     )}>
                         {course.title}
