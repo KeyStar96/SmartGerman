@@ -281,6 +281,7 @@ interface CourseCardProps {
 const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice, educatorName, dictionary }: CourseCardProps) => {
   const params = useParams();
   const lang = (params?.lang as string) || "de";
+  const isPrivate = config.translationKey === 'private_lesson';
 
   // Infer unit based on price/duration or fallback
   // Strictly use config duration
@@ -291,17 +292,11 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
   return (
     <motion.div
       variants={cardVariants}
-      className="group/card relative h-full flex flex-col
-        rounded-3xl overflow-hidden
-        bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md
-        border border-white/40 dark:border-white/10
-        transition-all duration-500 ease-out
-        hover:z-20 hover:-translate-y-2
-        hover:border-white/80 dark:hover:border-white/30
-        shadow-[0_8px_30px_rgb(0,0,0,0.04)]
-        dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]
-        hover:shadow-2xl
-      "
+      className={cn("group/card relative h-full flex flex-col rounded-3xl overflow-hidden backdrop-blur-md transition-all duration-500 ease-out hover:z-20 hover:-translate-y-2",
+        isPrivate
+          ? "bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50 hover:border-amber-400 dark:hover:border-amber-700 shadow-[0_8px_30px_rgb(251,191,36,0.1)]"
+          : "bg-white/60 dark:bg-[#1a1a1a]/60 border border-white/40 dark:border-white/10 hover:border-white/80 dark:hover:border-white/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
+      )}
     >
       {/* Ambient hover glow inside card (Premium Mouse Tracking) */}
       <MouseGlow color="rgba(251,146,60,0.15)" />

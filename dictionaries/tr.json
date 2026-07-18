@@ -336,6 +336,12 @@
       "description": "Evinizin rahatlığında. Tamamen sıfırdan başlıyoruz! Küçük gruplar halinde (en fazla 10 kişi), derslerin kaydını daha sonra kendi başınıza tekrar edebilmeniz için sunuyoruz ve gramer ve dil ile ilgili sorularınız için öğretmenimizden 7/24 yoğun Telegram desteği alabilirsiniz.",
       "level": "A1.1",
       "location": "Microsoft Teams"
+    },
+    "private_lesson": {
+      "title": "Özel Dersler",
+      "description": "Kendi hızınıza göre uyarlanmış, Hannover'de yüz yüze veya çevrimiçi esnek özel dersler ayırtın (25 € / 45 Dk.). > Kayıttan sonra öğretmeniniz uygun tarihleri belirlemek için sizinle iletişime geçecektir.",
+      "level": "A1-C1",
+      "location": "Esnek"
     }
   },
   "courses_v2": {

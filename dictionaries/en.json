@@ -596,6 +596,12 @@
       "description": "Comfortably from home. We start completely from scratch! In small groups (max. 10 people), including lesson recordings for your own review afterwards and intensive 24/7 Telegram support from the teacher for questions about grammar and language.",
       "level": "A1.1",
       "location": "Microsoft Teams"
+    },
+    "private_lesson": {
+      "title": "Private Lessons",
+      "description": "Book flexible private lessons online or in-person in Hannover, tailored to your pace (25 € / 45 Min.). > After registration, your teacher will contact you to coordinate available dates.",
+      "level": "A1-C1",
+      "location": "Flexible"
     }
   },
   "registration": {

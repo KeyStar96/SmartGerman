@@ -598,6 +598,12 @@
       "description": "Bequem von zu Hause. Wir fangen komplett von vorne an! In kleinen Gruppen (max. 10 Personen), inklusive Unterrichtsaufzeichnung für die eigene Wiederholung im Anschluss und intensivem 24/7 Telegram-Support durch die Lehrerin bei Fragen zur Grammatik und Sprache.",
       "level": "A1.1",
       "location": "Microsoft Teams"
+    },
+    "private_lesson": {
+      "title": "Privatunterricht",
+      "description": "Buchen Sie flexiblen Privatunterricht online oder in Präsenz vor Ort in Hannover, maßgeschneidert für Ihr Tempo (25 € / 45 Min.). > Nach der Anmeldung meldet sich Ihre Lehrkraft bei Ihnen, um die verfügbaren Termine mit Ihnen abzustimmen",
+      "level": "A1-C1",
+      "location": "Flexibel"
     }
   },
   "registration": {

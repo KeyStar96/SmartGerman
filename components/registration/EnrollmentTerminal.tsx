@@ -217,19 +217,19 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
     const t = dictionary?.registration?.course_card;
     const daysDict = dictionary?.timetable?.days;
     const timetableLabels = dictionary?.timetable?.labels;
+    const isPrivate = course.translationKey === 'private_lesson';
 
     return (
         <motion.div
             onClick={onToggle}
             layout
             className={cn(
-                "group relative w-full cursor-pointer rounded-3xl p-4 md:p-6 border transition-all duration-500 overflow-hidden",
-                // Base Glassmorphism
-                "bg-white/60 dark:bg-[#1a1a1a]/60 backdrop-blur-md",
-                "shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]",
+                "group relative w-full cursor-pointer rounded-3xl p-4 md:p-6 border transition-all duration-500 overflow-hidden backdrop-blur-md",
                 selected
                     ? "border-[#FF5C00] shadow-sm bg-orange-50/80 dark:bg-[#FF5C00]/20"
-                    : "border-white/40 dark:border-white/10 hover:border-white/80 dark:hover:border-white/30 hover:shadow-xl"
+                    : isPrivate
+                        ? "border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20 hover:border-amber-400 dark:hover:border-amber-700 shadow-[0_8px_30px_rgb(251,191,36,0.1)] hover:shadow-xl"
+                        : "bg-white/60 dark:bg-[#1a1a1a]/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border-white/40 dark:border-white/10 hover:border-white/80 dark:hover:border-white/30 hover:shadow-xl"
             )}
         >
             {/* Ambient hover glow inside card (Performance Optimized) */}
