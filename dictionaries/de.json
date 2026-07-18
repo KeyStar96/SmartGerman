@@ -102,8 +102,8 @@
           {
             "id": "de50_a1_1",
             "group": "Gruppe 1: Präsenz (Senioren-Fokus)",
-            "title": "Deutsch A1.1",
-            "level": "A1.1",
+            "title": "Deutsch Level 1",
+            "level": "A0 A1",
             "instructor": "Anastasia Sitov",
             "time": "Mo 9:00-10:30 & Di 10:30-12:00",
             "freq": "2x 90 min",
@@ -117,8 +117,8 @@
           {
             "id": "de50_a1_2",
             "group": "Gruppe 1: Präsenz (Senioren-Fokus)",
-            "title": "Deutsch A1.2",
-            "level": "A1.2",
+            "title": "Deutsch Level 2",
+            "level": "A1 A2",
             "instructor": "Anastasia Sitov",
             "time": "Di 9:00-10:30 & Mi 10:30-12:00",
             "freq": "2x 90 min",
@@ -132,8 +132,8 @@
           {
             "id": "de50_a2",
             "group": "Gruppe 1: Präsenz (Senioren-Fokus)",
-            "title": "Deutsch A2",
-            "level": "A2",
+            "title": "Deutsch Level 3",
+            "level": "A2 B1",
             "instructor": "Anastasia Sitov",
             "time": "Mo 10:30-12:00 & Mi 9:00-10:30",
             "freq": "2x 90 min",
@@ -534,15 +534,15 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "Deutsch A1.2",
+      "title": "Deutsch Level 2",
       "description": "Speziell für Lernende im besten Alter. Langsames Tempo, viel Wiederholung.",
-      "level": "A1.2",
+      "level": "A1 A2",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a1_2": {
-      "title": "Deutsch A2.1",
+      "title": "Deutsch Level 3",
       "description": "Aufbaukurs. Vertiefen Sie Grundlagen und Wortschatz.",
-      "level": "A2.1",
+      "level": "A2 B1",
       "location": "Freizeitheim Vahrenwald"
     },
     "de50_a2": {
@@ -582,9 +582,9 @@
       "location": "Microsoft Teams"
     },
     "de50_a1_1_replacement_2026_07": {
-      "title": "Deutsch A1.1",
+      "title": "Deutsch Level 1",
       "description": "Speziell für Lernende im besten Alter. Langsames Tempo, viel Wiederholung. Wir fangen komplett von vorne an!",
-      "level": "A1.1",
+      "level": "A0 A1",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {

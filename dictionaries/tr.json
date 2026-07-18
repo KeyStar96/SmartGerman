@@ -99,8 +99,8 @@
           {
             "id": "de50_a1_1",
             "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
-            "title": "Almanca A1.1",
-            "level": "A1.1",
+            "title": "Almanca Seviye 1",
+            "level": "A0 A1",
             "instructor": "Anastasia Sitov",
             "time": "Pzt 9:00-10:30 & Sal 10:30-12:00",
             "freq": "2x 90 dk",
@@ -114,8 +114,8 @@
           {
             "id": "de50_a1_2",
             "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
-            "title": "Almanca A1.2",
-            "level": "A1.2",
+            "title": "Almanca Seviye 2",
+            "level": "A1 A2",
             "instructor": "Anastasia Sitov",
             "time": "Sal 9:00-10:30 & Çar 10:30-12:00",
             "freq": "2x 90 dk",
@@ -129,8 +129,8 @@
           {
             "id": "de50_a2",
             "group": "Grup 1: Yüz Yüze (Kıdemli Odak)",
-            "title": "Almanca A2",
-            "level": "A2",
+            "title": "Almanca Seviye 3",
+            "level": "A2 B1",
             "instructor": "Anastasia Sitov",
             "time": "Pzt 10:30-12:00 & Çar 9:00-10:30",
             "freq": "2x 90 dk",
@@ -268,15 +268,15 @@
   },
   "CourseData": {
     "de50_a1_1": {
-      "title": "Almanca A1.2",
+      "title": "Almanca Seviye 2",
       "description": "yetişkin öğrenciler için özel. Yavaş tempo, rahat atmosfer.",
-      "level": "A1.2",
+      "level": "A1 A2",
       "location": "Yüz yüze"
     },
     "de50_a1_2": {
-      "title": "Almanca A2.1",
+      "title": "Almanca Seviye 3",
       "description": "Geliştirme kursu. Temellerin derinleştirilmesi.",
-      "level": "A2.1",
+      "level": "A2 B1",
       "location": "Yüz yüze"
     },
     "de50_a2": {
@@ -320,9 +320,9 @@
       "price_unit": "/ 90 Dak"
     },
     "de50_a1_1_replacement_2026_07": {
-      "title": "Almanca A1.1",
+      "title": "Almanca Seviye 1",
       "description": "Özellikle ileri yaşta öğrenenler için. Yavaş tempo, bol tekrar. Tamamen baştan başlıyoruz!",
-      "level": "A1.1",
+      "level": "A0 A1",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {
