@@ -554,15 +554,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         if (isTrialMode) setTrialDate("");
     }, [selectedCourseIds[0]]);
 
-    const availableCourses = React.useMemo(() => {
-        return (wizardData?.courses || [])
-            .filter(c => c.type === (wizard.courseType || "presence"))
-            .sort((a, b) => {
-                if (a.translationKey === 'private_lesson' && b.translationKey !== 'private_lesson') return 1;
-                if (b.translationKey === 'private_lesson' && a.translationKey !== 'private_lesson') return -1;
-                return 0;
-            });
-    }, [wizardData, wizard.courseType]);
+
 
     const trialDates = React.useMemo(() => {
         if (!trialCourse) return [];
@@ -641,7 +633,11 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     // Grouping Logic - MEMOIZED
     const { presenceCourses, onlineCourses, speechCourses } = React.useMemo(() => {
         const sourceData = courses || [];
-        const filteredData = isTrialMode ? sourceData.filter(c => c.trialLessons !== false) : sourceData;
+        const filteredData = (isTrialMode ? sourceData.filter(c => c.trialLessons !== false) : sourceData).sort((a, b) => {
+            if (a.translationKey === 'private_lesson' && b.translationKey !== 'private_lesson') return 1;
+            if (b.translationKey === 'private_lesson' && a.translationKey !== 'private_lesson') return -1;
+            return 0;
+        });
         return {
             presenceCourses: filteredData.filter(c => c.type === 'presence' && !c.id.includes('speech')),
             onlineCourses: filteredData.filter(c => c.type === 'online'),
