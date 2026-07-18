@@ -112,14 +112,21 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
     const dateFormatter = new Intl.DateTimeFormat(localeTag, { day: '2-digit', month: '2-digit', year: 'numeric' });
     const startPrefix = sectionData?.start_prefix || "Start";
 
-    return sourceData.filter((c) => {
-      if (c.type !== filter) return false;
-      if (c.endDate) {
-        const end = new Date(c.endDate);
-        if (end < today) return false;
-      }
-      return true;
-    }).map(course => {
+    return sourceData
+      .filter((c) => {
+        if (c.type !== filter) return false;
+        if (c.endDate) {
+          const end = new Date(c.endDate);
+          if (end < today) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (a.translationKey === 'private_lesson' && b.translationKey !== 'private_lesson') return 1;
+        if (b.translationKey === 'private_lesson' && a.translationKey !== 'private_lesson') return -1;
+        return 0;
+      })
+      .map((course) => {
       // Pre-calculate derived data here to keep props stable
       const sessions = course.sessions;
       const formattedSchedule = sessions.map((s) => {
@@ -292,10 +299,10 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
   return (
     <motion.div
       variants={cardVariants}
-      className={cn("group/card relative h-full flex flex-col rounded-3xl overflow-hidden backdrop-blur-md transition-all duration-500 ease-out hover:z-20 hover:-translate-y-2",
+      className={cn("group/card relative h-full flex flex-col rounded-3xl overflow-hidden backdrop-blur-md transition-all duration-500 ease-out hover:z-20 hover:-translate-y-2 border",
         isPrivate
-          ? "bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50 hover:border-amber-400 dark:hover:border-amber-700 shadow-[0_8px_30px_rgb(251,191,36,0.1)]"
-          : "bg-white/60 dark:bg-[#1a1a1a]/60 border border-white/40 dark:border-white/10 hover:border-white/80 dark:hover:border-white/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
+          ? "bg-gradient-to-br from-rose-500/5 via-purple-500/5 to-cyan-500/5 dark:from-rose-500/10 dark:via-purple-500/10 dark:to-cyan-500/10 border-purple-200/50 dark:border-purple-500/30 hover:border-purple-300 dark:hover:border-purple-400 shadow-[0_8px_30px_rgba(168,85,247,0.1)] before:absolute before:inset-0 before:-z-10 before:bg-gradient-to-br before:from-pink-500/10 before:via-purple-500/10 before:to-indigo-500/10 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-700"
+          : "bg-white/60 dark:bg-[#1a1a1a]/60 border-white/40 dark:border-white/10 hover:border-white/80 dark:hover:border-white/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
       )}
     >
       {/* Ambient hover glow inside card (Premium Mouse Tracking) */}

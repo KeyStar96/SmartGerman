@@ -228,7 +228,7 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
                 selected
                     ? "border-[#FF5C00] shadow-sm bg-orange-50/80 dark:bg-[#FF5C00]/20"
                     : isPrivate
-                        ? "border-amber-200 dark:border-amber-900/50 bg-amber-50/60 dark:bg-amber-950/20 hover:border-amber-400 dark:hover:border-amber-700 shadow-[0_8px_30px_rgb(251,191,36,0.1)] hover:shadow-xl"
+                        ? "bg-gradient-to-br from-rose-500/5 via-purple-500/5 to-cyan-500/5 dark:from-rose-500/10 dark:via-purple-500/10 dark:to-cyan-500/10 border-purple-200/50 dark:border-purple-500/30 hover:border-purple-300 dark:hover:border-purple-400 shadow-[0_8px_30px_rgba(168,85,247,0.1)] before:absolute before:inset-0 before:-z-10 before:bg-gradient-to-br before:from-pink-500/10 before:via-purple-500/10 before:to-indigo-500/10 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-700"
                         : "bg-white/60 dark:bg-[#1a1a1a]/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] border-white/40 dark:border-white/10 hover:border-white/80 dark:hover:border-white/30 hover:shadow-xl"
             )}
         >
@@ -553,6 +553,16 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
     useEffect(() => {
         if (isTrialMode) setTrialDate("");
     }, [selectedCourseIds[0]]);
+
+    const availableCourses = React.useMemo(() => {
+        return (wizardData?.courses || [])
+            .filter(c => c.type === (wizard.courseType || "presence"))
+            .sort((a, b) => {
+                if (a.translationKey === 'private_lesson' && b.translationKey !== 'private_lesson') return 1;
+                if (b.translationKey === 'private_lesson' && a.translationKey !== 'private_lesson') return -1;
+                return 0;
+            });
+    }, [wizardData, wizard.courseType]);
 
     const trialDates = React.useMemo(() => {
         if (!trialCourse) return [];
