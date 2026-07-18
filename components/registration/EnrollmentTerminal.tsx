@@ -707,7 +707,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
         // Note: For the CARD DISPLAY, user wants "Price per Unit".
         // The Monthly Total is calculated separately in `totalMonthlyPrice`.
         return {
-            title: c.title || dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.translationKey,
+            title: dictionary?.CourseData?.[c.translationKey]?.title || dictionary?.CourseData?.[c.id.replace('c_', '')]?.title || c.title || c.translationKey,
             priceFormatted: isTrialMode ? (trialT?.price_label || "Kostenlos") : new Intl.NumberFormat(lang === 'en' ? 'de-DE' : 'de-DE', { style: 'currency', currency: 'EUR' }).format(c.price),
             level: dictionary?.CourseData?.[c.translationKey]?.level,
             dictionary // Pass dictionary down
