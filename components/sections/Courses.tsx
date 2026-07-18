@@ -226,14 +226,14 @@ export default function Courses({ dictionary, courses }: CoursesProps) {
               className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pl-px pt-px"
             >
               {displayedCourses.map((courseConfig) => {
-                const dictTextData = courseTexts[courseConfig.translationKey];
+                const dictTextData = courseTexts?.[courseConfig.translationKey] || courseTexts?.[courseConfig.id.replace('c_', '')];
                 // Fallback struct so we don't break if neither exists (though we shouldn't render null entirely if possible)
                 if (!dictTextData && !courseConfig.title) return null;
 
                 // Merge the dictionary text data with the dynamic title
                 const textData = {
                   ...(dictTextData || {}),
-                  title: courseConfig.title || dictTextData?.title || courseConfig.translationKey,
+                  title: dictTextData?.title || courseConfig.title || courseConfig.translationKey,
                 } as CourseText;
 
                 return (
