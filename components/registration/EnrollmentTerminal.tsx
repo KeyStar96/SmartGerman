@@ -639,8 +639,8 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             return 0;
         });
         return {
-            presenceCourses: filteredData.filter(c => (c.type === 'presence' || c.translationKey === 'private_lesson') && !c.id.includes('speech')),
-            onlineCourses: filteredData.filter(c => c.type === 'online' || c.translationKey === 'private_lesson'),
+            presenceCourses: filteredData.filter(c => c.type === 'presence' && !c.id.includes('speech')),
+            onlineCourses: filteredData.filter(c => c.type === 'online'),
             speechCourses: filteredData.filter(c => c.id.includes('speech'))
         };
     }, [courses, isTrialMode]);
