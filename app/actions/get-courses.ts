@@ -30,7 +30,7 @@ export const getCourses = unstable_cache(
                 title: record.title,
                 type: record.type as CourseType,
                 price: Number(record.price),
-                sessions: record.sessions as CourseSession[],
+                sessions: (typeof record.sessions === 'string' ? JSON.parse(record.sessions) : record.sessions) as CourseSession[],
                 instructor: record.instructor as InstructorKey,
                 unitDuration: record.unit_duration,
                 startDate: record.start_date,
@@ -80,6 +80,6 @@ export const getCourses = unstable_cache(
             return [];
         }
     },
-    ['courses_v2'],        // cache key
+    ['courses_v3'],        // cache key
     { revalidate: 3600 }   // 1 hour
 );
