@@ -359,7 +359,7 @@ const CourseCard = React.memo(({ config, text, formattedSchedule, formattedPrice
 
             <h3 className={`
                   font-sans font-extrabold tracking-tight
-                  text-4xl md:text-5xl leading-[0.9]
+                  text-2xl xl:text-3xl leading-[1.1]
                   text-[#111111] dark:text-[#E2D7CE]
                 `}>
               {text.title}

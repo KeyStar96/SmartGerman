@@ -255,7 +255,7 @@ const CourseRow = React.memo(({ course, selected, onToggle, title, priceFormatte
                         <div className="flex flex-col gap-1 md:gap-2">
                             {/* Title */}
                             <span className={cn(
-                                "font-sans text-lg md:text-xl font-bold tracking-tight transition-colors md:w-[280px] break-words md:truncate pr-2",
+                                "font-sans text-base md:text-lg font-bold tracking-tight transition-colors md:w-[280px] break-words md:truncate pr-2",
                                 selected ? "text-[#FF5C00]" : "text-[#111111] dark:text-[#E2D7CE]"
                             )}>
                                 {title}
