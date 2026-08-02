@@ -8,7 +8,7 @@ import Header from "@/components/layout/Header";
 // Dynamic Imports for below-the-fold components
 const GoogleReviews = dynamic(() => import("@/components/sections/GoogleReviews"));
 const ScienceSection = dynamic(() => import("@/components/sections/ScienceSection"));
-const WhyUsHorizontal = dynamic(() => import("@/components/sections/WhyUsHorizontal"));
+const WhyUsBento = dynamic(() => import("@/components/sections/WhyUsBento"));
 const AboutContainer = dynamic(() => import("@/components/sections/About/AboutContainer"));
 const CourseDataWrapper = dynamic(() => import("@/components/sections/CourseDataWrapper"));
 const LocationSection = dynamic(() => import("@/components/sections/Location/LocationSection").then(mod => mod.LocationSection));
@@ -187,7 +187,7 @@ export default async function HomePage({
           <GoogleReviews title={dictionary.reviews_title || "Erfahrungen unserer Schüler"} dictionary={dictionary} />
           <ScienceSection dictionary={dictionary} />
           <AboutContainer dictionary={dictionary} />
-          <WhyUsHorizontal dictionary={dictionary} />
+          <WhyUsBento dictionary={dictionary} />
           <Suspense fallback={<div className="h-[50vh] flex items-center justify-center text-white/50 animate-pulse">Lade Kurse...</div>}>
             <CourseDataWrapper dictionary={dictionary} />
           </Suspense>
