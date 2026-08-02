@@ -301,12 +301,12 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
         className={cn(
           "block flex items-center justify-center",
           "relative px-3 py-1.5 rounded-full overflow-hidden",
-          "border border-white/10",
-          "shadow-lg shadow-black/20",
+          "border border-black/5 dark:border-white/10",
+          "bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md",
+          "shadow-lg shadow-black/5 dark:shadow-black/20",
           "transition-transform duration-300 hover:scale-105 group"
         )}
       >
-        <div className="absolute inset-0 bg-[#010101] z-0" />
         <div className="relative z-10">
           <LogoImage />
         </div>
@@ -317,14 +317,24 @@ function LogoSection({ lang, scrollY }: { lang: string, scrollY: any }) {
 
 function LogoImage() {
   return (
-    <Image
-      src="/Bilder/sitov-logo.jpg"
-      alt="Sitov Language Academy Logo"
-      width={240}
-      height={48}
-      className="h-8 md:h-9 w-auto object-contain scale-95 mix-blend-screen"
-      priority
-    />
+    <>
+      <Image
+        src="/Bilder/SG_Logo_Lightmode.png"
+        alt="SmartGerman Logo"
+        width={240}
+        height={48}
+        className="h-8 md:h-9 w-auto object-contain scale-95 dark:hidden"
+        priority
+      />
+      <Image
+        src="/Bilder/SG_Logo_Darkmode3.png"
+        alt="SmartGerman Logo"
+        width={240}
+        height={48}
+        className="h-8 md:h-9 w-auto object-contain scale-95 hidden dark:block"
+        priority
+      />
+    </>
   );
 }
 
@@ -413,11 +423,11 @@ function MobileFloatingDeck({ lang, isHidden, isMenuOpen, toggleMenu, dictionary
         className={cn(
           "relative h-11 min-w-[80px] px-4 w-auto flex items-center justify-center rounded-full",
           "border border-black/5 dark:border-white/10",
+          "bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md",
           "shadow-xl shadow-black/10 dark:shadow-black/30",
           "overflow-hidden"
         )}
       >
-        <div className="absolute inset-0 bg-[#010101] z-0" />
         <Link href={`/${lang}`} className="relative z-10 block h-8 w-auto">
           {/* Small Logo Icon for Mobile - utilizing LogoImage but maybe we want just the icon? 
                  LogoImage is full text. Let's use LogoImage for now, might be small. 

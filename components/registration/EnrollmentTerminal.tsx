@@ -1109,14 +1109,22 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         <Link href={`/${lang}`} className={cn("text-[10px] uppercase tracking-[0.2em] text-gray-600 dark:text-gray-400 hover:text-[#FF5C00] transition-colors flex items-center gap-2", monoClassName)}>
                             <ChevronLeft size={14} /> {t?.back_home || "Back"}
                         </Link>
-                        <div className="bg-[#010101] px-3 py-1.5 md:px-4 md:py-1.5 rounded-full border border-white/10 shadow-lg flex items-center justify-center overflow-hidden">
+                        <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-1.5 rounded-full border border-black/5 dark:border-white/10 shadow-lg flex items-center justify-center overflow-hidden">
                             <Image
-                                src="/Bilder/sitov-logo.jpg"
-                                alt="Sitov Language Academy"
+                                src="/Bilder/SG_Logo_Lightmode.png"
+                                alt="SmartGerman"
                                 width={240}
                                 height={48}
                                 priority
-                                className="object-contain w-auto h-7 md:h-9 scale-95 mix-blend-screen"
+                                className="object-contain w-auto h-7 md:h-9 scale-95 dark:hidden"
+                            />
+                            <Image
+                                src="/Bilder/SG_Logo_Darkmode3.png"
+                                alt="SmartGerman"
+                                width={240}
+                                height={48}
+                                priority
+                                className="object-contain w-auto h-7 md:h-9 scale-95 hidden dark:block"
                             />
                         </div>
                     </div>
