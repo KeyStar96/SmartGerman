@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import nodemailer from 'nodemailer'
 
 export async function submitAudioUrl(url: string) {
   const supabase = await createClient()
@@ -112,6 +113,52 @@ export async function submitTeacherFeedback(submissionId: string, feedbackText: 
   if (updateError) {
     console.error('Error updating submission status:', updateError)
     return { success: false, error: updateError.message }
+  }
+
+  // Fetch student email to send notification
+  const { data: submissionData } = await supabase
+    .from('submissions')
+    .select('user_id, profiles:user_id(email, name)')
+    .eq('id', submissionId)
+    .single()
+
+  const profiles = submissionData?.profiles as any
+  const studentEmail = profiles?.email
+  const studentName = profiles?.name || 'Schüler'
+
+  if (studentEmail && process.env.SMTP_HOST) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      })
+
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      const dashUrl = `${siteUrl}/de/dashboard/pronunciation`
+
+      await transporter.sendMail({
+        from: `"Sitov Language Academy" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+        to: studentEmail,
+        subject: 'Neues Feedback zu deiner Sprachaufnahme verfügbar! 🎙️',
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #FF5C00;">Hallo ${studentName},</h2>
+            <p>Deine Lehrkraft hat soeben eine neue Auswertung (Text/Audio) zu deiner Sprachaufnahme hinterlegt.</p>
+            <p>Höre dir jetzt das Feedback an und verbessere deine Aussprache weiter!</p>
+            <a href="${dashUrl}" style="display: inline-block; background-color: #FF5C00; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px;">
+              Jetzt Feedback ansehen
+            </a>
+          </div>
+        `
+      })
+    } catch (emailErr) {
+      console.error('Error sending email notification:', emailErr)
+    }
   }
 
   revalidatePath('/[lang]/admin/submissions', 'page')

@@ -5,6 +5,7 @@ import { submitTeacherFeedback } from '@/app/actions/feedback'
 import { Clock, CheckCircle2, Send, Loader2, User, Mic } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import PendingSubmissionCard from './PendingSubmissionCard'
+import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
 
 type Submission = {
   id: string;
@@ -140,7 +141,7 @@ export default function SubmissionsDashboard({
                     </div>
                     
                     <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
-                      <audio src={sub.content_url} controls className="w-full h-10" />
+                      <SpeedAudioPlayer src={sub.content_url} className="w-full h-10" />
                     </div>
                   </div>
 
@@ -157,7 +158,7 @@ export default function SubmissionsDashboard({
                           <div className="flex items-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-2">
                             <Mic size={16} /> Sprachnachricht
                           </div>
-                          <audio src={sub.teacher_feedback[0].feedback_audio_url} controls className="w-full h-8" />
+                          <SpeedAudioPlayer src={sub.teacher_feedback[0].feedback_audio_url} className="w-full h-8" />
                         </div>
                       )}
                     </div>

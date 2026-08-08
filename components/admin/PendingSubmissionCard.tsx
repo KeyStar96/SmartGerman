@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import { User, Mic, Square, Play, Trash2, Send, Loader2 } from 'lucide-react'
+import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
 
 type PendingSubmissionCardProps = {
   sub: any;
@@ -86,7 +87,7 @@ export default function PendingSubmissionCard({ sub, onSubmit }: PendingSubmissi
           
           <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Audio-Aufnahme</p>
-            <audio src={sub.content_url} controls className="w-full h-12" />
+            <SpeedAudioPlayer src={sub.content_url} className="w-full h-12" />
           </div>
         </div>
 
@@ -137,8 +138,8 @@ export default function PendingSubmissionCard({ sub, onSubmit }: PendingSubmissi
             )}
 
             {audioUrl && !isRecording && (
-              <div className="flex items-center gap-3">
-                <audio src={audioUrl} controls className="flex-1 h-10" />
+              <div className="flex items-center gap-3 mt-4">
+                <SpeedAudioPlayer src={audioUrl} className="flex-1 h-10" />
                 <button
                   onClick={deleteRecording}
                   className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"

@@ -1,6 +1,7 @@
 import { getStudentSubmissions } from '@/app/actions/feedback'
 import AudioRecorder from '@/components/audio/AudioRecorder'
 import { Clock, CheckCircle2, MessageSquare, Mic } from 'lucide-react'
+import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
 
 export default async function PronunciationDashboard() {
   const submissions = await getStudentSubmissions()
@@ -52,7 +53,7 @@ export default async function PronunciationDashboard() {
 
                 <div className="mb-6">
                   <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Deine Aufnahme</p>
-                  <audio src={sub.content_url} controls className="w-full max-w-md h-12" />
+                  <SpeedAudioPlayer src={sub.content_url} className="w-full max-w-md h-12" />
                 </div>
 
                 {sub.status === 'reviewed' && sub.teacher_feedback && sub.teacher_feedback.length > 0 && (
@@ -70,7 +71,7 @@ export default async function PronunciationDashboard() {
                         <div className="flex items-center gap-2 text-sm font-bold text-[#FF5C00] mb-2">
                           <Mic size={18} /> Sprachnachricht
                         </div>
-                        <audio src={sub.teacher_feedback[0].feedback_audio_url} controls className="w-full max-w-md h-10" />
+                        <SpeedAudioPlayer src={sub.teacher_feedback[0].feedback_audio_url} className="w-full max-w-md h-10" />
                       </div>
                     )}
                   </div>
