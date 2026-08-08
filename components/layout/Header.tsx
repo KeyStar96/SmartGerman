@@ -399,6 +399,12 @@ function ActionButtons({ lang, dictionary, isHidden }: any) {
 
       {/* CTA */}
       <Link
+        href={`/${lang}/dashboard`}
+        className="border border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 text-foreground px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-transform hover:scale-105"
+      >
+        Plattform
+      </Link>
+      <Link
         href={`/${lang}/registration`}
         className="bg-primary-orange hover:bg-primary-orange/90 text-white px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-transform hover:scale-105 shadow-lg shadow-orange-500/20"
       >
@@ -557,16 +563,28 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
             transition={{ delay: 0.5, duration: 0.6 }}
             className="flex flex-col items-center gap-8 relative z-10 w-full max-w-sm mx-auto"
           >
-            <Link
-              href={`/${lang}/registration`}
-              onClick={onClose}
-              className="group relative w-full overflow-hidden rounded-full p-[1px] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-[#FF5C00] to-orange-400 opacity-100 transition-opacity duration-300" />
-              <div className="relative flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#FF5C00] to-orange-500 px-8 py-4">
-                <span className="text-sm font-bold uppercase tracking-widest text-white">{dictionary.header.nav.enroll}</span>
-              </div>
-            </Link>
+            <div className="w-full flex flex-col gap-4">
+              <Link
+                href={`/${lang}/dashboard`}
+                onClick={onClose}
+                className="group relative w-full overflow-hidden rounded-full p-[1px] transition-transform hover:scale-[1.02] active:scale-[0.98] border border-black/10 dark:border-white/20"
+              >
+                <div className="relative flex w-full items-center justify-center gap-2 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur-md px-8 py-4">
+                  <span className="text-sm font-bold uppercase tracking-widest text-foreground">Lernplattform</span>
+                </div>
+              </Link>
+              
+              <Link
+                href={`/${lang}/registration`}
+                onClick={onClose}
+                className="group relative w-full overflow-hidden rounded-full p-[1px] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-[#FF5C00] to-orange-400 opacity-100 transition-opacity duration-300" />
+                <div className="relative flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#FF5C00] to-orange-500 px-8 py-4">
+                  <span className="text-sm font-bold uppercase tracking-widest text-white">{dictionary.header.nav.enroll}</span>
+                </div>
+              </Link>
+            </div>
 
             {/* Settings Zone in Menu (Sleek Capsule) */}
             <div className="flex items-center justify-center gap-6 px-6 py-3 rounded-full border border-black/5 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-md shadow-sm">
