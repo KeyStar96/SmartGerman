@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { updateSession } from './utils/supabase/middleware'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const searchParams = request.nextUrl.searchParams
+
+  // 1. Supabase Session aktualisieren
+  const { supabaseResponse, user } = await updateSession(request)
 
   // Legacy-Redirect: alte .html-Seiten → neue Pfade (permanenter 301-Redirect)
   if (pathname === '/AGB.html') {
@@ -30,7 +34,8 @@ export function middleware(request: NextRequest) {
   }
 
   // Überprüfen, ob die URL bereits mit einer Sprache beginnt
-  const pathnameIsMissingLocale = ['/de', '/en', '/uk', '/ru', '/tr'].every(
+  const locales = ['/de', '/en', '/uk', '/ru', '/tr']
+  const pathnameIsMissingLocale = locales.every(
     (locale) => !pathname.startsWith(`${locale}/`) && pathname !== locale
   )
 
@@ -41,6 +46,28 @@ export function middleware(request: NextRequest) {
       { status: 301 }
     )
   }
+
+  // Sprache aus dem aktuellen Pfad extrahieren
+  const currentLocale = locales.find(locale => pathname.startsWith(`${locale}/`) || pathname === locale) || '/de'
+
+  // Routenschutz (Auth)
+  const isProtectedPath = pathname.includes('/dashboard') || pathname.includes('/premium')
+  const isAuthPath = pathname.includes('/login') || pathname.includes('/register')
+
+  if (isProtectedPath && !user) {
+    // Nicht eingeloggt auf geschützte Seite -> Login
+    return NextResponse.redirect(new URL(`${currentLocale}/login`, request.url))
+  }
+
+  if (isAuthPath && user) {
+    // Eingeloggt auf Login/Register Seite -> Dashboard
+    return NextResponse.redirect(new URL(`${currentLocale}/dashboard`, request.url))
+  }
+
+  // Cookies und Header aus dem supabaseResponse in die aktuelle Response übernehmen, 
+  // falls wir nicht redirecten (dann geben wir supabaseResponse direkt zurück).
+  // Es ist einfacher, einfach supabaseResponse zurückzugeben.
+  return supabaseResponse
 }
 
 export const config = {
@@ -56,4 +83,3 @@ export const config = {
     '/((?!api|_next|Bilder|public|favicon.ico|sitemap.xml|robots.txt|google236d470275910d3c.html).*)',
   ],
 }
-
