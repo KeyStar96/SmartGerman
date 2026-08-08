@@ -3,10 +3,10 @@ import { unstable_cache } from 'next/cache';
 import { CourseConfig, CourseSession, CourseType, InstructorKey } from '@/lib/course-config';
 
 // ─── Stateless Supabase client (no cookies → enables static rendering) ───
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ─── Cached data-fetch (revalidates every hour) ───
 export const getCourses = unstable_cache(

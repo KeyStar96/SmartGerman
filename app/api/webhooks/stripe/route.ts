@@ -3,13 +3,12 @@ import { stripe } from '@/utils/stripe/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-// Wir brauchen den Service Role Key, da der Webhook ohne User-Session (Authentication) kommt
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(req: Request) {
+  // Wir brauchen den Service Role Key, da der Webhook ohne User-Session (Authentication) kommt
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
+  const supabaseAdmin = createClient(supabaseUrl, supabaseKey)
+
   const body = await req.text()
   const signature = req.headers.get('Stripe-Signature') as string
 

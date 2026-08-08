@@ -113,6 +113,37 @@ export async function submitTeacherFeedback(submissionId: string, feedbackText: 
     return { success: false, error: updateError.message }
   }
 
-  revalidatePath('/[lang]/admin/feedback', 'page')
+  revalidatePath('/[lang]/admin/submissions', 'page')
   return { success: true }
+}
+
+export async function getCompletedSubmissions() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return []
+
+  const { data, error } = await supabase
+    .from('submissions')
+    .select(`
+      *,
+      profiles:user_id (
+        name,
+        email,
+        native_language
+      ),
+      teacher_feedback (
+        feedback_text,
+        created_at
+      )
+    `)
+    .eq('status', 'reviewed')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching completed submissions:', error)
+    return []
+  }
+
+  return data
 }
