@@ -17,6 +17,7 @@ export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const isUploadingRef = useRef(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   
   const mediaRecorder = useRef<MediaRecorder | null>(null)
@@ -33,7 +34,8 @@ export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted
       }
 
       mediaRecorder.current.onstop = () => {
-        const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' })
+        const mimeType = mediaRecorder.current?.mimeType || 'audio/webm'
+        const audioBlob = new Blob(audioChunks.current, { type: mimeType })
         const url = URL.createObjectURL(audioBlob)
         setAudioUrl(url)
         setAudioBlob(audioBlob)
@@ -66,7 +68,8 @@ export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted
   }
 
   const uploadAndSubmit = async () => {
-    if (!audioBlob) return
+    if (!audioBlob || isUploadingRef.current) return
+    isUploadingRef.current = true
     setIsUploading(true)
 
     try {
@@ -74,11 +77,12 @@ export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not logged in')
 
-      const fileName = `${user.id}-${Date.now()}.webm`
+      const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm'
+      const fileName = `${user.id}-${Date.now()}.${ext}`
       
       const { data, error } = await supabase.storage
         .from('audio_submissions')
-        .upload(fileName, audioBlob, { contentType: 'audio/webm' })
+        .upload(fileName, audioBlob, { contentType: audioBlob.type })
 
       if (error) throw error
 
@@ -97,6 +101,7 @@ export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted
       console.error('Upload error:', err)
       alert('Es gab einen Fehler beim Hochladen. Bitte versuche es erneut.')
     } finally {
+      isUploadingRef.current = false
       setIsUploading(false)
     }
   }

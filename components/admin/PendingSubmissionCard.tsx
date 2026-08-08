@@ -31,7 +31,8 @@ export default function PendingSubmissionCard({ sub, onSubmit }: PendingSubmissi
       }
 
       mediaRecorder.current.onstop = () => {
-        const blob = new Blob(audioChunks.current, { type: 'audio/webm' })
+        const mimeType = mediaRecorder.current?.mimeType || 'audio/webm'
+        const blob = new Blob(audioChunks.current, { type: mimeType })
         const url = URL.createObjectURL(blob)
         setAudioUrl(url)
         setAudioBlob(blob)

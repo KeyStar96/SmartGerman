@@ -51,11 +51,12 @@ export default function SubmissionsDashboard({
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) throw new Error('Not logged in')
 
-        const fileName = `feedback/${id}_${Date.now()}.webm`
+        const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm'
+        const fileName = `feedback/${id}_${Date.now()}.${ext}`
         
         const { data, error } = await supabase.storage
           .from('audio_submissions')
-          .upload(fileName, audioBlob, { contentType: 'audio/webm' })
+          .upload(fileName, audioBlob, { contentType: audioBlob.type })
 
         if (error) throw error
 
