@@ -94,9 +94,9 @@ export default function AudioRecorder() {
   }
 
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-md ring-1 ring-gray-900/5 text-center">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Deine Aussprache üben</h2>
-      <p className="text-lg text-gray-600 mb-8">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-md border border-slate-200 dark:border-slate-800 text-center transition-colors">
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Deine Aussprache üben</h2>
+      <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
         Nimm dich selbst auf, höre es dir an und reiche es zur Korrektur ein.
       </p>
 
@@ -107,7 +107,7 @@ export default function AudioRecorder() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500"></span>
           </span>
-          <span className="text-xl font-bold text-red-600">Aufnahme läuft...</span>
+          <span className="text-xl font-bold text-red-600 dark:text-red-400">Aufnahme läuft...</span>
         </div>
       )}
 
@@ -116,14 +116,14 @@ export default function AudioRecorder() {
         {!isRecording ? (
           <button 
             onClick={startRecording}
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-red-600 text-white text-xl font-bold shadow-lg hover:bg-red-500 transition-all"
+            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-[#FF5C00] text-white text-xl font-bold shadow-lg hover:bg-[#e05200] transition-all"
           >
             <Mic size={28} /> {audioUrl ? 'Neu aufnehmen' : 'Aufnahme starten'}
           </button>
         ) : (
           <button 
             onClick={stopRecording}
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-gray-900 text-white text-xl font-bold shadow-lg hover:bg-gray-800 transition-all"
+            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-slate-900 dark:bg-slate-700 text-white text-xl font-bold shadow-lg hover:bg-slate-800 dark:hover:bg-slate-600 transition-all"
           >
             <Square size={28} /> Stoppen
           </button>
@@ -132,7 +132,7 @@ export default function AudioRecorder() {
         {audioUrl && !isRecording && (
           <button 
             onClick={playAudio}
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-blue-100 text-blue-700 text-xl font-bold hover:bg-blue-200 transition-all"
+            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
           >
             <Play size={28} /> Anhören
           </button>
@@ -141,17 +141,17 @@ export default function AudioRecorder() {
 
       {/* Submit */}
       {audioUrl && !isRecording && (
-        <div className="border-t pt-8 mt-4">
+        <div className="border-t border-slate-200 dark:border-slate-800 pt-8 mt-4">
           {isSubmitted ? (
-             <div className="bg-green-50 border border-green-200 p-6 rounded-xl inline-flex items-center gap-4">
-               <CheckCircle2 className="w-8 h-8 text-green-600" />
-               <span className="text-xl font-bold text-green-800">Erfolgreich abgegeben!</span>
+             <div className="bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-6 rounded-xl inline-flex items-center gap-4">
+               <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+               <span className="text-xl font-bold text-emerald-800 dark:text-emerald-300">Erfolgreich abgegeben!</span>
              </div>
           ) : (
              <button 
                 onClick={uploadAndSubmit}
                 disabled={isUploading}
-                className="flex items-center justify-center gap-3 w-full sm:w-auto mx-auto px-10 py-6 rounded-2xl bg-green-600 text-white text-2xl font-bold shadow-xl hover:bg-green-500 hover:shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-3 w-full sm:w-auto mx-auto px-10 py-6 rounded-2xl bg-emerald-600 text-white text-2xl font-bold shadow-xl hover:bg-emerald-500 hover:shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
              >
                 {isUploading ? <Loader2 className="animate-spin" size={32} /> : <UploadCloud size={32} />}
                 Zur Korrektur einreichen
