@@ -1,7 +1,8 @@
 import { getStudentSubmissions } from '@/app/actions/feedback'
 import AudioRecorder from '@/components/audio/AudioRecorder'
-import { Clock, CheckCircle2, MessageSquare, Mic } from 'lucide-react'
+import { Clock, CheckCircle2, MessageSquare, Mic, RotateCcw } from 'lucide-react'
 import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
+import ResubmissionRecorder from '@/components/audio/ResubmissionRecorder'
 
 export default async function PronunciationDashboard() {
   const submissions = await getStudentSubmissions()
@@ -40,15 +41,22 @@ export default async function PronunciationDashboard() {
                     </span>
                   </div>
                   
-                  {sub.status === 'pending' ? (
-                    <span className="inline-flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 px-4 py-2 rounded-full font-bold">
-                      <Clock size={18} /> In Bearbeitung
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 px-4 py-2 rounded-full font-bold">
-                      <CheckCircle2 size={18} /> Feedback erhalten
-                    </span>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {sub.attempt_number > 1 && (
+                      <span className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-bold">
+                        <RotateCcw size={14} /> Versuch {sub.attempt_number}
+                      </span>
+                    )}
+                    {sub.status === 'pending' ? (
+                      <span className="inline-flex items-center gap-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 px-4 py-2 rounded-full font-bold">
+                        <Clock size={18} /> In Bearbeitung
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 px-4 py-2 rounded-full font-bold">
+                        <CheckCircle2 size={18} /> Feedback erhalten
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mb-6">
@@ -75,6 +83,10 @@ export default async function PronunciationDashboard() {
                       </div>
                     )}
                   </div>
+                )}
+
+                {sub.status === 'reviewed' && (!sub.children || sub.children.length === 0) && (
+                  <ResubmissionRecorder parentId={sub.id} currentAttempt={sub.attempt_number || 1} />
                 )}
               </div>
             ))}

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from 'react'
-import { User, Mic, Square, Play, Trash2, Send, Loader2 } from 'lucide-react'
+import { User, Mic, Square, Play, Trash2, Send, Loader2, RotateCcw } from 'lucide-react'
 import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
 
 type PendingSubmissionCardProps = {
@@ -71,22 +71,48 @@ export default function PendingSubmissionCard({ sub, onSubmit }: PendingSubmissi
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left: Info & Audio */}
         <div className="flex-1 space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
-              <User className="h-6 w-6 text-slate-500 dark:text-slate-400" />
-            </div>
-            <div>
-              <h4 className="text-lg font-bold text-slate-900 dark:text-white">{sub.profiles?.name || 'Unbekannter Schüler'}</h4>
-              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                <span>{sub.profiles?.native_language || 'Keine Sprache angegeben'}</span>
-                <span>•</span>
-                <span>{new Date(sub.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                <User className="h-6 w-6 text-slate-500 dark:text-slate-400" />
+              </div>
+              <div>
+                <h4 className="text-lg font-bold text-slate-900 dark:text-white">{sub.profiles?.name || 'Unbekannter Schüler'}</h4>
+                <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                  <span>{sub.profiles?.native_language || 'Keine Sprache angegeben'}</span>
+                  <span>•</span>
+                  <span>{new Date(sub.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
               </div>
             </div>
+            {sub.attempt_number > 1 && (
+              <span className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-bold shrink-0">
+                <RotateCcw size={14} /> {sub.attempt_number}. Versuch
+              </span>
+            )}
           </div>
           
+          {sub.parent && (
+            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 opacity-75">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Vorheriger Versuch (V1)</p>
+              <SpeedAudioPlayer src={sub.parent.content_url} className="w-full h-10 mb-3" />
+              
+              {sub.parent.teacher_feedback && sub.parent.teacher_feedback.length > 0 && (
+                <div className="bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Dein bisheriges Feedback:</p>
+                  {sub.parent.teacher_feedback[0].feedback_text && (
+                    <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">{sub.parent.teacher_feedback[0].feedback_text}</p>
+                  )}
+                  {sub.parent.teacher_feedback[0].feedback_audio_url && (
+                    <SpeedAudioPlayer src={sub.parent.teacher_feedback[0].feedback_audio_url} className="w-full h-8" />
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Audio-Aufnahme</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Aktuelle Aufnahme {sub.attempt_number > 1 ? `(V${sub.attempt_number})` : ''}</p>
             <SpeedAudioPlayer src={sub.content_url} className="w-full h-12" />
           </div>
         </div>

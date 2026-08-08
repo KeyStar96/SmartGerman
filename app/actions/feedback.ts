@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import nodemailer from 'nodemailer'
 
-export async function submitAudioUrl(url: string) {
+export async function submitAudioUrl(url: string, parentId?: string, attemptNumber: number = 1) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -16,7 +16,9 @@ export async function submitAudioUrl(url: string) {
       user_id: user.id,
       type: 'audio',
       content_url: url,
-      status: 'pending'
+      status: 'pending',
+      parent_id: parentId || null,
+      attempt_number: attemptNumber
     })
 
   if (error) {
@@ -42,7 +44,8 @@ export async function getStudentSubmissions() {
         feedback_text,
         feedback_audio_url,
         created_at
-      )
+      ),
+      children:submissions!parent_id(id)
     `)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -70,6 +73,10 @@ export async function getPendingSubmissions() {
         name,
         email,
         native_language
+      ),
+      parent:parent_id (
+        *,
+        teacher_feedback (*)
       )
     `)
     .eq('status', 'pending')
@@ -184,6 +191,10 @@ export async function getCompletedSubmissions() {
         feedback_text,
         feedback_audio_url,
         created_at
+      ),
+      parent:parent_id (
+        *,
+        teacher_feedback (*)
       )
     `)
     .eq('status', 'reviewed')

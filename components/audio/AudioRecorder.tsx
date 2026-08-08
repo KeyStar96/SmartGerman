@@ -5,7 +5,14 @@ import { createClient } from '@/utils/supabase/client'
 import { submitAudioUrl } from '@/app/actions/feedback'
 import { Mic, Square, Play, UploadCloud, Loader2, CheckCircle2 } from 'lucide-react'
 
-export default function AudioRecorder() {
+type AudioRecorderProps = {
+  parentId?: string;
+  attemptNumber?: number;
+  onSubmitted?: () => void;
+  compact?: boolean;
+}
+
+export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted, compact = false }: AudioRecorderProps = {}) {
   const [isRecording, setIsRecording] = useState(false)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
@@ -79,9 +86,10 @@ export default function AudioRecorder() {
         .from('audio_submissions')
         .getPublicUrl(fileName)
 
-      const result = await submitAudioUrl(publicUrlData.publicUrl)
+      const result = await submitAudioUrl(publicUrlData.publicUrl, parentId, attemptNumber)
       if (result.success) {
         setIsSubmitted(true)
+        if (onSubmitted) onSubmitted()
       } else {
          throw new Error(result.error)
       }
@@ -94,11 +102,15 @@ export default function AudioRecorder() {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-md border border-slate-200 dark:border-slate-800 text-center transition-colors">
-      <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Deine Aussprache üben</h2>
-      <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
-        Nimm dich selbst auf, höre es dir an und reiche es zur Korrektur ein.
-      </p>
+    <div className={`bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-md border border-slate-200 dark:border-slate-800 text-center transition-colors ${compact ? 'p-6 shadow-none' : ''}`}>
+      {!compact && (
+        <>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Deine Aussprache üben</h2>
+          <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
+            Nimm dich selbst auf, höre es dir an und reiche es zur Korrektur ein.
+          </p>
+        </>
+      )}
 
       {/* Recording Indicator */}
       {isRecording && (

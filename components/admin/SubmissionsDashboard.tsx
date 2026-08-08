@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { submitTeacherFeedback } from '@/app/actions/feedback'
-import { Clock, CheckCircle2, Send, Loader2, User, Mic } from 'lucide-react'
+import { Clock, CheckCircle2, Send, Loader2, User, Mic, RotateCcw } from 'lucide-react'
 import { createClient } from '@/utils/supabase/client'
 import PendingSubmissionCard from './PendingSubmissionCard'
 import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
@@ -22,6 +22,16 @@ type Submission = {
     feedback_audio_url?: string;
     created_at: string;
   }[];
+  attempt_number?: number;
+  parent?: {
+    id: string;
+    content_url: string;
+    teacher_feedback?: {
+      feedback_text: string;
+      feedback_audio_url?: string;
+      created_at: string;
+    }[];
+  };
 }
 
 export default function SubmissionsDashboard({
@@ -138,9 +148,22 @@ export default function SubmissionsDashboard({
                           <span>{new Date(sub.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
+                      {sub.attempt_number > 1 && (
+                        <span className="ml-auto shrink-0 inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-bold">
+                          <RotateCcw size={14} /> {sub.attempt_number}. Versuch
+                        </span>
+                      )}
                     </div>
                     
+                    {sub.parent && (
+                      <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 opacity-75">
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Vorheriger Versuch (V1)</p>
+                        <SpeedAudioPlayer src={sub.parent.content_url} className="w-full h-10 mb-3" />
+                      </div>
+                    )}
+
                     <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Aktuelle Aufnahme {sub.attempt_number > 1 ? `(V${sub.attempt_number})` : ''}</p>
                       <SpeedAudioPlayer src={sub.content_url} className="w-full h-10" />
                     </div>
                   </div>
