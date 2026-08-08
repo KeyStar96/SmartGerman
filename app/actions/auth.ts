@@ -50,7 +50,7 @@ export async function signup(formData: FormData) {
   }
 
   // Weiterleitung zur Bestätigungsseite oder Login
-  redirect(`/${lang}/login?message=Registrierung+erfolgreich.+Bitte+E-Mail+bestätigen.`)
+  redirect(`/${lang}/login?message=Registrierung+erfolgreich.+Eine+E-Mail+wurde+an+die+angegebene+Adresse+versandt.+Bitte+bestätigen.`)
 }
 
 export async function logout(lang: string = 'de') {
