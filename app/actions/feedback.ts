@@ -82,7 +82,7 @@ export async function getPendingSubmissions() {
   return data
 }
 
-export async function submitTeacherFeedback(submissionId: string, feedbackText: string) {
+export async function submitTeacherFeedback(submissionId: string, feedbackText: string, feedbackAudioUrl?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -94,7 +94,8 @@ export async function submitTeacherFeedback(submissionId: string, feedbackText: 
     .insert({
       submission_id: submissionId,
       teacher_id: user.id,
-      feedback_text: feedbackText
+      feedback_text: feedbackText || '',
+      feedback_audio_url: feedbackAudioUrl || null
     })
 
   if (insertError) {
@@ -134,6 +135,7 @@ export async function getCompletedSubmissions() {
       ),
       teacher_feedback (
         feedback_text,
+        feedback_audio_url,
         created_at
       )
     `)

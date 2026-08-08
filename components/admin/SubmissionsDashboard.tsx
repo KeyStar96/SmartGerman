@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react'
 import { submitTeacherFeedback } from '@/app/actions/feedback'
-import { Clock, CheckCircle2, Send, Loader2, User } from 'lucide-react'
+import { Clock, CheckCircle2, Send, Loader2, User, Mic } from 'lucide-react'
+import { createClient } from '@/utils/supabase/client'
+import PendingSubmissionCard from './PendingSubmissionCard'
 
 type Submission = {
   id: string;
@@ -16,6 +18,7 @@ type Submission = {
   };
   teacher_feedback?: {
     feedback_text: string;
+    feedback_audio_url?: string;
     created_at: string;
   }[];
 }
@@ -28,35 +31,37 @@ export default function SubmissionsDashboard({
   completedSubmissions: Submission[];
 }) {
   const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending')
-  const [feedbackTexts, setFeedbackTexts] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState<Record<string, boolean>>({})
-
-  const handleFeedbackChange = (id: string, text: string) => {
-    setFeedbackTexts(prev => ({ ...prev, [id]: text }))
-  }
-
-  const handleSubmit = async (id: string) => {
-    const text = feedbackTexts[id]
-    if (!text || text.trim() === '') return
-
-    setIsSubmitting(prev => ({ ...prev, [id]: true }))
+  const handleFeedbackSubmit = async (id: string, text: string, audioBlob: Blob | null) => {
     try {
-      const res = await submitTeacherFeedback(id, text)
-      if (res.success) {
-        // Erfolgreich, UI aktualisiert sich über revalidatePath
-        setFeedbackTexts(prev => {
-          const newTexts = { ...prev }
-          delete newTexts[id]
-          return newTexts
-        })
-      } else {
+      let audioUrl = undefined
+
+      if (audioBlob) {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) throw new Error('Not logged in')
+
+        const fileName = `feedback/${id}_${Date.now()}.webm`
+        
+        const { data, error } = await supabase.storage
+          .from('audio_submissions')
+          .upload(fileName, audioBlob, { contentType: 'audio/webm' })
+
+        if (error) throw error
+
+        const { data: publicUrlData } = supabase.storage
+          .from('audio_submissions')
+          .getPublicUrl(fileName)
+          
+        audioUrl = publicUrlData.publicUrl
+      }
+
+      const res = await submitTeacherFeedback(id, text, audioUrl)
+      if (!res.success) {
         alert('Fehler beim Speichern des Feedbacks: ' + res.error)
       }
     } catch (err) {
       console.error(err)
       alert('Ein unerwarteter Fehler ist aufgetreten.')
-    } finally {
-      setIsSubmitting(prev => ({ ...prev, [id]: false }))
     }
   }
 
@@ -103,56 +108,11 @@ export default function SubmissionsDashboard({
             </div>
           ) : (
             pendingSubmissions.map(sub => (
-              <div key={sub.id} className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Left: Info & Audio */}
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
-                        <User className="h-6 w-6 text-slate-500 dark:text-slate-400" />
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-bold text-slate-900 dark:text-white">{sub.profiles?.name || 'Unbekannter Schüler'}</h4>
-                        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                          <span>{sub.profiles?.native_language || 'Keine Sprache angegeben'}</span>
-                          <span>•</span>
-                          <span>{new Date(sub.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Audio-Aufnahme</p>
-                      <audio src={sub.content_url} controls className="w-full h-12" />
-                    </div>
-                  </div>
-
-                  {/* Right: Feedback Form */}
-                  <div className="flex-1 space-y-4">
-                    <div>
-                      <label htmlFor={`feedback-${sub.id}`} className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-                        Dein Feedback an den Schüler
-                      </label>
-                      <textarea
-                        id={`feedback-${sub.id}`}
-                        rows={4}
-                        className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 focus:border-[#FF5C00] focus:ring-[#FF5C00] focus:ring-1 sm:text-sm"
-                        placeholder="Sehr gute Aussprache! Achte beim nächsten Mal auf..."
-                        value={feedbackTexts[sub.id] || ''}
-                        onChange={(e) => handleFeedbackChange(sub.id, e.target.value)}
-                      />
-                    </div>
-                    <button
-                      onClick={() => handleSubmit(sub.id)}
-                      disabled={!feedbackTexts[sub.id]?.trim() || isSubmitting[sub.id]}
-                      className="flex items-center justify-center gap-2 w-full bg-[#FF5C00] hover:bg-[#e05200] text-white px-6 py-3 rounded-xl font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting[sub.id] ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-                      Feedback freigeben
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <PendingSubmissionCard 
+                key={sub.id} 
+                sub={sub} 
+                onSubmit={handleFeedbackSubmit} 
+              />
             ))
           )
         )}
@@ -187,9 +147,19 @@ export default function SubmissionsDashboard({
                   <div className="flex-1">
                     <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-900/20 h-full">
                       <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-500 mb-2">Dein Feedback</p>
-                      <p className="text-slate-700 dark:text-slate-300">
-                        {sub.teacher_feedback?.[0]?.feedback_text || 'Kein Text hinterlegt.'}
-                      </p>
+                      {sub.teacher_feedback?.[0]?.feedback_text && (
+                        <p className="text-slate-700 dark:text-slate-300 mb-4">
+                          {sub.teacher_feedback[0].feedback_text}
+                        </p>
+                      )}
+                      {sub.teacher_feedback?.[0]?.feedback_audio_url && (
+                        <div className="bg-white/50 dark:bg-slate-900/50 p-3 rounded-lg">
+                          <div className="flex items-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-2">
+                            <Mic size={16} /> Sprachnachricht
+                          </div>
+                          <audio src={sub.teacher_feedback[0].feedback_audio_url} controls className="w-full h-8" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

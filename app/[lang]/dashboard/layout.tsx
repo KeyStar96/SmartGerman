@@ -52,7 +52,7 @@ export default async function DashboardLayout({
                   priority
                 />
               </Link>
-              <nav className="hidden md:flex space-x-6">
+              <nav className="hidden md:flex space-x-6 items-center">
                 <Link
                   href={`/${lang}/dashboard`}
                   className="inline-flex items-center px-1 pt-1 text-sm font-bold text-slate-900 dark:text-slate-100 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
@@ -65,6 +65,14 @@ export default async function DashboardLayout({
                 >
                   Lektionen
                 </Link>
+                {(profile?.role === 'teacher' || profile?.role === 'admin') && (
+                  <Link
+                    href={`/${lang}/admin/submissions`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold bg-[#FF5C00]/10 text-[#FF5C00] hover:bg-[#FF5C00]/20 transition-colors"
+                  >
+                    Lehrer-Bereich
+                  </Link>
+                )}
               </nav>
             </div>
             <div className="flex items-center space-x-4">

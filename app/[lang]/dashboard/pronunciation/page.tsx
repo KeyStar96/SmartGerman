@@ -1,6 +1,6 @@
 import { getStudentSubmissions } from '@/app/actions/feedback'
 import AudioRecorder from '@/components/audio/AudioRecorder'
-import { Clock, CheckCircle2, MessageSquare } from 'lucide-react'
+import { Clock, CheckCircle2, MessageSquare, Mic } from 'lucide-react'
 
 export default async function PronunciationDashboard() {
   const submissions = await getStudentSubmissions()
@@ -60,9 +60,19 @@ export default async function PronunciationDashboard() {
                     <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100 font-bold mb-3">
                       <MessageSquare size={20} className="text-[#FF5C00]" /> Lehrer-Feedback
                     </div>
-                    <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
-                      {sub.teacher_feedback[0].feedback_text}
-                    </p>
+                    {sub.teacher_feedback[0].feedback_text && (
+                      <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                        {sub.teacher_feedback[0].feedback_text}
+                      </p>
+                    )}
+                    {sub.teacher_feedback[0].feedback_audio_url && (
+                      <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 text-sm font-bold text-[#FF5C00] mb-2">
+                          <Mic size={18} /> Sprachnachricht
+                        </div>
+                        <audio src={sub.teacher_feedback[0].feedback_audio_url} controls className="w-full max-w-md h-10" />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
