@@ -58,7 +58,9 @@ export default async function AdminLayout({
                   priority
                 />
               </Link>
-              <AdminNav lang={lang} />
+              <div className="hidden lg:block">
+                <AdminNav lang={lang} />
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden sm:inline-flex items-center">
@@ -83,11 +85,15 @@ export default async function AdminLayout({
               </form>
             </div>
           </div>
+          
+          <div className="lg:hidden pb-3">
+            <AdminNav lang={lang} />
+          </div>
         </div>
       </header>
 
       <main className="flex-1">
-        <div className="mx-auto max-w-7xl py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl py-8 px-4 sm:px-6 lg:px-8">
           {children}
         </div>
       </main>

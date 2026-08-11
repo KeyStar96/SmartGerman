@@ -8,6 +8,12 @@ export default async function AdminStudentsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  const { data: profile } = user ? await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single() : { data: null }
+
   return (
     <div className="space-y-8">
       <div>
@@ -17,7 +23,12 @@ export default async function AdminStudentsPage() {
         </p>
       </div>
 
-      <StudentList initialStudents={students} currentUserId={user?.id} progressData={progressData} />
+      <StudentList 
+        initialStudents={students} 
+        currentUserId={user?.id} 
+        currentUserRole={profile?.role}
+        progressData={progressData} 
+      />
     </div>
   )
 }

@@ -16,10 +16,12 @@ type Profile = {
 export default function StudentList({ 
   initialStudents, 
   currentUserId,
+  currentUserRole,
   progressData = {}
 }: { 
   initialStudents: Profile[], 
   currentUserId?: string,
+  currentUserRole?: string,
   progressData?: Record<string, Record<string, number>>
 }) {
   const [students, setStudents] = useState<Profile[]>(initialStudents)
@@ -118,7 +120,7 @@ export default function StudentList({
                     <select
                       value={student.role}
                       onChange={(e) => handleRoleChange(student.id, e.target.value)}
-                      disabled={loadingId === student.id || student.id === currentUserId}
+                      disabled={loadingId === student.id || student.id === currentUserId || currentUserRole !== 'admin'}
                       className={`appearance-none w-full px-3 py-1.5 pr-8 rounded-lg text-sm font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#FF5C00] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                         student.role === 'teacher' || student.role === 'admin'
                           ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20'
@@ -127,7 +129,7 @@ export default function StudentList({
                     >
                       <option value="student">Student</option>
                       <option value="teacher">Teacher</option>
-                      {student.role === 'admin' && <option value="admin">Admin</option>}
+                      {(student.role === 'admin' || currentUserRole === 'admin') && <option value="admin">Admin</option>}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
                       {loadingId === student.id ? <Loader2 size={14} className="animate-spin" /> : (
