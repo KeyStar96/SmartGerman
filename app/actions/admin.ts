@@ -183,3 +183,48 @@ export async function getAllStudentsProgressData() {
     return {}
   }
 }
+
+export async function resetStudentProgress(userId: string, level: string) {
+  try {
+    await requireAdmin()
+    const supabase = createAdminClient()
+
+    // 1. Hole alle Übungen für das Level
+    const { data: exercises } = await supabase
+      .from('exercises')
+      .select('id')
+      .eq('level', level)
+
+    const exerciseIds = exercises?.map(e => e.id) || []
+
+    if (exerciseIds.length > 0) {
+      await supabase
+        .from('user_exercise_progress')
+        .delete()
+        .eq('user_id', userId)
+        .in('exercise_id', exerciseIds)
+    }
+
+    // 2. Hole alle Vokabelkarten für das Level
+    const { data: vocabCards } = await supabase
+      .from('vocabulary_cards')
+      .select('id')
+      .eq('level', level)
+
+    const vocabIds = vocabCards?.map(v => v.id) || []
+
+    if (vocabIds.length > 0) {
+      await supabase
+        .from('user_vocabulary_progress')
+        .delete()
+        .eq('user_id', userId)
+        .in('card_id', vocabIds)
+    }
+
+    revalidatePath('/[lang]/admin/students', 'page')
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error resetting student progress', error)
+    return { success: false, error: error.message }
+  }
+}

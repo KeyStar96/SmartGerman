@@ -26,6 +26,7 @@ export default function StudentList({
 }) {
   const [students, setStudents] = useState<Profile[]>(initialStudents)
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [resetLevel, setResetLevel] = useState<Record<string, string>>({})
 
   const handleRoleChange = async (id: string, newRole: string) => {
     if (id === currentUserId && newRole === 'student') {
@@ -54,6 +55,20 @@ export default function StudentList({
     setLoadingId(null)
   }
 
+  const handleResetProgress = async (id: string, level: string) => {
+    if (!confirm(`Möchtest du den Fortschritt für Level ${level} wirklich unwiderruflich löschen?`)) return
+    
+    setLoadingId(id)
+    const { resetStudentProgress } = await import('@/app/actions/admin')
+    const res = await resetStudentProgress(id, level)
+    if (res.success) {
+      alert(`Fortschritt für ${level} wurde zurückgesetzt! (Seite neu laden für aktuelles Dashboard)`)
+    } else {
+      alert('Fehler: ' + res.error)
+    }
+    setLoadingId(null)
+  }
+
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div className="overflow-x-auto">
@@ -65,6 +80,7 @@ export default function StudentList({
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Fortschritt</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Abo-Status</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Rolle</th>
+              <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Aktionen</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -138,11 +154,36 @@ export default function StudentList({
                     </div>
                   </div>
                 </td>
+                <td className="p-4">
+                  <div className="flex items-center gap-2">
+                    <select 
+                      className="px-2 py-1.5 rounded-lg text-sm font-bold border bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]"
+                      value={resetLevel[student.id] || 'A1.1'}
+                      onChange={(e) => setResetLevel({ ...resetLevel, [student.id]: e.target.value })}
+                      disabled={loadingId === student.id}
+                    >
+                      <option value="A1.1">A1.1</option>
+                      <option value="A1.2">A1.2</option>
+                      <option value="A2.1">A2.1</option>
+                      <option value="A2.2">A2.2</option>
+                      <option value="B1.1">B1.1</option>
+                      <option value="B1.2">B1.2</option>
+                    </select>
+                    <button 
+                      onClick={() => handleResetProgress(student.id, resetLevel[student.id] || 'A1.1')}
+                      disabled={loadingId === student.id}
+                      className="px-2 py-1.5 text-xs font-bold bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 dark:bg-red-900/20 dark:border-red-900/30 dark:text-red-400 transition-colors"
+                      title="Fortschritt löschen"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
             {students.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-slate-500">
+                <td colSpan={6} className="p-8 text-center text-slate-500">
                   Keine Nutzer gefunden.
                 </td>
               </tr>
