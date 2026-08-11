@@ -28,6 +28,10 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single()
 
+  if (profile?.role === 'teacher' || profile?.role === 'admin') {
+    redirect(`/${lang}/admin`)
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors">
       <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 transition-colors">
@@ -65,14 +69,6 @@ export default async function DashboardLayout({
                 >
                   Lektionen
                 </Link>
-                {(profile?.role === 'teacher' || profile?.role === 'admin') && (
-                  <Link
-                    href={`/${lang}/admin/submissions`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold bg-[#FF5C00]/10 text-[#FF5C00] hover:bg-[#FF5C00]/20 transition-colors"
-                  >
-                    Lehrer-Bereich
-                  </Link>
-                )}
               </nav>
             </div>
             <div className="flex items-center space-x-4">

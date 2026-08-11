@@ -39,7 +39,7 @@ export default async function AdminLayout({
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
             <div className="flex items-center gap-6">
-              <Link href={`/${lang}/dashboard`} className="flex-shrink-0 items-center block hover:opacity-80 transition-opacity">
+              <Link href={`/${lang}/admin`} className="flex-shrink-0 items-center block hover:opacity-80 transition-opacity">
                 <Image
                   src="/Bilder/SG_Logo_Lightmode.png"
                   alt="Sitov Language Academy"
@@ -57,12 +57,44 @@ export default async function AdminLayout({
                   priority
                 />
               </Link>
-              <nav className="hidden md:flex space-x-6">
+              <nav className="hidden lg:flex space-x-4 items-center">
+                <Link
+                  href={`/${lang}/admin`}
+                  className="inline-flex items-center px-2 pt-1 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
+                >
+                  Übersicht
+                </Link>
+                <Link
+                  href={`/${lang}/admin/students`}
+                  className="inline-flex items-center px-2 pt-1 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
+                >
+                  Studenten
+                </Link>
                 <Link
                   href={`/${lang}/admin/submissions`}
-                  className="inline-flex items-center px-1 pt-1 text-sm font-bold text-slate-900 dark:text-slate-100 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-bold bg-[#FF5C00]/10 text-[#FF5C00] hover:bg-[#FF5C00]/20 transition-colors"
                 >
-                  Submissions (Teacher)
+                  Feedback
+                </Link>
+                {/* CMS Dropdown-ähnliche Platzierung oder direkte Links */}
+                <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
+                <Link
+                  href={`/${lang}/admin/content/vocabulary`}
+                  className="inline-flex items-center px-2 pt-1 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
+                >
+                  Vokabeln
+                </Link>
+                <Link
+                  href={`/${lang}/admin/content/exercises`}
+                  className="inline-flex items-center px-2 pt-1 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
+                >
+                  Übungen
+                </Link>
+                <Link
+                  href={`/${lang}/admin/content/videos`}
+                  className="inline-flex items-center px-2 pt-1 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
+                >
+                  Videos
                 </Link>
               </nav>
             </div>

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import nodemailer from 'nodemailer'
 
 export async function submitAudioUrl(url: string, parentId?: string, attemptNumber: number = 1) {
@@ -145,11 +146,29 @@ export async function submitTeacherFeedback(submissionId: string, feedbackText: 
         },
       })
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      try {
+        const headersList = await headers()
+        const host = headersList.get('x-forwarded-host') || headersList.get('host')
+        const proto = headersList.get('x-forwarded-proto') || 'https'
+        if (host) {
+          siteUrl = `${proto}://${host}`
+        }
+      } catch (e) {
+        console.warn('Could not read headers for site URL fallback.')
+      }
+      
       const dashUrl = `${siteUrl}/de/dashboard/pronunciation`
 
+      let smtpFrom = process.env.SMTP_FROM || process.env.SMTP_USER || ''
+      let fromString = `"Sitov Language Academy" <${smtpFrom}>`
+      // Falls SMTP_FROM bereits formatierte Absender enthält (z.B. "Name <email@domain.de>")
+      if (smtpFrom.includes('<') && smtpFrom.includes('>')) {
+        fromString = smtpFrom
+      }
+
       await transporter.sendMail({
-        from: `"Sitov Language Academy" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+        from: fromString,
         to: studentEmail,
         subject: 'Neues Feedback zu deiner Sprachaufnahme verfügbar! 🎙️',
         html: `
