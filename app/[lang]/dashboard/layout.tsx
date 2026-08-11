@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import ThemeToggle from '@/components/layout/ThemeToggle'
+import DashboardHeader from '@/components/layout/DashboardHeader'
 
 export default async function DashboardLayout({
   children,
@@ -37,40 +38,29 @@ export default async function DashboardLayout({
       <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center flex-1">
               <Link href={`/${lang}/dashboard`} className="flex-shrink-0 items-center block hover:opacity-80 transition-opacity">
                 <Image
                   src="/Bilder/SG_Logo_Lightmode.png"
                   alt="Sitov Language Academy"
-                  width={240}
-                  height={48}
-                  className="h-7 md:h-8 w-auto object-contain dark:hidden"
+                  width={180}
+                  height={36}
+                  className="h-6 md:h-7 w-auto object-contain dark:hidden"
                   priority
                 />
                 <Image
                   src="/Bilder/SG_Logo_Darkmode3.png"
                   alt="Sitov Language Academy"
-                  width={240}
-                  height={48}
-                  className="h-7 md:h-8 w-auto object-contain hidden dark:block"
+                  width={180}
+                  height={36}
+                  className="h-6 md:h-7 w-auto object-contain hidden dark:block"
                   priority
                 />
               </Link>
-              <nav className="hidden md:flex space-x-6 items-center">
-                <Link
-                  href={`/${lang}/dashboard`}
-                  className="inline-flex items-center px-1 pt-1 text-sm font-bold text-slate-900 dark:text-slate-100 hover:text-[#FF5C00] dark:hover:text-[#FF5C00] transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href={`/${lang}/dashboard/profile`}
-                  className="inline-flex items-center px-1 pt-1 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-                >
-                  Profil
-                </Link>
-              </nav>
+              
+              <DashboardHeader lang={lang} />
             </div>
+            
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300 hidden sm:inline-flex items-center">
                 Hallo, {profile?.name || user.email} 
