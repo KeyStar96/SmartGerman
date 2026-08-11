@@ -5,14 +5,16 @@ import { PlayCircle, ExternalLink, Clock } from 'lucide-react'
 export default async function VideosOverviewPage({
   params,
 }: {
-  params: Promise<{ lang: string }>
+  params: Promise<{ lang: string, level: string }>
 }) {
-  const { lang } = await params
+  const { lang, level } = await params
+  const decodedLevel = decodeURIComponent(level)
   const supabase = await createClient()
 
   const { data: videos } = await supabase
     .from('videos')
     .select('*')
+    .eq('level', decodedLevel)
     .order('created_at', { ascending: true })
 
   if (!videos) return null

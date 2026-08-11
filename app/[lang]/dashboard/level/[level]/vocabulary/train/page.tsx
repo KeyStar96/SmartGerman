@@ -5,12 +5,13 @@ import Link from 'next/link'
 export default async function VocabTrainPage({
   params,
 }: {
-  params: Promise<{ lang: string }>
+  params: Promise<{ lang: string, level: string }>
 }) {
-  const { lang } = await params
+  const { lang, level } = await params
+  const decodedLevel = decodeURIComponent(level)
   
   // Fällige Karten vom Server abrufen
-  const dueCards = await getDueCards()
+  const dueCards = await getDueCards(decodedLevel)
 
   return (
     <div className="min-h-[80vh] flex flex-col">

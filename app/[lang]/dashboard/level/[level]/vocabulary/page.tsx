@@ -4,13 +4,14 @@ import Link from 'next/link'
 export default async function VocabularyOverviewPage({
   params,
 }: {
-  params: Promise<{ lang: string }>
+  params: Promise<{ lang: string, level: string }>
 }) {
-  const { lang } = await params
+  const { lang, level } = await params
+  const decodedLevel = decodeURIComponent(level)
   
-  // Lade Statistiken und fällige Karten
-  const stats = await getLessonStats()
-  const dueCards = await getDueCards()
+  // Lade Statistiken und fällige Karten für das spezifische Niveau
+  const stats = await getLessonStats(decodedLevel)
+  const dueCards = await getDueCards(decodedLevel)
   const dueCount = dueCards.length
 
   return (

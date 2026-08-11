@@ -10,6 +10,7 @@ export default function VocabCMS({ initialData }: { initialData: any[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   
   const [form, setForm] = useState({
+    level: 'A1.1',
     lesson: '',
     word_de: '',
     article: 'none',
@@ -50,7 +51,22 @@ export default function VocabCMS({ initialData }: { initialData: any[] }) {
       <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Neue Vokabel anlegen</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input required placeholder="Lektion (z.B. A1.1)" value={form.lesson} onChange={e => setForm({...form, lesson: e.target.value})} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800" />
+          <div>
+            <div className="relative">
+              <select value={form.level} onChange={e => setForm({...form, level: e.target.value})} className="appearance-none w-full p-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00] cursor-pointer font-bold">
+                <option value="A1.1">A1.1</option>
+                <option value="A1.2">A1.2</option>
+                <option value="A2.1">A2.1</option>
+                <option value="A2.2">A2.2</option>
+                <option value="B1.1">B1.1</option>
+                <option value="B1.2">B1.2</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              </div>
+            </div>
+          </div>
+          <input required placeholder="Lektion (z.B. Lektion 1)" value={form.lesson} onChange={e => setForm({...form, lesson: e.target.value})} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800" />
           <input required placeholder="Deutsches Wort" value={form.word_de} onChange={e => setForm({...form, word_de: e.target.value})} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800" />
           <select value={form.article} onChange={e => setForm({...form, article: e.target.value})} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800">
             <option value="none">Kein Artikel</option>
@@ -83,8 +99,9 @@ export default function VocabCMS({ initialData }: { initialData: any[] }) {
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
             {items.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20">
-                <td className="p-4 font-bold text-slate-900 dark:text-white">
-                  {item.article !== 'none' ? `${item.article} ` : ''}{item.word_de} {item.plural && `(${item.plural})`}
+                <td className="p-4 font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span className="bg-[#FF5C00] text-white px-2 py-0.5 rounded text-xs font-bold">{item.level}</span>
+                  <span>{item.article !== 'none' ? `${item.article} ` : ''}{item.word_de} {item.plural && `(${item.plural})`}</span>
                 </td>
                 <td className="p-4 text-slate-500">{item.lesson}</td>
                 <td className="p-4 text-slate-500 text-sm">

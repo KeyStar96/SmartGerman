@@ -6,12 +6,13 @@ import { ArrowLeft } from 'lucide-react'
 export default async function ExercisesPage({
   params,
 }: {
-  params: Promise<{ lang: string }>
+  params: Promise<{ lang: string, level: string }>
 }) {
-  const { lang } = await params
+  const { lang, level } = await params
+  const decodedLevel = decodeURIComponent(level)
   
-  // Abruf aller Übungen für A1.1 (Beispiel-Parameter, in Zukunft dynamisch pro Kurs)
-  const exercises = await getExercises('A1.1')
+  // Abruf aller Übungen für dieses Niveau
+  const exercises = await getExercises(decodedLevel)
   
   // Filtere nach unvollständigen Übungen (für den Übungsdurchlauf)
   const activeExercises = exercises.filter(ex => !ex.completed)

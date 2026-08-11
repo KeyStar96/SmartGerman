@@ -12,6 +12,7 @@ type Submission = {
   content_url: string;
   created_at: string;
   status: string;
+  level: string;
   profiles: {
     name: string;
     email: string;
@@ -146,6 +147,8 @@ export default function SubmissionsDashboard({
                       <div>
                         <h4 className="text-lg font-bold text-slate-900 dark:text-white">{sub.profiles?.name || 'Unbekannter Schüler'}</h4>
                         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                          <span className="bg-[#FF5C00] text-white px-2 py-0.5 rounded text-xs font-bold">{sub.level || 'A1.1'}</span>
+                          <span>•</span>
                           <span>{new Date(sub.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>

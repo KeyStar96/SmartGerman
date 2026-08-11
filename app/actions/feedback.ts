@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import nodemailer from 'nodemailer'
 
-export async function submitAudioUrl(url: string, parentId?: string, attemptNumber: number = 1) {
+export async function submitAudioUrl(url: string, parentId?: string, attemptNumber: number = 1, level?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -19,7 +19,8 @@ export async function submitAudioUrl(url: string, parentId?: string, attemptNumb
       content_url: url,
       status: 'pending',
       parent_id: parentId || null,
-      attempt_number: attemptNumber
+      attempt_number: attemptNumber,
+      level: level || 'A1.1'
     })
 
   if (error) {
@@ -31,13 +32,13 @@ export async function submitAudioUrl(url: string, parentId?: string, attemptNumb
   return { success: true }
 }
 
-export async function getStudentSubmissions() {
+export async function getStudentSubmissions(level?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return []
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('submissions')
     .select(`
       *,
@@ -49,7 +50,12 @@ export async function getStudentSubmissions() {
       children:submissions!parent_id(id)
     `)
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+    
+  if (level) {
+    query = query.eq('level', level)
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) {
     console.error('Error fetching student submissions:', error)

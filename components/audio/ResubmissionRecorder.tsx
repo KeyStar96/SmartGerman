@@ -4,7 +4,7 @@ import { useState } from 'react'
 import AudioRecorder from './AudioRecorder'
 import { Mic } from 'lucide-react'
 
-export default function ResubmissionRecorder({ parentId, currentAttempt = 1 }: { parentId: string, currentAttempt?: number }) {
+export default function ResubmissionRecorder({ parentId, currentAttempt = 1, level }: { parentId: string, currentAttempt?: number, level?: string }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -30,6 +30,7 @@ export default function ResubmissionRecorder({ parentId, currentAttempt = 1 }: {
           <AudioRecorder 
             parentId={parentId} 
             attemptNumber={currentAttempt + 1} 
+            level={level}
             compact={true} 
             onSubmitted={() => setIsOpen(false)}
           />

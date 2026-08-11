@@ -8,11 +8,12 @@ import { Mic, Square, Play, UploadCloud, Loader2, CheckCircle2 } from 'lucide-re
 type AudioRecorderProps = {
   parentId?: string;
   attemptNumber?: number;
+  level?: string;
   onSubmitted?: () => void;
   compact?: boolean;
 }
 
-export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted, compact = false }: AudioRecorderProps = {}) {
+export default function AudioRecorder({ parentId, attemptNumber = 1, level, onSubmitted, compact = false }: AudioRecorderProps = {}) {
   const [isRecording, setIsRecording] = useState(false)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
@@ -90,7 +91,7 @@ export default function AudioRecorder({ parentId, attemptNumber = 1, onSubmitted
         .from('audio_submissions')
         .getPublicUrl(fileName)
 
-      const result = await submitAudioUrl(publicUrlData.publicUrl, parentId, attemptNumber)
+      const result = await submitAudioUrl(publicUrlData.publicUrl, parentId, attemptNumber, level)
       if (result.success) {
         setIsSubmitted(true)
         if (onSubmitted) onSubmitted()

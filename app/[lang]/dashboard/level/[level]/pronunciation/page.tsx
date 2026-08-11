@@ -4,8 +4,14 @@ import { Clock, CheckCircle2, MessageSquare, Mic, RotateCcw } from 'lucide-react
 import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
 import ResubmissionRecorder from '@/components/audio/ResubmissionRecorder'
 
-export default async function PronunciationDashboard() {
-  const submissions = await getStudentSubmissions()
+export default async function PronunciationDashboard({
+  params,
+}: {
+  params: Promise<{ lang: string, level: string }>
+}) {
+  const { lang, level } = await params
+  const decodedLevel = decodeURIComponent(level)
+  const submissions = await getStudentSubmissions(decodedLevel)
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -18,7 +24,7 @@ export default async function PronunciationDashboard() {
       </div>
 
       {/* Recorder Component */}
-      <AudioRecorder />
+      <AudioRecorder level={decodedLevel} />
 
       {/* History */}
       <div className="space-y-6">
@@ -86,7 +92,7 @@ export default async function PronunciationDashboard() {
                 )}
 
                 {sub.status === 'reviewed' && (!sub.children || sub.children.length === 0) && (
-                  <ResubmissionRecorder parentId={sub.id} currentAttempt={sub.attempt_number || 1} />
+                  <ResubmissionRecorder parentId={sub.id} currentAttempt={sub.attempt_number || 1} level={decodedLevel} />
                 )}
               </div>
             ))}

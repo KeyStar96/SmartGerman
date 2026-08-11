@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function getDueCards() {
+export async function getDueCards(level?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -19,13 +19,14 @@ export async function getDueCards() {
   // Hole fällige Karten aus dem Lernfortschritt inkl. Vokabeldetails
   const now = new Date().toISOString()
   
-  const { data: dueCards, error } = await supabase
+  let query = supabase
     .from('user_vocabulary_progress')
     .select(`
       id,
       box_number,
-      vocabulary_cards (
+      vocabulary_cards!inner (
         id,
+        level,
         lesson,
         word_de,
         article,
@@ -42,7 +43,12 @@ export async function getDueCards() {
     .eq('user_id', user.id)
     .lte('next_review_date', now)
     .lt('box_number', 7) // 7 = fertig gelernt
-    .order('next_review_date', { ascending: true })
+    
+  if (level) {
+    query = query.eq('vocabulary_cards.level', level)
+  }
+
+  const { data: dueCards, error } = await query.order('next_review_date', { ascending: true })
 
   if (error) {
     console.error('Fehler beim Abrufen fälliger Karten:', error)
@@ -153,14 +159,19 @@ export async function submitAnswer(progressId: string, isCorrect: boolean, nativ
   return { success: true, newBox }
 }
 
-export async function getLessonStats() {
+export async function getLessonStats(level?: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
   
     if (!user) return []
   
     // Wir holen alle Karten und den User Fortschritt
-    const { data: cards } = await supabase.from('vocabulary_cards').select('id, lesson')
+    let cardsQuery = supabase.from('vocabulary_cards').select('id, lesson')
+    if (level) {
+      cardsQuery = cardsQuery.eq('level', level)
+    }
+    const { data: cards } = await cardsQuery
+    
     const { data: progress } = await supabase.from('user_vocabulary_progress').select('card_id, box_number').eq('user_id', user.id)
 
     if (!cards) return []

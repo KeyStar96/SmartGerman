@@ -10,6 +10,7 @@ export default function VideoCMS({ initialData }: { initialData: any[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   
   const [form, setForm] = useState({
+    level: 'A1.1',
     title: '',
     description: '',
     lesson: '',
@@ -49,6 +50,21 @@ export default function VideoCMS({ initialData }: { initialData: any[] }) {
       <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Neues Video anlegen</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div className="relative">
+              <select value={form.level} onChange={e => setForm({...form, level: e.target.value})} className="appearance-none w-full p-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00] cursor-pointer font-bold">
+                <option value="A1.1">A1.1</option>
+                <option value="A1.2">A1.2</option>
+                <option value="A2.1">A2.1</option>
+                <option value="A2.2">A2.2</option>
+                <option value="B1.1">B1.1</option>
+                <option value="B1.2">B1.2</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              </div>
+            </div>
+          </div>
           <input required placeholder="Titel des Videos" value={form.title} onChange={e => setForm({...form, title: e.target.value})} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800" />
           <input required placeholder="Lektion (z.B. A1.1)" value={form.lesson} onChange={e => setForm({...form, lesson: e.target.value})} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800" />
           <input placeholder="Beschreibung (optional)" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 md:col-span-2" />
@@ -87,6 +103,7 @@ export default function VideoCMS({ initialData }: { initialData: any[] }) {
                 <td className="p-4">
                   <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <PlaySquare size={16} className="text-[#FF5C00]" />
+                    <span className="bg-[#FF5C00] text-white px-2 py-0.5 rounded text-xs">{item.level}</span>
                     {item.title}
                   </div>
                   <div className="text-sm text-slate-500 truncate max-w-xs">{item.description}</div>

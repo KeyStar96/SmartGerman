@@ -64,10 +64,10 @@ export default async function DashboardLayout({
                   Dashboard
                 </Link>
                 <Link
-                  href={`/${lang}/dashboard/lessons`}
+                  href={`/${lang}/dashboard/profile`}
                   className="inline-flex items-center px-1 pt-1 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
                 >
-                  Lektionen
+                  Profil
                 </Link>
               </nav>
             </div>

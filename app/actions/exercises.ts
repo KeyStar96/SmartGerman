@@ -3,7 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export async function getExercises(lessonName?: string) {
+export async function getExercises(level?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -26,8 +26,8 @@ export async function getExercises(lessonName?: string) {
       )
     `)
   
-  if (lessonName) {
-    query = query.eq('lesson', lessonName)
+  if (level) {
+    query = query.eq('level', level)
   }
 
   const { data: exercises, error } = await query
