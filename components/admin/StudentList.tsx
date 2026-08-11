@@ -13,13 +13,15 @@ type Profile = {
   created_at: string
 }
 
-export default function StudentList({ initialStudents }: { initialStudents: Profile[] }) {
+export default function StudentList({ initialStudents, currentUserId }: { initialStudents: Profile[], currentUserId?: string }) {
   const [students, setStudents] = useState<Profile[]>(initialStudents)
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
-  const handleRoleChange = async (id: string, currentRole: string) => {
-    const newRole = currentRole === 'student' ? 'teacher' : 'student'
-    if (!confirm(`Möchtest du die Rolle wirklich auf '${newRole}' ändern?`)) return
+  const handleRoleChange = async (id: string, newRole: string) => {
+    if (id === currentUserId && newRole === 'student') {
+      alert('Du kannst dir nicht selbst die Admin/Teacher-Rechte entziehen!')
+      return
+    }
     
     setLoadingId(id)
     const res = await updateStudentRole(id, newRole)
@@ -31,10 +33,7 @@ export default function StudentList({ initialStudents }: { initialStudents: Prof
     setLoadingId(null)
   }
 
-  const handleSubChange = async (id: string, currentSub: string) => {
-    const newSub = currentSub === 'kostenlos' ? 'aktiv' : 'kostenlos'
-    if (!confirm(`Möchtest du das Abo wirklich auf '${newSub}' ändern?`)) return
-
+  const handleSubChange = async (id: string, newSub: string) => {
     setLoadingId(id)
     const res = await updateStudentSubscription(id, newSub)
     if (res.success) {
@@ -68,32 +67,49 @@ export default function StudentList({ initialStudents }: { initialStudents: Prof
                   {new Date(student.created_at).toLocaleDateString('de-DE')}
                 </td>
                 <td className="p-4">
-                  <button
-                    onClick={() => handleSubChange(student.id, student.subscription_status)}
-                    disabled={loadingId === student.id}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-colors border ${
-                      student.subscription_status === 'aktiv'
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 dark:hover:bg-emerald-500/20'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {loadingId === student.id ? <Loader2 size={14} className="animate-spin" /> : (student.subscription_status === 'aktiv' ? <CheckCircle2 size={14} /> : <XCircle size={14} />)}
-                    {student.subscription_status === 'aktiv' ? 'Premium' : 'Free'}
-                  </button>
+                  <div className="relative inline-block w-32">
+                    <select
+                      value={student.subscription_status}
+                      onChange={(e) => handleSubChange(student.id, e.target.value)}
+                      disabled={loadingId === student.id}
+                      className={`appearance-none w-full px-3 py-1.5 pr-8 rounded-lg text-sm font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#FF5C00] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                        student.subscription_status === 'aktiv'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                      }`}
+                    >
+                      <option value="kostenlos">Free</option>
+                      <option value="aktiv">Premium</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                      {loadingId === student.id ? <Loader2 size={14} className="animate-spin" /> : (
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                      )}
+                    </div>
+                  </div>
                 </td>
                 <td className="p-4">
-                  <button
-                    onClick={() => handleRoleChange(student.id, student.role)}
-                    disabled={loadingId === student.id}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-colors border ${
-                      student.role === 'teacher' || student.role === 'admin'
-                        ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20 dark:hover:bg-blue-500/20'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {loadingId === student.id ? <Loader2 size={14} className="animate-spin" /> : (student.role === 'teacher' || student.role === 'admin' ? <Shield size={14} /> : <User size={14} />)}
-                    <span className="capitalize">{student.role}</span>
-                  </button>
+                  <div className="relative inline-block w-32">
+                    <select
+                      value={student.role}
+                      onChange={(e) => handleRoleChange(student.id, e.target.value)}
+                      disabled={loadingId === student.id || student.id === currentUserId}
+                      className={`appearance-none w-full px-3 py-1.5 pr-8 rounded-lg text-sm font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#FF5C00] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                        student.role === 'teacher' || student.role === 'admin'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                      }`}
+                    >
+                      <option value="student">Student</option>
+                      <option value="teacher">Teacher</option>
+                      {student.role === 'admin' && <option value="admin">Admin</option>}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                      {loadingId === student.id ? <Loader2 size={14} className="animate-spin" /> : (
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                      )}
+                    </div>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -95,94 +95,103 @@ CREATE TABLE public.trial_lessons (
   CONSTRAINT trial_lessons_course_id_fkey FOREIGN KEY (course_id) REFERENCES public.courses(id)
 );
 CREATE TABLE public.profiles (
-  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id uuid NOT NULL,
   name text,
   email text NOT NULL,
-  native_language text CHECK (native_language IN ('Russisch', 'Türkisch', 'Andere')),
-  subscription_status text DEFAULT 'kostenlos' CHECK (subscription_status IN ('kostenlos', 'aktiv')),
+  native_language text CHECK (native_language = ANY (ARRAY['Russisch'::text, 'Türkisch'::text, 'Andere'::text])),
+  subscription_status text DEFAULT 'kostenlos'::text CHECK (subscription_status = ANY (ARRAY['kostenlos'::text, 'aktiv'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
   stripe_customer_id text,
   stripe_subscription_id text,
-  role text DEFAULT 'student' CHECK (role IN ('student', 'teacher')),
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now()
+  role text DEFAULT 'student'::text CHECK (role = ANY (ARRAY['student'::text, 'teacher'::text])),
+  CONSTRAINT profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
--- Note: RLS and Triggers for auth.users to automatically populate public.profiles are applied via migrations.
-
 CREATE TABLE public.vocabulary_cards (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   lesson text NOT NULL,
   word_de text NOT NULL,
-  article text CHECK (article IN ('der', 'die', 'das', 'none')),
+  article text CHECK (article = ANY (ARRAY['der'::text, 'die'::text, 'das'::text, 'none'::text])),
   plural text,
   translation_ru text,
   translation_tr text,
   translation_en text,
   image_url text,
   audio_url text,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   is_hard_for_ru boolean DEFAULT false,
   is_hard_for_tr boolean DEFAULT false,
-  created_at timestamp with time zone DEFAULT now()
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT vocabulary_cards_pkey PRIMARY KEY (id)
 );
-
 CREATE TABLE public.user_vocabulary_progress (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  card_id uuid NOT NULL REFERENCES public.vocabulary_cards(id) ON DELETE CASCADE,
-  box_number integer DEFAULT 1 CHECK (box_number BETWEEN 1 AND 7),
+  user_id uuid NOT NULL,
+  card_id uuid NOT NULL,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  box_number integer DEFAULT 1 CHECK (box_number >= 1 AND box_number <= 7),
   next_review_date timestamp with time zone DEFAULT now(),
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  UNIQUE(user_id, card_id)
+  CONSTRAINT user_vocabulary_progress_pkey PRIMARY KEY (id),
+  CONSTRAINT user_vocabulary_progress_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT user_vocabulary_progress_card_id_fkey FOREIGN KEY (card_id) REFERENCES public.vocabulary_cards(id)
 );
-
 CREATE TABLE public.videos (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
   description text,
   lesson text NOT NULL,
   video_url text,
-  is_external boolean DEFAULT false,
   external_url text,
-  created_at timestamp with time zone DEFAULT now()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  is_external boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT videos_pkey PRIMARY KEY (id)
 );
-
 CREATE TABLE public.exercises (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   lesson text NOT NULL,
   topic text NOT NULL,
-  type text NOT NULL CHECK (type IN ('fill_in_blank', 'multiple_choice', 'sentence_building')),
+  type text NOT NULL CHECK (type = ANY (ARRAY['fill_in_blank'::text, 'multiple_choice'::text, 'sentence_building'::text])),
   content jsonb NOT NULL,
   hint_ru text,
   hint_tr text,
-  created_at timestamp with time zone DEFAULT now()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT exercises_pkey PRIMARY KEY (id)
 );
-
 CREATE TABLE public.user_exercise_progress (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  exercise_id uuid NOT NULL REFERENCES public.exercises(id) ON DELETE CASCADE,
-  completed boolean DEFAULT false,
+  user_id uuid NOT NULL,
+  exercise_id uuid NOT NULL,
   score integer,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  completed boolean DEFAULT false,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  UNIQUE(user_id, exercise_id)
+  CONSTRAINT user_exercise_progress_pkey PRIMARY KEY (id),
+  CONSTRAINT user_exercise_progress_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT user_exercise_progress_exercise_id_fkey FOREIGN KEY (exercise_id) REFERENCES public.exercises(id)
 );
-
 CREATE TABLE public.submissions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-  type text NOT NULL CHECK (type IN ('audio', 'text')),
+  user_id uuid NOT NULL,
+  type text NOT NULL CHECK (type = ANY (ARRAY['audio'::text, 'text'::text])),
   content_url text,
   text_content text,
-  status text DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed')),
-  created_at timestamp with time zone DEFAULT now()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  status text DEFAULT 'pending'::text CHECK (status = ANY (ARRAY['pending'::text, 'reviewed'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  parent_id uuid,
+  attempt_number integer DEFAULT 1,
+  CONSTRAINT submissions_pkey PRIMARY KEY (id),
+  CONSTRAINT submissions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id),
+  CONSTRAINT submissions_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.submissions(id)
 );
-
 CREATE TABLE public.teacher_feedback (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  submission_id uuid NOT NULL REFERENCES public.submissions(id) ON DELETE CASCADE,
-  teacher_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  submission_id uuid NOT NULL,
+  teacher_id uuid NOT NULL,
   feedback_text text NOT NULL,
   feedback_audio_url text,
-  created_at timestamp with time zone DEFAULT now()
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT teacher_feedback_pkey PRIMARY KEY (id),
+  CONSTRAINT teacher_feedback_submission_id_fkey FOREIGN KEY (submission_id) REFERENCES public.submissions(id),
+  CONSTRAINT teacher_feedback_teacher_id_fkey FOREIGN KEY (teacher_id) REFERENCES public.profiles(id)
 );

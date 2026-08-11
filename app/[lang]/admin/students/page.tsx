@@ -1,8 +1,11 @@
 import { getStudents } from '@/app/actions/admin'
 import StudentList from '@/components/admin/StudentList'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function AdminStudentsPage() {
   const students = await getStudents()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   return (
     <div className="space-y-8">
@@ -13,7 +16,7 @@ export default async function AdminStudentsPage() {
         </p>
       </div>
 
-      <StudentList initialStudents={students} />
+      <StudentList initialStudents={students} currentUserId={user?.id} />
     </div>
   )
 }
