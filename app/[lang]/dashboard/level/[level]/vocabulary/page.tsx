@@ -47,18 +47,7 @@ export default async function VocabularyOverviewPage({
       
       {stats.length === 0 ? (
         <div className="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-          <p className="text-xl text-gray-600 mb-4">Du hast noch keine Lernsets gestartet.</p>
-          <form action={async () => {
-            'use server'
-            await initializeLesson('Schritte plus neu A1.1 - Lektion 1')
-          }}>
-            <button 
-              type="submit"
-              className="rounded-lg bg-green-600 px-8 py-4 text-xl font-bold text-white shadow-md hover:bg-green-500 transition-all"
-            >
-              Lektion 1 starten
-            </button>
-          </form>
+          <p className="text-xl text-gray-600 mb-4">Es gibt noch keine Lernsets für dieses Niveau.</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -81,12 +70,28 @@ export default async function VocabularyOverviewPage({
                   </span>
                 </div>
               </div>
-              <div className="w-full md:w-48 bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
-                <div 
-                  className="bg-green-500 h-4 rounded-full transition-all duration-500" 
-                  style={{ width: `${Math.round((stat.learned / stat.total) * 100)}%` }}
-                ></div>
-              </div>
+              
+              {stat.active === 0 && stat.learned === 0 ? (
+                <form action={async () => {
+                  'use server'
+                  const { initializeLesson } = await import('@/app/actions/vocabulary')
+                  await initializeLesson(stat.lesson)
+                }}>
+                  <button 
+                    type="submit"
+                    className="rounded-lg bg-green-600 px-6 py-2 text-sm font-bold text-white shadow-sm hover:bg-green-500 transition-all focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  >
+                    Starten
+                  </button>
+                </form>
+              ) : (
+                <div className="w-full md:w-48 bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
+                  <div 
+                    className="bg-green-500 h-4 rounded-full transition-all duration-500" 
+                    style={{ width: `${Math.round((stat.learned / stat.total) * 100)}%` }}
+                  ></div>
+                </div>
+              )}
             </div>
           ))}
         </div>

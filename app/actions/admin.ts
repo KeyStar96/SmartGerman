@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
 // Helper to check if current user is admin/teacher
@@ -18,12 +19,12 @@ async function requireAdmin() {
   if (profile?.role !== 'admin' && profile?.role !== 'teacher') {
     throw new Error('Not authorized')
   }
-  return supabase
 }
 
 export async function getAdminStats() {
   try {
-    const supabase = await requireAdmin()
+    await requireAdmin()
+    const supabase = createAdminClient()
     
     // Get total students
     const { count: studentCount } = await supabase
@@ -56,7 +57,8 @@ export async function getAdminStats() {
 
 export async function getStudents() {
   try {
-    const supabase = await requireAdmin()
+    await requireAdmin()
+    const supabase = createAdminClient()
     
     const { data, error } = await supabase
       .from('profiles')
@@ -73,7 +75,8 @@ export async function getStudents() {
 
 export async function updateStudentRole(userId: string, role: string) {
   try {
-    const supabase = await requireAdmin()
+    await requireAdmin()
+    const supabase = createAdminClient()
     
     const { error } = await supabase
       .from('profiles')
@@ -92,7 +95,8 @@ export async function updateStudentRole(userId: string, role: string) {
 
 export async function updateStudentSubscription(userId: string, status: string) {
   try {
-    const supabase = await requireAdmin()
+    await requireAdmin()
+    const supabase = createAdminClient()
     
     const { error } = await supabase
       .from('profiles')
@@ -111,7 +115,8 @@ export async function updateStudentSubscription(userId: string, status: string) 
 
 export async function getAllStudentsProgressData() {
   try {
-    const supabase = await requireAdmin()
+    await requireAdmin()
+    const supabase = createAdminClient()
     
     // 1. Hole alle Übungen und deren Level
     const { data: exercises } = await supabase.from('exercises').select('id, level')
