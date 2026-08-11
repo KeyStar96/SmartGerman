@@ -1233,5 +1233,40 @@
       "date": "Vor 6 Tagen",
       "avatar": "А"
     }
-  ]
+  ],
+  "dashboard": {
+    "title_html": "Wähle dein <span className=\"text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-[#FF5C00]\">Sprachniveau</span>",
+    "subtitle": "Womit möchtest du heute starten? Wähle dein Niveau aus, um auf Lektionen, Vokabeln und Videos zuzugreifen.",
+    "level_a11_title": "A1.1 Anfänger",
+    "level_a11_desc": "Die ersten Schritte in der deutschen Sprache. Begrüßung, Alphabet, Zahlen, erste Sätze.",
+    "level_a12_title": "A1.2 Anfänger",
+    "level_a12_desc": "Erweiterung des Grundwortschatzes und einfache grammatikalische Strukturen.",
+    "level_a21_title": "A2.1 Grundlegende Kenntnisse",
+    "level_a21_desc": "Du lernst, dich in alltäglichen Situationen besser auszudrücken.",
+    "level_a22_title": "A2.2 Grundlegende Kenntnisse",
+    "level_a22_desc": "Festigung der Grammatik und komplexere Gespräche im Alltag.",
+    "level_b11_title": "B1.1 Fortgeschrittene",
+    "level_b11_desc": "Verstehen von Texten zu vertrauten Themen, Meinungsäußerung.",
+    "level_b12_title": "B1.2 Fortgeschrittene",
+    "level_b12_desc": "Fließende Unterhaltungen und detailliertes Verständnis von Texten.",
+    "finished": "erledigt",
+    "continue_learning": "Weiterlernen",
+    "start": "Starten"
+  },
+  "exercises": {
+    "no_exercises": "Keine Übungen verfügbar.",
+    "great": "Großartig!",
+    "all_completed": "Du hast alle Übungen für heute abgeschlossen.",
+    "exercise": "Übung",
+    "of": "von",
+    "fill_blank": "Lücke ausfüllen",
+    "tip_mother_tongue": "Tipp für deine Muttersprache",
+    "correct_well_done": "Richtig! Gut gemacht.",
+    "check_answer": "Antwort prüfen",
+    "next_exercise": "Nächste Übung",
+    "back_to_dashboard": "Zurück zum Dashboard",
+    "title": "Interaktive Übungen",
+    "subtitle": "Trainiere Grammatik und Wortschatz gezielt.",
+    "completed_count": "Abgeschlossen"
+  }
 }

@@ -1235,5 +1235,40 @@
       "date": "6 gün önce",
       "avatar": "А"
     }
-  ]
+  ],
+  "dashboard": {
+    "title_html": "Dil <span className=\"text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-[#FF5C00]\">seviyenizi seçin</span>",
+    "subtitle": "Bugün nereden başlamak istiyorsunuz? Derslere, kelimelere ve videolara erişmek için seviyenizi seçin.",
+    "level_a11_title": "A1.1 Başlangıç",
+    "level_a11_desc": "Almanca diline ilk adımlar. Selamlaşma, alfabe, sayılar, ilk cümleler.",
+    "level_a12_title": "A1.2 Başlangıç",
+    "level_a12_desc": "Temel kelime dağarcığının genişletilmesi ve basit dilbilgisi yapıları.",
+    "level_a21_title": "A2.1 Temel Bilgiler",
+    "level_a21_desc": "Günlük durumlarda kendinizi daha iyi ifade etmeyi öğrenirsiniz.",
+    "level_a22_title": "A2.2 Temel Bilgiler",
+    "level_a22_desc": "Gramerin pekiştirilmesi ve günlük hayatta daha karmaşık konuşmalar.",
+    "level_b11_title": "B1.1 İleri Seviye",
+    "level_b11_desc": "Tanıdık konulardaki metinleri anlama, fikir belirtme.",
+    "level_b12_title": "B1.2 İleri Seviye",
+    "level_b12_desc": "Akıcı konuşmalar ve metinlerin detaylı anlaşılması.",
+    "finished": "tamamlandı",
+    "continue_learning": "Devam et",
+    "start": "Başla"
+  },
+  "exercises": {
+    "no_exercises": "Mevcut egzersiz yok.",
+    "great": "Harika!",
+    "all_completed": "Bugünlük tüm egzersizleri tamamladınız.",
+    "exercise": "Egzersiz",
+    "of": "/",
+    "fill_blank": "Boşluğu doldur",
+    "tip_mother_tongue": "Anadiliniz için ipucu",
+    "correct_well_done": "Doğru! Aferin.",
+    "check_answer": "Cevabı kontrol et",
+    "next_exercise": "Sonraki egzersiz",
+    "back_to_dashboard": "Kontrol paneline dön",
+    "title": "Etkileşimli Egzersizler",
+    "subtitle": "Gramer ve kelime dağarcığı için hedeflenmiş eğitim.",
+    "completed_count": "Tamamlandı"
+  }
 }

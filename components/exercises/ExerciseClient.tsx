@@ -14,7 +14,13 @@ type Exercise = {
   completed: boolean
 }
 
-export default function ExerciseClient({ exercises }: { exercises: Exercise[] }) {
+export default function ExerciseClient({ 
+  exercises,
+  translations = {}
+}: { 
+  exercises: Exercise[],
+  translations?: Record<string, string>
+}) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -23,7 +29,7 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
   if (exercises.length === 0) {
     return (
       <div className="bg-white p-12 rounded-2xl shadow-sm text-center">
-        <p className="text-xl text-gray-500">Keine Übungen verfügbar.</p>
+        <p className="text-xl text-gray-500">{translations.no_exercises || 'Keine Übungen verfügbar.'}</p>
       </div>
     )
   }
@@ -32,8 +38,8 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
     return (
       <div className="bg-white p-12 rounded-2xl shadow-sm text-center border-2 border-green-200 bg-green-50">
         <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-3xl font-bold text-green-800 mb-2">Großartig!</h2>
-        <p className="text-xl text-green-700">Du hast alle Übungen für heute abgeschlossen.</p>
+        <h2 className="text-3xl font-bold text-green-800 mb-2">{translations.great || 'Großartig!'}</h2>
+        <p className="text-xl text-green-700">{translations.all_completed || 'Du hast alle Übungen für heute abgeschlossen.'}</p>
       </div>
     )
   }
@@ -61,7 +67,7 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
     <div className="bg-white rounded-3xl shadow-lg ring-1 ring-gray-900/5 overflow-hidden transition-all duration-300">
       <div className="bg-blue-600 p-6 text-white flex justify-between items-center">
         <span className="text-lg font-medium opacity-80">{exercise.lesson} • {exercise.topic}</span>
-        <span className="text-lg font-bold">Übung {currentIndex + 1} von {exercises.length}</span>
+        <span className="text-lg font-bold">{translations.exercise || 'Übung'} {currentIndex + 1} {translations.of || 'von'} {exercises.length}</span>
       </div>
 
       <div className="p-8 sm:p-12">
@@ -110,7 +116,7 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
                     ? isCorrect ? 'border-green-500 text-green-700 bg-green-50' : 'border-red-500 text-red-700 bg-red-50'
                     : 'border-gray-300 focus:border-blue-500 bg-gray-50'
                 }`}
-                placeholder="Lücke ausfüllen"
+                placeholder={translations.fill_blank || 'Lücke ausfüllen'}
                 autoComplete="off"
                 spellCheck="false"
                 autoCorrect="off"
@@ -125,7 +131,7 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
           <div className="mt-8 bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-xl flex gap-4 items-start animate-in fade-in slide-in-from-bottom-4">
             <AlertCircle className="w-8 h-8 text-amber-600 shrink-0 mt-1" />
             <div>
-              <h4 className="text-xl font-bold text-amber-900 mb-2">Tipp für deine Muttersprache</h4>
+              <h4 className="text-xl font-bold text-amber-900 mb-2">{translations.tip_mother_tongue || 'Tipp für deine Muttersprache'}</h4>
               <p className="text-lg text-amber-800">{exercise.hint}</p>
             </div>
           </div>
@@ -134,7 +140,7 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
         {isSubmitted && isCorrect && (
            <div className="mt-8 bg-green-50 border border-green-200 p-6 rounded-xl flex gap-4 items-center animate-in fade-in zoom-in-95">
              <CheckCircle2 className="w-8 h-8 text-green-600 shrink-0" />
-             <h4 className="text-xl font-bold text-green-800">Richtig! Gut gemacht.</h4>
+             <h4 className="text-xl font-bold text-green-800">{translations.correct_well_done || 'Richtig! Gut gemacht.'}</h4>
            </div>
         )}
 
@@ -145,14 +151,14 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
               disabled={!selectedAnswer}
               className="px-8 py-4 bg-blue-600 text-white text-xl font-bold rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
             >
-              Antwort prüfen
+              {translations.check_answer || 'Antwort prüfen'}
             </button>
           ) : (
             <button
               onClick={handleNext}
               className="px-8 py-4 bg-gray-900 text-white text-xl font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md"
             >
-              Nächste Übung
+              {translations.next_exercise || 'Nächste Übung'}
             </button>
           )}
         </div>
