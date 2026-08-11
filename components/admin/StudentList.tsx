@@ -13,7 +13,15 @@ type Profile = {
   created_at: string
 }
 
-export default function StudentList({ initialStudents, currentUserId }: { initialStudents: Profile[], currentUserId?: string }) {
+export default function StudentList({ 
+  initialStudents, 
+  currentUserId,
+  progressData = {}
+}: { 
+  initialStudents: Profile[], 
+  currentUserId?: string,
+  progressData?: Record<string, Record<string, number>>
+}) {
   const [students, setStudents] = useState<Profile[]>(initialStudents)
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
@@ -52,6 +60,7 @@ export default function StudentList({ initialStudents, currentUserId }: { initia
             <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-sm">
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Name & Email</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Registriert am</th>
+              <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Fortschritt</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Abo-Status</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Rolle</th>
             </tr>
@@ -65,6 +74,22 @@ export default function StudentList({ initialStudents, currentUserId }: { initia
                 </td>
                 <td className="p-4 text-sm text-slate-500">
                   {new Date(student.created_at).toLocaleDateString('de-DE')}
+                </td>
+                <td className="p-4">
+                  {(() => {
+                    const p = progressData[student.id] || {}
+                    const activeLevels = Object.entries(p).filter(([_, val]) => val > 0).sort((a, b) => a[0].localeCompare(b[0]))
+                    if (activeLevels.length === 0) return <span className="text-slate-400 text-xs italic">Noch kein Fortschritt</span>
+                    return (
+                      <div className="flex flex-wrap gap-1.5 max-w-[140px]">
+                        {activeLevels.map(([level, val]) => (
+                          <span key={level} className="text-xs font-bold px-2 py-0.5 rounded-full bg-orange-100 text-[#FF5C00] dark:bg-[#FF5C00]/20 border border-orange-200 dark:border-[#FF5C00]/30 shadow-sm">
+                            {level}: {val}%
+                          </span>
+                        ))}
+                      </div>
+                    )
+                  })()}
                 </td>
                 <td className="p-4">
                   <div className="relative inline-block w-32">
@@ -115,7 +140,7 @@ export default function StudentList({ initialStudents, currentUserId }: { initia
             ))}
             {students.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-slate-500">
+                <td colSpan={5} className="p-8 text-center text-slate-500">
                   Keine Nutzer gefunden.
                 </td>
               </tr>

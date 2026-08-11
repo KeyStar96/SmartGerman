@@ -108,3 +108,73 @@ export async function updateStudentSubscription(userId: string, status: string) 
     return { success: false, error: error.message }
   }
 }
+
+export async function getAllStudentsProgressData() {
+  try {
+    const supabase = await requireAdmin()
+    
+    // 1. Hole alle Übungen und deren Level
+    const { data: exercises } = await supabase.from('exercises').select('id, level')
+    
+    // 2. Hole alle Vokabelkarten und deren Level
+    const { data: vocabCards } = await supabase.from('vocabulary_cards').select('id, level')
+
+    // 3. Hole den Fortschritt ALLER User für Übungen
+    const { data: exerciseProgress } = await supabase
+      .from('user_exercise_progress')
+      .select('user_id, exercise_id')
+      .eq('completed', true)
+
+    // 4. Hole den Fortschritt ALLER User für Vokabeln (Box 7 = gemeistert)
+    const { data: vocabProgress } = await supabase
+      .from('user_vocabulary_progress')
+      .select('user_id, card_id')
+      .eq('box_number', 7)
+
+    // Maps
+    const exerciseLevelMap = new Map((exercises || []).map(e => [e.id, e.level]))
+    const vocabLevelMap = new Map((vocabCards || []).map(v => [v.id, v.level]))
+
+    // Total per level
+    const totalPerLevel: Record<string, number> = {}
+    exercises?.forEach(e => { totalPerLevel[e.level] = (totalPerLevel[e.level] || 0) + 1 })
+    vocabCards?.forEach(v => { totalPerLevel[v.level] = (totalPerLevel[v.level] || 0) + 1 })
+
+    // Completed per user per level
+    const userCompletedPerLevel: Record<string, Record<string, number>> = {}
+    
+    exerciseProgress?.forEach(p => {
+      const level = exerciseLevelMap.get(p.exercise_id)
+      if (level) {
+        if (!userCompletedPerLevel[p.user_id]) userCompletedPerLevel[p.user_id] = {}
+        userCompletedPerLevel[p.user_id][level] = (userCompletedPerLevel[p.user_id][level] || 0) + 1
+      }
+    })
+
+    vocabProgress?.forEach(p => {
+      const level = vocabLevelMap.get(p.card_id)
+      if (level) {
+        if (!userCompletedPerLevel[p.user_id]) userCompletedPerLevel[p.user_id] = {}
+        userCompletedPerLevel[p.user_id][level] = (userCompletedPerLevel[p.user_id][level] || 0) + 1
+      }
+    })
+
+    // Compute percentages
+    const result: Record<string, Record<string, number>> = {}
+    Object.keys(userCompletedPerLevel).forEach(userId => {
+      result[userId] = {}
+      Object.keys(totalPerLevel).forEach(level => {
+        const total = totalPerLevel[level] || 0
+        if (total > 0) {
+          const completed = userCompletedPerLevel[userId][level] || 0
+          result[userId][level] = Math.round((completed / total) * 100)
+        }
+      })
+    })
+
+    return result
+  } catch (error) {
+    console.error('Error fetching progress data for all students', error)
+    return {}
+  }
+}

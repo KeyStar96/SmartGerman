@@ -100,16 +100,20 @@ export default function ExerciseClient({ exercises }: { exercises: Exercise[] })
             <div className="text-3xl leading-relaxed text-gray-800 font-medium mb-12 text-center">
               {exercise.content.text_before}
               <input
+                key={exercise.id}
                 type="text"
                 value={selectedAnswer || ''}
                 onChange={(e) => setSelectedAnswer(e.target.value)}
                 disabled={isSubmitted}
-                className={`mx-3 px-4 py-2 border-b-4 focus:outline-none transition-colors text-center w-48 ${
+                className={`mx-3 px-4 py-2 border-b-4 focus:outline-none transition-colors text-center min-w-[240px] ${
                   isSubmitted 
                     ? isCorrect ? 'border-green-500 text-green-700 bg-green-50' : 'border-red-500 text-red-700 bg-red-50'
                     : 'border-gray-300 focus:border-blue-500 bg-gray-50'
                 }`}
                 placeholder="Lücke ausfüllen"
+                autoComplete="off"
+                spellCheck="false"
+                autoCorrect="off"
               />
               {exercise.content.text_after}
             </div>

@@ -1,9 +1,10 @@
-import { getStudents } from '@/app/actions/admin'
+import { getStudents, getAllStudentsProgressData } from '@/app/actions/admin'
 import StudentList from '@/components/admin/StudentList'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function AdminStudentsPage() {
   const students = await getStudents()
+  const progressData = await getAllStudentsProgressData()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -16,7 +17,7 @@ export default async function AdminStudentsPage() {
         </p>
       </div>
 
-      <StudentList initialStudents={students} currentUserId={user?.id} />
+      <StudentList initialStudents={students} currentUserId={user?.id} progressData={progressData} />
     </div>
   )
 }
