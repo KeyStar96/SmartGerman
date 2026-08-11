@@ -34,10 +34,16 @@ export async function signup(formData: FormData) {
   const native_language = formData.get('native_language') as string
   const lang = formData.get('lang') as string || 'de'
 
+  // URL für die Bestätigung (auth/confirm) vorbereiten
+  const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL 
+    ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?lang=${lang}`
+    : `http://localhost:3000/auth/confirm?lang=${lang}`
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: redirectUrl,
       data: {
         name,
         native_language, // wird für public.profiles Trigger verwendet
