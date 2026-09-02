@@ -1769,6 +1769,9 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-02 — Smartphone-UX-Agent
+- Neuer Cursor-Agent `.cursor/rules/ux-smartphone-agent.mdc`: Mobile-First-Layout (320/375px), Stapeln unter `md:`, Safe-Area, 16px-Inputs gegen iOS-Zoom, kein Horizontal-Scroll. Ergänzt `ux-geragogik-agent.mdc` (Alter/Barrierefreiheit), ersetzt ihn nicht.
+
 ### 2026-09-02 — Vokabeltrainer A1.1 befüllt
 - Demo-Set „Schritte plus neu“ entfernt. Neu: Lernsets **Lektion 1** (Begrüßung, Personen, Herkunft, Länder, Sprachen, Formular) und **Lektion 2** (Befinden, Familie, Zahlen, Lebensmittel, Einkaufen).
 - Jede Karte hat Übersetzungen auf Russisch, Türkisch und Englisch; kontrastiv schwere Nomen (Artikel, Umlaut-Plural) sind für Leitner markiert.

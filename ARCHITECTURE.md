@@ -90,6 +90,7 @@ Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` ver
 
 ## 4. UX/UI-Architektur (Geragogik & Barrierefreiheit)
 
+- **Smartphone zuerst:** Cursor-Agent `.cursor/rules/ux-smartphone-agent.mdc` (Mobile-First, 375px, kein Horizontal-Scroll, Safe-Area). Geragogik-Maße bleiben in `ux-geragogik-agent.mdc`.
 - **Komponenten-Design (Mobile First)**: 
   - Extrem aufgeräumt, große Buttons (min. 48x48px Touch-Target).
   - Sticky Bottom Navigation auf Mobile für intuitive Erreichbarkeit.

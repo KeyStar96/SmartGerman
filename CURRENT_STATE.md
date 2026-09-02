@@ -75,7 +75,7 @@ Das Repository "SmartGerman" ist eine Next.js (App Router) basierte Webanwendung
 ## 4. Bekannte Bugs & Unvollständige Implementierungen (Tech Debt)
 - **Lehrer-Oberfläche ohne i18n:** `SubmissionsDashboard` und `PendingSubmissionCard` enthalten weiterhin deutsche Strings im Code. Bewusst zurückgestellt, da die Korrektur-Ansicht ausschließlich von deutschsprachigen Lehrkräften genutzt wird.
 - **Übungstyp `sentence_building`:** Im Schema und CMS vorhanden, aber noch ohne Studenten-UI. Solche Übungen werden derzeit serverseitig übersprungen und protokolliert, damit keine leere Karte erscheint.
-- **Fehlende UI-Politur (Geragogik):** Außerhalb der drei umgesetzten Module muss die UI noch konsequenter auf große Touch-Targets und fehlerverzeihendes Design geprüft werden (u.a. Level-Übersicht).
+- **Fehlende UI-Politur (Smartphone):** Viele Views sind noch Desktop-first (enge Zeilen, Overflow, kleine Abstände). Der Agent `.cursor/rules/ux-smartphone-agent.mdc` gilt für `app/**/*.tsx` und `components/**/*.tsx` und erzwingt Mobile-First (375px), Stapeln unter `md:`, Safe-Area und 48px-Targets. Geragogik bleibt in `ux-geragogik-agent.mdc`.
 - **Hardcodierte Strings:** `app/[lang]/dashboard/level/[level]/page.tsx` enthält weiterhin deutsche Kachel-Texte im Code statt Dictionary-Keys.
 - **Teacher-Dashboard Vollständigkeit:** Das Korrigieren von Audio-Einsendungen ist umgesetzt; es fehlt weiterhin das feingranulare UI zur Verwaltung von Schülern (z.B. Abo-Status anzeigen).
 - **Stripe-Integration:** Die Basis-Bibliothek ist installiert, aber der vollständige Webhook-Workflow und das Paywall-Blocking auf Serverseite sind noch nicht vollständig implementiert.
