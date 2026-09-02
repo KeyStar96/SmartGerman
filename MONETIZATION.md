@@ -15,7 +15,7 @@ Die Lernplattform der Sitov Language Academy operiert nach einem Freemium-Modell
 ## 2. Stripe Checkout-Workflow
 
 ### Upgrade-Prozess (Client zu Stripe)
-1. **Paywall-Trigger:** Der Nutzer klickt im Dashboard auf einen gesperrten Premium-Inhalt oder den "Upgrade"-Button.
+1. **Paywall-Trigger:** Der Nutzer öffnet das Profil (Header-Icon in der Lernplattform) oder einen gesperrten Premium-Inhalt und klickt auf „Jetzt Premium aktivieren“.
 2. **Checkout Session:** Eine Next.js Server Action (`createCheckoutSession`) ruft die Stripe-API auf, erstellt eine Checkout-Session und gibt die URL zurück.
 3. **Metadaten:** Die Session enthält in den `metadata` zwingend die `user_id` aus Supabase, um den Kauf später zuzuordnen.
 4. **Redirect:** Der Nutzer wird zu Stripe gehosteten Checkout-Seite weitergeleitet.

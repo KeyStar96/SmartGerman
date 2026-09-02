@@ -91,9 +91,10 @@ Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` ver
 ## 4. UX/UI-Architektur (Geragogik & Barrierefreiheit)
 
 - **Smartphone zuerst:** Cursor-Agent `.cursor/rules/ux-smartphone-agent.mdc` (Mobile-First, 375px, kein Horizontal-Scroll, Safe-Area). Geragogik-Maße bleiben in `ux-geragogik-agent.mdc`.
+- **Lernplattform-Hülle:** `app/[lang]/dashboard/layout.tsx` stapelt auf dem Handy Logo/Aktionen und darunter den Seitentitel (`DashboardHeader`). Touch-Targets 48px, `min-h-dvh`, Safe-Area, Profil-Icon. Texte über `lib/dashboard-i18n.ts` / `lib/videos-i18n.ts` / `lib/profile-i18n.ts`.
 - **Komponenten-Design (Mobile First)**: 
   - Extrem aufgeräumt, große Buttons (min. 48x48px Touch-Target).
-  - Sticky Bottom Navigation auf Mobile für intuitive Erreichbarkeit.
+  - Primäraktionen auf dem Handy volle Breite, Toolbars stapeln unter `md:`.
 - **Feedback & Fehler-Toleranz (Zero-Error UI)**:
   - Bei Netzwerkfehlern (z.B. Offline) greift Next.js `error.tsx` mit einem freundlichen Fallback ("Hoppla, das Internet hakt. Versuchen Sie es noch einmal.").
   - Skeleton-Loader für *jeden* asynchronen Ladevorgang (`loading.tsx` und Suspense-Boundaries), um das Gefühl von fließender Geschwindigkeit zu erzeugen.

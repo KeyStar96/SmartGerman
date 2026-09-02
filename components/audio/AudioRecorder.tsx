@@ -89,7 +89,7 @@ export default function AudioRecorder({
   return (
     <div
       className={`rounded-3xl border border-slate-200 bg-white text-center shadow-md transition-colors dark:border-slate-800 dark:bg-slate-900 ${
-        compact ? 'p-6 shadow-none' : 'p-8'
+        compact ? 'p-5 shadow-none' : 'p-5 sm:p-8'
       }`}
     >
       {!compact && (

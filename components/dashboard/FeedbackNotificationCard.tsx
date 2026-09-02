@@ -45,8 +45,8 @@ export default function FeedbackNotificationCard({
           <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#FF5C00] text-white shadow-md">
             <Mic size={30} aria-hidden="true" />
           </span>
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          <div className="min-w-0">
+            <h2 className="break-words text-xl font-bold text-slate-900 sm:text-2xl dark:text-slate-100">
               {t('notification_title')}
             </h2>
             <p className="mt-1 text-lg text-slate-700 dark:text-slate-300">{description}</p>
@@ -55,7 +55,7 @@ export default function FeedbackNotificationCard({
 
         <Link
           href={href}
-          className="flex min-h-16 shrink-0 items-center justify-center gap-3 rounded-2xl bg-[#FF5C00] px-8 text-xl font-bold text-white shadow-md transition-colors hover:bg-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+          className="flex min-h-16 w-full shrink-0 items-center justify-center gap-3 rounded-2xl bg-[#FF5C00] px-8 text-xl font-bold text-white shadow-md transition-colors hover:bg-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:w-auto"
         >
           {t('notification_cta')}
           <ChevronRight size={26} aria-hidden="true" />

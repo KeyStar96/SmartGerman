@@ -102,7 +102,7 @@ export default function SolutionAudioButton({
       onClick={handleClick}
       aria-label={ariaLabel}
       className={cn(
-        'inline-flex min-h-14 items-center justify-center gap-3 rounded-2xl px-6 py-3 text-xl font-bold transition-colors focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]',
+        'inline-flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl px-6 py-3 text-xl font-bold transition-colors focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto',
         variant === 'primary'
           ? 'bg-blue-600 text-white shadow-md hover:bg-blue-500'
           : 'border-2 border-blue-200 bg-white text-blue-700 hover:bg-blue-50'

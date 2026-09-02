@@ -1,159 +1,114 @@
-'use client'
-
-import { useEffect, useState, useRef } from 'react'
-import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
-import { ArrowLeft, Play, Pause, Rewind, FastForward, Settings } from 'lucide-react'
-import { useParams, useRouter } from 'next/navigation'
+import { ArrowLeft, Play } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/utils/supabase/server'
+import { getDictionary } from '@/lib/dictionary'
+import { createVideoTranslator, type VideoTranslations } from '@/lib/videos-i18n'
+import VideoPlayer from '@/components/dashboard/VideoPlayer'
 
-export default function VideoPlayerPage() {
-  const params = useParams()
-  const router = useRouter()
-  const lang = params.lang as string
-  const videoId = params.id as string
-  
-  const [video, setVideo] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  
-  // Player state
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [playbackRate, setPlaybackRate] = useState(1.0)
-  
-  const videoRef = useRef<HTMLVideoElement>(null)
+export default async function VideoPlayerPage({
+  params,
+}: {
+  params: Promise<{ lang: string; level: string; id: string }>
+}) {
+  const { lang, level, id } = await params
+  const decodedLevel = decodeURIComponent(level)
+  const levelSegment = encodeURIComponent(decodedLevel)
+  const overviewHref = `/${lang}/dashboard/level/${levelSegment}/videos`
+  const dict = await getDictionary(lang)
+  const t = createVideoTranslator((dict.videos ?? {}) as VideoTranslations)
 
-  useEffect(() => {
-    async function loadVideo() {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('videos')
-        .select('*')
-        .eq('id', videoId)
-        .single()
-      
-      if (data) {
-        if (data.is_external) {
-           // Redirect externals just in case they navigated here directly
-           window.location.href = data.external_url
-           return
-        }
-        setVideo(data)
+  let videoTitle = ''
+  let videoLesson = ''
+  let videoDescription: string | null = null
+  let videoUrl: string | null = null
+  let found = false
+  let externalUrl: string | null = null
+
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase.from('videos').select('*').eq('id', id).maybeSingle()
+
+    if (error) {
+      console.error('Video konnte nicht geladen werden:', error.message)
+    } else if (data) {
+      if (data.is_external && data.external_url) {
+        externalUrl = data.external_url
+      } else {
+        found = true
+        videoTitle = data.title
+        videoLesson = data.lesson
+        videoDescription = data.description
+        videoUrl = data.video_url
       }
-      setLoading(false)
     }
-    loadVideo()
-  }, [videoId])
-
-  if (loading) {
-    return <div className="p-12 text-center text-xl text-gray-500 animate-pulse">Lade Video...</div>
+  } catch (err) {
+    console.error('Video konnte nicht geladen werden:', err)
   }
 
-  if (!video) {
+  if (externalUrl) {
+    redirect(externalUrl)
+  }
+
+  if (!found) {
     return (
-      <div className="p-12 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Video nicht gefunden</h1>
-        <Link href={`/${lang}/dashboard/videos`} className="text-blue-600 text-lg hover:underline">
-          Zurück zur Übersicht
+      <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-900/5 sm:p-12 dark:bg-slate-900 dark:ring-slate-800">
+        <h1 className="mb-4 text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">{t('not_found')}</h1>
+        <Link
+          href={overviewHref}
+          className="inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 hover:text-blue-800"
+        >
+          <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_level')}
         </Link>
       </div>
     )
   }
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) videoRef.current.pause()
-      else videoRef.current.play()
-      setIsPlaying(!isPlaying)
-    }
-  }
-
-  const toggleSpeed = () => {
-    if (videoRef.current) {
-      const newRate = playbackRate === 1.0 ? 0.8 : 1.0
-      videoRef.current.playbackRate = newRate
-      setPlaybackRate(newRate)
-    }
-  }
-
   return (
-    <div className="max-w-4xl mx-auto">
-      <Link 
-        href={`/${lang}/dashboard/videos`}
-        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium mb-6 text-lg transition-colors"
+    <div className="mx-auto max-w-4xl">
+      <Link
+        href={overviewHref}
+        className="mb-6 inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
       >
-        <ArrowLeft size={24} /> Zurück zur Lektionsübersicht
+        <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_level')}
       </Link>
 
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden ring-1 ring-gray-900/5">
-        {/* Video Area */}
-        <div className="aspect-video bg-black relative flex items-center justify-center">
-          {video.video_url ? (
-            <video 
-              ref={videoRef}
-              src={video.video_url} 
-              className="w-full h-full"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-            />
-          ) : (
-            <div className="text-center p-8">
-              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-yellow-500/20 mb-6">
-                <Play className="h-12 w-12 text-yellow-500" />
+      <div className="overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/5 dark:bg-slate-900 dark:ring-slate-800">
+        {videoUrl ? (
+          <VideoPlayer
+            src={videoUrl}
+            labels={{
+              rewindAria: t('rewind_aria'),
+              forwardAria: t('forward_aria'),
+              playAria: t('play_aria'),
+              pauseAria: t('pause_aria'),
+              speedAria: t('speed_aria', { speed: '{speed}' }),
+            }}
+          />
+        ) : (
+          <div className="relative flex aspect-video items-center justify-center bg-black">
+            <div className="p-6 text-center sm:p-8">
+              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-yellow-500/20">
+                <Play className="h-12 w-12 text-yellow-500" aria-hidden="true" />
               </div>
-              <h2 className="text-3xl font-bold text-white mb-4">In Vorbereitung</h2>
-              <p className="text-xl text-gray-400">
-                Dieses Video wird bald veröffentlicht.
-              </p>
+              <h2 className="mb-4 text-2xl font-bold text-white sm:text-3xl">{t('in_preparation')}</h2>
+              <p className="text-lg text-slate-400 sm:text-xl">{t('in_preparation_hint')}</p>
             </div>
-          )}
-        </div>
-
-        {/* Custom Controls (Barrierefrei) */}
-        {video.video_url && (
-          <div className="bg-gray-900 p-6 flex items-center justify-center gap-8">
-            <button 
-              onClick={() => { if(videoRef.current) videoRef.current.currentTime -= 10 }}
-              className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors"
-              aria-label="10 Sekunden zurück"
-            >
-              <Rewind size={32} />
-            </button>
-            
-            <button 
-              onClick={togglePlay}
-              className="p-6 rounded-full bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-lg"
-              aria-label={isPlaying ? "Pause" : "Play"}
-            >
-              {isPlaying ? <Pause size={40} /> : <Play size={40} className="ml-2" />}
-            </button>
-            
-            <button 
-              onClick={() => { if(videoRef.current) videoRef.current.currentTime += 10 }}
-              className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors"
-              aria-label="10 Sekunden vor"
-            >
-              <FastForward size={32} />
-            </button>
-            
-            <button 
-              onClick={toggleSpeed}
-              className={`ml-8 flex items-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-colors ${
-                playbackRate === 0.8 ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-              }`}
-              title="Langsamer abspielen"
-            >
-              <Settings size={24} />
-              {playbackRate}x
-            </button>
           </div>
         )}
 
-        {/* Video Info */}
-        <div className="p-10">
-          <div className="text-blue-600 font-bold text-lg mb-2">Lektion {video.lesson}</div>
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">{video.title}</h1>
-          <p className="text-xl text-gray-600 leading-relaxed">
-            {video.description}
-          </p>
+        <div className="p-6 sm:p-10">
+          <div className="mb-2 text-lg font-bold text-blue-600">
+            {t('lesson_label', { lesson: videoLesson })}
+          </div>
+          <h1 className="mb-4 break-words text-2xl font-extrabold text-slate-900 sm:text-4xl dark:text-white">
+            {videoTitle}
+          </h1>
+          {videoDescription ? (
+            <p className="text-lg leading-relaxed break-words text-slate-600 sm:text-xl dark:text-slate-400">
+              {videoDescription}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>

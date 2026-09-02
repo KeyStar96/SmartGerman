@@ -32,11 +32,11 @@ export default async function ExercisesPage({
           >
             <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_level')}
           </Link>
-          <h1 className="text-4xl font-extrabold text-gray-900">{t('title')}</h1>
+          <h1 className="break-words text-3xl font-extrabold text-gray-900 sm:text-4xl">{t('title')}</h1>
           <p className="mt-2 text-xl text-gray-600">{t('subtitle')}</p>
         </div>
-        <div className="hidden text-right sm:block">
-          <div className="text-3xl font-bold text-green-600">
+        <div className="text-left sm:text-right">
+          <div className="text-2xl font-bold text-green-600 sm:text-3xl">
             {completedCount} / {exercises.length}
           </div>
           <div className="text-sm font-medium uppercase tracking-wider text-gray-500">

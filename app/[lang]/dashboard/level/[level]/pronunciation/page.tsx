@@ -33,10 +33,10 @@ export default async function PronunciationDashboard({
         </Link>
       </div>
 
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 text-white shadow-lg dark:bg-slate-800">
+      <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-lg sm:p-8 dark:bg-slate-800">
         <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 -translate-y-1/2 translate-x-1/2 rounded-full bg-[#FF5C00] opacity-20 blur-[100px]" />
-        <h1 className="relative z-10 mb-4 text-3xl font-bold">{t('title')}</h1>
-        <p className="relative z-10 text-xl opacity-90">{t('subtitle')}</p>
+        <h1 className="relative z-10 mb-4 break-words text-2xl font-bold sm:text-3xl">{t('title')}</h1>
+        <p className="relative z-10 text-lg leading-relaxed opacity-90 sm:text-xl">{t('subtitle')}</p>
       </div>
 
       <AudioRecorder level={decodedLevel} translations={translations} />

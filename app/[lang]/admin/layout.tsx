@@ -37,10 +37,10 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors">
       <header className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 justify-between items-center">
+          <div className="flex min-h-16 justify-between items-center gap-2 py-2">
             <div className="flex items-center gap-6">
               <Link href={`/${lang}/admin`} className="flex-shrink-0 items-center block hover:opacity-80 transition-opacity">
                 <Image
@@ -80,7 +80,7 @@ export default async function AdminLayout({
               }}>
                 <button
                   type="submit"
-                  className="rounded-xl bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                  className="inline-flex h-12 items-center justify-center rounded-xl bg-white dark:bg-slate-800 px-4 text-sm font-bold text-slate-900 dark:text-slate-100 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Abmelden
                 </button>

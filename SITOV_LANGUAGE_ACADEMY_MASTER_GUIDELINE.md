@@ -75,7 +75,7 @@ A systematic review of font-size research for older adults found that larger typ
 
 ### **Sitov project standard**
 
-Use the following as the **default design system**, not merely as the minimum accessible version:
+Use the following as the **default design system**, not merely as the minimum accessible version. The student learning shell (Dashboard, Niveau, Videos, Profil, Übungen, Vokabeltrainer, Aussprache) follows this on 375px: stacked header, 48px targets, full-width primary actions, no hover-only controls.
 
 | Token | CSS | Recommendation |
 |---|---:|---|

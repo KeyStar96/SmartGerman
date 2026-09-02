@@ -105,7 +105,7 @@ export default function VocabTrainerClient({
 
   if (session.length === 0) {
     return (
-      <div className="mx-auto mt-10 max-w-2xl rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-gray-900/5">
+      <div className="mx-auto mt-6 max-w-2xl rounded-3xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-900/5 sm:p-12">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
           <Check className="h-10 w-10 text-green-600" aria-hidden="true" />
         </div>
@@ -123,7 +123,7 @@ export default function VocabTrainerClient({
 
   if (!currentCard) {
     return (
-      <div className="mx-auto mt-10 max-w-2xl rounded-3xl border-2 border-green-200 bg-green-50 p-12 text-center shadow-sm">
+      <div className="mx-auto mt-6 max-w-2xl rounded-3xl border-2 border-green-200 bg-green-50 p-6 text-center shadow-sm sm:p-12">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
           <PartyPopper className="h-10 w-10 text-green-600" aria-hidden="true" />
         </div>
@@ -144,7 +144,7 @@ export default function VocabTrainerClient({
 
   return (
     <div className="mx-auto mt-6 max-w-2xl">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-lg font-medium text-gray-600">
+      <div className="mb-6 flex flex-col gap-3 text-lg font-medium text-gray-600 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <span>{t('lesson_label', { lesson: card.lesson })}</span>
         <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-blue-800">
           <Layers size={20} aria-hidden="true" />
@@ -155,27 +155,27 @@ export default function VocabTrainerClient({
 
       <div className="flex min-h-[26rem] flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
         {/* Vorderseite: Muttersprache */}
-        <div className="flex flex-1 flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-10">
+        <div className="flex flex-1 flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-6 sm:p-10">
           {card.image_url ? (
             <img
               src={card.image_url}
               alt={t('image_alt')}
-              className="mb-8 h-48 w-48 rounded-2xl object-cover shadow-md"
+              className="mb-6 h-40 w-40 max-w-full rounded-2xl object-cover shadow-md sm:mb-8 sm:h-48 sm:w-48"
             />
           ) : (
-            <div className="mb-8 flex h-32 w-32 items-center justify-center rounded-2xl bg-gray-200 text-gray-400 shadow-inner">
+            <div className="mb-6 flex h-28 w-28 items-center justify-center rounded-2xl bg-gray-200 text-gray-400 shadow-inner sm:mb-8 sm:h-32 sm:w-32">
               <ImageIcon size={48} aria-hidden="true" />
             </div>
           )}
 
-          <h2 className="text-center text-4xl font-bold text-gray-800">
+          <h2 className="break-words text-center text-3xl font-bold text-gray-800 sm:text-4xl">
             {currentCard.translation || t('no_translation')}
           </h2>
         </div>
 
         {isRevealed ? (
-          <div className="flex flex-col items-center justify-center bg-white p-10">
-            <span className={cn('text-center text-5xl font-extrabold', articleColorClass(card.article))}>
+          <div className="flex flex-col items-center justify-center bg-white p-6 sm:p-10">
+            <span className={cn('break-words text-center text-3xl font-extrabold sm:text-5xl', articleColorClass(card.article))}>
               {displayWord}
             </span>
 
@@ -218,7 +218,7 @@ export default function VocabTrainerClient({
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="mt-6 inline-flex min-h-16 items-center gap-3 rounded-2xl bg-gray-900 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                  className="mt-6 inline-flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-gray-900 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
                 >
                   {currentIndex + 1 >= session.length ? t('finish_session') : t('next_card')}
                   <ArrowRight size={28} aria-hidden="true" />
@@ -251,7 +251,7 @@ export default function VocabTrainerClient({
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center bg-white p-10">
+          <div className="flex items-center justify-center bg-white p-6 sm:p-10">
             <button
               type="button"
               onClick={() => setIsRevealed(true)}

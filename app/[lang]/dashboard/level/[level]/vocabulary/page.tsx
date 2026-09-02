@@ -23,7 +23,7 @@ export default async function VocabularyOverviewPage({
   const levelSegment = encodeURIComponent(decodedLevel)
 
   return (
-    <div className="mx-auto max-w-4xl rounded-3xl bg-white p-8 shadow-sm ring-1 ring-gray-900/5">
+    <div className="mx-auto max-w-4xl rounded-3xl bg-white p-5 shadow-sm ring-1 ring-gray-900/5 sm:p-8">
       <Link
         href={`/${lang}/dashboard/level/${levelSegment}`}
         className="mb-4 inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800"
@@ -33,7 +33,7 @@ export default async function VocabularyOverviewPage({
 
       <div className="mb-8 flex flex-col justify-between gap-6 border-b border-gray-200 pb-6 md:flex-row md:items-center">
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900">{t('title')}</h1>
+          <h1 className="break-words text-3xl font-extrabold text-gray-900 sm:text-4xl">{t('title')}</h1>
           <p className="mt-2 text-xl text-gray-600">{t('subtitle')}</p>
         </div>
 
@@ -110,7 +110,7 @@ export default async function VocabularyOverviewPage({
                   >
                     <button
                       type="submit"
-                      className="min-h-14 rounded-2xl bg-green-600 px-8 py-4 text-lg font-bold text-white shadow-sm transition-colors hover:bg-green-500 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                      className="min-h-14 w-full rounded-2xl bg-green-600 px-8 py-4 text-lg font-bold text-white shadow-sm transition-colors hover:bg-green-500 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto"
                     >
                       {t('start_set')}
                     </button>

@@ -60,8 +60,8 @@ export default function MultipleChoiceExerciseCard({
   }
 
   return (
-    <div className="p-6 sm:p-10">
-      <h3 className="text-2xl font-bold leading-relaxed text-gray-900">{exercise.content.question}</h3>
+    <div className="p-5 sm:p-10">
+      <h3 className="break-words text-xl font-bold leading-relaxed text-gray-900 sm:text-2xl">{exercise.content.question}</h3>
 
       <div className="mt-8 space-y-4">
         {exercise.content.options.map((option) => {
@@ -126,12 +126,12 @@ export default function MultipleChoiceExerciseCard({
         </div>
       )}
 
-      <div className="mt-10 flex justify-end">
+      <div className="mt-10 flex flex-col sm:flex-row sm:justify-end">
         {isSolved ? (
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex min-h-16 items-center gap-3 rounded-2xl bg-gray-900 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+            className="inline-flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-gray-900 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto"
           >
             {nextLabel}
             <ArrowRight size={28} aria-hidden="true" />
@@ -141,7 +141,7 @@ export default function MultipleChoiceExerciseCard({
             type="button"
             onClick={handleCheck}
             disabled={!selectedOption}
-            className="min-h-16 rounded-2xl bg-blue-600 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+            className="min-h-16 w-full rounded-2xl bg-blue-600 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto"
           >
             {t('check_answer')}
           </button>

@@ -3,7 +3,15 @@
 import React, { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 
-export default function ThemeToggle() {
+export default function ThemeToggle({
+  label,
+  lightLabel,
+  darkLabel,
+}: {
+  label?: string
+  lightLabel?: string
+  darkLabel?: string
+}) {
   const [isDark, setIsDark] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -22,17 +30,26 @@ export default function ThemeToggle() {
     window.dispatchEvent(new Event("storage"));
   };
 
-  if (isDark === null) return <div className="w-9 h-9" />; // placeholder
+  if (isDark === null) {
+    return <div className="h-12 w-12 shrink-0" aria-hidden="true" />;
+  }
+
+  const ariaLabel = isDark
+    ? (lightLabel ?? label ?? "Helles Design aktivieren")
+    : (darkLabel ?? label ?? "Dunkles Design aktivieren");
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="relative p-2.5 rounded-full border border-black/5 dark:border-white/10 transition-colors shadow-sm overflow-hidden hover:bg-black/5 dark:hover:bg-white/5 bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center"
-      aria-label="Toggle Theme"
+      className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm transition-colors hover:bg-slate-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+      aria-label={ariaLabel}
     >
-      <div className="relative z-10">
-        {isDark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-black" />}
-      </div>
+      {isDark ? (
+        <Sun className="h-5 w-5 text-white" aria-hidden="true" />
+      ) : (
+        <Moon className="h-5 w-5 text-slate-900" aria-hidden="true" />
+      )}
     </button>
   );
 }

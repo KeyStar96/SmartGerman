@@ -56,7 +56,7 @@ export default function ExerciseClient({
 
   if (session.length === 0) {
     return (
-      <div className="rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-gray-900/5">
+      <div className="rounded-3xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-900/5 sm:p-12">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
           <BookOpenCheck className="h-10 w-10 text-blue-600" aria-hidden="true" />
         </div>
@@ -74,7 +74,7 @@ export default function ExerciseClient({
 
   if (!currentExercise) {
     return (
-      <div className="rounded-3xl border-2 border-green-200 bg-green-50 p-12 text-center shadow-sm">
+      <div className="rounded-3xl border-2 border-green-200 bg-green-50 p-6 text-center shadow-sm sm:p-12">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
           <PartyPopper className="h-10 w-10 text-green-600" aria-hidden="true" />
         </div>
@@ -95,9 +95,9 @@ export default function ExerciseClient({
 
   return (
     <div className="overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
-      <div className="bg-blue-600 px-6 py-5 text-white">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-lg font-medium opacity-90">
+      <div className="bg-blue-600 px-5 py-5 text-white sm:px-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <span className="break-words text-lg font-medium opacity-90">
             {currentExercise.lesson} • {currentExercise.topic}
           </span>
           <span className="text-lg font-bold">

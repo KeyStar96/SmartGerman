@@ -92,13 +92,13 @@ export default function FillInBlankExerciseCard({
   const gapContent = isSolved ? exercise.content.correct_answer : selectedChip
 
   return (
-    <div className="p-6 sm:p-10">
-      {/* Satz mit Lücke – 30px, damit die Aufgabe klar über dem Body-Text liegt. */}
-      <p className="text-center text-3xl font-medium leading-loose text-gray-900">
+    <div className="p-5 sm:p-10">
+      {/* Satz mit Lücke – auf dem Handy 20px, ab Tablet 30px. */}
+      <p className="break-words text-center text-xl font-medium leading-relaxed text-gray-900 sm:text-3xl sm:leading-loose">
         {exercise.content.text_before}
         <span
           className={cn(
-            'mx-2 inline-flex min-w-[9rem] items-center justify-center rounded-xl border-b-4 px-4 py-1 align-middle transition-colors',
+            'mx-2 inline-flex max-w-full min-w-[6rem] items-center justify-center break-words rounded-xl border-b-4 px-3 py-1 align-middle transition-colors sm:min-w-[9rem] sm:px-4',
             isSolved
               ? 'border-green-600 bg-green-50 font-bold text-green-800'
               : selectedChip
@@ -117,7 +117,7 @@ export default function FillInBlankExerciseCard({
           <h3 className="mt-10 text-center text-2xl font-bold text-gray-800">{t('choose_word')}</h3>
 
           {/* Tipp-Chips: Touch-Targets mit 64px Höhe, kein Drag-and-Drop. */}
-          <div className="mt-6 flex flex-wrap justify-center gap-4">
+          <div className="mt-6 flex flex-wrap justify-center gap-3 sm:gap-4">
             {exercise.chips.map((chip) => {
               const isExcluded = excludedChips.includes(chip)
               const isSelected = selectedChip === chip
@@ -186,7 +186,7 @@ export default function FillInBlankExerciseCard({
           </div>
 
           {/* Tap-to-Listen für das gelöste Wort und den gesamten Satz. */}
-          <div className="mt-6 flex flex-wrap gap-4">
+          <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
             <SolutionAudioButton
               text={exercise.content.correct_answer}
               audioUrl={exercise.solutionAudioUrl}
@@ -209,12 +209,12 @@ export default function FillInBlankExerciseCard({
         </div>
       )}
 
-      <div className="mt-10 flex justify-end">
+      <div className="mt-10 flex flex-col sm:flex-row sm:justify-end">
         {isSolved ? (
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex min-h-16 items-center gap-3 rounded-2xl bg-gray-900 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+            className="inline-flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-gray-900 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto"
           >
             {nextLabel}
             <ArrowRight size={28} aria-hidden="true" />
@@ -224,7 +224,7 @@ export default function FillInBlankExerciseCard({
             type="button"
             onClick={handleCheck}
             disabled={!selectedChip}
-            className="min-h-16 rounded-2xl bg-blue-600 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+            className="min-h-16 w-full rounded-2xl bg-blue-600 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto"
           >
             {t('check_answer')}
           </button>
