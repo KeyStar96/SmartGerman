@@ -19,4 +19,22 @@ test.describe('Authentication Flow', () => {
     // Sollte er ebenfalls auf Login umgeleitet werden
     await expect(page).toHaveURL(/.*\/login/);
   });
+
+  test('keeps confirmation tokens instead of treating ?lang= as a legacy homepage', async ({
+    page,
+  }) => {
+    await page.goto('/auth/confirm?token_hash=ungueltig&type=signup&lang=de');
+
+    await expect(page).toHaveURL(/\/de\/login\?status=/);
+    await expect(page).not.toHaveURL(/\/de\/?$/);
+    await expect(page.getByRole('status')).toBeVisible();
+  });
+
+  test('PKCE callback path also keeps the one-time code', async ({ page }) => {
+    await page.goto('/auth/callback?code=ungueltig&lang=de');
+
+    await expect(page).toHaveURL(/\/de\/login\?status=/);
+    await expect(page).not.toHaveURL(/\/de\/?$/);
+    await expect(page.getByRole('status')).toBeVisible();
+  });
 });

@@ -6,6 +6,8 @@ import Image from 'next/image'
 import ThemeToggle from '@/components/layout/ThemeToggle'
 import DashboardHeader from '@/components/layout/DashboardHeader'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardLayout({
   children,
   params,

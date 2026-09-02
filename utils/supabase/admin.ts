@@ -1,10 +1,11 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/supabase/database.types';
+import { readSupabasePublicConfig } from '@/lib/supabase-env';
 
 // ADMIN CLIENT - Uses Service Role Key
 // Warning: Bypasses RLS. Use only in secure server actions.
 export function createAdminClient() {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const { url: supabaseUrl } = readSupabasePublicConfig();
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
     if (!supabaseServiceKey) {

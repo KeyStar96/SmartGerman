@@ -1,5 +1,33 @@
+import Link from 'next/link'
+import type { Metadata } from 'next'
 import { updatePassword } from '@/app/actions/auth'
+import AuthForm from '@/components/auth/AuthForm'
+import AuthShell from '@/components/auth/AuthShell'
+import AuthStatusMessage from '@/components/auth/AuthStatusMessage'
+import {
+  authStatusMessage,
+  authTranslations,
+  createAuthTranslator,
+  passwordHint,
+} from '@/lib/auth-i18n'
+import { getDictionary } from '@/lib/dictionary'
+import { parseAuthStatus, PASSWORD_MIN_LENGTH } from '@/lib/types/auth'
+import { createClient } from '@/utils/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
+
+/**
+ * Vergabe eines neuen Passworts nach dem Klick im Recovery-Link.
+ *
+ * Der Link führt über `/auth/confirm`, wo aus dem Einmal-Token eine Sitzung
+ * wird. Fehlt diese Sitzung hier, ist der Link abgelaufen oder wurde in einem
+ * anderen Browser geöffnet. Dann zeigen wir statt eines Formulars, das
+ * zwangsläufig fehlschlägt, direkt den Weg zu einem neuen Link.
+ */
 export default async function ResetPasswordPage({
   params,
   searchParams,
@@ -9,61 +37,74 @@ export default async function ResetPasswordPage({
 }) {
   const { lang } = await params
   const resolvedSearchParams = await searchParams
-  const message = resolvedSearchParams?.message as string
+  const status = parseAuthStatus(resolvedSearchParams?.status)
+
+  const dictionary = await getDictionary(lang)
+  const t = createAuthTranslator(authTranslations(dictionary))
+
+  let hasRecoverySession = false
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    hasRecoverySession = user !== null
+  } catch (error) {
+    console.error('[reset-password] Sitzung konnte nicht geprüft werden', {
+      error: error instanceof Error ? error.message : 'unbekannt',
+    })
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50/50 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-xl ring-1 ring-gray-900/5 backdrop-blur-sm">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-gray-900">
-            Neues Passwort festlegen
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Bitte gib dein neues sicheres Passwort ein.
-          </p>
-        </div>
+    <AuthShell
+      lang={lang}
+      title={t('reset_title')}
+      description={hasRecoverySession ? t('reset_description') : undefined}
+    >
+      {status && <AuthStatusMessage status={status} message={authStatusMessage(t, status)} />}
 
-        <form className="mt-8 space-y-6" action={updatePassword}>
-          <input type="hidden" name="lang" value={lang} />
-          
-          <div className="space-y-4 rounded-md shadow-sm">
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Neues Passwort
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={6}
-                className="relative block w-full rounded-lg border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all"
-                placeholder="Neues Passwort (mind. 6 Zeichen)"
-              />
-            </div>
-          </div>
-
-          {message && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">{message}</h3>
-                </div>
-              </div>
-            </div>
+      {hasRecoverySession ? (
+        <AuthForm
+          action={updatePassword}
+          lang={lang}
+          submitLabel={t('reset_submit')}
+          pendingLabel={t('reset_pending')}
+          fields={[
+            {
+              name: 'password',
+              label: t('field_password_new'),
+              type: 'password',
+              placeholder: t('field_password_placeholder'),
+              autoComplete: 'new-password',
+              minLength: PASSWORD_MIN_LENGTH,
+              hint: passwordHint(t),
+            },
+          ]}
+        />
+      ) : (
+        <div className="space-y-5">
+          {!status && (
+            <AuthStatusMessage
+              status="password_session_missing"
+              message={authStatusMessage(t, 'password_session_missing')}
+            />
           )}
 
-          <div>
-            <button
-              type="submit"
-              className="group relative flex w-full justify-center rounded-lg bg-blue-600 py-3 px-4 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all shadow-md hover:shadow-lg"
-            >
-              Passwort speichern
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          <Link
+            href={`/${lang}/forgot-password`}
+            className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-[#FF5C00] px-6 text-xl font-bold text-white shadow-md transition-colors hover:bg-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white"
+          >
+            {t('forgot_submit')}
+          </Link>
+
+          <Link
+            href={`/${lang}/login`}
+            className="inline-flex min-h-14 items-center text-lg font-semibold text-[#FF5C00] underline decoration-2 underline-offset-4 hover:text-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+          >
+            {t('forgot_back_to_login')}
+          </Link>
+        </div>
+      )}
+    </AuthShell>
   )
 }

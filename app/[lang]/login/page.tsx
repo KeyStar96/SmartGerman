@@ -1,5 +1,29 @@
-import { login } from '@/app/actions/auth'
 import Link from 'next/link'
+import type { Metadata } from 'next'
+import { login, resendConfirmation } from '@/app/actions/auth'
+import AuthForm from '@/components/auth/AuthForm'
+import AuthShell from '@/components/auth/AuthShell'
+import AuthStatusMessage from '@/components/auth/AuthStatusMessage'
+import { authStatusMessage, authTranslations, createAuthTranslator } from '@/lib/auth-i18n'
+import { getDictionary } from '@/lib/dictionary'
+import { parseAuthStatus, type AuthStatusCode } from '@/lib/types/auth'
+
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  // Anmeldeseiten gehören nicht in den Suchindex.
+  robots: { index: false, follow: false },
+}
+
+/**
+ * Status, bei denen ein neuer Bestätigungslink der eigentliche Ausweg ist.
+ * Nur dann wird das zweite Formular gezeigt – sonst lenkt es ab.
+ */
+const RESEND_STATUS: readonly AuthStatusCode[] = [
+  'login_unconfirmed',
+  'confirm_failed',
+  'confirm_missing_params',
+]
 
 export default async function LoginPage({
   params,
@@ -8,102 +32,98 @@ export default async function LoginPage({
   params: Promise<{ lang: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  // Await the params and searchParams objects
   const { lang } = await params
   const resolvedSearchParams = await searchParams
-  const message = resolvedSearchParams?.message as string
+  const status = parseAuthStatus(resolvedSearchParams?.status)
+
+  const dictionary = await getDictionary(lang)
+  const t = createAuthTranslator(authTranslations(dictionary))
+
+  const showResend = status !== null && RESEND_STATUS.includes(status)
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white dark:bg-zinc-900 p-10 shadow-xl ring-1 ring-black/5 dark:ring-white/10 backdrop-blur-sm">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            Willkommen zurück
-          </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Oder{' '}
-            <Link
-              href={`/${lang}/register`}
-              className="font-medium text-primary-orange hover:text-orange-500 transition-colors"
-            >
-              erstelle ein neues Konto
-            </Link>
-          </p>
-        </div>
+    <AuthShell
+      lang={lang}
+      title={t('login_title')}
+      description={
+        <>
+          {t('login_subtitle')}{' '}
+          <Link
+            href={`/${lang}/register`}
+            className="font-semibold text-[#FF5C00] underline decoration-2 underline-offset-4 hover:text-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+          >
+            {t('login_register_link')}
+          </Link>
+        </>
+      }
+    >
+      {status && <AuthStatusMessage status={status} message={authStatusMessage(t, status)} />}
 
-        <form className="mt-8 space-y-6" action={login}>
-          <input type="hidden" name="lang" value={lang} />
-          <div className="space-y-4 rounded-md shadow-sm">
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                E-Mail Adresse
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="relative block w-full rounded-lg border-0 py-3 px-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-orange sm:text-sm sm:leading-6 transition-all"
-                placeholder="E-Mail Adresse"
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Passwort
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="relative block w-full rounded-lg border-0 py-3 px-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-orange sm:text-sm sm:leading-6 transition-all"
-                placeholder="Passwort"
-              />
-            </div>
-          </div>
+      <AuthForm
+        action={login}
+        lang={lang}
+        submitLabel={t('login_submit')}
+        pendingLabel={t('login_pending')}
+        fields={[
+          {
+            name: 'email',
+            label: t('field_email'),
+            type: 'email',
+            placeholder: t('field_email_placeholder'),
+            autoComplete: 'email',
+          },
+          {
+            name: 'password',
+            label: t('field_password'),
+            type: 'password',
+            placeholder: t('field_password_placeholder'),
+            autoComplete: 'current-password',
+          },
+        ]}
+      />
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-primary-orange focus:ring-primary-orange dark:bg-zinc-800"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                Angemeldet bleiben
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a href="#" className="font-medium text-primary-orange hover:text-orange-500 transition-colors">
-                Passwort vergessen?
-              </a>
-            </div>
-          </div>
-
-          {message && (
-            <div className={`rounded-md p-4 border ${message.includes('erfolgreich') ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' : 'bg-red-50 text-red-800 border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-800'}`}>
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium">{message}</h3>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              className="group relative flex w-full justify-center rounded-lg bg-primary-orange py-3 px-4 text-sm font-semibold text-white hover:bg-primary-orange/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-orange transition-all shadow-md hover:shadow-lg"
-            >
-              Anmelden
-            </button>
-          </div>
-        </form>
+      <div className="border-t-2 border-slate-200 pt-4 dark:border-slate-800">
+        <Link
+          href={`/${lang}/forgot-password`}
+          className="inline-flex min-h-14 items-center text-lg font-semibold text-[#FF5C00] underline decoration-2 underline-offset-4 hover:text-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+        >
+          {t('login_forgot_password')}
+        </Link>
       </div>
-    </div>
+
+      {showResend && (
+        <section
+          aria-label={t('resend_title')}
+          className="space-y-4 rounded-2xl border-2 border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800/50"
+        >
+          <div className="space-y-2">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              {t('resend_title')}
+            </h2>
+            <p className="text-lg text-slate-700 dark:text-slate-300">
+              {t('resend_description')}
+            </p>
+          </div>
+
+          <AuthForm
+            action={resendConfirmation}
+            lang={lang}
+            submitLabel={t('resend_submit')}
+            pendingLabel={t('resend_pending')}
+            fields={[
+              {
+                name: 'email',
+                label: t('field_email'),
+                type: 'email',
+                placeholder: t('field_email_placeholder'),
+                autoComplete: 'email',
+              },
+            ]}
+          />
+
+          <p className="text-base text-slate-600 dark:text-slate-400">{t('spam_hint')}</p>
+        </section>
+      )}
+    </AuthShell>
   )
 }

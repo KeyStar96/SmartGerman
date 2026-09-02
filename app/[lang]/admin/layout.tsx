@@ -6,6 +6,8 @@ import Image from 'next/image'
 import ThemeToggle from '@/components/layout/ThemeToggle'
 import AdminNav from '@/components/admin/AdminNav'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminLayout({
   children,
   params,

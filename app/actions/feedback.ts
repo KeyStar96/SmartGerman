@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { headers } from 'next/headers'
+import { getOutboundSiteUrl } from '@/lib/site-url'
 import nodemailer from 'nodemailer'
 import { createClient } from '@/utils/supabase/server'
 import type {
@@ -345,15 +345,7 @@ async function notifyStudentByEmail(
     const studentEmail = data.profiles.email
     const studentName = data.profiles.name ?? 'Schüler'
 
-    let siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-    try {
-      const headersList = await headers()
-      const host = headersList.get('x-forwarded-host') ?? headersList.get('host')
-      const proto = headersList.get('x-forwarded-proto') ?? 'https'
-      if (host) siteUrl = `${proto}://${host}`
-    } catch {
-      console.warn('Host-Header nicht lesbar, nutze konfigurierte Basis-URL.')
-    }
+    const siteUrl = await getOutboundSiteUrl()
 
     const dashUrl = `${siteUrl}/de/dashboard/level/${encodeURIComponent(data.level)}/pronunciation`
 

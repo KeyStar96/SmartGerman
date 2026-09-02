@@ -48,3 +48,4 @@ Da der Webhook die Supabase-Datenbank (`profiles` Tabelle) in Echtzeit aktualisi
 ## 5. Protokoll (2026-09-02)
 - Stripe-relevante DB-Spalten (`profiles.stripe_customer_id`, `profiles.stripe_subscription_id`) und Indizes sind in `supabase/schema.sql` dokumentiert.
 - Supabase-Projekt-Binding: ausschließlich `wcaslabeiwtvygxtzcio` (SmartGerman v2, Live-DB). Schema-Änderungen dürfen Webhook-Workflows nicht brechen.
+- Auth-Produktionsfix (Bestätigungslinks, Site-URL) ändert den Stripe-Workflow nicht. Checkout-`success_url`/`cancel_url` und das Customer-Portal nutzen `getSiteUrl()` (`NEXT_PUBLIC_SITE_URL`), analog zu den Auth-Redirects – keine hartcodierte localhost-Origin mehr.

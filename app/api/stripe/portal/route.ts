@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/utils/stripe/server'
 import { createClient } from '@/utils/supabase/server'
+import { buildSiteUrl, getSiteUrl } from '@/lib/site-url'
 
 export async function POST(req: Request) {
   try {
@@ -21,12 +22,12 @@ export async function POST(req: Request) {
       return new NextResponse('Kein Stripe Kunde gefunden', { status: 400 })
     }
 
-    const { origin } = new URL(req.url)
+    const siteUrl = await getSiteUrl()
     const lang = req.headers.get('referer')?.includes('/tr/') ? 'tr' : req.headers.get('referer')?.includes('/ru/') ? 'ru' : 'de'
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
-      return_url: `${origin}/${lang}/dashboard/profile`,
+      return_url: buildSiteUrl(siteUrl, `/${lang}/dashboard/profile`),
       locale: 'de',
     })
 

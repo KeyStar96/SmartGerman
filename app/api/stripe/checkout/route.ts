@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/utils/stripe/server'
 import { createClient } from '@/utils/supabase/server'
+import { buildSiteUrl, getSiteUrl } from '@/lib/site-url'
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
       .eq('id', user.id)
       .single()
 
-    const { origin } = new URL(req.url)
+    const siteUrl = await getSiteUrl()
     const lang = req.headers.get('referer')?.includes('/tr/') ? 'tr' : req.headers.get('referer')?.includes('/ru/') ? 'ru' : 'de'
 
     // Hier sollte später die echte Price ID aus dem Stripe Dashboard eingesetzt werden
@@ -52,8 +53,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'subscription',
-      success_url: `${origin}/${lang}/dashboard?payment=success`,
-      cancel_url: `${origin}/${lang}/dashboard/profile?payment=cancelled`,
+      success_url: buildSiteUrl(siteUrl, `/${lang}/dashboard`, { payment: 'success' }),
+      cancel_url: buildSiteUrl(siteUrl, `/${lang}/dashboard/profile`, { payment: 'cancelled' }),
       metadata: {
         supabase_user_id: user.id
       },

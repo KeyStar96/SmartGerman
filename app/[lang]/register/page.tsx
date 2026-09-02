@@ -1,5 +1,23 @@
-import { signup } from '@/app/actions/auth'
 import Link from 'next/link'
+import type { Metadata } from 'next'
+import { signup } from '@/app/actions/auth'
+import AuthForm from '@/components/auth/AuthForm'
+import AuthShell from '@/components/auth/AuthShell'
+import AuthStatusMessage from '@/components/auth/AuthStatusMessage'
+import {
+  authStatusMessage,
+  authTranslations,
+  createAuthTranslator,
+  passwordHint,
+} from '@/lib/auth-i18n'
+import { getDictionary } from '@/lib/dictionary'
+import { parseAuthStatus, PASSWORD_MIN_LENGTH } from '@/lib/types/auth'
+
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 export default async function RegisterPage({
   params,
@@ -10,111 +28,75 @@ export default async function RegisterPage({
 }) {
   const { lang } = await params
   const resolvedSearchParams = await searchParams
-  const message = resolvedSearchParams?.message as string
+  const status = parseAuthStatus(resolvedSearchParams?.status)
+
+  const dictionary = await getDictionary(lang)
+  const t = createAuthTranslator(authTranslations(dictionary))
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white dark:bg-zinc-900 p-10 shadow-xl ring-1 ring-black/5 dark:ring-white/10 backdrop-blur-sm">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            Konto erstellen
-          </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Bereits registriert?{' '}
-            <Link
-              href={`/${lang}/login`}
-              className="font-medium text-primary-orange hover:text-orange-500 transition-colors"
-            >
-              Hier anmelden
-            </Link>
-          </p>
-        </div>
+    <AuthShell
+      lang={lang}
+      title={t('register_title')}
+      description={
+        <>
+          {t('register_subtitle')}{' '}
+          <Link
+            href={`/${lang}/login`}
+            className="font-semibold text-[#FF5C00] underline decoration-2 underline-offset-4 hover:text-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+          >
+            {t('register_login_link')}
+          </Link>
+        </>
+      }
+    >
+      {status && <AuthStatusMessage status={status} message={authStatusMessage(t, status)} />}
 
-        <form className="mt-8 space-y-6" action={signup}>
-          <input type="hidden" name="lang" value={lang} />
-          
-          <div className="space-y-4 rounded-md shadow-sm">
-            <div>
-              <label htmlFor="name" className="sr-only">
-                Vollständiger Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="relative block w-full rounded-lg border-0 py-3 px-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-orange sm:text-sm sm:leading-6 transition-all"
-                placeholder="Vollständiger Name"
-              />
-            </div>
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                E-Mail Adresse
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="relative block w-full rounded-lg border-0 py-3 px-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-orange sm:text-sm sm:leading-6 transition-all"
-                placeholder="E-Mail Adresse"
-              />
-            </div>
-            <div>
-              <label htmlFor="native_language" className="sr-only">
-                Erstsprache
-              </label>
-              <select
-                id="native_language"
-                name="native_language"
-                required
-                className="relative block w-full rounded-lg border-0 py-3 px-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-orange sm:text-sm sm:leading-6 transition-all"
-                defaultValue=""
-              >
-                <option value="" disabled>Deine Erstsprache auswählen</option>
-                <option value="Russisch">Russisch</option>
-                <option value="Türkisch">Türkisch</option>
-                <option value="Andere">Andere</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Passwort
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                minLength={6}
-                className="relative block w-full rounded-lg border-0 py-3 px-4 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-orange sm:text-sm sm:leading-6 transition-all"
-                placeholder="Passwort (mind. 6 Zeichen)"
-              />
-            </div>
-          </div>
+      <AuthForm
+        action={signup}
+        lang={lang}
+        submitLabel={t('register_submit')}
+        pendingLabel={t('register_pending')}
+        fields={[
+          {
+            name: 'name',
+            label: t('field_name'),
+            type: 'text',
+            placeholder: t('field_name_placeholder'),
+            autoComplete: 'name',
+          },
+          {
+            name: 'email',
+            label: t('field_email'),
+            type: 'email',
+            placeholder: t('field_email_placeholder'),
+            autoComplete: 'email',
+          },
+          {
+            name: 'native_language',
+            label: t('field_native_language'),
+            type: 'select',
+            placeholder: t('field_native_language_placeholder'),
+            // Die Werte müssen dem CHECK-Constraint auf `profiles.native_language`
+            // entsprechen, sonst scheitert der Trigger beim Anlegen des Profils.
+            options: [
+              { value: 'Russisch', label: t('native_language_russian') },
+              { value: 'Türkisch', label: t('native_language_turkish') },
+              { value: 'Andere', label: t('native_language_other') },
+            ],
+          },
+          {
+            name: 'password',
+            label: t('field_password'),
+            type: 'password',
+            placeholder: t('field_password_placeholder'),
+            autoComplete: 'new-password',
+            minLength: PASSWORD_MIN_LENGTH,
+            hint: passwordHint(t),
+          },
+        ]}
+      />
 
-          {message && (
-            <div className={`rounded-md p-4 border ${message.includes('erfolgreich') ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800' : 'bg-red-50 text-red-800 border-red-200 dark:bg-red-950/50 dark:text-red-300 dark:border-red-800'}`}>
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium">{message}</h3>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              className="group relative flex w-full justify-center rounded-lg bg-primary-orange py-3 px-4 text-sm font-semibold text-white hover:bg-primary-orange/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-orange transition-all shadow-md hover:shadow-lg"
-            >
-              Registrieren
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      <p className="text-base text-slate-600 dark:text-slate-400">{t('spam_hint')}</p>
+    </AuthShell>
   )
 }

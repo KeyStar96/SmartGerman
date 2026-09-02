@@ -63,9 +63,19 @@ Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` ver
 ## 3. Sicherheitskonzept & RBAC (Role-Based Access Control)
 
 ### Edge Middleware (`middleware.ts`)
-1. **Session Check**: Überprüft bei jeder Anfrage den JWT-Token.
-2. **Role Verification**: Bei Zugriff auf `/admin/*` wird das Profil des Users aus Supabase geladen. Ist die `role !== 'teacher'`, wird sofort auf `/dashboard` (oder eine "Access Denied" Seite) redirected (Status 302/303).
-3. **Premium Paywall**: Bei Zugriff auf Premium-Lektionen in `/(student)/dashboard/premium/*` wird der `subscription_status` geprüft. Falls nicht `aktiv`, Redirect auf die Pricing/Upgrade-Seite.
+1. **Session Check**: Überprüft bei jeder Anfrage den JWT-Token und übernimmt gesetzte Cookies bei Weiterleitungen.
+2. **Auth-Callbacks**: `/auth/*` ist von Locale- und `?lang=`-Redirects ausgenommen (`lib/locale-routing.ts`). Bestätigungslinks (`/auth/confirm?lang=de&token_hash=…`) dürfen niemals auf `/de` umgeschrieben werden – sonst geht das Einmal-Token verloren.
+3. **Routenschutz**: `/dashboard`, `/premium` und `/admin` verlangen eine Sitzung. `/login` und `/register` leiten eingeloggte Nutzer ins Dashboard.
+4. **Lehrer-UI**: Die eigentliche Rollenprüfung (`teacher` | `admin`) bleibt im `app/[lang]/admin/layout.tsx`. Die Middleware fängt nur unangemeldete Aufrufe ab.
+
+### Authentifizierung (produktionsreif)
+- **Kanonische Domain:** `https://www.sitov-academy.com` (`CANONICAL_SITE_URL` in `lib/site-url.ts`).
+- **Outbound-URLs:** `getOutboundSiteUrl()` erzeugt Bestätigungs-, Reset- und Feedback-Links. Localhost wird übersprungen, selbst wenn die Registrierung lokal gegen die Live-DB läuft.
+- **Callback:** `app/auth/confirm/route.ts` und `app/auth/callback/route.ts` akzeptieren PKCE (`?code=`) und OTP (`?token_hash=` / `?token=` + `type=`). Token-Hash hat Vorrang (geräteunabhängig). Nach Erfolg geht es über `NEXT_PUBLIC_SITE_URL` direkt auf `/{lang}/dashboard` (Recovery: `/{lang}/reset-password`).
+- **Site-URL:** Auth- und Stripe-Weiterleitungen nutzen `getSiteUrl()` / `buildPublicUrl()` aus `lib/site-url.ts`. Es gibt keine hartcodierte `http://localhost:3000`-Redirects in Auth- oder API-Routern.
+- **Supabase-Env:** `lib/supabase-env.ts` liest `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` und fällt auf die Aliase `SUPABASE_URL` / `SUPABASE_ANON_KEY` zurück.
+- **Supabase Auth (kein SQL, GoTrue-Config):** Site URL = `https://www.sitov-academy.com`. Redirect-Allowlist: `https://www.sitov-academy.com/**`, `https://sitov-academy.com/**`, `https://www.sitov-academy.com/auth/confirm**`, `https://www.sitov-academy.com/auth/callback**`, `http://localhost:3000/**`.
+- **E-Mail-Templates:** `supabase/templates/confirmation.html` und `recovery.html` nutzen `token_hash` plus `RedirectTo` (Fallback: `SiteURL`). So funktioniert der Link auch in einem anderen Browser, und die Sprache aus der Registrierung bleibt erhalten.
 
 ### Row Level Security (RLS) in Supabase
 - **Profiles**: Jeder Nutzer kann nur sein eigenes Profil lesen/schreiben. Lehrer können alle lesen.

@@ -1,31 +1,96 @@
-import { type EmailOtpType } from '@supabase/supabase-js'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { decideAuthCallback, readAuthCallbackSearch } from '@/lib/auth-callback'
+import { buildAuthRedirectUrl, originFromHeaders } from '@/lib/site-url'
+import type { AuthStatusCode } from '@/lib/types/auth'
+
+/**
+ * Einstiegspunkt für alle Links aus Auth-E-Mails (Bestätigung, Passwort-Reset,
+ * E-Mail-Wechsel) und für den PKCE-Callback von GoTrue.
+ *
+ * Die Verzweigung PKCE vs. OTP liegt in `lib/auth-callback.ts`. Diese Route
+ * führt sie aus und leitet anschließend über `NEXT_PUBLIC_SITE_URL` weiter –
+ * nie über eine hartcodierte localhost-Adresse. Lokale Requests bleiben auf
+ * dem Request-Host, damit Session-Cookies und Playwright greifen.
+ *
+ * Nach erfolgreicher Bestätigung geht es direkt ins geschützte Dashboard
+ * (`/{lang}/dashboard`). Recovery-Links landen auf der Passwortvergabe.
+ *
+ * Diese Route darf nie über die Middleware umgeleitet werden: Eine
+ * Weiterleitung würde die Einmal-Token aus der Query verlieren. Siehe
+ * `isLocaleExempt` in `lib/locale-routing.ts`.
+ */
+
+function requestOrigin(request: NextRequest): string | null {
+  return originFromHeaders(
+    request.headers.get('x-forwarded-host'),
+    request.headers.get('x-forwarded-proto'),
+    request.headers.get('host')
+  )
+}
+
+function redirectTo(request: NextRequest, path: string, status?: AuthStatusCode): NextResponse {
+  const origin = requestOrigin(request)
+  const target = status
+    ? buildAuthRedirectUrl(origin, path, { status })
+    : buildAuthRedirectUrl(origin, path)
+  return NextResponse.redirect(target)
+}
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type') as EmailOtpType | null
-  const lang = searchParams.get('lang') || 'de'
+  const decision = decideAuthCallback(readAuthCallbackSearch(request.nextUrl.searchParams))
 
-  // Standard-Redirect ist die Login-Seite mit einer Erfolgsmeldung
-  const next = searchParams.get('next') ?? `/${lang}/login?message=Registrierung+erfolgreich.+Du+kannst+dich+nun+anmelden.`
-
-  if (token_hash && type) {
-    const supabase = await createClient()
-    
-    // Verifiziere das Token (aus der E-Mail)
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
-    
-    if (!error) {
-      // Wenn erfolgreich, redirecte den User zur Login-Seite
-      return NextResponse.redirect(new URL(next, request.url))
+  if (decision.kind === 'reject') {
+    if (decision.status === 'confirm_missing_params') {
+      console.error('[auth/confirm] Aufruf ohne Token', { lang: decision.lang })
+    } else {
+      console.error('[auth/confirm] Anbieter hat den Vorgang abgebrochen', {
+        lang: decision.lang,
+        error: request.nextUrl.searchParams.get('error'),
+        code: request.nextUrl.searchParams.get('error_code'),
+      })
     }
+    return redirectTo(request, decision.redirectPath, decision.status)
   }
 
-  // Bei Fehler: redirecte mit einer Fehlermeldung
-  return NextResponse.redirect(new URL(`/${lang}/login?message=Verifizierung+fehlgeschlagen+oder+Link+abgelaufen`, request.url))
+  try {
+    const supabase = await createClient()
+    const { error } =
+      decision.verify.flow === 'pkce'
+        ? await supabase.auth.exchangeCodeForSession(decision.verify.code)
+        : await supabase.auth.verifyOtp({
+            type: decision.verify.type,
+            token_hash: decision.verify.tokenHash,
+          })
+
+    if (error) {
+      console.error('[auth/confirm] Verifizierung fehlgeschlagen', {
+        lang: decision.lang,
+        flow: decision.verify.flow,
+        message: error.message,
+      })
+      const failPath = decision.isRecovery
+        ? `/${decision.lang}/forgot-password`
+        : `/${decision.lang}/login`
+      const failStatus: AuthStatusCode = decision.isRecovery
+        ? 'password_session_missing'
+        : 'confirm_failed'
+      return redirectTo(request, failPath, failStatus)
+    }
+
+    return redirectTo(request, decision.nextPath)
+  } catch (error) {
+    console.error('[auth/confirm] Unerwarteter Fehler', {
+      lang: decision.lang,
+      flow: decision.verify.flow,
+      error: error instanceof Error ? error.message : 'unbekannt',
+    })
+    const failPath = decision.isRecovery
+      ? `/${decision.lang}/forgot-password`
+      : `/${decision.lang}/login`
+    const failStatus: AuthStatusCode = decision.isRecovery
+      ? 'password_session_missing'
+      : 'confirm_failed'
+    return redirectTo(request, failPath, failStatus)
+  }
 }

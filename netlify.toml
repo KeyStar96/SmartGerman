@@ -2,5 +2,13 @@
   command = "npm run build"
   publish = ".next"
 
+# Wird zur Build-Zeit in Next.js eingebrannt. Ohne diesen Wert erzeugt die
+# Registrierung Bestätigungslinks auf http://localhost:3000.
+[build.environment]
+  NEXT_PUBLIC_SITE_URL = "https://www.sitov-academy.com"
+
+[context.production.environment]
+  NEXT_PUBLIC_SITE_URL = "https://www.sitov-academy.com"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"

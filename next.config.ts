@@ -3,8 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // PERFORMANCE: Compiler-Optimierungen
   compiler: {
-    // Entferne console.log in Production (spart Bundle-Größe und CPU)
-    removeConsole: process.env.NODE_ENV === "production",
+    // Entferne console.log in Production (spart Bundle-Größe und CPU).
+    // `console.error` und `console.warn` bleiben erhalten: Sie sind laut
+    // Projektregeln die Grundlage für serverseitiges Logging, und ohne sie
+    // lässt sich ein Fehler in Produktion nicht mehr nachvollziehen.
+    removeConsole:
+      process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
 
   // PERFORMANCE: Aktiviere React Strict Mode nur in Development

@@ -1769,6 +1769,16 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-02 — Authentifizierung Live-Betrieb
+- Auth- und Stripe-Redirects nutzen `NEXT_PUBLIC_SITE_URL` (`getSiteUrl` / `buildPublicUrl`), keine hartcodierte `http://localhost:3000`.
+- `/auth/confirm` und `/auth/callback` verifizieren PKCE (`code`) und OTP (`token_hash`) und leiten nach Erfolg direkt auf `/{lang}/dashboard`.
+- Produktions-ENVs: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPABASE_URL` (Alias `SUPABASE_URL`), `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Alias `SUPABASE_ANON_KEY`).
+
+### 2026-09-02 — Authentifizierung produktionsreif
+- Bestätigungslinks zeigen auf `https://www.sitov-academy.com/auth/confirm`, nicht auf localhost.
+- `/auth/confirm` ist von Locale-Redirects ausgenommen; Token-Hash-Templates ermöglichen die Bestätigung auf einem anderen Gerät (Geragogik).
+- Anmelde- und Registrierungsseiten folgen den Geragogik-Maßen (18px Fließtext, 24px Titel, min. 56px Felder und Knöpfe), ohne Timer und ohne Fachbegriffe.
+
 ### 2026-09-02 — Supabase MCP & Schema-Sync
 - **Projekt-Binding:** Ausschließlich Supabase-Projekt `wcaslabeiwtvygxtzcio` (SmartGerman v2).
 - **Agent-Regeln (`.cursorrules`):** SQL-Output-Pflicht entfernt; stattdessen Live-DB-Schutz, MCP-basierte Migrationen, Schema-Sync-Pflicht.
