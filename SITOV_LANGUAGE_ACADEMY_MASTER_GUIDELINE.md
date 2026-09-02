@@ -1769,6 +1769,10 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-02 — Vokabeltrainer A1.1 befüllt
+- Demo-Set „Schritte plus neu“ entfernt. Neu: Lernsets **Lektion 1** (Begrüßung, Personen, Herkunft, Länder, Sprachen, Formular) und **Lektion 2** (Befinden, Familie, Zahlen, Lebensmittel, Einkaufen).
+- Jede Karte hat Übersetzungen auf Russisch, Türkisch und Englisch; kontrastiv schwere Nomen (Artikel, Umlaut-Plural) sind für Leitner markiert.
+
 ### 2026-09-02 — Authentifizierung Live-Betrieb
 - Auth- und Stripe-Redirects nutzen `NEXT_PUBLIC_SITE_URL` (`getSiteUrl` / `buildPublicUrl`), keine hartcodierte `http://localhost:3000`.
 - `/auth/confirm` und `/auth/callback` verifizieren PKCE (`code`) und OTP (`token_hash`) und leiten nach Erfolg direkt auf `/{lang}/dashboard`.

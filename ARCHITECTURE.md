@@ -20,7 +20,7 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
   - *Zusätzlich benötigt*: Eine hierarchische `lessons`-Tabelle (gehört zu Kurs), um Videos, Vokabeln und Übungen sauber zu bündeln.
 - **Content-Entitäten**:
   - `videos`: URL, Lektions-Zugehörigkeit, Titel.
-  - `vocabulary_cards`: Wort, Artikel, Übersetzungen, Audio, Bild.
+  - `vocabulary_cards`: Wort, Artikel, Plural, Übersetzungen (`translation_ru` / `_tr` / `_en`), Audio, Bild. Lernsets sind der Text in `lesson` plus `level`. A1.1 live: **Lektion 1** (84 Karten), **Lektion 2** (161 Karten). Seed: `supabase/seeds/a11_*.sql`.
   - `exercises`: Typ (`fill_in_blank`, `multiple_choice`, `sentence_building`), Content als JSONB, `solution_audio_url` für Tap-to-Listen.
     - `content` bei `fill_in_blank`: `{ text_before, text_after, correct_answer, options?, smart_hint? }`.
       `options` sind die Auswahl-Chips; fehlen sie, werden sie serverseitig aus der Wortfamilie generiert.
