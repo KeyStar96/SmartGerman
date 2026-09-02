@@ -1,7 +1,10 @@
 import Link from 'next/link'
 import { BookOpen, ChevronRight, Trophy } from 'lucide-react'
 import { getAllLevelsProgress } from '@/app/actions/progress'
+import { getUnseenFeedbackSummary } from '@/app/actions/feedback'
 import { getDictionary } from '@/lib/dictionary'
+import type { PronunciationTranslations } from '@/lib/pronunciation-i18n'
+import FeedbackNotificationCard from '@/components/dashboard/FeedbackNotificationCard'
 
 export default async function DashboardPage({
   params,
@@ -9,8 +12,12 @@ export default async function DashboardPage({
   params: Promise<{ lang: string }>
 }) {
   const { lang } = await params
-  const progressMap = await getAllLevelsProgress()
-  const dict = await getDictionary(lang)
+  const [progressMap, unseenFeedback, dict] = await Promise.all([
+    getAllLevelsProgress(),
+    getUnseenFeedbackSummary(),
+    getDictionary(lang),
+  ])
+  const pronunciationTranslations = (dict.pronunciation ?? {}) as PronunciationTranslations
 
   const LEVELS = [
     { id: 'A1.1', title: dict.dashboard?.level_a11_title || 'A1.1 Anfänger', description: dict.dashboard?.level_a11_desc || 'Die ersten Schritte in der deutschen Sprache.', color: 'from-orange-400 to-[#FF5C00]' },
@@ -32,6 +39,12 @@ export default async function DashboardPage({
           {dict.dashboard?.subtitle || 'Womit möchtest du heute starten?'}
         </p>
       </div>
+
+      <FeedbackNotificationCard
+        summary={unseenFeedback}
+        translations={pronunciationTranslations}
+        lang={lang}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {LEVELS.map((level) => {

@@ -1,179 +1,210 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { useState } from 'react'
+import { CheckCircle2, Loader2, Mic, Square, Trash2, TriangleAlert, UploadCloud } from 'lucide-react'
 import { submitAudioUrl } from '@/app/actions/feedback'
-import { Mic, Square, Play, UploadCloud, Loader2, CheckCircle2 } from 'lucide-react'
+import { uploadStudentRecording } from '@/lib/audio/upload'
+import { useAudioRecorder } from '@/lib/audio/useAudioRecorder'
+import {
+  createPronunciationTranslator,
+  type PronunciationTranslations,
+} from '@/lib/pronunciation-i18n'
+import LiveWaveform from '@/components/audio/LiveWaveform'
+import WaveformPlayer from '@/components/audio/WaveformPlayer'
 
-type AudioRecorderProps = {
-  parentId?: string;
-  attemptNumber?: number;
-  level?: string;
-  onSubmitted?: () => void;
-  compact?: boolean;
-}
+/**
+ * Aufnahme-Karte für Schüler: aufnehmen, anhören, einreichen.
+ *
+ * Die Aufnahme-Mechanik liegt in `useAudioRecorder`, der Upload in
+ * `lib/audio/upload.ts`. Diese Komponente ist reine UI und Ablaufsteuerung.
+ */
+export default function AudioRecorder({
+  parentId,
+  attemptNumber = 1,
+  level,
+  translations,
+  onSubmitted,
+  compact = false,
+}: {
+  parentId?: string
+  attemptNumber?: number
+  level?: string
+  translations?: PronunciationTranslations
+  onSubmitted?: () => void
+  compact?: boolean
+}) {
+  const t = createPronunciationTranslator(translations ?? {})
+  const recorder = useAudioRecorder()
 
-export default function AudioRecorder({ parentId, attemptNumber = 1, level, onSubmitted, compact = false }: AudioRecorderProps = {}) {
-  const [isRecording, setIsRecording] = useState(false)
-  const [audioUrl, setAudioUrl] = useState<string | null>(null)
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isUploading, setIsUploading] = useState(false)
-  const isUploadingRef = useRef(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  
-  const mediaRecorder = useRef<MediaRecorder | null>(null)
-  const audioChunks = useRef<Blob[]>([])
+  const [uploadFailed, setUploadFailed] = useState(false)
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      mediaRecorder.current = new MediaRecorder(stream)
-      audioChunks.current = []
+  const statusMessage = (() => {
+    if (recorder.status === 'denied') return t('mic_denied')
+    if (recorder.status === 'unsupported') return t('mic_unsupported')
+    if (recorder.status === 'failed') return t('record_failed')
+    if (uploadFailed) return t('upload_failed')
+    return null
+  })()
 
-      mediaRecorder.current.ondataavailable = (event) => {
-        audioChunks.current.push(event.data)
-      }
-
-      mediaRecorder.current.onstop = () => {
-        const mimeType = mediaRecorder.current?.mimeType || 'audio/webm'
-        const audioBlob = new Blob(audioChunks.current, { type: mimeType })
-        const url = URL.createObjectURL(audioBlob)
-        setAudioUrl(url)
-        setAudioBlob(audioBlob)
-      }
-
-      mediaRecorder.current.start()
-      setIsRecording(true)
-      setAudioUrl(null)
-      setIsSubmitted(false)
-    } catch (err) {
-      console.error('Fehler beim Zugriff auf das Mikrofon:', err)
-      alert('Bitte erlaube den Zugriff auf dein Mikrofon, um aufzunehmen.')
-    }
+  const handleStart = async () => {
+    setUploadFailed(false)
+    setIsSubmitted(false)
+    await recorder.start()
   }
 
-  const stopRecording = () => {
-    if (mediaRecorder.current) {
-      mediaRecorder.current.stop()
-      setIsRecording(false)
-      // Stop all tracks to release microphone
-      mediaRecorder.current.stream.getTracks().forEach(track => track.stop())
-    }
-  }
+  const handleSubmit = async () => {
+    if (!recorder.audioBlob || isUploading) return
 
-  const playAudio = () => {
-    if (audioUrl) {
-      const audio = new Audio(audioUrl)
-      audio.play()
-    }
-  }
-
-  const uploadAndSubmit = async () => {
-    if (!audioBlob || isUploadingRef.current) return
-    isUploadingRef.current = true
     setIsUploading(true)
+    setUploadFailed(false)
 
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not logged in')
-
-      const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm'
-      const fileName = `${user.id}-${Date.now()}.${ext}`
-      
-      const { data, error } = await supabase.storage
-        .from('audio_submissions')
-        .upload(fileName, audioBlob, { contentType: audioBlob.type })
-
-      if (error) throw error
-
-      const { data: publicUrlData } = supabase.storage
-        .from('audio_submissions')
-        .getPublicUrl(fileName)
-
-      const result = await submitAudioUrl(publicUrlData.publicUrl, parentId, attemptNumber, level)
-      if (result.success) {
-        setIsSubmitted(true)
-        if (onSubmitted) onSubmitted()
-      } else {
-         throw new Error(result.error)
+      const upload = await uploadStudentRecording(recorder.audioBlob)
+      if (!upload.success) {
+        setUploadFailed(true)
+        return
       }
-    } catch (err) {
-      console.error('Upload error:', err)
-      alert('Es gab einen Fehler beim Hochladen. Bitte versuche es erneut.')
+
+      const result = await submitAudioUrl({
+        url: upload.publicUrl,
+        parentId,
+        attemptNumber,
+        level,
+      })
+
+      if (!result.success) {
+        setUploadFailed(true)
+        return
+      }
+
+      setIsSubmitted(true)
+      onSubmitted?.()
     } finally {
-      isUploadingRef.current = false
       setIsUploading(false)
     }
   }
 
   return (
-    <div className={`bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-md border border-slate-200 dark:border-slate-800 text-center transition-colors ${compact ? 'p-6 shadow-none' : ''}`}>
+    <div
+      className={`rounded-3xl border border-slate-200 bg-white text-center shadow-md transition-colors dark:border-slate-800 dark:bg-slate-900 ${
+        compact ? 'p-6 shadow-none' : 'p-8'
+      }`}
+    >
       {!compact && (
         <>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">Deine Aussprache üben</h2>
-          <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
-            Nimm dich selbst auf, höre es dir an und reiche es zur Korrektur ein.
-          </p>
+          <h2 className="mb-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
+            {t('record_title')}
+          </h2>
+          <p className="mb-8 text-lg text-slate-600 dark:text-slate-400">{t('record_hint')}</p>
         </>
       )}
 
-      {/* Recording Indicator */}
-      {isRecording && (
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <span className="relative flex h-5 w-5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500"></span>
-          </span>
-          <span className="text-xl font-bold text-red-600 dark:text-red-400">Aufnahme läuft...</span>
+      {(recorder.isRecording || recorder.hasRecording) && (
+        <div className="mb-6">
+          {recorder.isRecording ? (
+            <LiveWaveform
+              levels={recorder.levels}
+              isActive
+              elapsedSeconds={recorder.elapsedSeconds}
+              ariaLabel={t('waveform_live_aria')}
+            />
+          ) : (
+            <WaveformPlayer src={recorder.audioUrl} t={t} label={t('your_recording')} />
+          )}
         </div>
       )}
 
-      {/* Controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8">
-        {!isRecording ? (
-          <button 
-            onClick={startRecording}
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-[#FF5C00] text-white text-xl font-bold shadow-lg hover:bg-[#e05200] transition-all"
+      {recorder.isRecording && (
+        <p
+          className="mb-6 flex items-center justify-center gap-3 text-xl font-bold text-[#FF5C00]"
+          aria-live="polite"
+        >
+          <span className="relative flex h-4 w-4">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF5C00] opacity-75" />
+            <span className="relative inline-flex h-4 w-4 rounded-full bg-[#FF5C00]" />
+          </span>
+          {t('recording_running')}
+        </p>
+      )}
+
+      {statusMessage && (
+        <p
+          className="mx-auto mb-6 flex max-w-xl items-start gap-3 rounded-2xl bg-amber-50 p-4 text-left text-lg text-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+          role="status"
+        >
+          <TriangleAlert size={24} className="mt-0.5 shrink-0" aria-hidden="true" />
+          {statusMessage}
+        </p>
+      )}
+
+      <div className="mb-2 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        {recorder.isRecording ? (
+          <button
+            type="button"
+            onClick={recorder.stop}
+            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-slate-900 px-8 text-xl font-bold text-white shadow-lg transition-colors hover:bg-slate-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto dark:bg-slate-700 dark:hover:bg-slate-600"
           >
-            <Mic size={28} /> {audioUrl ? 'Neu aufnehmen' : 'Aufnahme starten'}
+            <Square size={26} aria-hidden="true" /> {t('stop_recording')}
           </button>
         ) : (
-          <button 
-            onClick={stopRecording}
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-slate-900 dark:bg-slate-700 text-white text-xl font-bold shadow-lg hover:bg-slate-800 dark:hover:bg-slate-600 transition-all"
+          <button
+            type="button"
+            onClick={handleStart}
+            disabled={recorder.status === 'requesting' || isUploading}
+            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-[#FF5C00] px-8 text-xl font-bold text-white shadow-lg transition-colors hover:bg-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
-            <Square size={28} /> Stoppen
+            {recorder.status === 'requesting' ? (
+              <Loader2 size={26} className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Mic size={26} aria-hidden="true" />
+            )}
+            {recorder.hasRecording ? t('record_again') : t('start_recording')}
           </button>
         )}
 
-        {audioUrl && !isRecording && (
-          <button 
-            onClick={playAudio}
-            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+        {recorder.hasRecording && !isSubmitted && (
+          <button
+            type="button"
+            onClick={recorder.reset}
+            disabled={isUploading}
+            aria-label={t('delete_recording_aria')}
+            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-slate-100 px-8 text-xl font-bold text-slate-700 transition-colors hover:bg-slate-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] disabled:opacity-60 sm:w-auto dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
-            <Play size={28} /> Anhören
+            <Trash2 size={26} aria-hidden="true" /> {t('delete_recording')}
           </button>
         )}
       </div>
 
-      {/* Submit */}
-      {audioUrl && !isRecording && (
-        <div className="border-t border-slate-200 dark:border-slate-800 pt-8 mt-4">
+      {recorder.hasRecording && (
+        <div className="mt-6 border-t border-slate-200 pt-6 dark:border-slate-800">
           {isSubmitted ? (
-             <div className="bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 p-6 rounded-xl inline-flex items-center gap-4">
-               <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-               <span className="text-xl font-bold text-emerald-800 dark:text-emerald-300">Erfolgreich abgegeben!</span>
-             </div>
+            <div className="mx-auto inline-flex max-w-xl items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-left dark:border-emerald-800 dark:bg-emerald-950/50">
+              <CheckCircle2 className="h-8 w-8 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+              <div>
+                <p className="text-xl font-bold text-emerald-800 dark:text-emerald-300">
+                  {t('submitted')}
+                </p>
+                <p className="mt-1 text-lg text-emerald-800/80 dark:text-emerald-300/80">
+                  {t('submitted_hint')}
+                </p>
+              </div>
+            </div>
           ) : (
-             <button 
-                onClick={uploadAndSubmit}
-                disabled={isUploading}
-                className="flex items-center justify-center gap-3 w-full sm:w-auto mx-auto px-10 py-6 rounded-2xl bg-emerald-600 text-white text-2xl font-bold shadow-xl hover:bg-emerald-500 hover:shadow-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-             >
-                {isUploading ? <Loader2 className="animate-spin" size={32} /> : <UploadCloud size={32} />}
-                Zur Korrektur einreichen
-             </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isUploading}
+              className="mx-auto flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-emerald-600 px-10 text-xl font-bold text-white shadow-lg transition-colors hover:bg-emerald-500 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            >
+              {isUploading ? (
+                <Loader2 className="animate-spin" size={28} aria-hidden="true" />
+              ) : (
+                <UploadCloud size={28} aria-hidden="true" />
+              )}
+              {isUploading ? t('submitting') : t('submit_for_review')}
+            </button>
           )}
         </div>
       )}

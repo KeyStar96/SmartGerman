@@ -1,168 +1,157 @@
 'use client'
 
-import { useState } from 'react'
-import { saveExerciseProgress } from '@/app/actions/exercises'
-import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import Link from 'next/link'
+import { BookOpenCheck, CloudOff, PartyPopper } from 'lucide-react'
+import FillInBlankExerciseCard from '@/components/exercises/FillInBlankExercise'
+import MultipleChoiceExerciseCard from '@/components/exercises/MultipleChoiceExercise'
+import { finishExerciseSession, recordExerciseAttempt } from '@/app/actions/exercises'
+import { createExerciseTranslator, type ExerciseTranslations } from '@/lib/exercise-i18n'
+import type { StudentExercise } from '@/lib/types/exercise'
 
-type Exercise = {
-  id: string
-  lesson: string
-  topic: string
-  type: string
-  content: any
-  hint: string | null
-  completed: boolean
+interface ExerciseClientProps {
+  exercises: StudentExercise[]
+  translations?: ExerciseTranslations
+  lang: string
+  level: string
 }
 
-export default function ExerciseClient({ 
+export default function ExerciseClient({
   exercises,
-  translations = {}
-}: { 
-  exercises: Exercise[],
-  translations?: Record<string, string>
-}) {
+  translations = {},
+  lang,
+  level,
+}: ExerciseClientProps) {
+  /**
+   * Bewusst als Snapshot: Würde die Liste mitten im Durchlauf aus dem Server
+   * neu einfliegen, verschöben sich die Indizes und der Lernende verlöre den
+   * Kontext.
+   */
+  const [session] = useState<StudentExercise[]>(exercises)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
 
-  if (exercises.length === 0) {
+  const t = useMemo(() => createExerciseTranslator(translations), [translations])
+  const currentExercise = session[currentIndex]
+
+  const handleAttempt = useCallback(
+    (exerciseId: string, isCorrect: boolean, hintShown: boolean): void => {
+      void recordExerciseAttempt({ exerciseId, isCorrect, hintShown })
+        .then((result) => setSaveFailed(!result.success))
+        .catch(() => setSaveFailed(true))
+    },
+    []
+  )
+
+  const handleNext = useCallback((): void => {
+    const nextIndex = currentIndex + 1
+    setCurrentIndex(nextIndex)
+
+    if (nextIndex >= session.length) {
+      void finishExerciseSession(level).catch(() => {
+        // Fortschrittsanzeige aktualisiert sich dann erst beim nächsten Aufruf.
+      })
+    }
+  }, [currentIndex, level, session.length])
+
+  if (session.length === 0) {
     return (
-      <div className="bg-white p-12 rounded-2xl shadow-sm text-center">
-        <p className="text-xl text-gray-500">{translations.no_exercises || 'Keine Übungen verfügbar.'}</p>
+      <div className="rounded-3xl bg-white p-12 text-center shadow-sm ring-1 ring-gray-900/5">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
+          <BookOpenCheck className="h-10 w-10 text-blue-600" aria-hidden="true" />
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900">{t('no_exercises')}</h2>
+        <p className="mx-auto mt-3 max-w-lg text-xl text-gray-600">{t('no_exercises_hint')}</p>
+        <Link
+          href={`/${lang}/dashboard/level/${encodeURIComponent(level)}`}
+          className="mt-8 inline-flex min-h-16 items-center rounded-2xl bg-blue-600 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-blue-500"
+        >
+          {t('back_to_level')}
+        </Link>
       </div>
     )
   }
 
-  if (currentIndex >= exercises.length) {
+  if (!currentExercise) {
     return (
-      <div className="bg-white p-12 rounded-2xl shadow-sm text-center border-2 border-green-200 bg-green-50">
-        <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-3xl font-bold text-green-800 mb-2">{translations.great || 'Großartig!'}</h2>
-        <p className="text-xl text-green-700">{translations.all_completed || 'Du hast alle Übungen für heute abgeschlossen.'}</p>
+      <div className="rounded-3xl border-2 border-green-200 bg-green-50 p-12 text-center shadow-sm">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+          <PartyPopper className="h-10 w-10 text-green-600" aria-hidden="true" />
+        </div>
+        <h2 className="text-3xl font-bold text-green-900">{t('great')}</h2>
+        <p className="mt-3 text-xl text-green-800">{t('all_completed')}</p>
+        <Link
+          href={`/${lang}/dashboard/level/${encodeURIComponent(level)}`}
+          className="mt-8 inline-flex min-h-16 items-center rounded-2xl bg-green-700 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-green-600"
+        >
+          {t('back_to_level')}
+        </Link>
       </div>
     )
   }
 
-  const exercise = exercises[currentIndex]
-
-  const handleSubmit = async () => {
-    if (!selectedAnswer) return
-    
-    const correct = selectedAnswer === exercise.content.correct_answer
-    setIsCorrect(correct)
-    setIsSubmitted(true)
-    
-    // Save progress
-    await saveExerciseProgress(exercise.id, correct)
-  }
-
-  const handleNext = () => {
-    setSelectedAnswer(null)
-    setIsSubmitted(false)
-    setCurrentIndex(prev => prev + 1)
-  }
+  const nextLabel = currentIndex + 1 >= session.length ? t('great') : t('next_exercise')
+  const progressPercent = Math.round((currentIndex / session.length) * 100)
 
   return (
-    <div className="bg-white rounded-3xl shadow-lg ring-1 ring-gray-900/5 overflow-hidden transition-all duration-300">
-      <div className="bg-blue-600 p-6 text-white flex justify-between items-center">
-        <span className="text-lg font-medium opacity-80">{exercise.lesson} • {exercise.topic}</span>
-        <span className="text-lg font-bold">{translations.exercise || 'Übung'} {currentIndex + 1} {translations.of || 'von'} {exercises.length}</span>
-      </div>
-
-      <div className="p-8 sm:p-12">
-        {exercise.type === 'multiple_choice' && (
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-8">{exercise.content.question}</h3>
-            <div className="space-y-4">
-              {exercise.content.options.map((option: string) => (
-                <button
-                  key={option}
-                  onClick={() => !isSubmitted && setSelectedAnswer(option)}
-                  disabled={isSubmitted}
-                  className={`w-full text-left px-6 py-4 rounded-xl border-2 text-xl font-medium transition-all ${
-                    selectedAnswer === option 
-                      ? 'border-blue-600 bg-blue-50 text-blue-800' 
-                      : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                  } ${
-                    isSubmitted && option === exercise.content.correct_answer 
-                      ? '!border-green-500 !bg-green-50 !text-green-800' 
-                      : ''
-                  } ${
-                    isSubmitted && selectedAnswer === option && !isCorrect 
-                      ? '!border-red-500 !bg-red-50 !text-red-800' 
-                      : ''
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {exercise.type === 'fill_in_blank' && (
-          <div>
-            <div className="text-3xl leading-relaxed text-gray-800 font-medium mb-12 text-center">
-              {exercise.content.text_before}
-              <input
-                key={exercise.id}
-                type="text"
-                value={selectedAnswer || ''}
-                onChange={(e) => setSelectedAnswer(e.target.value)}
-                disabled={isSubmitted}
-                className={`mx-3 px-4 py-2 border-b-4 focus:outline-none transition-colors text-center min-w-[240px] ${
-                  isSubmitted 
-                    ? isCorrect ? 'border-green-500 text-green-700 bg-green-50' : 'border-red-500 text-red-700 bg-red-50'
-                    : 'border-gray-300 focus:border-blue-500 bg-gray-50'
-                }`}
-                placeholder={translations.fill_blank || 'Lücke ausfüllen'}
-                autoComplete="off"
-                spellCheck="false"
-                autoCorrect="off"
-              />
-              {exercise.content.text_after}
-            </div>
-          </div>
-        )}
-
-        {/* Kontrastiver Grammatik-Hinweis bei Fehler */}
-        {isSubmitted && !isCorrect && exercise.hint && (
-          <div className="mt-8 bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-xl flex gap-4 items-start animate-in fade-in slide-in-from-bottom-4">
-            <AlertCircle className="w-8 h-8 text-amber-600 shrink-0 mt-1" />
-            <div>
-              <h4 className="text-xl font-bold text-amber-900 mb-2">{translations.tip_mother_tongue || 'Tipp für deine Muttersprache'}</h4>
-              <p className="text-lg text-amber-800">{exercise.hint}</p>
-            </div>
-          </div>
-        )}
-
-        {isSubmitted && isCorrect && (
-           <div className="mt-8 bg-green-50 border border-green-200 p-6 rounded-xl flex gap-4 items-center animate-in fade-in zoom-in-95">
-             <CheckCircle2 className="w-8 h-8 text-green-600 shrink-0" />
-             <h4 className="text-xl font-bold text-green-800">{translations.correct_well_done || 'Richtig! Gut gemacht.'}</h4>
-           </div>
-        )}
-
-        <div className="mt-12 flex justify-end">
-          {!isSubmitted ? (
-            <button
-              onClick={handleSubmit}
-              disabled={!selectedAnswer}
-              className="px-8 py-4 bg-blue-600 text-white text-xl font-bold rounded-xl hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
-            >
-              {translations.check_answer || 'Antwort prüfen'}
-            </button>
-          ) : (
-            <button
-              onClick={handleNext}
-              className="px-8 py-4 bg-gray-900 text-white text-xl font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md"
-            >
-              {translations.next_exercise || 'Nächste Übung'}
-            </button>
-          )}
+    <div className="overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
+      <div className="bg-blue-600 px-6 py-5 text-white">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-lg font-medium opacity-90">
+            {currentExercise.lesson} • {currentExercise.topic}
+          </span>
+          <span className="text-lg font-bold">
+            {t('progress_label', { current: currentIndex + 1, total: session.length })}
+          </span>
+        </div>
+        {/* Ruhige Fortschrittsanzeige – kein Timer, keine Punktejagd. */}
+        <div
+          className="mt-4 h-3 w-full overflow-hidden rounded-full bg-white/25"
+          role="progressbar"
+          aria-valuenow={progressPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={t('completed_count')}
+        >
+          <div
+            className="h-full rounded-full bg-white transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
+
+      {currentExercise.type === 'fill_in_blank' ? (
+        <FillInBlankExerciseCard
+          key={currentExercise.id}
+          exercise={currentExercise}
+          t={t}
+          nextLabel={nextLabel}
+          onAttempt={(isCorrect, hintShown) => handleAttempt(currentExercise.id, isCorrect, hintShown)}
+          onNext={handleNext}
+        />
+      ) : (
+        <MultipleChoiceExerciseCard
+          key={currentExercise.id}
+          exercise={currentExercise}
+          t={t}
+          nextLabel={nextLabel}
+          onAttempt={(isCorrect, hintShown) => handleAttempt(currentExercise.id, isCorrect, hintShown)}
+          onNext={handleNext}
+        />
+      )}
+
+      {/* Graceful Degradation: Der Durchlauf bleibt nutzbar, auch wenn das
+          Speichern des Fortschritts scheitert. */}
+      {saveFailed && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4 sm:px-10"
+        >
+          <CloudOff className="h-6 w-6 shrink-0 text-gray-500" aria-hidden="true" />
+          <p className="text-lg text-gray-600">{t('error_description')}</p>
+        </div>
+      )}
     </div>
   )
 }

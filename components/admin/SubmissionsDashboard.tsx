@@ -3,44 +3,17 @@
 import React, { useState } from 'react'
 import { submitTeacherFeedback } from '@/app/actions/feedback'
 import { Clock, CheckCircle2, Mic, RotateCcw, PartyPopper, AlertTriangle } from 'lucide-react'
-import { createClient } from '@/utils/supabase/client'
+import { uploadFeedbackRecording } from '@/lib/audio/upload'
 import PendingSubmissionCard from './PendingSubmissionCard'
-import SpeedAudioPlayer from '@/components/audio/SpeedAudioPlayer'
-
-type Submission = {
-  id: string;
-  content_url: string;
-  created_at: string;
-  status: string;
-  level: string;
-  profiles: {
-    name: string;
-    email: string;
-    native_language: string;
-  };
-  teacher_feedback?: {
-    feedback_text: string;
-    feedback_audio_url?: string;
-    created_at: string;
-  }[];
-  attempt_number?: number;
-  parent?: {
-    id: string;
-    content_url: string;
-    teacher_feedback?: {
-      feedback_text: string;
-      feedback_audio_url?: string;
-      created_at: string;
-    }[];
-  };
-}
+import WaveformPlayer from '@/components/audio/WaveformPlayer'
+import type { TeacherSubmission } from '@/lib/types/feedback'
 
 export default function SubmissionsDashboard({
   pendingSubmissions,
   completedSubmissions
 }: {
-  pendingSubmissions: Submission[];
-  completedSubmissions: Submission[];
+  pendingSubmissions: TeacherSubmission[];
+  completedSubmissions: TeacherSubmission[];
 }) {
   const [activeTab, setActiveTab] = useState<'pending' | 'completed'>('pending')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
@@ -54,33 +27,23 @@ export default function SubmissionsDashboard({
   const handleFeedbackSubmit = async (id: string, text: string, audioBlob: Blob | null) => {
     setErrorMessage(null)
     try {
-      let audioUrl = undefined
+      let audioUrl: string | null = null
 
       if (audioBlob) {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) throw new Error('Nicht eingeloggt')
-
-        const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm'
-        const fileName = `feedback/${id}_${Date.now()}.${ext}`
-        
-        const { error } = await supabase.storage
-          .from('audio_submissions')
-          .upload(fileName, audioBlob, { contentType: audioBlob.type })
-
-        if (error) throw error
-
-        const { data: publicUrlData } = supabase.storage
-          .from('audio_submissions')
-          .getPublicUrl(fileName)
-          
-        audioUrl = publicUrlData.publicUrl
+        const upload = await uploadFeedbackRecording(audioBlob, id)
+        if (!upload.success) {
+          throw new Error('Sprachnachricht konnte nicht hochgeladen werden.')
+        }
+        audioUrl = upload.publicUrl
       }
 
-      const res = await submitTeacherFeedback(id, text, audioUrl)
-      if (!res.success) {
-        throw new Error(res.error || 'Speichern fehlgeschlagen.')
-      }
+      const res = await submitTeacherFeedback({
+        submissionId: id,
+        feedbackText: text,
+        feedbackAudioUrl: audioUrl,
+      })
+
+      if (!res.success) throw new Error(`Speichern fehlgeschlagen: ${res.reason ?? 'unbekannt'}`)
 
       const submission = pendingSubmissions.find(s => s.id === id)
       const studentName = submission?.profiles?.name || 'den Schüler'
@@ -207,14 +170,15 @@ export default function SubmissionsDashboard({
                     
                     {sub.parent && (
                       <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 opacity-75">
-                        <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Vorherige Aufnahme</p>
-                        <SpeedAudioPlayer src={sub.parent.content_url} className="w-full h-12 mb-3" />
+                        <WaveformPlayer src={sub.parent.content_url} label="Vorherige Aufnahme" compact />
                       </div>
                     )}
 
                     <div className="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Aufnahme {sub.attempt_number && sub.attempt_number > 1 ? `(V${sub.attempt_number})` : ''}</p>
-                      <SpeedAudioPlayer src={sub.content_url} className="w-full min-h-[48px]" />
+                      <WaveformPlayer
+                        src={sub.content_url}
+                        label={`Aufnahme ${sub.attempt_number && sub.attempt_number > 1 ? `(V${sub.attempt_number})` : ''}`}
+                      />
                     </div>
                   </div>
 
@@ -231,7 +195,7 @@ export default function SubmissionsDashboard({
                           <div className="flex items-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-3">
                             <Mic size={18} /> Gesendete Sprachnachricht
                           </div>
-                          <SpeedAudioPlayer src={sub.teacher_feedback[0].feedback_audio_url} className="w-full min-h-[48px]" />
+                          <WaveformPlayer src={sub.teacher_feedback[0].feedback_audio_url} compact />
                         </div>
                       )}
                     </div>

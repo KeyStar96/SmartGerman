@@ -1,4 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/supabase/database.types';
 
 // ADMIN CLIENT - Uses Service Role Key
 // Warning: Bypasses RLS. Use only in secure server actions.
@@ -10,7 +11,7 @@ export function createAdminClient() {
         throw new Error('SUPABASE_SERVICE_ROLE_KEY is missing.');
     }
 
-    return createSupabaseClient(supabaseUrl, supabaseServiceKey, {
+    return createSupabaseClient<Database>(supabaseUrl, supabaseServiceKey, {
         auth: {
             persistSession: false,
             autoRefreshToken: false,

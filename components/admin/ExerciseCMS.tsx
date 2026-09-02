@@ -3,8 +3,16 @@
 import { useState } from 'react'
 import { addExercise, deleteExercise } from '@/app/actions/cms'
 import { Trash2, Plus, Loader2, BookOpen } from 'lucide-react'
+import type { AddExerciseInput, ExerciseContent, ExerciseType } from '@/lib/types/exercise'
+import type { Database } from '@/supabase/database.types'
 
-export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
+type ExerciseRow = Database['public']['Tables']['exercises']['Row']
+
+function splitList(value: string): string[] {
+  return value.split(',').map(entry => entry.trim()).filter(Boolean)
+}
+
+export default function ExerciseCMS({ initialData }: { initialData: ExerciseRow[] }) {
   const [items, setItems] = useState(initialData)
   const [loading, setLoading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -13,13 +21,20 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
     level: 'A1.1',
     lesson: '',
     topic: '',
-    type: 'fill_in_blank',
+    type: 'fill_in_blank' as ExerciseType,
     hint_ru: '',
-    hint_tr: ''
+    hint_tr: '',
+    solution_audio_url: ''
   })
 
   // Spezifische States für die Übungstypen (benutzerfreundlich)
-  const [fillInBlank, setFillInBlank] = useState({ text_before: '', text_after: '', correct_answer: '' })
+  const [fillInBlank, setFillInBlank] = useState({
+    text_before: '',
+    text_after: '',
+    correct_answer: '',
+    options: '',
+    smart_hint: ''
+  })
   const [multipleChoice, setMultipleChoice] = useState({ question: '', options: '', correct_answer: '' })
   const [sentenceBuilding, setSentenceBuilding] = useState({ parts: '' })
 
@@ -27,7 +42,7 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
     e.preventDefault()
     setLoading(true)
     
-    let content = {}
+    let content: ExerciseContent | null = null
     
     if (form.type === 'fill_in_blank') {
       if (!fillInBlank.correct_answer) {
@@ -35,10 +50,33 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
         setLoading(false)
         return
       }
+
+      const chipOptions = splitList(fillInBlank.options)
+      const correctAnswer = fillInBlank.correct_answer.trim()
+
+      // Die Lösung muss unter den Chips sein, sonst ist die Übung unlösbar.
+      if (chipOptions.length > 0) {
+        const containsAnswer = chipOptions.some(
+          option => option.toLocaleLowerCase('de-DE') === correctAnswer.toLocaleLowerCase('de-DE')
+        )
+        if (!containsAnswer) {
+          alert('Die Auswahl-Chips müssen die korrekte Lösung enthalten!')
+          setLoading(false)
+          return
+        }
+        if (chipOptions.length < 2) {
+          alert('Bitte mindestens zwei Auswahl-Chips angeben – oder das Feld leer lassen.')
+          setLoading(false)
+          return
+        }
+      }
+
       content = {
         text_before: fillInBlank.text_before,
         text_after: fillInBlank.text_after,
-        correct_answer: fillInBlank.correct_answer
+        correct_answer: correctAnswer,
+        ...(chipOptions.length > 0 ? { options: chipOptions } : {}),
+        ...(fillInBlank.smart_hint.trim() ? { smart_hint: fillInBlank.smart_hint.trim() } : {})
       }
     } else if (form.type === 'multiple_choice') {
       if (!multipleChoice.question || !multipleChoice.options || !multipleChoice.correct_answer) {
@@ -48,7 +86,7 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
       }
       content = {
         question: multipleChoice.question,
-        options: multipleChoice.options.split(',').map(s => s.trim()).filter(Boolean),
+        options: splitList(multipleChoice.options),
         correct_answer: multipleChoice.correct_answer.trim()
       }
     } else if (form.type === 'sentence_building') {
@@ -58,11 +96,26 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
         return
       }
       content = {
-        parts: sentenceBuilding.parts.split(',').map(s => s.trim()).filter(Boolean)
+        parts: splitList(sentenceBuilding.parts)
       }
     }
 
-    const payload = { ...form, content }
+    if (!content) {
+      alert('Bitte die Übungsinhalte ausfüllen!')
+      setLoading(false)
+      return
+    }
+
+    const payload: AddExerciseInput = {
+      level: form.level,
+      lesson: form.lesson,
+      topic: form.topic,
+      type: form.type,
+      hint_ru: form.hint_ru.trim() || null,
+      hint_tr: form.hint_tr.trim() || null,
+      solution_audio_url: form.solution_audio_url.trim() || null,
+      content
+    }
     const res = await addExercise(payload)
     
     if (res.success) {
@@ -120,7 +173,7 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
           <div className="md:col-span-2">
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Übungstyp</label>
             <div className="relative">
-              <select value={form.type} onChange={e => setForm({...form, type: e.target.value})} className="appearance-none w-full p-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00] cursor-pointer">
+              <select value={form.type} onChange={e => setForm({...form, type: e.target.value as ExerciseType})} className="appearance-none w-full p-3 pr-10 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00] cursor-pointer">
                 <option value="fill_in_blank">Lückentext</option>
                 <option value="multiple_choice">Multiple Choice</option>
                 <option value="sentence_building">Satzbau</option>
@@ -135,18 +188,37 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
             <h4 className="font-bold text-slate-700 dark:text-slate-300">Übungsinhalte ({form.type === 'fill_in_blank' ? 'Lückentext' : form.type === 'multiple_choice' ? 'Multiple Choice' : 'Satzbau'})</h4>
             
             {form.type === 'fill_in_blank' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm text-slate-600 dark:text-slate-400 mb-1">Text davor</label>
-                  <input placeholder="Ich " value={fillInBlank.text_before} onChange={e => setFillInBlank({...fillInBlank, text_before: e.target.value})} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm text-slate-600 dark:text-slate-400 mb-1">Text davor</label>
+                    <input placeholder="Ich " value={fillInBlank.text_before} onChange={e => setFillInBlank({...fillInBlank, text_before: e.target.value})} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-[#FF5C00] mb-1">Die Lücke (Lösung)</label>
+                    <input required placeholder="bin" value={fillInBlank.correct_answer} onChange={e => setFillInBlank({...fillInBlank, correct_answer: e.target.value})} className="w-full p-3 rounded-xl border border-[#FF5C00]/50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-slate-600 dark:text-slate-400 mb-1">Text danach</label>
+                    <input placeholder=" Nico." value={fillInBlank.text_after} onChange={e => setFillInBlank({...fillInBlank, text_after: e.target.value})} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+                  </div>
                 </div>
+
                 <div>
-                  <label className="block text-sm font-bold text-[#FF5C00] mb-1">Die Lücke (Lösung)</label>
-                  <input required placeholder="bin" value={fillInBlank.correct_answer} onChange={e => setFillInBlank({...fillInBlank, correct_answer: e.target.value})} className="w-full p-3 rounded-xl border border-[#FF5C00]/50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Auswahl-Chips (kommagetrennt, optional)</label>
+                  <input placeholder="bin, bist, ist, sind" value={fillInBlank.options} onChange={e => setFillInBlank({...fillInBlank, options: e.target.value})} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+                  <p className="text-xs text-slate-500 mt-2">
+                    Der Schüler tippt einen dieser Chips an – eine Tastatureingabe gibt es nicht. Die Lösung muss enthalten sein.
+                    Bleibt das Feld leer, werden die Chips automatisch aus der passenden Wortfamilie erzeugt.
+                  </p>
                 </div>
+
                 <div>
-                  <label className="block text-sm text-slate-600 dark:text-slate-400 mb-1">Text danach</label>
-                  <input placeholder=" Nico." value={fillInBlank.text_after} onChange={e => setFillInBlank({...fillInBlank, text_after: e.target.value})} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Smart Hint (optional)</label>
+                  <input placeholder="Achte auf die 1. Person Singular." value={fillInBlank.smart_hint} onChange={e => setFillInBlank({...fillInBlank, smart_hint: e.target.value})} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+                  <p className="text-xs text-slate-500 mt-2">
+                    Erscheint nach zwei Fehlversuchen. Ohne Eintrag wird automatisch ein Hinweis zu Wortart bzw. Genus erzeugt.
+                  </p>
                 </div>
               </div>
             )}
@@ -175,6 +247,14 @@ export default function ExerciseCMS({ initialData }: { initialData: any[] }) {
                 <p className="text-xs text-slate-500 mt-2">Die Wörter werden für den Schüler automatisch gemischt. Die eingegebene Reihenfolge ist die Lösung.</p>
               </div>
             )}
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Audio-URL der Lösung (optional)</label>
+            <input type="url" placeholder="https://… .mp3" value={form.solution_audio_url} onChange={e => setForm({...form, solution_audio_url: e.target.value})} className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF5C00]" />
+            <p className="text-xs text-slate-500 mt-2">
+              Für den Tap-to-Listen-Button. Ohne Eintrag wird die Audio-Spur aus der Vokabelbank genutzt, sonst die Sprachausgabe des Geräts.
+            </p>
           </div>
 
           <div>

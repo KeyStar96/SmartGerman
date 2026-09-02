@@ -1,47 +1,57 @@
-import { getExercises } from '@/app/actions/exercises'
-import ExerciseClient from '@/components/exercises/ExerciseClient'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { getExercises } from '@/app/actions/exercises'
+import ExerciseClient from '@/components/exercises/ExerciseClient'
 import { getDictionary } from '@/lib/dictionary'
+import { createExerciseTranslator, type ExerciseTranslations } from '@/lib/exercise-i18n'
 
 export default async function ExercisesPage({
   params,
 }: {
-  params: Promise<{ lang: string, level: string }>
+  params: Promise<{ lang: string; level: string }>
 }) {
   const { lang, level } = await params
   const decodedLevel = decodeURIComponent(level)
   const dict = await getDictionary(lang)
-  
-  // Abruf aller Übungen für dieses Niveau
+  const translations = (dict.exercises ?? {}) as ExerciseTranslations
+  const t = createExerciseTranslator(translations)
+
   const exercises = await getExercises(decodedLevel)
-  
-  // Filtere nach unvollständigen Übungen (für den Übungsdurchlauf)
-  const activeExercises = exercises.filter(ex => !ex.completed)
+
+  // Bereits gelöste Übungen werden nicht erneut abgefragt.
+  const activeExercises = exercises.filter((exercise) => !exercise.completed)
+  const completedCount = exercises.length - activeExercises.length
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6 flex justify-between items-end">
+    <div className="mx-auto max-w-4xl">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link 
-            href={`/${lang}/dashboard`}
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium mb-4 text-lg transition-colors"
+          <Link
+            href={`/${lang}/dashboard/level/${encodeURIComponent(decodedLevel)}`}
+            className="mb-4 inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800"
           >
-            <ArrowLeft size={24} /> {dict.exercises?.back_to_dashboard || 'Zurück zum Dashboard'}
+            <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_level')}
           </Link>
-          <h1 className="text-4xl font-extrabold text-gray-900">{dict.exercises?.title || 'Interaktive Übungen'}</h1>
-          <p className="text-xl text-gray-600 mt-2">{dict.exercises?.subtitle || 'Trainiere Grammatik und Wortschatz gezielt.'}</p>
+          <h1 className="text-4xl font-extrabold text-gray-900">{t('title')}</h1>
+          <p className="mt-2 text-xl text-gray-600">{t('subtitle')}</p>
         </div>
-        <div className="text-right hidden sm:block">
-           <div className="text-3xl font-bold text-green-600">
-             {exercises.length - activeExercises.length} / {exercises.length}
-           </div>
-           <div className="text-sm font-medium text-gray-500 uppercase tracking-wider">{dict.exercises?.completed_count || 'Abgeschlossen'}</div>
+        <div className="hidden text-right sm:block">
+          <div className="text-3xl font-bold text-green-600">
+            {completedCount} / {exercises.length}
+          </div>
+          <div className="text-sm font-medium uppercase tracking-wider text-gray-500">
+            {t('completed_count')}
+          </div>
         </div>
       </div>
 
       <div className="mt-8">
-        <ExerciseClient exercises={activeExercises} translations={dict.exercises || {}} />
+        <ExerciseClient
+          exercises={activeExercises}
+          translations={translations}
+          lang={lang}
+          level={decodedLevel}
+        />
       </div>
     </div>
   )

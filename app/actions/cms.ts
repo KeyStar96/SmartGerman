@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { toJsonContent, type AddExerciseInput } from '@/lib/types/exercise'
 
 // Helper to check if current user is admin/teacher
 async function requireAdmin() {
@@ -99,15 +100,30 @@ export async function getExercises() {
   return data || []
 }
 
-export async function addExercise(payload: any) {
+export async function addExercise(payload: AddExerciseInput): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await requireAdmin()
-    const { error } = await supabase.from('exercises').insert([payload])
+    const { error } = await supabase.from('exercises').insert([
+      {
+        level: payload.level,
+        lesson: payload.lesson,
+        topic: payload.topic,
+        type: payload.type,
+        hint_ru: payload.hint_ru,
+        hint_tr: payload.hint_tr,
+        solution_audio_url: payload.solution_audio_url,
+        content: toJsonContent(payload.content),
+      },
+    ])
     if (error) throw error
     revalidatePath('/[lang]/admin/content/exercises', 'page')
     return { success: true }
-  } catch (err: any) {
-    return { success: false, error: err.message }
+  } catch (err) {
+    console.error('Fehler beim Anlegen einer Übung:', err)
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Die Übung konnte nicht gespeichert werden.',
+    }
   }
 }
 
