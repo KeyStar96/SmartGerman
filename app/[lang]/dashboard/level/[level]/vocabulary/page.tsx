@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { ArrowLeft, BookOpenCheck } from 'lucide-react'
-import { getDueCards, getLessonStats, initializeLesson } from '@/app/actions/vocabulary'
+import { getDueCards, getLessonStats } from '@/app/actions/vocabulary'
 import { getDictionary } from '@/lib/dictionary'
 import { createVocabularyTranslator, type VocabularyTranslations } from '@/lib/vocabulary-i18n'
+import LessonList from '@/components/vocabulary/LessonList'
 
 export default async function VocabularyOverviewPage({
   params,
@@ -67,73 +68,7 @@ export default async function VocabularyOverviewPage({
           <p className="mx-auto mt-2 max-w-md text-lg text-gray-600">{t('no_sets_hint')}</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {stats.map((stat) => {
-            const learnedPercent = stat.total > 0 ? Math.round((stat.learned / stat.total) * 100) : 0
-            const isUnstarted = stat.active === 0 && stat.learned === 0
-
-            return (
-              <div
-                key={stat.lesson}
-                className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md md:flex-row md:items-center"
-              >
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{stat.lesson}</h3>
-                  <div className="mt-2 flex flex-wrap gap-4 text-lg text-gray-600">
-                    <span className="inline-flex items-center gap-2">
-                      <span className="h-3 w-3 rounded-full bg-blue-500" aria-hidden="true" />
-                      {stat.active} {t('in_training')}
-                    </span>
-                    <span className="inline-flex items-center gap-2">
-                      <span className="h-3 w-3 rounded-full bg-green-500" aria-hidden="true" />
-                      {stat.learned} {t('learned')}
-                    </span>
-                    {stat.due > 0 && (
-                      <span className="inline-flex items-center gap-2 font-bold text-amber-700">
-                        <span className="h-3 w-3 rounded-full bg-amber-500" aria-hidden="true" />
-                        {stat.due} {t('due_now')}
-                      </span>
-                    )}
-                    <span className="inline-flex items-center gap-2">
-                      <span className="h-3 w-3 rounded-full bg-gray-300" aria-hidden="true" />
-                      {stat.total} {t('total')}
-                    </span>
-                  </div>
-                </div>
-
-                {isUnstarted ? (
-                  <form
-                    action={async () => {
-                      'use server'
-                      await initializeLesson(stat.lesson, decodedLevel)
-                    }}
-                  >
-                    <button
-                      type="submit"
-                      className="min-h-14 w-full rounded-2xl bg-green-600 px-8 py-4 text-lg font-bold text-white shadow-sm transition-colors hover:bg-green-500 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto"
-                    >
-                      {t('start_set')}
-                    </button>
-                  </form>
-                ) : (
-                  <div
-                    className="h-4 w-full overflow-hidden rounded-full bg-gray-200 shadow-inner md:w-48"
-                    role="progressbar"
-                    aria-valuenow={learnedPercent}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={t('learned')}
-                  >
-                    <div
-                      className="h-4 rounded-full bg-green-500 transition-all duration-500"
-                      style={{ width: `${learnedPercent}%` }}
-                    />
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+        <LessonList stats={stats} lang={lang} level={decodedLevel} translations={translations} />
       )}
     </div>
   )

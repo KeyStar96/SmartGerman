@@ -9,12 +9,32 @@ import { createClient } from '@/utils/supabase/client'
  *   Lehrkraft `feedback/{submissionId}_{timestamp}.{ext}`
  */
 
+/**
+ * Muss exakt mit dem Bucket in Supabase Storage übereinstimmen
+ * (siehe `supabase/migrations/fix_audio_submissions_storage_policies.sql`).
+ * Unterstrich, nicht Bindestrich – Storage-Bucket-Namen sind case- und
+ * zeichensensitiv, ein Tippfehler hier führt zu einem stillen 404 beim Upload.
+ */
 export const AUDIO_BUCKET = 'audio_submissions'
 
-/** Dateiendung passend zum aufgenommenen MIME-Type. */
+/**
+ * Reduziert einen `MediaRecorder`-MIME-Type auf den reinen Basistyp ohne
+ * Codec-Parameter, z.B. `audio/webm;codecs=opus` → `audio/webm`.
+ * Der volle String eignet sich nicht zuverlässig als HTTP-`Content-Type`
+ * für den Storage-Upload; der Basistyp ist das, was Supabase Storage und
+ * der `<audio>`-Tag beim Abspielen erwarten.
+ */
+export function baseMimeType(mimeType: string | undefined | null): string {
+  if (!mimeType) return 'audio/webm'
+  const base = mimeType.split(';')[0]?.trim()
+  return base || 'audio/webm'
+}
+
+/** Dateiendung passend zum aufgenommenen MIME-Type (`audio/webm` → `webm`, `audio/mp4` → `mp4`). */
 export function extensionForMimeType(mimeType: string): string {
-  if (mimeType.includes('mp4')) return 'mp4'
-  if (mimeType.includes('ogg')) return 'ogg'
+  const base = baseMimeType(mimeType)
+  if (base.includes('mp4')) return 'mp4'
+  if (base.includes('ogg')) return 'ogg'
   return 'webm'
 }
 
@@ -22,32 +42,79 @@ export type AudioUploadResult =
   | { success: true; publicUrl: string }
   | { success: false; reason: 'not_authenticated' | 'upload_failed' }
 
+/**
+ * Liefert die für Logging hilfreichen Eckdaten eines Storage-Fehlers.
+ * Der Supabase-JS-Client wirft für Storage-Aufrufe kein einheitliches
+ * Error-Objekt (mal `StorageError`, mal ein rohes `Error` bei Netzwerkfehlern),
+ * deshalb greifen wir defensiv auf mögliche Felder zu statt sie zu casten.
+ */
+function describeStorageError(err: unknown): Record<string, unknown> {
+  if (err && typeof err === 'object') {
+    const candidate = err as { message?: unknown; name?: unknown; status?: unknown; statusCode?: unknown }
+    return {
+      name: candidate.name,
+      message: candidate.message,
+      status: candidate.status ?? candidate.statusCode,
+    }
+  }
+  return { message: String(err) }
+}
+
 async function uploadToBucket(blob: Blob, buildPath: (userId: string) => string): Promise<AudioUploadResult> {
+  const contentType = baseMimeType(blob.type)
+  let path = ''
+
   try {
     const supabase = createClient()
     const {
       data: { user },
+      error: authError,
     } = await supabase.auth.getUser()
+
+    if (authError) {
+      console.error('Audio-Upload: Sitzung nicht abrufbar.', describeStorageError(authError))
+      return { success: false, reason: 'not_authenticated' }
+    }
 
     if (!user) {
       console.error('Audio-Upload ohne angemeldeten Nutzer abgebrochen.')
       return { success: false, reason: 'not_authenticated' }
     }
 
-    const path = buildPath(user.id)
+    path = buildPath(user.id)
+
     const { error } = await supabase.storage
       .from(AUDIO_BUCKET)
-      .upload(path, blob, { contentType: blob.type })
+      .upload(path, blob, { contentType, upsert: true })
 
     if (error) {
-      console.error('Audio-Upload fehlgeschlagen:', error.message)
+      // Transparentes Logging für Storage-Fehler (z.B. falscher Bucket-Name,
+      // fehlende RLS-Policy, abgelaufene Sitzung) – niemals nur "es hat nicht
+      // funktioniert" ohne Kontext für die Fehlersuche im Live-Betrieb.
+      console.error('Audio-Upload zu Supabase Storage fehlgeschlagen:', {
+        bucket: AUDIO_BUCKET,
+        path,
+        blobType: blob.type,
+        contentType,
+        blobSizeBytes: blob.size,
+        ...describeStorageError(error),
+      })
       return { success: false, reason: 'upload_failed' }
     }
 
     const { data } = supabase.storage.from(AUDIO_BUCKET).getPublicUrl(path)
     return { success: true, publicUrl: data.publicUrl }
   } catch (err) {
-    console.error('Unerwarteter Fehler beim Audio-Upload:', err)
+    // Fängt Netzwerkfehler (Offline, Timeout, CORS) ab, die der
+    // Supabase-Client als geworfene Exception statt als `{ error }` liefert.
+    console.error('Unerwarteter Netzwerk- oder Laufzeitfehler beim Audio-Upload:', {
+      bucket: AUDIO_BUCKET,
+      path,
+      blobType: blob.type,
+      contentType,
+      blobSizeBytes: blob.size,
+      ...describeStorageError(err),
+    })
     return { success: false, reason: 'upload_failed' }
   }
 }

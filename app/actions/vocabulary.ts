@@ -5,15 +5,20 @@ import { createClient } from '@/utils/supabase/server'
 import {
   applyLeitnerAnswer,
   LEITNER_LEARNED_BOX,
+  nextReviewDateForBox,
   normalizeBox,
   type LeitnerPhase,
 } from '@/lib/leitner'
 import {
   isHardForNativeLanguage,
   resolveTranslation,
+  type AddCardsResult,
+  type AssessmentDecision,
   type DueVocabularyCard,
   type InitializeLessonResult,
+  type LessonCardView,
   type LessonStat,
+  type SubmitAssessmentResult,
   type SubmitVocabularyAnswerInput,
   type SubmitVocabularyAnswerResult,
 } from '@/lib/types/vocabulary'
@@ -208,6 +213,200 @@ export async function initializeLesson(
   } catch (err) {
     console.error('Unerwarteter Fehler in initializeLesson:', err)
     return { success: false, added: 0 }
+  }
+}
+
+/**
+ * Liefert alle Vokabeln einer Lektion inklusive persönlichem Lernstand –
+ * Grundlage für die Lektions-Detailansicht und den Einstufungs-Durchlauf.
+ * Karten ohne Lernstand (`phase: null`) wurden noch nicht in den
+ * Karteikasten übernommen.
+ */
+export async function getLessonCards(lessonName: string, level?: string): Promise<LessonCardView[]> {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return []
+
+    const nativeLanguage = await loadNativeLanguage(supabase, user.id)
+
+    let cardsQuery = supabase
+      .from('vocabulary_cards')
+      .select(
+        'id, word_de, article, plural, translation_ru, translation_tr, translation_en, is_hard_for_ru, is_hard_for_tr'
+      )
+      .eq('lesson', lessonName)
+
+    if (level) {
+      cardsQuery = cardsQuery.eq('level', level)
+    }
+
+    const [{ data: cards, error: cardsError }, { data: progress, error: progressError }] = await Promise.all([
+      cardsQuery,
+      supabase.from('user_vocabulary_progress').select('card_id, box_number').eq('user_id', user.id),
+    ])
+
+    if (cardsError) {
+      console.error(`Karten der Lektion "${lessonName}" nicht ladbar:`, cardsError.message)
+      return []
+    }
+
+    if (progressError) {
+      console.error('Lernfortschritt für die Detailansicht nicht ladbar:', progressError.message)
+    }
+
+    const progressByCard = new Map(
+      (progress ?? []).map((entry) => [entry.card_id, normalizeBox(entry.box_number)])
+    )
+
+    return (cards ?? [])
+      .map((card) => {
+        const box = progressByCard.get(card.id)
+        const isLearned = box === LEITNER_LEARNED_BOX
+        const phase: LeitnerPhase | null = box === undefined ? null : isLearned ? 6 : box
+
+        return {
+          id: card.id,
+          word_de: card.word_de,
+          article: card.article,
+          plural: card.plural,
+          translation: resolveTranslation(card, nativeLanguage),
+          phase,
+          isLearned,
+        }
+      })
+      .sort((a, b) => a.word_de.localeCompare(b.word_de, 'de-DE'))
+  } catch (err) {
+    console.error('Unerwarteter Fehler in getLessonCards:', err)
+    return []
+  }
+}
+
+/**
+ * Manuelle Übernahme einzelner, gezielt ausgewählter Vokabeln in den
+ * Karteikasten. Startet immer in Phase 1, unabhängig vom Lektionsstatus.
+ * Karten mit bereits bestehendem Lernstand werden übersprungen.
+ */
+export async function addCardsToTrainer(cardIds: string[]): Promise<AddCardsResult> {
+  try {
+    if (cardIds.length === 0) return { success: true, added: 0 }
+
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { success: false, added: 0 }
+
+    const { data: existingProgress, error: progressError } = await supabase
+      .from('user_vocabulary_progress')
+      .select('card_id')
+      .eq('user_id', user.id)
+      .in('card_id', cardIds)
+
+    if (progressError) {
+      console.error('Bestehender Lernfortschritt nicht ladbar:', progressError.message)
+      return { success: false, added: 0 }
+    }
+
+    const existingCardIds = new Set((existingProgress ?? []).map((entry) => entry.card_id))
+    const now = new Date().toISOString()
+
+    const newProgress = cardIds
+      .filter((cardId) => !existingCardIds.has(cardId))
+      .map((cardId) => ({
+        user_id: user.id,
+        card_id: cardId,
+        box_number: 1,
+        next_review_date: now,
+      }))
+
+    if (newProgress.length > 0) {
+      const { error: insertError } = await supabase.from('user_vocabulary_progress').insert(newProgress)
+
+      if (insertError) {
+        console.error('Manuelle Vokabel-Übernahme nicht speicherbar:', insertError.message)
+        return { success: false, added: 0 }
+      }
+    }
+
+    revalidatePath('/[lang]/dashboard', 'page')
+    revalidatePath('/[lang]/dashboard/level/[level]', 'page')
+    revalidatePath('/[lang]/dashboard/level/[level]/vocabulary', 'page')
+    return { success: true, added: newProgress.length }
+  } catch (err) {
+    console.error('Unerwarteter Fehler in addCardsToTrainer:', err)
+    return { success: false, added: 0 }
+  }
+}
+
+/**
+ * Übernimmt das Ergebnis des „Vokabeln einstufen"-Durchlaufs (Pre-Assessment):
+ * Bereits bekannte Vokabeln werden direkt als gelernt (Phase 6 / Box 7)
+ * verbucht, neue starten regulär in Phase 1. Karten mit bereits bestehendem
+ * Lernstand werden übersprungen, damit ein Doppelklick nichts überschreibt.
+ */
+export async function submitLessonAssessment(decisions: AssessmentDecision[]): Promise<SubmitAssessmentResult> {
+  try {
+    if (decisions.length === 0) return { success: true, addedLearned: 0, addedNew: 0 }
+
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { success: false, addedLearned: 0, addedNew: 0 }
+
+    const cardIds = decisions.map((decision) => decision.cardId)
+    const { data: existingProgress, error: progressError } = await supabase
+      .from('user_vocabulary_progress')
+      .select('card_id')
+      .eq('user_id', user.id)
+      .in('card_id', cardIds)
+
+    if (progressError) {
+      console.error('Bestehender Lernfortschritt nicht ladbar:', progressError.message)
+      return { success: false, addedLearned: 0, addedNew: 0 }
+    }
+
+    const existingCardIds = new Set((existingProgress ?? []).map((entry) => entry.card_id))
+    const now = new Date()
+    const nowIso = now.toISOString()
+
+    const rows = decisions
+      .filter((decision) => !existingCardIds.has(decision.cardId))
+      .map((decision) => ({
+        user_id: user.id,
+        card_id: decision.cardId,
+        box_number: decision.alreadyKnown ? LEITNER_LEARNED_BOX : 1,
+        next_review_date: decision.alreadyKnown
+          ? nextReviewDateForBox(LEITNER_LEARNED_BOX, false, now).toISOString()
+          : nowIso,
+      }))
+
+    if (rows.length > 0) {
+      const { error: insertError } = await supabase.from('user_vocabulary_progress').insert(rows)
+
+      if (insertError) {
+        console.error('Einstufung nicht speicherbar:', insertError.message)
+        return { success: false, addedLearned: 0, addedNew: 0 }
+      }
+    }
+
+    const addedLearned = rows.filter((row) => row.box_number === LEITNER_LEARNED_BOX).length
+    const addedNew = rows.length - addedLearned
+
+    revalidatePath('/[lang]/dashboard', 'page')
+    revalidatePath('/[lang]/dashboard/level/[level]', 'page')
+    revalidatePath('/[lang]/dashboard/level/[level]/vocabulary', 'page')
+
+    return { success: true, addedLearned, addedNew }
+  } catch (err) {
+    console.error('Unerwarteter Fehler in submitLessonAssessment:', err)
+    return { success: false, addedLearned: 0, addedNew: 0 }
   }
 }
 

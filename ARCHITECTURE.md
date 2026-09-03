@@ -20,7 +20,7 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
   - *Zusätzlich benötigt*: Eine hierarchische `lessons`-Tabelle (gehört zu Kurs), um Videos, Vokabeln und Übungen sauber zu bündeln.
 - **Content-Entitäten**:
   - `videos`: URL, Lektions-Zugehörigkeit, Titel.
-  - `vocabulary_cards`: Wort, Artikel, Plural, Übersetzungen (`translation_ru` / `_tr` / `_en`), Audio, Bild. Lernsets sind der Text in `lesson` plus `level`. A1.1 live: **Lektion 1** (84 Karten), **Lektion 2** (161 Karten). Seed: `supabase/seeds/a11_*.sql`.
+  - `vocabulary_cards`: Wort, Artikel, Plural, Übersetzungen (`translation_ru` / `_tr` / `_en`), Audio, Bild. Lernsets sind der Text in `lesson` plus `level`. A1.1 live: **Lektion 1** (84 Karten), **Lektion 2** (85 Karten), **Lektion 3** (76 Karten). Seed: `supabase/seeds/a11_*.sql`. Migration: `supabase/migrations/move_einkauf_vocab_to_a11_lektion_3.sql`.
   - `exercises`: Typ (`fill_in_blank`, `multiple_choice`, `sentence_building`), Content als JSONB, `solution_audio_url` für Tap-to-Listen.
     - `content` bei `fill_in_blank`: `{ text_before, text_after, correct_answer, options?, smart_hint? }`.
       `options` sind die Auswahl-Chips; fehlen sie, werden sie serverseitig aus der Wortfamilie generiert.
@@ -29,6 +29,8 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
     - Ruhezeiten je Phase: 1, 1, 3, 9, 29, 90 Tage; für kontrastiv schwere Vokabeln halbiert (min. 1 Tag).
     - Die Phasenlogik liegt ausschließlich in `lib/leitner.ts` als reine Funktionen – Server Actions und UI enthalten keine Intervall-Arithmetik.
     - Index `idx_user_vocabulary_progress_due` auf `(user_id, next_review_date, box_number)` für die Abfrage der fälligen Karten.
+    - **Übernahme-Wege in den Karteikasten:** (1) automatisch beim Sofort-Start einer ganzen Lektion (`initializeLesson`, legacy), (2) manuell je Einzelvokabel über `addCardsToTrainer(cardIds)` (Start immer Phase 1), (3) über den „Vokabeln einstufen"-Durchlauf `submitLessonAssessment(decisions)` – bekannte Vokabeln landen direkt auf Box 7 mit regulärer Phase-6-Ruhezeit, neue starten in Phase 1. Alle drei Wege überspringen Karten mit bereits bestehendem Lernstand (kein Überschreiben von Fortschritt).
+    - `getLessonCards(lesson, level)` liefert alle Vokabeln einer Lektion inklusive persönlichem Lernstand (`phase: null` = noch nicht übernommen) für die Lektions-Detailansicht in `components/vocabulary/LessonList.tsx`.
   - `user_exercise_progress`: Score (0–100, gestaffelt nach Versuchen), Completed-Status, `attempts`, `hint_shown`.
   - `submissions` & `teacher_feedback`: Audio/Text-Einsendungen von Studenten, verknüpft mit Lehrer-Feedback (Audio/Text).
     - `submissions.parent_id` / `attempt_number` bilden die Kette aus erstem Versuch und Wiedervorlage.
@@ -38,7 +40,7 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
 - **Audio-Pipeline**:
   - Aufnahme: `lib/audio/useAudioRecorder.ts` (getUserMedia, MediaRecorder, AnalyserNode) – einzige Quelle für Schüler- und Lehrer-Aufnahmen.
   - Darstellung: `lib/audio/waveform.ts` (reine Funktionen) plus `LiveWaveform` (laufende Aufnahme) und `WaveformPlayer` (fertige Datei mit Fortschritt, Tempo und Sprung).
-  - Upload: `lib/audio/upload.ts`, Bucket `audio_submissions`. Pfade `{userId}-{timestamp}` (Schüler) und `feedback/{submissionId}_{timestamp}` (Lehrkraft) – von den Storage-Policies abhängig, daher nicht ändern.
+  - Upload: `lib/audio/upload.ts`, Bucket `audio_submissions`. Pfade `{userId}-{timestamp}` (Schüler) und `feedback/{submissionId}_{timestamp}` (Lehrkraft) – von den Storage-Policies abhängig, daher nicht ändern. `contentType` wird über `baseMimeType()` auf den reinen Basistyp (`audio/webm` / `audio/mp4`, ohne `;codecs=...`) reduziert, bevor er an Storage gesendet wird; `upload()` läuft mit `upsert: true`. Storage-Fehler (Bucket/Pfad/MIME/Statuscode) und Netzwerkfehler werden vollständig über `console.error` geloggt (nie nur eine generische Meldung). RLS: `supabase/migrations/fix_audio_submissions_storage_policies.sql` (idempotent, INSERT/UPDATE für `authenticated`, SELECT für `public`).
 
 ## 2. API-Design & Routing (Next.js App Router)
 
@@ -56,6 +58,7 @@ app/[lang]/
 ### Server Actions (API-Ersatz)
 Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` verwendet, um Type-Safety (Zero-Error-Policy) zu garantieren:
 - `actions/auth.ts`: Login/Logout/Register.
+- `actions/vocabulary.ts`: `getDueCards`, `submitVocabularyAnswer`, `getLessonStats`, `getLessonCards` (Detailansicht), `addCardsToTrainer` (manuelle Einzelübernahme), `submitLessonAssessment` (Pre-Assessment-Einstufung). Route `/dashboard/level/[level]/vocabulary/assess?lesson=…` nutzt `getLessonCards` + `submitLessonAssessment` für den „Vokabeln einstufen"-Durchlauf.
 - `actions/student.ts`: Submit Exercise, Update Vocab Box, Upload Audio Submission.
 - `actions/teacher.ts`: Provide Feedback, Update User Subscription (manuell).
 - `actions/stripe.ts`: Create Checkout Session, Customer Portal.
@@ -91,7 +94,7 @@ Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` ver
 ## 4. UX/UI-Architektur (Geragogik & Barrierefreiheit)
 
 - **Smartphone zuerst:** Cursor-Agent `.cursor/rules/ux-smartphone-agent.mdc` (Mobile-First, 375px, kein Horizontal-Scroll, Safe-Area). Geragogik-Maße bleiben in `ux-geragogik-agent.mdc`.
-- **Lernplattform-Hülle:** `app/[lang]/dashboard/layout.tsx` stapelt auf dem Handy Logo/Aktionen und darunter den Seitentitel (`DashboardHeader`). Touch-Targets 48px, `min-h-dvh`, Safe-Area, Profil-Icon. Texte über `lib/dashboard-i18n.ts` / `lib/videos-i18n.ts` / `lib/profile-i18n.ts`.
+- **Lernplattform-Hülle:** `app/[lang]/dashboard/layout.tsx` nutzt einen `flex flex-wrap justify-between`-Header: Logo per `order-1` ganz links, Profil/Theme/Abmelden per `order-2`/`order-3` (`md:order-3`) ganz rechts, Breadcrumb-Navigation (`DashboardHeader`) per `order-3 basis-full` (`md:order-2 md:basis-auto`) – auf dem Handy eigene volle Zeile unterhalb, ab `md:` mittig zwischen Logo und Profil-Block. Nur noch eine `DashboardHeader`-Instanz (keine Duplizierung mehr); Breakpoint innerhalb der Komponente ist konsistent `md:`. Touch-Targets 48px, `min-h-dvh`, Safe-Area, Profil-Icon. Texte über `lib/dashboard-i18n.ts` / `lib/videos-i18n.ts` / `lib/profile-i18n.ts`.
 - **Komponenten-Design (Mobile First)**: 
   - Extrem aufgeräumt, große Buttons (min. 48x48px Touch-Target).
   - Primäraktionen auf dem Handy volle Breite, Toolbars stapeln unter `md:`.

@@ -1,6 +1,5 @@
--- A1.1 Lektion 2 (Teil 1): Befinden, Familie, Verben, Pronomen, Zahlen, Sätze
--- Vor Teil 2 (Einkauf) ausführen. Ein erneutes Ausführen dieses Files löscht
--- zuerst alle Karten von „Lektion 2“ auf A1.1 – also auch den Einkaufsteil.
+-- A1.1 Lektion 2: Befinden, Familie, Verben, Pronomen, Zahlen, Sätze
+-- Kann eigenständig ausgeführt werden, um Lektion 2 (A1.1) zu befüllen oder zurückzusetzen.
 
 DELETE FROM public.vocabulary_cards
 WHERE level = 'A1.1' AND lesson = 'Lektion 2';
@@ -50,7 +49,6 @@ VALUES
 ('Lektion 2', 'A1.1', 'Ort', 'der', 'Orte', 'место / населённый пункт', 'yer / kasaba', 'place / town', false, false),
 -- Verben
 ('Lektion 2', 'A1.1', 'lernen', 'none', NULL, 'учить / учиться', 'öğrenmek', 'to learn', false, false),
-('Lektion 2', 'A1.1', 'haben', 'none', NULL, 'иметь', 'sahip olmak', 'to have', false, false),
 ('Lektion 2', 'A1.1', 'leben', 'none', NULL, 'жить', 'yaşamak', 'to live', false, false),
 ('Lektion 2', 'A1.1', 'wohnen', 'none', NULL, 'проживать / жить (по адресу)', 'oturmak / ikamet etmek', 'to live (reside)', false, false),
 ('Lektion 2', 'A1.1', 'verstehen', 'none', NULL, 'понимать', 'anlamak', 'to understand', false, false),

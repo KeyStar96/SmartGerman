@@ -62,7 +62,15 @@ export default function AudioRecorder({
 
     try {
       const upload = await uploadStudentRecording(recorder.audioBlob)
-      if (!upload.success) {
+      if (upload.success === false) {
+        // Details stehen bereits im Log von `uploadStudentRecording`
+        // (Bucket, Pfad, MIME-Type, Fehlergrund) – hier nur der Ablaufkontext.
+        console.error('Einreichung abgebrochen: Audio-Upload fehlgeschlagen.', {
+          reason: upload.reason,
+          parentId,
+          attemptNumber,
+          level,
+        })
         setUploadFailed(true)
         return
       }
@@ -75,12 +83,23 @@ export default function AudioRecorder({
       })
 
       if (!result.success) {
+        console.error('Einreichung abgebrochen: Speichern in der Datenbank fehlgeschlagen.', {
+          reason: result.reason,
+          parentId,
+          attemptNumber,
+          level,
+        })
         setUploadFailed(true)
         return
       }
 
       setIsSubmitted(true)
       onSubmitted?.()
+    } catch (err) {
+      // Fängt z.B. Netzwerkabbrüche beim Aufruf der Server Action ab, die
+      // sonst als unbehandelte Promise-Rejection verschwinden würden.
+      console.error('Unerwarteter Fehler beim Einreichen der Aufnahme:', err)
+      setUploadFailed(true)
     } finally {
       setIsUploading(false)
     }

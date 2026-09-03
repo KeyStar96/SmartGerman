@@ -49,7 +49,7 @@ export default function DashboardHeader({
   const currentName = breadcrumbs[breadcrumbs.length - 1]?.name ?? t('nav_dashboard')
 
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-2 md:ml-6 md:gap-4">
+    <div className="flex min-w-0 w-full items-center gap-2 md:w-auto md:flex-1 md:gap-3">
       {backHref ? (
         <Link
           href={backHref}
@@ -61,7 +61,7 @@ export default function DashboardHeader({
         </Link>
       ) : null}
 
-      <nav className="hidden min-w-0 sm:flex" aria-label="Breadcrumb">
+      <nav className="hidden min-w-0 md:flex" aria-label="Breadcrumb">
         <ol className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1
@@ -86,7 +86,7 @@ export default function DashboardHeader({
         </ol>
       </nav>
 
-      <p className="min-w-0 truncate text-base font-bold text-[#FF5C00] sm:hidden">{currentName}</p>
+      <p className="min-w-0 truncate text-base font-bold text-[#FF5C00] md:hidden">{currentName}</p>
     </div>
   )
 }

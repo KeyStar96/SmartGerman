@@ -64,6 +64,38 @@ export interface InitializeLessonResult {
 }
 
 /**
+ * Einzelne Vokabel für die Lektions-Detailansicht, inklusive persönlichem
+ * Lernstand. `phase` ist `null`, solange die Vokabel noch nicht manuell oder
+ * per Einstufung in den Karteikasten übernommen wurde.
+ */
+export interface LessonCardView {
+  id: string
+  word_de: string
+  article: string | null
+  plural: string | null
+  translation: string
+  phase: LeitnerPhase | null
+  isLearned: boolean
+}
+
+export interface AddCardsResult {
+  success: boolean
+  added: number
+}
+
+/** Eine Entscheidung im „Vokabeln einstufen"-Durchlauf (Pre-Assessment). */
+export interface AssessmentDecision {
+  cardId: string
+  alreadyKnown: boolean
+}
+
+export interface SubmitAssessmentResult {
+  success: boolean
+  addedLearned: number
+  addedNew: number
+}
+
+/**
  * Wählt die Übersetzung passend zur Muttersprache mit klarer Fallback-Kette.
  * Gibt notfalls einen leeren String zurück – die UI zeigt dann einen
  * Empty-State statt einer kaputten Karte.

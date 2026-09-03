@@ -47,37 +47,34 @@ export default async function DashboardLayout({
     <div className="flex min-h-dvh flex-col bg-slate-50 transition-colors dark:bg-slate-950">
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white pt-[env(safe-area-inset-top)] transition-colors dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex min-h-16 flex-col gap-1 py-2 md:flex-row md:items-center md:gap-4 md:py-2">
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/${lang}/dashboard`}
-                className="flex h-12 shrink-0 items-center rounded-xl px-1 transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-              >
-                <Image
-                  src="/Bilder/SG_Logo_Lightmode.png"
-                  alt="Sitov Language Academy"
-                  width={180}
-                  height={36}
-                  className="h-6 w-auto object-contain dark:hidden md:h-7"
-                  priority
-                  sizes="180px"
-                />
-                <Image
-                  src="/Bilder/SG_Logo_Darkmode3.png"
-                  alt="Sitov Language Academy"
-                  width={180}
-                  height={36}
-                  className="hidden h-6 w-auto object-contain dark:block md:h-7"
-                  priority
-                  sizes="180px"
-                />
-              </Link>
+          <div className="flex min-h-16 w-full flex-wrap items-center justify-between gap-y-2 gap-x-3 py-2 md:flex-nowrap md:gap-x-4">
+            {/* Logo – immer ganz links */}
+            <Link
+              href={`/${lang}/dashboard`}
+              className="order-1 flex h-12 shrink-0 items-center rounded-xl px-1 transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+            >
+              <Image
+                src="/Bilder/SG_Logo_Lightmode.png"
+                alt="Sitov Language Academy"
+                width={180}
+                height={36}
+                className="h-6 w-auto object-contain dark:hidden md:h-7"
+                priority
+                sizes="180px"
+              />
+              <Image
+                src="/Bilder/SG_Logo_Darkmode3.png"
+                alt="Sitov Language Academy"
+                width={180}
+                height={36}
+                className="hidden h-6 w-auto object-contain dark:block md:h-7"
+                priority
+                sizes="180px"
+              />
+            </Link>
 
-              <div className="hidden min-w-0 flex-1 md:block">
-                <DashboardHeader lang={lang} translations={translations} />
-              </div>
-
-              <div className="ml-auto flex shrink-0 items-center gap-2">
+            {/* Profil, Design & Abmelden – immer ganz rechts */}
+            <div className="order-2 flex shrink-0 items-center gap-2 md:order-3">
               <span className="hidden min-w-0 items-center text-sm font-medium text-slate-700 lg:inline-flex dark:text-slate-300">
                 <span className="max-w-[12rem] truncate">{t('hello', { name: displayName })}</span>
                 <span
@@ -121,9 +118,9 @@ export default async function DashboardLayout({
                 </button>
               </form>
             </div>
-            </div>
 
-            <div className="min-w-0 md:hidden">
+            {/* Navigation / Breadcrumb – eigene Zeile auf Mobile, mittig/rechts der Logo-Reihe ab Tablet */}
+            <div className="order-3 min-w-0 basis-full md:order-2 md:basis-auto">
               <DashboardHeader lang={lang} translations={translations} />
             </div>
           </div>

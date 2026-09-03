@@ -6,6 +6,7 @@ import { ArrowRight, Check, CloudOff, Image as ImageIcon, Layers, PartyPopper, X
 import SolutionAudioButton from '@/components/exercises/SolutionAudioButton'
 import { finishVocabularySession, submitVocabularyAnswer } from '@/app/actions/vocabulary'
 import { createVocabularyTranslator, type VocabularyTranslations } from '@/lib/vocabulary-i18n'
+import { articleColorClass } from '@/lib/vocabulary-ui'
 import type { LeitnerPhase } from '@/lib/leitner'
 import type { DueVocabularyCard } from '@/lib/types/vocabulary'
 import { cn } from '@/lib/utils'
@@ -22,20 +23,6 @@ interface VocabTrainerClientProps {
   translations?: VocabularyTranslations
   lang: string
   level: string
-}
-
-/** Artikel-Farben als zusätzliche visuelle Merkhilfe für das Genus. */
-function articleColorClass(article: string | null): string {
-  switch (article) {
-    case 'der':
-      return 'text-blue-700'
-    case 'die':
-      return 'text-red-700'
-    case 'das':
-      return 'text-green-700'
-    default:
-      return 'text-gray-900'
-  }
 }
 
 export default function VocabTrainerClient({
@@ -275,6 +262,14 @@ export default function VocabTrainerClient({
       </div>
 
       <p className="mt-6 text-center text-lg text-gray-500">{t('phase_explanation')}</p>
+      <div className="mt-4 text-center">
+        <Link
+          href={overviewHref}
+          className="inline-flex min-h-12 items-center text-lg font-medium text-blue-600 underline-offset-4 hover:underline"
+        >
+          {t('add_more_vocabulary')}
+        </Link>
+      </div>
     </div>
   )
 }

@@ -1769,6 +1769,19 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-03 — Audio-Upload-Fehler behoben (Aussprache-Training)
+- Fehlermeldung „Die Aufnahme konnte gerade nicht hochgeladen werden“ zurückverfolgt auf zwei Ursachen in `lib/audio/upload.ts`: vollen MIME-Type inkl. Codec-Parameter als `Content-Type` gesendet, und zu knappes Fehler-Logging ohne Bucket/Pfad/Statuscode.
+- Neue Funktion `baseMimeType()` normalisiert auf `audio/webm` bzw. `audio/mp4` vor dem Storage-Upload; `upload()` läuft mit `upsert: true`.
+- Strukturiertes `console.error`-Logging für jeden Fehlerpfad (Sitzung, Storage, Netzwerk) in `upload.ts` und `AudioRecorder.tsx`.
+- Bucket-Name im Code (`audio_submissions`) gegen Live-Projekt verifiziert – bereits korrekt, kein Rename nötig.
+- RLS-Migration `supabase/migrations/fix_audio_submissions_storage_policies.sql` (idempotent) live ausgeführt: Bucket + INSERT/UPDATE/SELECT-Policies neu bestätigt.
+
+### 2026-09-03 — Vokabeltrainer A1.1 Lektion 3 (Einkauf & Lebensmittel)
+- Einkauf, Lebensmittel, Geschäfte, Mengen und Redemittel (76 Karten) wurden aus A1.1 Lektion 2 in die eigenständige **Lektion 3** überführt.
+- A1.1 Lektion 2 fokussiert nun sauber auf Befinden, Familie, Pronomen und Zahlen 0–20 (85 Karten).
+- Live-DB Migration `move_einkauf_vocab_to_a11_lektion_3.sql` via Supabase API ausgeführt; alle Lernfortschritte in `user_vocabulary_progress` blieben 100% erhalten.
+- Seed-Dateien synchronisiert (`supabase/seeds/a11_lektion_2_familie.sql`, `a11_lektion_3_einkauf.sql`).
+
 ### 2026-09-02 — Smartphone-UX-Agent
 - Neuer Cursor-Agent `.cursor/rules/ux-smartphone-agent.mdc`: Mobile-First-Layout (320/375px), Stapeln unter `md:`, Safe-Area, 16px-Inputs gegen iOS-Zoom, kein Horizontal-Scroll. Ergänzt `ux-geragogik-agent.mdc` (Alter/Barrierefreiheit), ersetzt ihn nicht.
 
