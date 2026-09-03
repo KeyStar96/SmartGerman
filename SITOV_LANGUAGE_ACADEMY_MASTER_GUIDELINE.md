@@ -1769,6 +1769,15 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-03 — Rücknahme No-Scroll-Layout, Trainer-Feinschliff & Textfix „Lektion Lektion 2"
+- **Rücknahme starre Viewport-Sperre:** Das im Eintrag darunter beschriebene `lg:h-[calc(100vh-5rem)] lg:overflow-hidden`-Muster verursachte auf MacBook/Laptop-Displays abgeschnittene Inhalte und blockiertes Trackpad-Scrollen. In allen sechs Trainer-Seiten (`vocabulary`, `vocabulary/train`, `vocabulary/assess`, `pronunciation`, `exercises`, `videos`) entfernt und durch flexible Container (`min-h-screen w-full py-8`, natürliches `overflow-y-auto`-Scrollverhalten des Browsers) ersetzt.
+- **Karteikarten-Trainer:** `VocabTrainerClient.tsx` kompakter gestaltet (kleinere Innenabstände/Bildgröße); `vocabulary/train/page.tsx` zentriert die Karte über `flex flex-1 items-center justify-center` (mit `min-h-`, nicht `h-`) vertikal, ohne Clipping-Risiko – bei zu wenig Platz scrollt die Seite einfach.
+- **Aussprache-Trainer:** Kopf, Hero-Karte, Recorder und „Deine bisherigen Einreichungen" bilden jetzt einen einzigen natürlich fließenden Block; die Einreichungen stehen unter der Aufnahme-Box.
+- **Textfix „Lektion Lektion 2":** Neue Hilfsfunktion `stripLessonPrefix()` (`lib/utils.ts`) entfernt ein bereits in den Rohdaten enthaltenes führendes „Lektion", bevor die `lesson_label`-Übersetzung ihr eigenes Präfix davorsetzt. Angewendet in `VocabTrainerClient.tsx`, `LessonAssessmentClient.tsx`, `videos/page.tsx` (×2) und `videos/[id]/page.tsx`.
+- **Vokabeltrainer-Übersicht:** Leerer „0%"-Fortschrittsbalken in `LessonList.tsx` entfernt (nur noch sichtbar, wenn `stat.learned > 0`).
+- **Vokabel-Modal:** `LessonCardsModal.tsx` auf `max-h-[80vh]` begrenzt; Listbereich mit explizitem `flex-1 overflow-y-auto` statt fester `max-h-[400px]`.
+- QS: `tsc --noEmit` fehlerfrei, `jest` 446/446 (ohne den vorbestehenden, umgebungsabhängigen DB-Integrationstest), `next build` erfolgreich.
+
 ### 2026-09-03 — Unified Siri-Waveform, Vokabeltrainer-Bugfix, No-Scroll-Layout & Re-Branding
 - **`FluidWaveform`:** Die Canvas-Siri-Wave aus `LiveWaveform` wurde in eine eigenständige, wiederverwendbare Komponente (`components/audio/FluidWaveform.tsx`) extrahiert – datenquellen-agnostisch über eine `getVolume(): number`-Callback-Prop. `WaveformPlayer` (Wiedergabe fertiger Aufnahmen) nutzt sie jetzt ebenfalls statt der alten `div`-Balken; die Wellenbewegung während der Wiedergabe ist eine bewusste, überlagerte Sinus-Simulation statt eines echten `AnalyserNode` am `<audio>`-Element (Stummschaltungs-/CORS-Risiko vermieden, von der Aufgabenstellung explizit als Alternative erlaubt). Seek-Funktion (Klick, Pfeiltasten, `role="slider"`) bleibt vollständig erhalten. Tote Balken-Funktionen (`extractPeaks`, `normalizePeaks`, `barHeightPercent`) und ihre Tests entfernt.
 - **Bugfix grauer Balken:** Der Lern-Fortschrittsbalken in `LessonList.tsx` stand ohne grüne Füllung wie ein eingefrorener Platzhalter direkt neben „Vokabeln anzeigen". Jetzt unterhalb der Lektions-Kennzahlen, getrennt von der Button-Reihe, mit Prozent-Anzeige.

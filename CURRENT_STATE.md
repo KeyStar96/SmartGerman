@@ -128,9 +128,9 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 - Ursache: In `LessonList.tsx` stand der Lern-Fortschrittsbalken in derselben Button-Reihe wie „Vokabeln anzeigen". Ohne grüne Füllung (0% gelernt, aber schon Karten „im Training") sah er wie ein eingefrorener Lade-Platzhalter direkt neben dem Button aus.
 - Fix: Der Fortschrittsbalken (dünner, `h-2`, mit Prozent-Zahl daneben) steht jetzt unterhalb der Lektions-Kennzahlen im Textblock, komplett getrennt von der Button-Reihe.
 
-**3. Vokabeltrainer-Redesign & No-Scroll-Viewport (Desktop `lg:`):**
-- Die Lektions-Detailliste war ein Inline-Akkordeon, das die Übersichtsseite bei vielen Vokabeln beliebig lang zog. Ersetzt durch `components/vocabulary/LessonCardsModal.tsx`: ein zentriertes Overlay (`role="dialog"`, ESC schließt, Klick außerhalb schließt) mit fester Kopfzeile und einem intern scrollenden Listbereich (`max-h-[400px] overflow-y-auto`). `LessonList.tsx` verwaltet nur noch, welche Lektion geöffnet ist (`openLesson`), keine verschachtelte Karten-Ladezustände mehr pro Zeile.
-- Alle vier Trainer-Hauptansichten (`vocabulary`, `vocabulary/train`, `vocabulary/assess`, `pronunciation`, `exercises`, `videos`) haben ab `lg:` das Muster `lg:h-[calc(100vh-5rem)] lg:overflow-hidden flex flex-col` erhalten: ein fixer Kopfbereich (`shrink-0`: Zurück-Link, Titel, Hero-Karte/Recorder) und ein einziger scrollbarer Inhaltsbereich darunter (`min-h-0 flex-1 lg:overflow-y-auto`). Damit muss auf Desktop nie die ganze Seite scrollen, nur der jeweilige Listen-/Verlaufs-/Karten-Bereich. Auf Mobile (`< lg`) bleibt gewohntes vertikales Scrollen, da die Höhenbegrenzung nur ab `lg:` greift.
+**3. Vokabeltrainer-Redesign & No-Scroll-Viewport (Desktop `lg:`):** *(Layout-Ansatz am selben Tag durch 4f wieder aufgehoben, siehe unten – der `LessonCardsModal` bleibt bestehen.)*
+- Die Lektions-Detailliste war ein Inline-Akkordeon, das die Übersichtsseite bei vielen Vokabeln beliebig lang zog. Ersetzt durch `components/vocabulary/LessonCardsModal.tsx`: ein zentriertes Overlay (`role="dialog"`, ESC schließt, Klick außerhalb schließt) mit fester Kopfzeile und einem intern scrollenden Listbereich. `LessonList.tsx` verwaltet nur noch, welche Lektion geöffnet ist (`openLesson`), keine verschachtelte Karten-Ladezustände mehr pro Zeile.
+- Alle vier Trainer-Hauptansichten (`vocabulary`, `vocabulary/train`, `vocabulary/assess`, `pronunciation`, `exercises`, `videos`) hatten ab `lg:` das Muster `lg:h-[calc(100vh-5rem)] lg:overflow-hidden flex flex-col` erhalten. **Dieses Muster wurde am selben Tag (siehe 4f) wieder entfernt**, da es auf MacBook/Laptop-Displays Inhalte abschnitt und das Trackpad-Scrollen blockierte.
 - Betroffene Dateien: `app/[lang]/dashboard/level/[level]/vocabulary/page.tsx`, `.../vocabulary/train/page.tsx`, `.../vocabulary/assess/page.tsx`, `.../pronunciation/page.tsx`, `.../exercises/page.tsx`, `.../videos/page.tsx`.
 
 **4. Re-Branding „SmartGerman" → „Sitov Academy":**
@@ -138,6 +138,26 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 - Bewusst unverändert: `package.json`-Projektname (bereits `sitov-language-academy`), die Supabase-Projekt-ID `wcaslabeiwtvygxtzcio`, sowie der externe Telegram-Link `t.me/smartgerman_hannover` (realer Kanalname eines Drittanbieters, keine Textersetzung möglich ohne den Link zu brechen).
 
 **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, `npx jest` (446 Tests grün, ein vorbestehender, umgebungsabhängiger Integrationstest ohne `SUPABASE_SERVICE_ROLE_KEY` weiterhin rot), `next build` erfolgreich.
+
+## 4f. Rücknahme des No-Scroll-Layouts, Trainer-Feinschliff & Textfix (2026-09-03)
+
+**1. Rücknahme der starren Viewport-Sperre:**
+- Nutzer-Feedback: Das `lg:h-[calc(100vh-5rem)] lg:overflow-hidden`-Muster aus 4e funktionierte auf MacBook/Laptop-Displays nicht zuverlässig – Inhalte wurden unten abgeschnitten, das Trackpad-/Mausrad-Scrollen reagierte inkonsistent.
+- Fix: In allen sechs Trainer-Seiten (`vocabulary`, `vocabulary/train`, `vocabulary/assess`, `pronunciation`, `exercises`, `videos`) entfernt und durch flexible Container ersetzt (`min-h-screen w-full py-8`, kein `overflow-hidden` auf Container-Ebene). Die Seiten scrollen jetzt wieder ganz normal mit dem Browser/Trackpad, auf allen Bildschirmgrößen identisch.
+
+**2. Karteikarten- & Aussprache-Trainer – Layout-Feinschliff:**
+- `VocabTrainerClient.tsx`: Karte kompakter gestaltet (kleinere Innenabstände, kleineres Bild, engere Abstände zwischen Wort/Buttons), damit sie auf 13"/14"-Laptops möglichst komplett sichtbar ist. `vocabulary/train/page.tsx` zentriert die Karte jetzt über `flex flex-1 items-center justify-center` (mit `min-h-`, nicht `h-`) vertikal im sichtbaren Bereich – wächst der Inhalt doch über den Viewport hinaus, scrollt die Seite einfach natürlich statt abzuschneiden.
+- `pronunciation/page.tsx`: Kopfbereich, Hero-Karte, Recorder und die Sektion „Deine bisherigen Einreichungen" sind jetzt ein einziger natürlich fließender Block (`space-y-10`); die Einreichungen stehen unter der Aufnahme-Box und scrollen mit der Seite.
+
+**3. Textfix „Lektion Lektion 2":**
+- Ursache: `vocabulary_cards.lesson`/`videos.lesson` werden von der Lehrkraft bereits als vollständiger String (`"Lektion 2"`) gepflegt. Die `lesson_label`-Übersetzung (`"Lektion {lesson}"` bzw. `"Lesson {lesson}"` etc.) fügte selbst noch ein Präfix hinzu → Dopplung.
+- Fix: Neue Hilfsfunktion `stripLessonPrefix()` in `lib/utils.ts` entfernt ein führendes „Lektion" (case-insensitive) aus dem Rohwert, bevor er in die Übersetzung eingesetzt wird. Angewendet an allen 5 Stellen, die `t('lesson_label', …)` nutzen: `VocabTrainerClient.tsx`, `LessonAssessmentClient.tsx`, `videos/page.tsx` (×2), `videos/[id]/page.tsx`.
+
+**4. Vokabeltrainer-Übersicht & Modal-Fix:**
+- Leerer „0%"-Fortschrittsbalken entfernt: `LessonList.tsx` zeigt den Lernfortschrittsbalken jetzt erst, wenn `stat.learned > 0` ist (statt bei jedem `active > 0`) – kein leerer, unfertig wirkender Balken mehr direkt nach Übernahme einer Lektion.
+- `LessonCardsModal.tsx`: Modal-Höhe auf `max-h-[80vh]` begrenzt (`flex flex-col` mit `shrink-0`-Kopfzeile), der Listenbereich hat jetzt explizit `flex-1 overflow-y-auto` statt einer festen `max-h-[400px]` – scrollt auf allen Bildschirmgrößen flüssig per Trackpad/Mausrad, ohne das Modal selbst zu sprengen.
+
+**Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, `npx jest` (446 Tests grün, derselbe vorbestehende Integrationstest ohne `SUPABASE_SERVICE_ROLE_KEY` weiterhin rot), `next build` erfolgreich.
 
 ## 5. Hosting
 - Die Lernplattform läuft auf **Netlify** (`netlify.toml`, `@netlify/plugin-nextjs`). `NEXT_PUBLIC_SITE_URL` ist dort auf `https://www.sitov-academy.com` gesetzt. Derselbe Satz gilt für Vercel Production (Dashboard → Environment Variables).

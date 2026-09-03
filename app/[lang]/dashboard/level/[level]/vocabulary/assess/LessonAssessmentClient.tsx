@@ -7,7 +7,7 @@ import { submitLessonAssessment } from '@/app/actions/vocabulary'
 import { createVocabularyTranslator, type VocabularyTranslations } from '@/lib/vocabulary-i18n'
 import { articleColorClass } from '@/lib/vocabulary-ui'
 import type { LessonCardView } from '@/lib/types/vocabulary'
-import { cn } from '@/lib/utils'
+import { cn, stripLessonPrefix } from '@/lib/utils'
 
 interface LessonAssessmentClientProps {
   cards: LessonCardView[]
@@ -112,7 +112,7 @@ export default function LessonAssessmentClient({
   return (
     <div className="mx-auto mt-2 max-w-2xl">
       <div className="mb-6 flex flex-col gap-3 text-lg font-medium text-gray-600 sm:flex-row sm:items-center sm:justify-between">
-        <span>{t('lesson_label', { lesson: lessonName })}</span>
+        <span>{t('lesson_label', { lesson: stripLessonPrefix(lessonName) })}</span>
         <span>{t('card_progress', { current: currentIndex + 1, total: cards.length })}</span>
       </div>
 

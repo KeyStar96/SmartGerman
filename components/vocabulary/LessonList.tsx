@@ -76,12 +76,12 @@ export default function LessonList({ stats, lang, level, translations = {} }: Le
                 </div>
 
                 {/*
-                  Fortschrittsbalken bewusst UNTERHALB der Textinfos, nicht mehr
-                  in der Button-Reihe: Dort sah er ohne grüne Füllung (0%
-                  gelernt, aber schon Karten "im Training") wie ein starrer,
-                  eingefrorener Lade-Platzhalter neben "Vokabeln anzeigen" aus.
+                  Fortschrittsbalken nur ab dem ersten gelernten Wort zeigen:
+                  Bei 0% wirkte er (egal ob in der Button-Reihe oder darunter)
+                  wie ein leerer, unfertiger Lade-Platzhalter. Sobald etwas
+                  gelernt wurde, steht er dezent unterhalb der Textinfos.
                 */}
-                {hasProgress && (
+                {stat.learned > 0 && (
                   <div className="mt-3 flex max-w-xs items-center gap-3">
                     <div
                       className="h-2 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-slate-800"

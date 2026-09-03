@@ -19,8 +19,8 @@ export default async function VocabTrainPage({
   const dueCards = await getDueCards(decodedLevel)
 
   return (
-    <div className="flex min-h-[80vh] flex-col lg:h-[calc(100vh-5rem)] lg:overflow-hidden">
-      <div className="mb-4 shrink-0">
+    <div className="flex min-h-screen w-full flex-col py-8">
+      <div className="mb-4">
         <Link
           href={`/${lang}/dashboard/level/${encodeURIComponent(decodedLevel)}/vocabulary`}
           className="inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800"
@@ -29,8 +29,14 @@ export default async function VocabTrainPage({
         </Link>
       </div>
 
-      {/* Scrollt intern, falls die Karte (Bild + Text) auf kleinen Laptop-Bildschirmen nicht ganz passt. */}
-      <div className="min-h-0 flex-1 lg:overflow-y-auto">
+      {/*
+        Zentriert die Karteikarte im verbleibenden, sichtbaren Bereich – über
+        `min-h-` statt einer festen `h-[calc(100vh-...)]`: Passt die Karte
+        (Bild + Buttons) nicht komplett auf kleinere Laptop-Displays, wächst
+        der Container einfach mit und die Seite scrollt ganz natürlich per
+        Mausrad/Trackpad, statt unten abgeschnitten zu werden.
+      */}
+      <div className="flex flex-1 items-center justify-center py-4">
         <VocabTrainerClient
           initialCards={dueCards}
           translations={translations}

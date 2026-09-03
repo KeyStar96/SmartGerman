@@ -14,10 +14,10 @@ type CardsState = 'loading' | 'error' | LessonCardView[]
  * Vokabelliste einer Lektion als Overlay statt Akkordeon.
  *
  * Grund: Ein aufklappender Bereich direkt in der Lektionsliste zieht die
- * Übersichtsseite bei vielen Vokabeln endlos lang und verhindert das
- * No-Scroll-Viewport-Layout auf Desktop. Das Modal hat stattdessen eine fest
- * begrenzte Höhe mit eigenem internen Scrollbereich (`max-h-[400px]
- * overflow-y-auto`) – die Übersichtsseite dahinter bleibt unverändert.
+ * Übersichtsseite bei vielen Vokabeln endlos lang. Das Modal hat stattdessen
+ * eine auf `max-h-[80vh]` begrenzte Gesamthöhe; der Wörterliste-Body bekommt
+ * explizit `overflow-y-auto`, damit auf dem MacBook-Trackpad/Mausrad flüssig
+ * gescrollt werden kann, ohne dass das Modal selbst über den Viewport wächst.
  */
 export default function LessonCardsModal({
   lesson,
@@ -100,9 +100,9 @@ export default function LessonCardsModal({
         aria-modal="true"
         aria-label={lesson}
         onClick={(event) => event.stopPropagation()}
-        className="flex w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-slate-900"
+        className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-slate-900"
       >
-        <div className="flex items-center justify-between gap-4 border-b border-gray-100 p-5 dark:border-slate-800">
+        <div className="flex shrink-0 items-center justify-between gap-4 border-b border-gray-100 p-5 dark:border-slate-800">
           <h3 className="min-w-0 truncate text-xl font-bold text-gray-900 dark:text-slate-100">{lesson}</h3>
           <button
             type="button"
@@ -114,7 +114,8 @@ export default function LessonCardsModal({
           </button>
         </div>
 
-        <div className="max-h-[400px] overflow-y-auto p-5 sm:p-6">
+        {/* Body: explizit overflow-y-auto, damit die Wörterliste unabhängig von ihrer Länge flüssig scrollt und das max-h-[80vh]-Modal nicht sprengt. */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6">
           {cardsState === 'loading' && (
             <p className="flex items-center gap-3 text-lg text-gray-600 dark:text-slate-400">
               <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />

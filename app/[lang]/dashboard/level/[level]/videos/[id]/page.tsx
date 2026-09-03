@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { getDictionary } from '@/lib/dictionary'
 import { createVideoTranslator, type VideoTranslations } from '@/lib/videos-i18n'
+import { stripLessonPrefix } from '@/lib/utils'
 import VideoPlayer from '@/components/dashboard/VideoPlayer'
 
 export default async function VideoPlayerPage({
@@ -99,7 +100,7 @@ export default async function VideoPlayerPage({
 
         <div className="p-6 sm:p-10">
           <div className="mb-2 text-lg font-bold text-blue-600">
-            {t('lesson_label', { lesson: videoLesson })}
+            {t('lesson_label', { lesson: stripLessonPrefix(videoLesson) })}
           </div>
           <h1 className="mb-4 break-words text-2xl font-extrabold text-slate-900 sm:text-4xl dark:text-white">
             {videoTitle}
