@@ -51,3 +51,4 @@ Da der Webhook die Supabase-Datenbank (`profiles` Tabelle) in Echtzeit aktualisi
 - A1.1-Vokabelinhalt: Lektion 1 (84), Lektion 2 (85) und neu Lektion 3 (76) ändert den Stripe-Workflow nicht. Paywall bleibt am `subscription_status`, nicht an einzelnen Karten.
 - Migration `move_einkauf_vocab_to_a11_lektion_3.sql` erfolgreich am Live-Projekt ausgeführt; bestehende User-Progress-Daten (245 Einträge) bleiben vollständig intakt.
 - Layout-Rücknahme (No-Scroll → natürliches Scrollen), Textfix „Lektion Lektion 2" und Vokabeltrainer-Feinschliff (2026-09-03, siehe `CURRENT_STATE.md` 4f) sind rein visuelle/UI-Änderungen ohne Berührung von Stripe-Webhooks, `subscription_status` oder Paywall-Logik.
+- Vokabel-Modal Tabs/eigene Vokabeln/Phasen-Diagramm (2026-09-03, siehe `CURRENT_STATE.md` 4g): clientseitiges `localStorage`, kein Stripe-Bezug, Paywall unverändert am `subscription_status`.

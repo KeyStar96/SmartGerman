@@ -1026,6 +1026,17 @@ html.dark {
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+/*
+ * Innerer Scrollbereich von Overlays (Vokabel-Modal): natives Momentum auf
+ * iOS/macOS-Trackpads, ohne dass die Seite dahinter mitzieht.
+ * `data-lenis-prevent` am selben Element verhindert zusätzlich, dass Lenis
+ * die Wheel-Events für den Desktop-Smooth-Scroll abfängt.
+ */
+.modal-scroll-region {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
 p {
   @apply text-justify hyphens-auto;
 }

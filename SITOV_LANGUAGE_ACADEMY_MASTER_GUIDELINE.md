@@ -1769,6 +1769,13 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-03 — Vokabel-Modal: Scroll-Fix, Tabs, eigene Vokabeln & Phasen-Diagramm
+- **Scroll:** Dialog `max-h-[calc(100vh-6rem)] flex flex-col`; Header `flex-shrink-0`; Body `flex-1 min-h-0 overflow-y-auto overscroll-contain` plus `.modal-scroll-region` (`-webkit-overflow-scrolling: touch`). `data-lenis-prevent` am Dialog, damit Lenis Trackpad-/Mausrad-Gesten nicht schluckt.
+- **Tabs:** Wörterliste und Phasen-Verteilung (`role="tablist"`), Texte in `dictionaries/{de,en,ru,uk,tr}.json`.
+- **Eigene Vokabeln:** Clientseitig in `localStorage` (`lib/vocabulary-custom.ts`), Start in Phase 1, sofort in Liste und Statistik. Kein Server-Persistenz-Pfad, bewusst getrennt vom Leitner-Trainer.
+- **Phasen-Diagramm:** Tailwind-Balken Phase 1–6 + Gelernt, Anzahl über dem Balken, farbliche Labels, gewichteter Gesamtfortschritt (`computePhaseDistribution`).
+- QS: `tsc --noEmit` fehlerfrei, neue Unit-Tests grün.
+
 ### 2026-09-03 — Rücknahme No-Scroll-Layout, Trainer-Feinschliff & Textfix „Lektion Lektion 2"
 - **Rücknahme starre Viewport-Sperre:** Das im Eintrag darunter beschriebene `lg:h-[calc(100vh-5rem)] lg:overflow-hidden`-Muster verursachte auf MacBook/Laptop-Displays abgeschnittene Inhalte und blockiertes Trackpad-Scrollen. In allen sechs Trainer-Seiten (`vocabulary`, `vocabulary/train`, `vocabulary/assess`, `pronunciation`, `exercises`, `videos`) entfernt und durch flexible Container (`min-h-screen w-full py-8`, natürliches `overflow-y-auto`-Scrollverhalten des Browsers) ersetzt.
 - **Karteikarten-Trainer:** `VocabTrainerClient.tsx` kompakter gestaltet (kleinere Innenabstände/Bildgröße); `vocabulary/train/page.tsx` zentriert die Karte über `flex flex-1 items-center justify-center` (mit `min-h-`, nicht `h-`) vertikal, ohne Clipping-Risiko – bei zu wenig Platz scrollt die Seite einfach.

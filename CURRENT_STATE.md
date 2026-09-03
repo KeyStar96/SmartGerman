@@ -159,6 +159,20 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 
 **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, `npx jest` (446 Tests grün, derselbe vorbestehende Integrationstest ohne `SUPABASE_SERVICE_ROLE_KEY` weiterhin rot), `next build` erfolgreich.
 
+## 4g. Vokabel-Modal: Scroll-Fix, Tabs, eigene Vokabeln & Phasen-Diagramm (2026-09-03)
+
+**Ursache des Scroll-Problems:** Der Dialog war bereits `flex flex-col` mit `max-h`, dem Body fehlte aber `min-h-0` (Flex-Kinder defaulten auf `min-height: auto` und lassen sich nicht unter die Inhaltsgröße stauchen). Zusätzlich fängt Lenis auf Desktop (`SmoothScroll.tsx`, `smoothWheel: true`) Wheel-Events ab – ohne `data-lenis-prevent` kommt die Geste nie im inneren Scrollbereich an.
+
+**Layout:** Dialog `max-h-[calc(100vh-6rem)] flex flex-col overflow-hidden`. Header (Titel, Tabs, Schließen) `flex-shrink-0`. Body `flex-1 min-h-0 overflow-y-auto overscroll-contain` plus `.modal-scroll-region` (`-webkit-overflow-scrolling: touch`). Backdrop sperrt Body-Scroll (`overflow: hidden`) und schluckt Wheel-Events nur auf der Abdunklung selbst, nicht auf dem Dialog.
+
+**Tabs:** „Wörterliste" und „Phasen-Verteilung" (`role="tablist"`), i18n in allen fünf Dictionaries.
+
+**Eigene Vokabeln:** Button öffnet Inline-Formular (deutsches Wort + Übersetzung). Speicherung in `localStorage` über `lib/vocabulary-custom.ts` (Key `sitov_custom_vocab:{level}:{lesson}`), Start immer Phase 1. Führendes `der`/`die`/`das` wird für Artikelfarben geparst. Erscheinen sofort in Liste und Diagramm; bewusst **kein** Server-Write in `vocabulary_cards` / `user_vocabulary_progress` (kein Fälligkeits-Mechanismus, gerätegebunden).
+
+**Phasen-Diagramm:** Tailwind-Balken für Phase 1–6 und „Gelernt", Anzahl über dem Balken, farbliche Phasenbezeichnung darunter (Amber → Grün), Gesamtfortschritt gewichtet (unberührt = 0, Phase n = n/7, gelernt = 7/7). `computePhaseDistribution` in `lib/vocabulary-ui.ts`, Tests in `__tests__/vocabulary-phases.test.ts` und `__tests__/vocabulary-custom.test.ts`.
+
+**Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, neue Unit-Tests grün. Live-Klick im Browser nicht möglich (kein laufender Dev-Server, keine Browser-Tools in dieser Session).
+
 ## 5. Hosting
 - Die Lernplattform läuft auf **Netlify** (`netlify.toml`, `@netlify/plugin-nextjs`). `NEXT_PUBLIC_SITE_URL` ist dort auf `https://www.sitov-academy.com` gesetzt. Derselbe Satz gilt für Vercel Production (Dashboard → Environment Variables).
 - Caching muss für Server Components (z.B. Kurslisten) korrekt eingestellt werden, um Ladezeiten zu minimieren.

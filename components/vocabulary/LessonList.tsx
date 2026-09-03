@@ -21,9 +21,9 @@ interface LessonListProps {
  * oder ganzer Lektionen (über den Einstufungs-Durchlauf `/vocabulary/assess`).
  *
  * Bewusst KEIN Akkordeon: Ein inline aufklappender Bereich zieht diese
- * Übersichtsseite bei vielen Vokabeln endlos lang und verhindert das
- * No-Scroll-Viewport-Layout auf Desktop. Die Detailliste öffnet daher als
- * `LessonCardsModal` mit fest begrenzter, intern scrollender Höhe.
+ * Übersichtsseite bei vielen Vokabeln endlos lang. Die Detailliste öffnet
+ * daher als `LessonCardsModal` (Tabs Wörterliste / Phasen-Verteilung) mit
+ * begrenzter Höhe und eigenem internem Scrollbereich.
  */
 export default function LessonList({ stats, lang, level, translations = {} }: LessonListProps) {
   const router = useRouter()
