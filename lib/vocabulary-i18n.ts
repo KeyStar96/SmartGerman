@@ -53,6 +53,7 @@ export const VOCABULARY_FALLBACKS = {
   // Lektions-Detailansicht & manuelle Übernahme
   show_cards: 'Vokabeln anzeigen',
   hide_cards: 'Vokabeln ausblenden',
+  close_cards: 'Schließen',
   cards_loading: 'Vokabeln werden geladen …',
   cards_load_failed: 'Die Vokabeln konnten nicht geladen werden. Bitte versuche es noch einmal.',
   phase_badge: 'Phase {phase}',

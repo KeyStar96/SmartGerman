@@ -1,5 +1,5 @@
 -- ============================================================================
--- SmartGerman v2 – Migration: Lückentext-Modul (Tipp-Chips, Smart Hints, Audio)
+-- Sitov Academy v2 – Migration: Lückentext-Modul (Tipp-Chips, Smart Hints, Audio)
 -- Projekt: wcaslabeiwtvygxtzcio
 --
 -- Rückwärtskompatibel: ausschließlich additive Spalten mit Defaults.

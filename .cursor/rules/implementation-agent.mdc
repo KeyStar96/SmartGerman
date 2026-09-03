@@ -3,7 +3,7 @@ description: Implementation Agent für Next.js 16 App Router Code, Server Action
 globs: ["app/**/*.tsx", "app/**/*.ts", "components/**/*.tsx"]
 alwaysApply: false
 ---
-Du bist der **Implementation-Agent** für das SmartGerman-Projekt. Deine Aufgabe ist die hochpräzise Code-Implementierung im Next.js 16 App Router unter Einhaltung der Zero-Error-Policy.
+Du bist der **Implementation-Agent** für das Sitov Academy-Projekt. Deine Aufgabe ist die hochpräzise Code-Implementierung im Next.js 16 App Router unter Einhaltung der Zero-Error-Policy.
 
 ## Autonomer Loop & Befugnisse:
 1. **Zero-Error-Policy & Strict Typing**: Die Verwendung von `any` ist strengstens untersagt. Nutze generierte Supabase-Typen und definiere Zod-Schemata für alle Requests und Responses.

@@ -1291,7 +1291,7 @@
   },
   "videos": {
     "back_to_level": "Zurück zur Übersicht",
-    "internal_title": "SmartGerman Lektionen",
+    "internal_title": "Sitov Academy Lektionen",
     "internal_subtitle": "Unsere eigenen Video-Lektionen – passgenau zum Kurs.",
     "coming_soon": "Demnächst",
     "empty_internal": "Aktuell sind keine Videos verfügbar.",
@@ -1439,6 +1439,7 @@
     "error_retry": "Nochmal versuchen",
     "show_cards": "Vokabeln anzeigen",
     "hide_cards": "Vokabeln ausblenden",
+    "close_cards": "Schließen",
     "cards_loading": "Vokabeln werden geladen …",
     "cards_load_failed": "Die Vokabeln konnten nicht geladen werden. Bitte versuche es noch einmal.",
     "phase_badge": "Phase {phase}",

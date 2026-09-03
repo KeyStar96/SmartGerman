@@ -47,6 +47,6 @@ Da der Webhook die Supabase-Datenbank (`profiles` Tabelle) in Echtzeit aktualisi
 
 ## 5. Protokoll (2026-09-03)
 - Stripe-relevante DB-Spalten (`profiles.stripe_customer_id`, `profiles.stripe_subscription_id`) und Indizes sind in `supabase/schema.sql` dokumentiert.
-- Supabase-Projekt-Binding: ausschließlich `wcaslabeiwtvygxtzcio` (SmartGerman v2, Live-DB). Schema-Änderungen dürfen Webhook-Workflows nicht brechen.
+- Supabase-Projekt-Binding: ausschließlich `wcaslabeiwtvygxtzcio` (Sitov Academy v2, Live-DB). Schema-Änderungen dürfen Webhook-Workflows nicht brechen.
 - A1.1-Vokabelinhalt: Lektion 1 (84), Lektion 2 (85) und neu Lektion 3 (76) ändert den Stripe-Workflow nicht. Paywall bleibt am `subscription_status`, nicht an einzelnen Karten.
 - Migration `move_einkauf_vocab_to_a11_lektion_3.sql` erfolgreich am Live-Projekt ausgeführt; bestehende User-Progress-Daten (245 Einträge) bleiben vollständig intakt.

@@ -1292,7 +1292,7 @@
   },
   "videos": {
     "back_to_level": "Back to overview",
-    "internal_title": "SmartGerman lessons",
+    "internal_title": "Sitov Academy lessons",
     "internal_subtitle": "Our own video lessons, tailored to the course.",
     "coming_soon": "Coming soon",
     "empty_internal": "No videos are available yet.",
@@ -1440,6 +1440,7 @@
     "error_retry": "Try again",
     "show_cards": "Show vocabulary",
     "hide_cards": "Hide vocabulary",
+    "close_cards": "Close",
     "cards_loading": "Loading vocabulary …",
     "cards_load_failed": "The vocabulary could not be loaded. Please try again.",
     "phase_badge": "Phase {phase}",

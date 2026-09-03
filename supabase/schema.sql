@@ -1,4 +1,4 @@
--- SmartGerman v2 – Supabase Schema Reference
+-- Sitov Academy v2 – Supabase Schema Reference
 -- Projekt-ID: wcaslabeiwtvygxtzcio
 -- Stand: synchronisiert mit Live-Datenbank (2026-09-02)
 --

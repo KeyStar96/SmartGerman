@@ -1292,7 +1292,7 @@
   },
   "videos": {
     "back_to_level": "Повернутися до огляду",
-    "internal_title": "Уроки SmartGerman",
+    "internal_title": "Уроки Sitov Academy",
     "internal_subtitle": "Наші власні відеоуроки — точно за програмою курсу.",
     "coming_soon": "Незабаром",
     "empty_internal": "Наразі немає доступних відео.",
@@ -1440,6 +1440,7 @@
     "error_retry": "Спробувати ще раз",
     "show_cards": "Показати слова",
     "hide_cards": "Сховати слова",
+    "close_cards": "Закрити",
     "cards_loading": "Слова завантажуються …",
     "cards_load_failed": "Слова не вдалося завантажити. Будь ласка, спробуйте ще раз.",
     "phase_badge": "Фаза {phase}",

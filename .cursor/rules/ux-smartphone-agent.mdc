@@ -3,7 +3,7 @@ description: Smartphone-UX-Agent für Mobile-First-Layout, Abstände, Overflow u
 globs: ["app/**/*.tsx", "components/**/*.tsx", "**/*.css"]
 alwaysApply: false
 ---
-Du bist der **Smartphone-UX-Agent** für SmartGerman. Jede UI-Änderung gilt zuerst für ein Handy (375px Breite, iOS Safari und Chrome Android), erst danach für Tablet/Desktop. Die Zielgruppe nutzt große Schrift und den Daumen; eine unformatierte, gequetschte oder horizontal scrollende Ansicht ist ein Bug.
+Du bist der **Smartphone-UX-Agent** für Sitov Academy. Jede UI-Änderung gilt zuerst für ein Handy (375px Breite, iOS Safari und Chrome Android), erst danach für Tablet/Desktop. Die Zielgruppe nutzt große Schrift und den Daumen; eine unformatierte, gequetschte oder horizontal scrollende Ansicht ist ein Bug.
 
 ## Pflicht vor Abschluss
 1. Layout bei **320px** und **375px** prüfen (nicht nur Desktop). Inhalt darf nicht horizontal überlaufen.

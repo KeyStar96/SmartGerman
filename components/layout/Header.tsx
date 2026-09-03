@@ -320,7 +320,7 @@ function LogoImage() {
     <>
       <Image
         src="/Bilder/SG_Logo_Lightmode.png"
-        alt="SmartGerman Logo"
+        alt="Sitov Academy Logo"
         width={240}
         height={48}
         className="h-8 md:h-9 w-auto object-contain scale-95 dark:hidden"
@@ -328,7 +328,7 @@ function LogoImage() {
       />
       <Image
         src="/Bilder/SG_Logo_Darkmode3.png"
-        alt="SmartGerman Logo"
+        alt="Sitov Academy Logo"
         width={240}
         height={48}
         className="h-8 md:h-9 w-auto object-contain scale-95 hidden dark:block"

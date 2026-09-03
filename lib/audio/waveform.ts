@@ -6,64 +6,13 @@
  * (`AnalyserNode`, `decodeAudioData`) passiert in den Komponenten.
  */
 
-/** Anzahl der Balken in der Tonspur. Bei ~48px Breite je Balkenpaar gut sichtbar. */
+/**
+ * Anzahl der Pegelwerte in der laufenden Tonspur (`levels`-Array aus
+ * `useAudioRecorder`). Dient nur noch als Fallback-Datenquelle für
+ * `LiveWaveform`, falls kein `AnalyserNode` verfügbar ist – die eigentliche
+ * Darstellung ist die Canvas-Siri-Wave (`FluidWaveform`), keine Balken mehr.
+ */
 export const WAVEFORM_BAR_COUNT = 48
-
-/** Mindesthöhe eines Balkens in Prozent, damit auch Stille sichtbar bleibt. */
-export const WAVEFORM_MIN_BAR_PERCENT = 6
-
-/**
- * Verdichtet Audio-Samples zu einer festen Anzahl von Balken.
- *
- * Je Abschnitt wird der Spitzenwert genommen (nicht der Mittelwert): Bei
- * Sprache erzeugt der Mittelwert eine flache, wenig aussagekräftige Linie.
- */
-export function extractPeaks(
-  samples: ArrayLike<number>,
-  barCount: number = WAVEFORM_BAR_COUNT
-): number[] {
-  const bars = Math.max(1, Math.floor(barCount))
-  if (samples.length === 0) return new Array<number>(bars).fill(0)
-
-  const peaks: number[] = new Array<number>(bars).fill(0)
-  const samplesPerBar = samples.length / bars
-
-  for (let bar = 0; bar < bars; bar += 1) {
-    const start = Math.floor(bar * samplesPerBar)
-    const end = Math.min(samples.length, Math.floor((bar + 1) * samplesPerBar))
-    let peak = 0
-
-    for (let index = start; index < Math.max(end, start + 1); index += 1) {
-      const value = Math.abs(samples[index] ?? 0)
-      if (value > peak) peak = value
-    }
-
-    peaks[bar] = peak
-  }
-
-  return peaks
-}
-
-/**
- * Skaliert Spitzenwerte auf 0–1, bezogen auf den lautesten Balken.
- *
- * Eine leise Aufnahme sieht dadurch genauso deutlich aus wie eine laute –
- * für unsere Zielgruppe wichtiger als eine absolut korrekte Pegelanzeige.
- */
-export function normalizePeaks(peaks: readonly number[]): number[] {
-  const loudest = peaks.reduce((max, value) => (value > max ? value : max), 0)
-  if (loudest <= 0) return peaks.map(() => 0)
-  return peaks.map((value) => Math.min(1, Math.max(0, value / loudest)))
-}
-
-/** Höhe eines Balkens in Prozent, inklusive Mindesthöhe für Stille. */
-export function barHeightPercent(
-  normalizedPeak: number,
-  minPercent: number = WAVEFORM_MIN_BAR_PERCENT
-): number {
-  const clamped = Math.min(1, Math.max(0, normalizedPeak))
-  return Math.round(minPercent + clamped * (100 - minPercent))
-}
 
 /**
  * Rechnet die Rohdaten eines `AnalyserNode` (Zeitbereich, 0–255 um 128
@@ -107,7 +56,7 @@ export function formatDuration(totalSeconds: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
-/** Anteil der bereits abgespielten Zeit, für die Einfärbung der Balken. */
+/** Anteil der bereits abgespielten Zeit, für die Fortschritts-Leiste unter der Welle. */
 export function playbackProgress(currentTime: number, duration: number): number {
   if (!Number.isFinite(duration) || duration <= 0) return 0
   return Math.min(1, Math.max(0, currentTime / duration))

@@ -1769,12 +1769,20 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-03 — Unified Siri-Waveform, Vokabeltrainer-Bugfix, No-Scroll-Layout & Re-Branding
+- **`FluidWaveform`:** Die Canvas-Siri-Wave aus `LiveWaveform` wurde in eine eigenständige, wiederverwendbare Komponente (`components/audio/FluidWaveform.tsx`) extrahiert – datenquellen-agnostisch über eine `getVolume(): number`-Callback-Prop. `WaveformPlayer` (Wiedergabe fertiger Aufnahmen) nutzt sie jetzt ebenfalls statt der alten `div`-Balken; die Wellenbewegung während der Wiedergabe ist eine bewusste, überlagerte Sinus-Simulation statt eines echten `AnalyserNode` am `<audio>`-Element (Stummschaltungs-/CORS-Risiko vermieden, von der Aufgabenstellung explizit als Alternative erlaubt). Seek-Funktion (Klick, Pfeiltasten, `role="slider"`) bleibt vollständig erhalten. Tote Balken-Funktionen (`extractPeaks`, `normalizePeaks`, `barHeightPercent`) und ihre Tests entfernt.
+- **Bugfix grauer Balken:** Der Lern-Fortschrittsbalken in `LessonList.tsx` stand ohne grüne Füllung wie ein eingefrorener Platzhalter direkt neben „Vokabeln anzeigen". Jetzt unterhalb der Lektions-Kennzahlen, getrennt von der Button-Reihe, mit Prozent-Anzeige.
+- **Vokabeltrainer-Redesign:** Die aufklappende Inline-Vokabelliste ist einem Modal (`components/vocabulary/LessonCardsModal.tsx`, `max-h-[400px] overflow-y-auto`, ESC/Klick-außerhalb schließt) gewichen – kein endlos wachsendes Akkordeon mehr.
+- **No-Scroll-Viewport (Desktop `lg:`):** Alle sechs Trainer-Hauptrouten (`vocabulary`, `vocabulary/train`, `vocabulary/assess`, `pronunciation`, `exercises`, `videos`) nutzen ab `lg:` `h-[calc(100vh-5rem)] overflow-hidden flex flex-col` mit fixem Kopfbereich und genau einem intern scrollenden Inhaltsbereich (`flex-1 overflow-y-auto`). Mobile (`< lg`) scrollt weiterhin normal.
+- **Re-Branding:** Alle 22 Textvorkommen von „SmartGerman" im Repository durch „Sitov Academy" ersetzt (Komponenten, Dictionaries, Alt-Texte, Cursor-Rules, SQL-Kommentare, Doku). `package.json`, Supabase-Projekt-ID und der externe Telegram-Link `t.me/smartgerman_hannover` bleiben unverändert.
+- QS: `tsc --noEmit` fehlerfrei, `jest` 446/446 (ohne den vorbestehenden, umgebungsabhängigen DB-Integrationstest), `next build` erfolgreich.
+
 ### 2026-09-03 — Supabase-Browser-Client-Fix & Siri-Style Live-Waveform
 - Ursache für „@supabase/ssr: Your project's URL and API key are required...“ gefunden: `utils/supabase/client.ts` las die `NEXT_PUBLIC_`-Variablen über eine Hilfsfunktion (`readSupabasePublicConfig()`), die Next.js im Browser-Bundle nicht zur Build-Zeit ersetzen kann (nur wortwörtlicher `process.env.NEXT_PUBLIC_XXX`-Zugriff wird ersetzt). Serverseitig fiel es nie auf, da dort ein echtes `process.env` existiert.
 - Fix: direkter, literaler `process.env.NEXT_PUBLIC_*`-Zugriff in `client.ts`, saubere Validierung mit `console.error` + neuem typisierten `SupabaseConfigError` statt unkontrolliertem Absturz; `lib/audio/upload.ts` erkennt diesen Fehler gezielt (`reason: 'not_configured'`). Neuer Test `__tests__/supabase-client.test.ts`.
 - Funktioniert unverändert plattformunabhängig (Vercel „Shared“ Env Vars, Netlify `@netlify/plugin-nextjs`, lokal `.env.local`) – Variablen müssen nur zur Build-Zeit gesetzt sein.
 - `components/audio/LiveWaveform.tsx` von starren DOM-Balken auf eine flüssige Canvas-Siri-Wave umgestellt: drei phasenverschobene Sinus-Wellen, live gespeist aus dem `AnalyserNode` (Web Audio API) über `requestAnimationFrame`, weich geglättet über neue Funktion `smoothTowards()` (`lib/audio/waveform.ts`, mit Tests). Warmer Orange-Glow passend zum Markendesign; respektiert `prefers-reduced-motion`; räumt sich über `cancelAnimationFrame`/`ResizeObserver.disconnect()` selbst auf.
-- `useAudioRecorder.ts` gibt dafür `analyserRef` nach außen frei; `AudioRecorder.tsx` und `PendingSubmissionCard.tsx` reichen ihn durch. `WaveformPlayer` (fertige Aufnahme, Seek-Leiste) bleibt bewusst unverändert.
+- `useAudioRecorder.ts` gibt dafür `analyserRef` nach außen frei; `AudioRecorder.tsx` und `PendingSubmissionCard.tsx` reichen ihn durch. `WaveformPlayer` (fertige Aufnahme, Seek-Leiste) blieb an diesem Tag zunächst unverändert Balken-basiert – wurde im selben Tages-Batch aber noch auf `FluidWaveform` umgestellt, siehe Eintrag „Unified Siri-Waveform" oben.
 
 ### 2026-09-03 — Audio-Upload-Fehler behoben (Aussprache-Training)
 - Fehlermeldung „Die Aufnahme konnte gerade nicht hochgeladen werden“ zurückverfolgt auf zwei Ursachen in `lib/audio/upload.ts`: vollen MIME-Type inkl. Codec-Parameter als `Content-Type` gesendet, und zu knappes Fehler-Logging ohne Bucket/Pfad/Statuscode.
@@ -1807,7 +1815,7 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 - Anmelde- und Registrierungsseiten folgen den Geragogik-Maßen (18px Fließtext, 24px Titel, min. 56px Felder und Knöpfe), ohne Timer und ohne Fachbegriffe.
 
 ### 2026-09-02 — Supabase MCP & Schema-Sync
-- **Projekt-Binding:** Ausschließlich Supabase-Projekt `wcaslabeiwtvygxtzcio` (SmartGerman v2).
+- **Projekt-Binding:** Ausschließlich Supabase-Projekt `wcaslabeiwtvygxtzcio` (Sitov Academy v2).
 - **Agent-Regeln (`.cursorrules`):** SQL-Output-Pflicht entfernt; stattdessen Live-DB-Schutz, MCP-basierte Migrationen, Schema-Sync-Pflicht.
 - **`supabase/schema.sql`:** Ergänzt um Funktionen (`handle_new_user`, `handle_registration_confirmation`), Trigger, RLS-Policies, Indizes und Unique-Constraints — abgeglichen mit Live-DB.
 - **`supabase/database.types.ts`:** Neu generiert; Supabase-Clients typisiert.

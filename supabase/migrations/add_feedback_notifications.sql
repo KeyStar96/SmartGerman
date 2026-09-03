@@ -1,5 +1,5 @@
 -- ============================================================================
--- SmartGerman v2 – Migration: Benachrichtigungen für Lehrer-Feedback
+-- Sitov Academy v2 – Migration: Benachrichtigungen für Lehrer-Feedback
 -- Projekt: wcaslabeiwtvygxtzcio
 --
 -- Rückwärtskompatibel:

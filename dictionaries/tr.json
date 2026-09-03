@@ -1293,7 +1293,7 @@
   },
   "videos": {
     "back_to_level": "Genel görünüme dön",
-    "internal_title": "SmartGerman dersleri",
+    "internal_title": "Sitov Academy dersleri",
     "internal_subtitle": "Kursa özel, kendi video derslerimiz.",
     "coming_soon": "Yakında",
     "empty_internal": "Şu anda video yok.",
@@ -1441,6 +1441,7 @@
     "error_retry": "Yeniden dene",
     "show_cards": "Kelimeleri göster",
     "hide_cards": "Kelimeleri gizle",
+    "close_cards": "Kapat",
     "cards_loading": "Kelimeler yükleniyor …",
     "cards_load_failed": "Kelimeler yüklenemedi. Lütfen tekrar deneyin.",
     "phase_badge": "Faz {phase}",

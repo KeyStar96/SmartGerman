@@ -19,8 +19,8 @@ export default async function VocabTrainPage({
   const dueCards = await getDueCards(decodedLevel)
 
   return (
-    <div className="flex min-h-[80vh] flex-col">
-      <div className="mb-4">
+    <div className="flex min-h-[80vh] flex-col lg:h-[calc(100vh-5rem)] lg:overflow-hidden">
+      <div className="mb-4 shrink-0">
         <Link
           href={`/${lang}/dashboard/level/${encodeURIComponent(decodedLevel)}/vocabulary`}
           className="inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800"
@@ -29,7 +29,8 @@ export default async function VocabTrainPage({
         </Link>
       </div>
 
-      <div className="flex-1">
+      {/* Scrollt intern, falls die Karte (Bild + Text) auf kleinen Laptop-Bildschirmen nicht ganz passt. */}
+      <div className="min-h-0 flex-1 lg:overflow-y-auto">
         <VocabTrainerClient
           initialCards={dueCards}
           translations={translations}

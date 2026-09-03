@@ -1112,7 +1112,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                         <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-1.5 rounded-full border border-black/5 dark:border-white/10 shadow-lg flex items-center justify-center overflow-hidden">
                             <Image
                                 src="/Bilder/SG_Logo_Lightmode.png"
-                                alt="SmartGerman"
+                                alt="Sitov Academy"
                                 width={240}
                                 height={48}
                                 priority
@@ -1120,7 +1120,7 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
                             />
                             <Image
                                 src="/Bilder/SG_Logo_Darkmode3.png"
-                                alt="SmartGerman"
+                                alt="Sitov Academy"
                                 width={240}
                                 height={48}
                                 priority

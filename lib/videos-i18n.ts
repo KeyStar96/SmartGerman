@@ -2,7 +2,7 @@ import { createTranslator, type Translations, type Translator } from '@/lib/i18n
 
 export const VIDEO_FALLBACKS = {
   back_to_level: 'Zurück zur Übersicht',
-  internal_title: 'SmartGerman Lektionen',
+  internal_title: 'Sitov Academy Lektionen',
   internal_subtitle: 'Unsere eigenen Video-Lektionen – passgenau zum Kurs.',
   coming_soon: 'Demnächst',
   empty_internal: 'Aktuell sind keine Videos verfügbar.',

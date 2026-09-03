@@ -1,69 +1,11 @@
 import {
-  WAVEFORM_BAR_COUNT,
-  WAVEFORM_MIN_BAR_PERCENT,
   appendLevel,
-  barHeightPercent,
-  extractPeaks,
   formatDuration,
   levelFromTimeDomain,
-  normalizePeaks,
   playbackProgress,
   seekTargetSeconds,
   smoothTowards,
 } from '@/lib/audio/waveform'
-
-describe('extractPeaks', () => {
-  it('verdichtet Samples auf die gewünschte Balkenzahl', () => {
-    const samples = Array.from({ length: 1000 }, (_, index) => index / 1000)
-    expect(extractPeaks(samples, 10)).toHaveLength(10)
-    expect(extractPeaks(samples)).toHaveLength(WAVEFORM_BAR_COUNT)
-  })
-
-  it('nimmt je Abschnitt den Spitzenwert, nicht den Mittelwert', () => {
-    // Ein einzelner Ausschlag im zweiten Viertel muss sichtbar bleiben.
-    const samples = [0, 0, 0.9, 0, 0, 0, 0, 0]
-    expect(extractPeaks(samples, 4)).toEqual([0, 0.9, 0, 0])
-  })
-
-  it('behandelt negative Amplituden wie positive', () => {
-    expect(extractPeaks([-0.7, 0.2], 1)).toEqual([0.7])
-  })
-
-  it('liefert bei leeren Daten Nullen statt einer leeren Liste', () => {
-    expect(extractPeaks([], 5)).toEqual([0, 0, 0, 0, 0])
-  })
-
-  it('kommt mit mehr Balken als Samples zurecht', () => {
-    const peaks = extractPeaks([0.5, 0.25], 6)
-    expect(peaks).toHaveLength(6)
-    expect(peaks.every((value) => value >= 0)).toBe(true)
-  })
-})
-
-describe('normalizePeaks', () => {
-  it('skaliert den lautesten Balken auf 1', () => {
-    expect(normalizePeaks([0.1, 0.2, 0.4])).toEqual([0.25, 0.5, 1])
-  })
-
-  it('lässt eine stille Aufnahme flach', () => {
-    expect(normalizePeaks([0, 0, 0])).toEqual([0, 0, 0])
-  })
-})
-
-describe('barHeightPercent', () => {
-  it('hält die Mindesthöhe für Stille ein', () => {
-    expect(barHeightPercent(0)).toBe(WAVEFORM_MIN_BAR_PERCENT)
-  })
-
-  it('nutzt bei Vollausschlag die ganze Höhe', () => {
-    expect(barHeightPercent(1)).toBe(100)
-  })
-
-  it('begrenzt Werte außerhalb von 0 bis 1', () => {
-    expect(barHeightPercent(-3)).toBe(WAVEFORM_MIN_BAR_PERCENT)
-    expect(barHeightPercent(7)).toBe(100)
-  })
-})
 
 describe('levelFromTimeDomain', () => {
   it('meldet bei Stille (Ruhewert 128) keinen Pegel', () => {

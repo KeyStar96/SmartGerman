@@ -1,5 +1,5 @@
 -- ============================================================================
--- SmartGerman v2 – Migration: Phase-6-Leitner-Prinzip für den Vokabeltrainer
+-- Sitov Academy v2 – Migration: Phase-6-Leitner-Prinzip für den Vokabeltrainer
 -- Projekt: wcaslabeiwtvygxtzcio
 --
 -- Rückwärtskompatibel:

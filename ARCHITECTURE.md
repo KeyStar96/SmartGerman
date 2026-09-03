@@ -2,7 +2,7 @@
 
 ## 1. Datenmodellierung (Datenbankschema)
 
-**Supabase-Projekt:** `wcaslabeiwtvygxtzcio` (SmartGerman v2) — Live-Datenbank, produktiv im Einsatz.
+**Supabase-Projekt:** `wcaslabeiwtvygxtzcio` (Sitov Academy v2) — Live-Datenbank, produktiv im Einsatz.
 
 **Schema-Referenz:** `supabase/schema.sql` (Tabellen, Funktionen, Trigger, RLS-Policies, Indizes)  
 **TypeScript-Types:** `supabase/database.types.ts` (automatisch generiert via Supabase MCP/CLI)
@@ -30,7 +30,7 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
     - Die Phasenlogik liegt ausschließlich in `lib/leitner.ts` als reine Funktionen – Server Actions und UI enthalten keine Intervall-Arithmetik.
     - Index `idx_user_vocabulary_progress_due` auf `(user_id, next_review_date, box_number)` für die Abfrage der fälligen Karten.
     - **Übernahme-Wege in den Karteikasten:** (1) automatisch beim Sofort-Start einer ganzen Lektion (`initializeLesson`, legacy), (2) manuell je Einzelvokabel über `addCardsToTrainer(cardIds)` (Start immer Phase 1), (3) über den „Vokabeln einstufen"-Durchlauf `submitLessonAssessment(decisions)` – bekannte Vokabeln landen direkt auf Box 7 mit regulärer Phase-6-Ruhezeit, neue starten in Phase 1. Alle drei Wege überspringen Karten mit bereits bestehendem Lernstand (kein Überschreiben von Fortschritt).
-    - `getLessonCards(lesson, level)` liefert alle Vokabeln einer Lektion inklusive persönlichem Lernstand (`phase: null` = noch nicht übernommen) für die Lektions-Detailansicht in `components/vocabulary/LessonList.tsx`.
+    - `getLessonCards(lesson, level)` liefert alle Vokabeln einer Lektion inklusive persönlichem Lernstand (`phase: null` = noch nicht übernommen) für die Lektions-Detailansicht. `components/vocabulary/LessonList.tsx` zeigt je Lektion nur noch Kennzahlen + Buttons; die eigentliche Vokabelliste öffnet als `components/vocabulary/LessonCardsModal.tsx` (Overlay, `max-h-[400px] overflow-y-auto`) statt als Inline-Akkordeon – ein aufklappender Bereich hätte die Übersichtsseite bei vielen Vokabeln endlos lang gezogen und das No-Scroll-Viewport-Layout (Punkt 4) verhindert.
   - `user_exercise_progress`: Score (0–100, gestaffelt nach Versuchen), Completed-Status, `attempts`, `hint_shown`.
   - `submissions` & `teacher_feedback`: Audio/Text-Einsendungen von Studenten, verknüpft mit Lehrer-Feedback (Audio/Text).
     - `submissions.parent_id` / `attempt_number` bilden die Kette aus erstem Versuch und Wiedervorlage.
@@ -39,7 +39,10 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
     - Die Funktion läuft mit `search_path = ''` (alle Objekte vollqualifiziert) und `EXECUTE` liegt nur bei `authenticated`; `anon` ist explizit entzogen, damit der RPC-Endpunkt nicht ohne Anmeldung erreichbar ist.
 - **Audio-Pipeline**:
   - Aufnahme: `lib/audio/useAudioRecorder.ts` (getUserMedia, MediaRecorder, AnalyserNode) – einzige Quelle für Schüler- und Lehrer-Aufnahmen. Gibt zusätzlich `analyserRef` (Live-`AnalyserNode`) nach außen frei, damit Visualisierungen direkt auf Rohdaten zugreifen können.
-  - Darstellung: `lib/audio/waveform.ts` (reine Funktionen, inkl. `smoothTowards()` für Frame-Glättung) plus `LiveWaveform` (laufende Aufnahme, Canvas-Siri-Wave) und `WaveformPlayer` (fertige Datei mit Fortschritt, Tempo und Sprung, unverändert Balken-basiert für Seek-Interaktion).
+  - Darstellung: `lib/audio/waveform.ts` (reine Funktionen, inkl. `smoothTowards()` für Frame-Glättung) plus die wiederverwendbare Canvas-Komponente `components/audio/FluidWaveform.tsx` – eine Siri-artige, aus drei phasenverschobenen Sinuswellen bestehende Tonspur, datenquellen-agnostisch über eine `getVolume(): number`-Prop (0–1 je Frame). Zwei Verwender:
+    - `LiveWaveform` (laufende Aufnahme): liefert den echten Mikrofon-Pegel aus dem `AnalyserNode`, Fallback auf das `levels`-Array.
+    - `WaveformPlayer` (Wiedergabe, ersetzt die frühere Balken-Anzeige vollständig): simuliert den Pegel während `isPlaying` bewusst über zwei sanft verstimmte, überlagerte Sinuswellen statt über einen echten `AnalyserNode` am `<audio>`-Element – das würde die Wiedergabe über `createMediaElementSource()` in den Web-Audio-Graphen umleiten (Stummschaltungsrisiko, nur eine Quelle pro Element über alle Re-Renders, CORS-Abhängigkeit vom Storage-Bucket) und ist für die Kernfunktion "Aufnahme anhören" zu riskant. Seek-Interaktion (`role="slider"`, Klick, Pfeiltasten) bleibt erhalten, nur die Balken-Darstellung wurde ersetzt; eine schmale Fortschritts-Leiste unter der Welle zeigt weiterhin die abgespielte Position.
+    - `FluidWaveform` animiert nur, während `isActive` true ist (rAF-Loop); im inaktiven Zustand wird ein einzelner ruhiger Frame gezeichnet statt einer Dauerschleife – wichtig, wenn mehrere Player gleichzeitig auf einer Seite stehen (`SubmissionHistory`).
   - Upload: `lib/audio/upload.ts`, Bucket `audio_submissions`. Pfade `{userId}-{timestamp}` (Schüler) und `feedback/{submissionId}_{timestamp}` (Lehrkraft) – von den Storage-Policies abhängig, daher nicht ändern. `contentType` wird über `baseMimeType()` auf den reinen Basistyp (`audio/webm` / `audio/mp4`, ohne `;codecs=...`) reduziert, bevor er an Storage gesendet wird; `upload()` läuft mit `upsert: true`. Storage-Fehler (Bucket/Pfad/MIME/Statuscode) und Netzwerkfehler werden vollständig über `console.error` geloggt (nie nur eine generische Meldung). RLS: `supabase/migrations/fix_audio_submissions_storage_policies.sql` (idempotent, INSERT/UPDATE für `authenticated`, SELECT für `public`).
   - Browser-Client: `utils/supabase/client.ts` liest `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` bewusst **direkt und literal** aus `process.env` (nicht über `lib/supabase-env.ts`), da Next.js diese Variablen nur bei wortwörtlichem `process.env.NEXT_PUBLIC_*`-Zugriff zur Build-Zeit ins Client-Bundle einbrennt. Fehlen die Variablen, wirft `createClient()` einen typisierten `SupabaseConfigError` (mit vorherigem `console.error`) statt mit leeren Strings in `@supabase/ssr` zu crashen; `lib/audio/upload.ts` fängt diesen Fehler gezielt ab (`reason: 'not_configured'`). `lib/supabase-env.ts` bleibt ausschließlich für serverseitigen Code (Server Components, Server Actions, Middleware, Admin-Client) reserviert.
 
@@ -104,6 +107,10 @@ Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` ver
   - Skeleton-Loader für *jeden* asynchronen Ladevorgang (`loading.tsx` und Suspense-Boundaries), um das Gefühl von fließender Geschwindigkeit zu erzeugen.
   - Keine "leeren" Seiten. Wenn keine Vokabeln fällig sind: Wunderschöne Illustration mit Lob ("Alles gelernt für heute!").
 - **Styling**: Sitov Branding (`#FF5C00`), weiche Slate-Töne für Dark/Light-Mode. Keine grellen Kontraste, die die Augen älterer Nutzer anstrengen, aber klare Hervorhebungen für Call-to-Actions.
+- **No-Scroll-Viewport-Layout (Desktop, `lg:`)**: Die Hauptansichten der vier Trainer (`vocabulary`, `vocabulary/train`, `vocabulary/assess`, `pronunciation`, `exercises`, `videos`) nutzen ab `lg:` das Muster `lg:h-[calc(100vh-5rem)] lg:overflow-hidden` auf dem äußeren Container plus `flex flex-col`: ein fixer Kopfbereich (`shrink-0`, Zurück-Link, Titel, Hero/Recorder) und darunter genau ein scrollbarer Bereich (`min-h-0 flex-1 lg:overflow-y-auto`), der die eigentliche Liste/Karte enthält. So scrollt auf Desktop nie die ganze Seite, nur der jeweilige Inhaltsbereich – auf Mobile (`< lg`) bleibt gewohntes vertikales Scrollen, da die Höhenbegrenzung nur ab `lg:` greift.
+
+## Re-Branding "Sitov Academy" (2026-09-03)
+Alle Textvorkommen von "SmartGerman" (Komponenten, i18n-Fallbacks, Alt-Texte, Doku, Kommentare in `.mdc`/`.sql`) wurden durch "Sitov Academy" ersetzt. Unverändert: `package.json`-Name (bereits `sitov-language-academy`), Supabase-Projekt-ID `wcaslabeiwtvygxtzcio`, sowie externe URLs/Handles wie `t.me/smartgerman_hannover` (echter Telegram-Kanalname, keine Umbenennung möglich).
 
 ## 5. Übungs-Modul (Lückentexte & Multiple Choice)
 

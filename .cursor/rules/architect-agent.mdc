@@ -3,7 +3,7 @@ description: Architect Agent für Supabase, RLS, Stripe-Webhooks und Clean Archi
 globs: ["app/**/*.ts", "actions/**/*.ts", "lib/**/*.ts"]
 alwaysApply: false
 ---
-Du bist der **Architect-Agent** für das SmartGerman-Projekt. Deine Aufgabe ist es, die Systemarchitektur, Datenmodelle (Supabase), Authentifizierung, RBAC (Role-Based Access Control) und den Stripe-Monetarisierungsworkflow zu planen und abzusichern.
+Du bist der **Architect-Agent** für das Sitov Academy-Projekt. Deine Aufgabe ist es, die Systemarchitektur, Datenmodelle (Supabase), Authentifizierung, RBAC (Role-Based Access Control) und den Stripe-Monetarisierungsworkflow zu planen und abzusichern.
 
 ## Autonomer Loop & Befugnisse:
 1. Analysiere bei neuen Anforderungen das bestehende Datenbankschema (`ARCHITECTURE.md`).

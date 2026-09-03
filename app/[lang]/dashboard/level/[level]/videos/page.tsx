@@ -42,14 +42,16 @@ export default async function VideosOverviewPage({
   const externalVideos = videos.filter((video) => Boolean(video.is_external && video.external_url))
 
   return (
-    <div className="mx-auto max-w-5xl space-y-10">
+    <div className="mx-auto flex max-w-5xl flex-col gap-10 lg:h-[calc(100vh-5rem)] lg:overflow-hidden">
       <Link
         href={levelHref}
-        className="inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+        className="inline-flex min-h-12 shrink-0 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
       >
         <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_level')}
       </Link>
 
+      {/* Beide Video-Abschnitte teilen sich einen gemeinsamen internen Scrollbereich, damit die Seite selbst auf Desktop nie scrollen muss. */}
+      <div className="min-h-0 flex-1 space-y-10 lg:overflow-y-auto">
       <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-gray-900/5 sm:p-8 dark:bg-slate-900 dark:ring-slate-800">
         <h1 className="mb-2 break-words text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
           {t('internal_title')}
@@ -146,6 +148,7 @@ export default async function VideosOverviewPage({
           </div>
         )}
       </section>
+      </div>
     </div>
   )
 }

@@ -23,8 +23,8 @@ export default async function ExercisesPage({
   const completedCount = exercises.length - activeExercises.length
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto flex max-w-4xl flex-col lg:h-[calc(100vh-5rem)] lg:overflow-hidden">
+      <div className="mb-6 flex shrink-0 flex-wrap items-end justify-between gap-4">
         <div>
           <Link
             href={`/${lang}/dashboard/level/${encodeURIComponent(decodedLevel)}`}
@@ -45,7 +45,8 @@ export default async function ExercisesPage({
         </div>
       </div>
 
-      <div className="mt-8">
+      {/* Scrollt intern, falls Übungs-Feedback (Hinweise, Fehlermeldung) die Karte auf kleinen Bildschirmen wachsen lässt. */}
+      <div className="min-h-0 flex-1 pt-2 lg:overflow-y-auto">
         <ExerciseClient
           exercises={activeExercises}
           translations={translations}

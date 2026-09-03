@@ -3,7 +3,7 @@ description: Review- und Compliance-Agent für Code-Qualität und automatisches 
 globs: ["**/*"]
 alwaysApply: true
 ---
-Du bist der **Review- & Protocol-Agent** für das SmartGerman-Projekt. Du greifst im Hintergrund (oder als letzter Schritt in jedem Task-Loop) ein, um die Code-Qualität zu sichern und die Dokumentation aktuell zu halten.
+Du bist der **Review- & Protocol-Agent** für das Sitov Academy-Projekt. Du greifst im Hintergrund (oder als letzter Schritt in jedem Task-Loop) ein, um die Code-Qualität zu sichern und die Dokumentation aktuell zu halten.
 
 ## Autonomer Loop & Befugnisse (Muss nach jedem Task ausgeführt werden):
 1. **Code-Review**: Prüfe geänderte Dateien auf verbotenes `any`, fehlende Try/Catch-Blöcke oder ungesicherte Server Actions.

@@ -2,15 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { Pause, Play } from 'lucide-react'
-import {
-  WAVEFORM_BAR_COUNT,
-  barHeightPercent,
-  extractPeaks,
-  formatDuration,
-  normalizePeaks,
-  playbackProgress,
-  seekTargetSeconds,
-} from '@/lib/audio/waveform'
+import FluidWaveform from '@/components/audio/FluidWaveform'
+import { formatDuration, playbackProgress, seekTargetSeconds } from '@/lib/audio/waveform'
 import {
   createPronunciationTranslator,
   type PronunciationTranslator,
@@ -19,47 +12,11 @@ import {
 /** Tempo-Stufen: langsamer zum Nachsprechen, schneller zum Überfliegen. */
 const SPEEDS = [1, 0.75, 1.25] as const
 
-/** Flache Balken, solange die echten Spitzenwerte noch nicht vorliegen. */
-const FLAT_PEAKS: readonly number[] = Array.from({ length: WAVEFORM_BAR_COUNT }, () => 0.18)
-
 /** Sprung pro Pfeiltaste – bewusst grob, damit Nachjustieren leicht bleibt. */
 const KEYBOARD_SEEK_SECONDS = 5
 
 /** Greift nur, wenn kein Übersetzer übergeben wird (z.B. in der Lehrer-Ansicht). */
 const defaultTranslator = createPronunciationTranslator({})
-
-interface WindowWithLegacyAudioContext extends Window {
-  webkitAudioContext?: typeof AudioContext
-}
-
-/**
- * Liest die Spitzenwerte einer Audio-Datei für die statische Tonspur.
- * Schlägt das fehl (CORS, exotisches Format), bleibt die Wiedergabe nutzbar
- * und es werden nur die flachen Platzhalter-Balken gezeigt.
- */
-async function loadPeaks(src: string, signal: AbortSignal): Promise<number[] | null> {
-  try {
-    const response = await fetch(src, { signal })
-    if (!response.ok) return null
-
-    const buffer = await response.arrayBuffer()
-    const legacy = (window as WindowWithLegacyAudioContext).webkitAudioContext
-    const Ctor = window.AudioContext ?? legacy
-    if (!Ctor) return null
-
-    const context = new Ctor()
-    try {
-      const decoded = await context.decodeAudioData(buffer)
-      return normalizePeaks(extractPeaks(decoded.getChannelData(0)))
-    } finally {
-      void context.close().catch(() => undefined)
-    }
-  } catch (err) {
-    if (signal.aborted) return null
-    console.warn('Tonspur konnte nicht analysiert werden:', err)
-    return null
-  }
-}
 
 export default function WaveformPlayer({
   src,
@@ -75,8 +32,9 @@ export default function WaveformPlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
+  /** Frame-Zähler für die Sinus-Simulation der Wiedergabe-Welle, siehe `getVolume`. */
+  const simPhaseRef = useRef(0)
 
-  const [peaks, setPeaks] = useState<readonly number[]>(FLAT_PEAKS)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -85,22 +43,32 @@ export default function WaveformPlayer({
 
   const translate: PronunciationTranslator = t ?? defaultTranslator
 
-  useEffect(() => {
-    if (!src) return
-    const controller = new AbortController()
-
-    void loadPeaks(src, controller.signal).then((result) => {
-      if (!controller.signal.aborted && result) setPeaks(result)
-    })
-
-    return () => controller.abort()
-  }, [src])
-
   const speed = SPEEDS[speedIndex] ?? 1
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.playbackRate = speed
   }, [speed])
+
+  /**
+   * Simulierter Lautstärke-Pegel während der Wiedergabe (0..1).
+   *
+   * Bewusst KEIN echter `AnalyserNode` am `<audio>`-Element: Das würde die
+   * Wiedergabe über `createMediaElementSource()` in den Web-Audio-Graphen
+   * umleiten (Stummschaltungsrisiko bei fehlendem `resume()`/fehlender
+   * Verbindung zu `destination`, nur eine Quelle pro Element über alle
+   * Re-Renders hinweg möglich, CORS-Abhängigkeit vom Storage-Bucket für
+   * echte Frequenzdaten). Für die Kernfunktion "Aufnahme anhören" ist das
+   * zu riskant – zwei sanft verstimmte, überlagerte Sinuswellen ergeben ein
+   * organisches, nie exakt periodisches Wellenbild, ganz ohne dieses Risiko.
+   */
+  const getVolume = useCallback((): number => {
+    if (!isPlaying) return 0
+    simPhaseRef.current += 1
+    const frame = simPhaseRef.current
+    const wave =
+      Math.sin(frame * 0.05) * 0.5 + Math.sin(frame * 0.087 + 1.3) * 0.35 + Math.sin(frame * 0.021) * 0.15
+    return Math.min(1, Math.max(0, 0.55 + wave * 0.45))
+  }, [isPlaying])
 
   const togglePlayback = useCallback(() => {
     const audio = audioRef.current
@@ -152,7 +120,6 @@ export default function WaveformPlayer({
   if (!src) return null
 
   const progress = playbackProgress(currentTime, duration)
-  const playedBars = Math.round(progress * peaks.length)
 
   return (
     <div className="w-full">
@@ -190,20 +157,19 @@ export default function WaveformPlayer({
           aria-valuetext={`${formatDuration(currentTime)} / ${formatDuration(duration)}`}
           onClick={(event) => handleSeek(event.clientX)}
           onKeyDown={handleSeekByKeyboard}
-          className={`flex flex-1 cursor-pointer items-center justify-start gap-[2px] rounded-2xl bg-slate-100 px-3 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] dark:bg-slate-800 ${
+          className={`relative flex-1 cursor-pointer overflow-hidden rounded-2xl bg-slate-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] dark:bg-slate-800 ${
             compact ? 'h-12' : 'h-16'
           }`}
         >
-          {peaks.map((peak, index) => (
+          <FluidWaveform getVolume={getVolume} isActive={isPlaying} />
+
+          {/* Dezente Fortschritts-Leiste unter der Welle – ersetzt die frühere Balken-Einfärbung. */}
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-slate-300/70 dark:bg-slate-600/70">
             <div
-              key={index}
-              aria-hidden="true"
-              className={`w-full max-w-[7px] flex-1 rounded-full transition-colors ${
-                index < playedBars ? 'bg-[#FF5C00]' : 'bg-slate-400 dark:bg-slate-500'
-              }`}
-              style={{ height: `${barHeightPercent(peak)}%` }}
+              className="h-full bg-[#FF5C00] transition-[width] duration-150"
+              style={{ width: `${Math.round(progress * 100)}%` }}
             />
-          ))}
+          </div>
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-1">
