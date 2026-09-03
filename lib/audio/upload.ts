@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/client'
+import { createClient, SupabaseConfigError } from '@/utils/supabase/client'
 
 /**
  * Zentraler Upload-Pfad für Sprachaufnahmen.
@@ -40,7 +40,7 @@ export function extensionForMimeType(mimeType: string): string {
 
 export type AudioUploadResult =
   | { success: true; publicUrl: string }
-  | { success: false; reason: 'not_authenticated' | 'upload_failed' }
+  | { success: false; reason: 'not_authenticated' | 'upload_failed' | 'not_configured' }
 
 /**
  * Liefert die für Logging hilfreichen Eckdaten eines Storage-Fehlers.
@@ -105,6 +105,21 @@ async function uploadToBucket(blob: Blob, buildPath: (userId: string) => string)
     const { data } = supabase.storage.from(AUDIO_BUCKET).getPublicUrl(path)
     return { success: true, publicUrl: data.publicUrl }
   } catch (err) {
+    // Fehlende NEXT_PUBLIC_-Konfiguration im Browser (siehe
+    // `utils/supabase/client.ts`) ist ein Deployment-/Env-Problem, kein
+    // Storage-Fehler – eigener Log-Text und eigener `reason`, damit sich das
+    // in Produktion sofort von einem echten Upload-Fehler unterscheiden lässt.
+    if (err instanceof SupabaseConfigError) {
+      console.error('Audio-Upload abgebrochen: Supabase ist im Browser nicht konfiguriert.', {
+        bucket: AUDIO_BUCKET,
+        blobType: blob.type,
+        contentType,
+        blobSizeBytes: blob.size,
+        message: err.message,
+      })
+      return { success: false, reason: 'not_configured' }
+    }
+
     // Fängt Netzwerkfehler (Offline, Timeout, CORS) ab, die der
     // Supabase-Client als geworfene Exception statt als `{ error }` liefert.
     console.error('Unerwarteter Netzwerk- oder Laufzeitfehler beim Audio-Upload:', {

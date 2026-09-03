@@ -137,6 +137,7 @@ export default function PendingSubmissionCard({ sub, onSubmit }: PendingSubmissi
                   isActive
                   elapsedSeconds={recorder.elapsedSeconds}
                   ariaLabel="Tonspur der laufenden Aufnahme"
+                  analyserRef={recorder.analyserRef}
                 />
               </div>
             )}

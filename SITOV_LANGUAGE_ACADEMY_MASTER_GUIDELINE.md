@@ -1769,6 +1769,13 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-03 — Supabase-Browser-Client-Fix & Siri-Style Live-Waveform
+- Ursache für „@supabase/ssr: Your project's URL and API key are required...“ gefunden: `utils/supabase/client.ts` las die `NEXT_PUBLIC_`-Variablen über eine Hilfsfunktion (`readSupabasePublicConfig()`), die Next.js im Browser-Bundle nicht zur Build-Zeit ersetzen kann (nur wortwörtlicher `process.env.NEXT_PUBLIC_XXX`-Zugriff wird ersetzt). Serverseitig fiel es nie auf, da dort ein echtes `process.env` existiert.
+- Fix: direkter, literaler `process.env.NEXT_PUBLIC_*`-Zugriff in `client.ts`, saubere Validierung mit `console.error` + neuem typisierten `SupabaseConfigError` statt unkontrolliertem Absturz; `lib/audio/upload.ts` erkennt diesen Fehler gezielt (`reason: 'not_configured'`). Neuer Test `__tests__/supabase-client.test.ts`.
+- Funktioniert unverändert plattformunabhängig (Vercel „Shared“ Env Vars, Netlify `@netlify/plugin-nextjs`, lokal `.env.local`) – Variablen müssen nur zur Build-Zeit gesetzt sein.
+- `components/audio/LiveWaveform.tsx` von starren DOM-Balken auf eine flüssige Canvas-Siri-Wave umgestellt: drei phasenverschobene Sinus-Wellen, live gespeist aus dem `AnalyserNode` (Web Audio API) über `requestAnimationFrame`, weich geglättet über neue Funktion `smoothTowards()` (`lib/audio/waveform.ts`, mit Tests). Warmer Orange-Glow passend zum Markendesign; respektiert `prefers-reduced-motion`; räumt sich über `cancelAnimationFrame`/`ResizeObserver.disconnect()` selbst auf.
+- `useAudioRecorder.ts` gibt dafür `analyserRef` nach außen frei; `AudioRecorder.tsx` und `PendingSubmissionCard.tsx` reichen ihn durch. `WaveformPlayer` (fertige Aufnahme, Seek-Leiste) bleibt bewusst unverändert.
+
 ### 2026-09-03 — Audio-Upload-Fehler behoben (Aussprache-Training)
 - Fehlermeldung „Die Aufnahme konnte gerade nicht hochgeladen werden“ zurückverfolgt auf zwei Ursachen in `lib/audio/upload.ts`: vollen MIME-Type inkl. Codec-Parameter als `Content-Type` gesendet, und zu knappes Fehler-Logging ohne Bucket/Pfad/Statuscode.
 - Neue Funktion `baseMimeType()` normalisiert auf `audio/webm` bzw. `audio/mp4` vor dem Storage-Upload; `upload()` läuft mit `upsert: true`.

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { appendLevel, levelFromTimeDomain, WAVEFORM_BAR_COUNT } from '@/lib/audio/waveform'
 
 /**
@@ -36,6 +36,13 @@ export interface UseAudioRecorderResult {
   audioBlob: Blob | null
   isRecording: boolean
   hasRecording: boolean
+  /**
+   * Live-Zugriff auf den `AnalyserNode` der laufenden Aufnahme, für eigene
+   * Visualisierungen (z.B. die Canvas-Siri-Wave in `LiveWaveform`).
+   * `current` ist nur während der Aufnahme gesetzt und wird beim Stoppen
+   * automatisch wieder auf `null` gesetzt (siehe `teardown`).
+   */
+  analyserRef: RefObject<AnalyserNode | null>
   start: () => Promise<void>
   stop: () => void
   /** Verwirft die Aufnahme und gibt den Object-URL frei. */
@@ -255,6 +262,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     audioBlob,
     isRecording: status === 'recording',
     hasRecording: status === 'ready' && audioBlob !== null,
+    analyserRef,
     start,
     stop,
     reset,

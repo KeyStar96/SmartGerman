@@ -9,6 +9,7 @@ import {
   normalizePeaks,
   playbackProgress,
   seekTargetSeconds,
+  smoothTowards,
 } from '@/lib/audio/waveform'
 
 describe('extractPeaks', () => {
@@ -134,5 +135,28 @@ describe('playbackProgress und seekTargetSeconds', () => {
   it('bleibt bei fehlender Dauer bei 0', () => {
     expect(seekTargetSeconds(50, 100, 0)).toBe(0)
     expect(seekTargetSeconds(50, 0, 20)).toBe(0)
+  })
+})
+
+describe('smoothTowards', () => {
+  it('erreicht das Ziel sofort bei Glättung 1', () => {
+    expect(smoothTowards(0, 1, 1)).toBe(1)
+  })
+
+  it('bleibt beim aktuellen Wert bei Glättung 0', () => {
+    expect(smoothTowards(0.3, 1, 0)).toBe(0.3)
+  })
+
+  it('nähert sich schrittweise an, statt zu springen', () => {
+    const step1 = smoothTowards(0, 1, 0.2)
+    expect(step1).toBeCloseTo(0.2)
+    const step2 = smoothTowards(step1, 1, 0.2)
+    expect(step2).toBeGreaterThan(step1)
+    expect(step2).toBeLessThan(1)
+  })
+
+  it('begrenzt den Glättungsfaktor auf 0 bis 1', () => {
+    expect(smoothTowards(0, 1, -5)).toBe(0)
+    expect(smoothTowards(0, 1, 5)).toBe(1)
   })
 })

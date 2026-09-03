@@ -122,3 +122,18 @@ export function seekTargetSeconds(offsetX: number, width: number, duration: numb
   const ratio = Math.min(1, Math.max(0, offsetX / width))
   return ratio * duration
 }
+
+/**
+ * Nähert einen Wert pro Frame exponentiell an ein Ziel an (Lerp).
+ *
+ * Für die Siri-artige Live-Tonspur: Rohe Pegelwerte aus dem `AnalyserNode`
+ * springen von Frame zu Frame stark. Statt den Zielwert direkt als Amplitude
+ * zu zeichnen, nähert sich die tatsächlich gezeichnete Amplitude ihm nur zu
+ * einem Anteil `smoothing` pro Frame an – das ergibt eine weiche, organische
+ * Bewegung statt eines abgehackten Zitterns, ganz ohne mehrere Frames an
+ * Historie verwalten zu müssen.
+ */
+export function smoothTowards(current: number, target: number, smoothing: number): number {
+  const factor = Math.min(1, Math.max(0, smoothing))
+  return current + (target - current) * factor
+}

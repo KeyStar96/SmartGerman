@@ -128,6 +128,7 @@ export default function AudioRecorder({
               isActive
               elapsedSeconds={recorder.elapsedSeconds}
               ariaLabel={t('waveform_live_aria')}
+              analyserRef={recorder.analyserRef}
             />
           ) : (
             <WaveformPlayer src={recorder.audioUrl} t={t} label={t('your_recording')} />
