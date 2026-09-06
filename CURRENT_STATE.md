@@ -181,6 +181,13 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 - **Tailwind-Content erweitert:** `tailwind.config.ts` scannt nun auch `./lib/**`, damit die statischen Farbklassen aus `levelVisual`/`phaseBarClasses` zuverlässig generiert werden.
 - **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei. Kein `any`, keine neuen Server Actions/DB-Änderungen.
 
+## 4i. Vokabeltrainer: Sofortiger Kartenwechsel & Tinder-Pre-Rendering (2026-09-06)
+
+- **Feedback-Meldungen entfernt:** Nach „Wusste ich" / „Wusste ich nicht" erscheint keine Bestätigungsmeldung mehr (früher „Weiter in Phase X. Wiederholung schon morgen." + separater „Nächste Karte"-Button). Der Wechsel erfolgt sofort. `AnswerFeedback`-State, `handleNext` und der Zwischen-Button wurden aus `VocabTrainerClient.tsx` entfernt.
+- **Fire-and-forget-Speicherung:** `submitVocabularyAnswer` läuft im Hintergrund; der Kartenwechsel wartet bewusst nicht auf die Server-Antwort. Schlägt das Speichern fehl, erscheint weiterhin der dezente, nicht-blockierende `save_failed`-Hinweis (Graceful Degradation).
+- **Tinder-Pre-Rendering:** Aktuelle Karte (Index `i`) und Folgekarte (`i+1`) liegen per CSS-Grid (`[grid-area:1/1]`) übereinander im DOM. Die Folgekarte ist inkl. Bild fertig gerendert; zusätzlich werden die Bilder von `i+1` und `i+2` per `new Image()` vorgeladen. Beim Antworten fliegt die aktive Karte weich zur Seite (rechts = gewusst, links = nicht gewusst; `translate`+`rotate`+`opacity`, 260 ms), die dahinterliegende Karte wird ohne Ladezeit sofort aktiv. `motion-reduce:transition-none` respektiert Bewegungsreduktion.
+- **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, keine Lint-Fehler, kein `any`, keine DB-/Server-Action-Änderungen.
+
 ## 5. Hosting
 - Die Lernplattform läuft auf **Netlify** (`netlify.toml`, `@netlify/plugin-nextjs`). `NEXT_PUBLIC_SITE_URL` ist dort auf `https://www.sitov-academy.com` gesetzt. Derselbe Satz gilt für Vercel Production (Dashboard → Environment Variables).
 - Caching muss für Server Components (z.B. Kurslisten) korrekt eingestellt werden, um Ladezeiten zu minimieren.

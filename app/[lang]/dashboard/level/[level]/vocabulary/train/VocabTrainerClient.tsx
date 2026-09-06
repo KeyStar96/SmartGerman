@@ -1,28 +1,63 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Check, CloudOff, Image as ImageIcon, Layers, PartyPopper, X } from 'lucide-react'
+import { Check, CloudOff, Image as ImageIcon, Layers, PartyPopper, X } from 'lucide-react'
 import SolutionAudioButton from '@/components/exercises/SolutionAudioButton'
 import { finishVocabularySession, submitVocabularyAnswer } from '@/app/actions/vocabulary'
-import { createVocabularyTranslator, type VocabularyTranslations } from '@/lib/vocabulary-i18n'
+import {
+  createVocabularyTranslator,
+  type VocabularyTranslations,
+  type VocabularyTranslator,
+} from '@/lib/vocabulary-i18n'
 import { articleColorClass } from '@/lib/vocabulary-ui'
-import type { LeitnerPhase } from '@/lib/leitner'
 import type { DueVocabularyCard } from '@/lib/types/vocabulary'
 import { cn, stripLessonPrefix } from '@/lib/utils'
-
-interface AnswerFeedback {
-  phase: LeitnerPhase
-  intervalInDays: number
-  movedBack: boolean
-  becameLearned: boolean
-}
 
 interface VocabTrainerClientProps {
   initialCards: DueVocabularyCard[]
   translations?: VocabularyTranslations
   lang: string
   level: string
+}
+
+/** Dauer der Exit-Animation. Danach wird sofort die vorgerenderte Karte aktiv. */
+const EXIT_MS = 260
+
+type ExitDirection = 'left' | 'right' | null
+
+/** Deutsches Wort inkl. Artikel, wie es aufgedeckt angezeigt wird. */
+function toDisplayWord(card: DueVocabularyCard['card']): string {
+  return card.article && card.article !== 'none' ? `${card.article} ${card.word_de}` : card.word_de
+}
+
+/**
+ * Vorderseite (Muttersprache + Bild). Wird sowohl für die aktive Karte als auch
+ * für die vorgerenderte nächste Karte im Stapel verwendet – so ist das Bild der
+ * Folgekarte bereits dekodiert, sobald sie aktiv wird.
+ */
+function CardFront({ item, t }: { item: DueVocabularyCard; t: VocabularyTranslator }) {
+  const { card } = item
+  return (
+    <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-6 sm:p-8">
+      {card.image_url ? (
+        <img
+          src={card.image_url}
+          alt={t('image_alt')}
+          decoding="async"
+          className="mb-4 h-28 w-28 max-w-full rounded-2xl object-cover shadow-md sm:mb-6 sm:h-36 sm:w-36"
+        />
+      ) : (
+        <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-200 text-gray-400 shadow-inner sm:mb-6 sm:h-24 sm:w-24">
+          <ImageIcon size={40} aria-hidden="true" />
+        </div>
+      )}
+
+      <h2 className="break-words text-center text-2xl font-bold text-gray-800 sm:text-3xl">
+        {item.translation || t('no_translation')}
+      </h2>
+    </div>
+  )
 }
 
 export default function VocabTrainerClient({
@@ -35,60 +70,75 @@ export default function VocabTrainerClient({
   const [session] = useState<DueVocabularyCard[]>(initialCards)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isRevealed, setIsRevealed] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [feedback, setFeedback] = useState<AnswerFeedback | null>(null)
+  /** Solange gesetzt, läuft die Exit-Animation der aktuellen Karte. */
+  const [exitDirection, setExitDirection] = useState<ExitDirection>(null)
   const [saveFailed, setSaveFailed] = useState(false)
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const t = useMemo(() => createVocabularyTranslator(translations), [translations])
   const currentCard = session[currentIndex]
+  const nextCard = session[currentIndex + 1]
   const overviewHref = `/${lang}/dashboard/level/${encodeURIComponent(level)}/vocabulary`
 
-  const handleAnswer = useCallback(
-    async (isCorrect: boolean): Promise<void> => {
-      if (isSubmitting || !currentCard) return
-      setIsSubmitting(true)
-      setSaveFailed(false)
-
-      try {
-        const result = await submitVocabularyAnswer({
-          progressId: currentCard.progressId,
-          isCorrect,
-        })
-
-        if (!result.success || result.newPhase === undefined) {
-          setSaveFailed(true)
-          setIsSubmitting(false)
-          return
-        }
-
-        setFeedback({
-          phase: result.newPhase,
-          intervalInDays: result.intervalInDays ?? 1,
-          movedBack: result.movedBack ?? false,
-          becameLearned: result.becameLearned ?? false,
-        })
-      } catch (err) {
-        console.error('Antwort konnte nicht gespeichert werden:', err)
-        setSaveFailed(true)
-      } finally {
-        setIsSubmitting(false)
+  /**
+   * Pre-Rendering-Absicherung: Bilder der nächsten beiden Karten vorab in den
+   * Browser-Cache holen, damit beim Kartenwechsel keine Ladezeit entsteht.
+   */
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    for (const offset of [1, 2]) {
+      const url = session[currentIndex + offset]?.card.image_url
+      if (url) {
+        const preload = new window.Image()
+        preload.decoding = 'async'
+        preload.src = url
       }
-    },
-    [currentCard, isSubmitting]
-  )
-
-  const handleNext = useCallback((): void => {
-    const nextIndex = currentIndex + 1
-    setFeedback(null)
-    setIsRevealed(false)
-    setCurrentIndex(nextIndex)
-
-    if (nextIndex >= session.length) {
-      void finishVocabularySession().catch(() => {
-        // Die Übersicht aktualisiert sich dann beim nächsten Seitenaufruf.
-      })
     }
-  }, [currentIndex, session.length])
+  }, [currentIndex, session])
+
+  /** Aufräumen: laufenden Exit-Timer beim Unmount stoppen. */
+  useEffect(() => {
+    return () => {
+      if (exitTimerRef.current) clearTimeout(exitTimerRef.current)
+    }
+  }, [])
+
+  const handleAnswer = useCallback(
+    (isCorrect: boolean): void => {
+      // Während einer laufenden Transition keine weitere Antwort annehmen.
+      if (exitDirection !== null || !currentCard) return
+
+      const nextIndex = currentIndex + 1
+
+      // Speichern läuft im Hintergrund (fire-and-forget) – der Kartenwechsel
+      // wartet bewusst NICHT darauf, damit er sofort erfolgt.
+      setSaveFailed(false)
+      void submitVocabularyAnswer({ progressId: currentCard.progressId, isCorrect })
+        .then((result) => {
+          if (!result.success) setSaveFailed(true)
+        })
+        .catch((err) => {
+          console.error('Antwort konnte nicht gespeichert werden:', err)
+          setSaveFailed(true)
+        })
+
+      // Sofortige, flüssige Exit-Bewegung: „Wusste ich" nach rechts, sonst links.
+      setExitDirection(isCorrect ? 'right' : 'left')
+
+      exitTimerRef.current = setTimeout(() => {
+        setCurrentIndex(nextIndex)
+        setIsRevealed(false)
+        setExitDirection(null)
+
+        if (nextIndex >= session.length) {
+          void finishVocabularySession().catch(() => {
+            // Die Übersicht aktualisiert sich dann beim nächsten Seitenaufruf.
+          })
+        }
+      }, EXIT_MS)
+    },
+    [currentCard, currentIndex, exitDirection, session.length]
+  )
 
   if (session.length === 0) {
     return (
@@ -126,13 +176,13 @@ export default function VocabTrainerClient({
     )
   }
 
-  const { card } = currentCard
-  const displayWord = card.article && card.article !== 'none' ? `${card.article} ${card.word_de}` : card.word_de
+  const displayWord = toDisplayWord(currentCard.card)
+  const isExiting = exitDirection !== null
 
   return (
     <div className="mx-auto w-full max-w-2xl">
       <div className="mb-4 flex flex-col gap-3 text-lg font-medium text-gray-600 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <span>{t('lesson_label', { lesson: stripLessonPrefix(card.lesson) })}</span>
+        <span>{t('lesson_label', { lesson: stripLessonPrefix(currentCard.card.lesson) })}</span>
         <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-blue-800">
           <Layers size={20} aria-hidden="true" />
           {t('phase_label', { phase: currentCard.phase })}
@@ -140,126 +190,119 @@ export default function VocabTrainerClient({
         <span>{t('card_progress', { current: currentIndex + 1, total: session.length })}</span>
       </div>
 
-      {/* Kompakte Karte: kleinere Innenabstände als früher, damit sie auf Laptop-Displays (13"/14") möglichst ohne Scrollen komplett sichtbar ist. Wird sie trotzdem zu groß, scrollt die Seite jetzt einfach natürlich statt abzuschneiden. */}
-      <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
-        {/* Vorderseite: Muttersprache */}
-        <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-6 sm:p-8">
-          {card.image_url ? (
-            <img
-              src={card.image_url}
-              alt={t('image_alt')}
-              className="mb-4 h-28 w-28 max-w-full rounded-2xl object-cover shadow-md sm:mb-6 sm:h-36 sm:w-36"
-            />
-          ) : (
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-200 text-gray-400 shadow-inner sm:mb-6 sm:h-24 sm:w-24">
-              <ImageIcon size={40} aria-hidden="true" />
+      {/*
+        Tinder-Stapel: aktuelle Karte (i) und bereits fertig gerenderte
+        Folgekarte (i+1) liegen per CSS-Grid in derselben Zelle übereinander.
+        Beim Antworten fliegt die aktive Karte weich zur Seite, die dahinter
+        vorgerenderte Karte wird ohne Ladezeit sofort aktiv.
+      */}
+      <div className="grid">
+        {nextCard && (
+          <div
+            aria-hidden="true"
+            className={cn(
+              'z-0 origin-top self-start [grid-area:1/1] transition-transform duration-[260ms] ease-out motion-reduce:transition-none',
+              isExiting ? 'translate-y-0 scale-100' : 'translate-y-2 scale-[0.96]'
+            )}
+          >
+            <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
+              <CardFront item={nextCard} t={t} />
+              <div className="flex items-center justify-center bg-white p-6 sm:p-8">
+                <div className="w-full rounded-2xl bg-blue-600 py-6 text-center text-2xl font-bold text-white shadow-md">
+                  {t('reveal_solution')}
+                </div>
+              </div>
             </div>
+          </div>
+        )}
+
+        <div
+          className={cn(
+            'z-10 self-start [grid-area:1/1] transition-all duration-[260ms] ease-in will-change-transform motion-reduce:transition-none',
+            exitDirection === 'right' && 'translate-x-[130%] rotate-[8deg] opacity-0',
+            exitDirection === 'left' && '-translate-x-[130%] -rotate-[8deg] opacity-0'
           )}
+        >
+          <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
+            <CardFront item={currentCard} t={t} />
 
-          <h2 className="break-words text-center text-2xl font-bold text-gray-800 sm:text-3xl">
-            {currentCard.translation || t('no_translation')}
-          </h2>
-        </div>
+            {isRevealed ? (
+              <div className="flex flex-col items-center justify-center bg-white p-6 sm:p-8">
+                <span
+                  className={cn(
+                    'break-words text-center text-2xl font-extrabold sm:text-4xl',
+                    articleColorClass(currentCard.card.article)
+                  )}
+                >
+                  {displayWord}
+                </span>
 
-        {isRevealed ? (
-          <div className="flex flex-col items-center justify-center bg-white p-6 sm:p-8">
-            <span className={cn('break-words text-center text-2xl font-extrabold sm:text-4xl', articleColorClass(card.article))}>
-              {displayWord}
-            </span>
+                {currentCard.card.plural && (
+                  <p className="mt-2 text-xl text-gray-500">
+                    {t('plural_label', { plural: currentCard.card.plural })}
+                  </p>
+                )}
 
-            {card.plural && (
-              <p className="mt-2 text-xl text-gray-500">{t('plural_label', { plural: card.plural })}</p>
+                <div className="mt-4">
+                  <SolutionAudioButton
+                    text={displayWord}
+                    audioUrl={currentCard.card.audio_url}
+                    label={t('listen_word')}
+                    ariaLabel={t('listen_word_aria', { word: currentCard.card.word_de })}
+                    variant="secondary"
+                  />
+                </div>
+
+                {/* Direkt bewerten – ohne Bestätigungsmeldung, der Wechsel erfolgt sofort. */}
+                <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={() => handleAnswer(false)}
+                    disabled={isExiting}
+                    className="flex min-h-16 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-amber-300 bg-amber-50 py-4 text-amber-800 transition-colors hover:bg-amber-100 disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                  >
+                    <X size={30} className="mb-1" aria-hidden="true" />
+                    <span className="text-xl font-bold">{t('didnt_know')}</span>
+                    <span className="mt-1 text-base opacity-90">{t('didnt_know_hint')}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleAnswer(true)}
+                    disabled={isExiting}
+                    className="flex min-h-16 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-green-300 bg-green-50 py-4 text-green-800 transition-colors hover:bg-green-100 disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                  >
+                    <Check size={30} className="mb-1" aria-hidden="true" />
+                    <span className="text-xl font-bold">{t('knew_it')}</span>
+                    <span className="mt-1 text-base opacity-90">{t('knew_it_hint')}</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center bg-white p-6 sm:p-8">
+                <button
+                  type="button"
+                  onClick={() => setIsRevealed(true)}
+                  disabled={isExiting}
+                  className="w-full rounded-2xl bg-blue-600 py-6 text-2xl font-bold text-white shadow-md transition-all hover:bg-blue-500 hover:shadow-lg disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                >
+                  {t('reveal_solution')}
+                </button>
+              </div>
             )}
 
-            <div className="mt-4">
-              <SolutionAudioButton
-                text={displayWord}
-                audioUrl={card.audio_url}
-                label={t('listen_word')}
-                ariaLabel={t('listen_word_aria', { word: card.word_de })}
-                variant="secondary"
-              />
-            </div>
-
-            {feedback ? (
+            {saveFailed && (
               <div
                 role="status"
                 aria-live="polite"
-                className={cn(
-                  'mt-6 w-full rounded-2xl border-2 p-6 text-center',
-                  feedback.movedBack
-                    ? 'border-amber-200 bg-amber-50 text-amber-900'
-                    : 'border-green-200 bg-green-50 text-green-900'
-                )}
+                className="flex items-center gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4"
               >
-                <p className="text-xl font-bold">
-                  {feedback.becameLearned
-                    ? t('became_learned')
-                    : feedback.movedBack
-                      ? t('moved_back', { phase: feedback.phase })
-                      : feedback.intervalInDays <= 1
-                        ? t('moved_forward_tomorrow', { phase: feedback.phase })
-                        : t('moved_forward', { phase: feedback.phase, days: feedback.intervalInDays })}
-                </p>
-
-                {/* Kein automatischer Kartenwechsel: Der Lernende bestimmt das Tempo. */}
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="mt-4 inline-flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-gray-900 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-gray-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-                >
-                  {currentIndex + 1 >= session.length ? t('finish_session') : t('next_card')}
-                  <ArrowRight size={28} aria-hidden="true" />
-                </button>
-              </div>
-            ) : (
-              <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:gap-4">
-                <button
-                  type="button"
-                  onClick={() => void handleAnswer(false)}
-                  disabled={isSubmitting}
-                  className="flex min-h-16 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-amber-300 bg-amber-50 py-4 text-amber-800 transition-colors hover:bg-amber-100 disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-                >
-                  <X size={30} className="mb-1" aria-hidden="true" />
-                  <span className="text-xl font-bold">{t('didnt_know')}</span>
-                  <span className="mt-1 text-base opacity-90">{t('didnt_know_hint')}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => void handleAnswer(true)}
-                  disabled={isSubmitting}
-                  className="flex min-h-16 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-green-300 bg-green-50 py-4 text-green-800 transition-colors hover:bg-green-100 disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-                >
-                  <Check size={30} className="mb-1" aria-hidden="true" />
-                  <span className="text-xl font-bold">{t('knew_it')}</span>
-                  <span className="mt-1 text-base opacity-90">{t('knew_it_hint')}</span>
-                </button>
+                <CloudOff className="h-6 w-6 shrink-0 text-gray-500" aria-hidden="true" />
+                <p className="text-lg text-gray-600">{t('save_failed')}</p>
               </div>
             )}
           </div>
-        ) : (
-          <div className="flex items-center justify-center bg-white p-6 sm:p-8">
-            <button
-              type="button"
-              onClick={() => setIsRevealed(true)}
-              className="w-full rounded-2xl bg-blue-600 py-6 text-2xl font-bold text-white shadow-md transition-all hover:bg-blue-500 hover:shadow-lg focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-            >
-              {t('reveal_solution')}
-            </button>
-          </div>
-        )}
-
-        {saveFailed && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="flex items-center gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4"
-          >
-            <CloudOff className="h-6 w-6 shrink-0 text-gray-500" aria-hidden="true" />
-            <p className="text-lg text-gray-600">{t('save_failed')}</p>
-          </div>
-        )}
+        </div>
       </div>
 
       <p className="mt-4 text-center text-lg text-gray-500">{t('phase_explanation')}</p>
