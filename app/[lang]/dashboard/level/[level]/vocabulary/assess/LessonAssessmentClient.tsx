@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { BookmarkPlus, Check, CloudOff, PartyPopper } from 'lucide-react'
 import { submitLessonAssessment } from '@/app/actions/vocabulary'
