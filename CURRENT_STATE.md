@@ -6,9 +6,14 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 ## 1a. Änderungsprotokoll — 2026-09-06: SMTP Server-Only Isolation & Netlify Secret Leak Fix
 
 **Kernänderungen:**
+- **Ursache des Netlify Secret Scans:**
+  - Netlifys Secret-Scanner vergleicht den String-Wert von Umgebungsvariablen (z. B. `SMTP_USER="info@sitov-academy.com"`) mit den generierten statischen HTML-Seiten.
+  - Da `info@sitov-academy.com` gleichzeitig die offizielle, öffentliche Kontakt- und Impressums-E-Mail der Sprachschule ist (im Footer und JSON-LD Schema), schlug der Scanner fälschlicherweise Alarm (False Positive).
 - **Server-Only Isolation für Mailer:**
   - `lib/mail.ts`: Zentrales Mailer-Modul mit `import 'server-only'` und `sendEmail(options)` Helper. Verhindert, dass `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` oder `SMTP_FROM` jemals in Client-Bundles oder Edge-Umgebungen gelangen.
   - `app/actions/feedback.ts`: Direkte `nodemailer`-Aufrufe und inline-`process.env.SMTP_*`-Zugriffe durch `sendEmail()` aus `lib/mail.ts` ersetzt.
+- **Netlify Scanner Konfiguration (`netlify.toml`):**
+  - Ergänzung von `SECRETS_SCAN_OMIT_KEYS = "SMTP_USER,SMTP_FROM"`, damit Netlify den legitimen öffentlichen Text der E-Mail-Adresse nicht als Secret-Leak blockiert.
 - **Entkopplung öffentlicher E-Mail-Adressen:**
   - Öffentliche Kontakt- und Impressums-Adressen (`info@sitov-academy.com`) sind strikt als statische Textbausteine in den Dictionaries und Komponenten hinterlegt und greifen niemals auf `SMTP_USER` zu.
 
