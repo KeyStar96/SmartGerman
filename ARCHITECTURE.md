@@ -185,3 +185,8 @@ Es gibt keine Timer, keine Bestenlisten und keine Fehler-Metaphorik (kein Rot, k
 `recordExerciseAttempt` schreibt jeden Versuch fort und ruft **kein** `revalidatePath` auf — ein
 Refresh mitten im Durchlauf würde die Übungsliste neu filtern und die Indizes verschieben.
 Die Fortschrittsanzeigen werden erst über `finishExerciseSession` am Ende des Durchlaufs aktualisiert.
+
+### Konsolidierter Vokabeltrainer (ab 06.09.2026)
+- Die getrennte Route `/train` wurde in die Haupt-Lernseite (`VocabTrainerPageClient`) integriert.
+- Der State für die selektierten Lektionen (Lernkasten) bleibt im `localStorage`, synchronisiert sich aber sofort in derselben Ansicht.
+- Neue Server-Action: `resetLessonProgress` erlaubt das komplette Löschen des `user_vocabulary_progress` für eine spezifische Lektion.

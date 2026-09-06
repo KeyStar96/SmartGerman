@@ -4,6 +4,8 @@
 
 > **i18n-Update (2026-09-06):** Die Oberflächensprache folgt der bei der Registrierung gewählten Erstsprache und wird nach dem Login automatisch gesetzt; im Profil ist sie jederzeit über einen Sprachumschalter änderbar (Endonyme, große Bedienelemente). Grundsatz: Kein interner Fallback-String darf ungeübersetzt in der UI erscheinen – alle sieben Übersetzer-Sektionen sind in allen fünf Sprachen (de/en/uk/ru/tr) vollständig zu pflegen (Audit siehe `CURRENT_STATE.md` 1a). Routen-Segmente in Breadcrumbs müssen stets übersetzte Namen zeigen (`DASHBOARD_ROUTE_KEYS`).
 
+> **Vokabeltrainer-Konsolidierung (2026-09-06):** Reduktion der Komplexität durch Zusammenführung von Übersicht, Lektionen-Verwaltung (Lernkasten) und Training auf einer einzigen Seite (`VocabTrainerPageClient`). Einführung einer Onboarding-Logik ("Einstufen" vs. "Von Null starten") für neue Lektionen sowie eines Abfragerichtung-Umschalters (Muttersprache -> Zielsprache vs. Zielsprache -> Muttersprache), um verschiedenen Lernpräferenzen gerecht zu werden. Der Reset-Button wurde mit Sicherheitsabfrage prominent platziert.
+
 > **UX-Update (2026-09-06):** Mobile-First-Konventionen präzisiert (siehe `CURRENT_STATE.md` 1a): (1) Hover-Effekte gelten nur auf echten Zeigegeräten (`@media (hover: hover)` via Tailwind `hoverOnlyWhenSupported`); auf Touch gibt es nur kurzes `:active`-Druck-Feedback. (2) Großflächige Hintergründe als reiner CSS-Verlauf (kein Bild) gegen Color-Banding. (3) Im aktiven Lernmodus zählt „Karte + Aktion ohne Scrollen sichtbar": zusammengeführte Navigation, einzeilige Meta-Info, vertikal zentrierte 100dvh-Karte; Erklärtexte gehören ausschließlich in die Übersicht vor dem Start.
 
 **Research date:** 02 September 2026  

@@ -8,6 +8,16 @@
 - **Zweite Welle entfernt:** `FluidWaveform` zeichnet wieder nur die Siri-Sinus-Schichten. Keine Oszilloskop-Kurve mehr.
 - **Übungssätze A1–C2:** Katalog + Live-DB unverändert zum vorherigen Stand (A1.1–B1.2 eigene Sätze, Familien A1–C2).
 
+## 1a. Änderungsprotokoll — 2026-09-06: Vokabeltrainer Konsolidierung & Bugfixes
+
+**Kernänderungen:**
+- **Zentrale Ansicht:** Die Ansichten für Lektionen-Auswahl (Lernkasten) und das aktive Training wurden in `components/vocabulary/VocabTrainerPageClient.tsx` konsolidiert. Die separate Route `/train` wurde restlos entfernt. Die gesamte Steuerung (Auswählen, Einstufen, Abfragen) findet auf einer einzigen Seite statt.
+- **Onboarding für neue Lektionen:** Klickt ein Nutzer auf eine völlig neue Lektion, erscheint ein Onboarding-Modal. Er kann zwischen "Einstufen" (vorab bekannte Wörter aussortieren) und "Von Null starten" (alles in Phase 1 legen) wählen.
+- **Automatischer Import nach Einstufung:** `LessonAssessmentClient.tsx` wurde so angepasst, dass die Lektion nach Abschluss der Einstufung automatisch im Hintergrund (im `localStorage`) in die aktive Lernbox aufgenommen wird.
+- **Fortschritt zurücksetzen:** Ein Button "Lernfortschritt zurücksetzen" wurde am Ende der Vokabelliste in `LessonCardsModal.tsx` wieder integriert. Nach einer Sicherheitsabfrage löscht die neue Server-Action `resetLessonProgress` den kompletten Lernfortschritt für die ausgewählte Lektion.
+- **Abfragerichtung Umschalten:** In der Vokabelabfrage (`VocabCardSession`) gibt es nun oben im Header ein neues Icon zum Wechseln der Abfragerichtung (Muttersprache -> Zielsprache vs. Zielsprache -> Muttersprache).
+
+
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
 

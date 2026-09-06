@@ -606,3 +606,58 @@ export async function getLessonStats(level?: string): Promise<LessonStat[]> {
     return []
   }
 }
+
+/**
+ * Setzt den Lernfortschritt für eine bestimmte Lektion zurück.
+ * Löscht alle zugehörigen Einträge aus `user_vocabulary_progress`.
+ */
+export async function resetLessonProgress(lessonName: string, level?: string): Promise<{ success: boolean }> {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { success: false }
+
+    if (level) {
+      const profile = await loadLevelAccessProfile(supabase, user.id)
+      if (!hasLevelAccess(profile, level)) return { success: false }
+    }
+
+    // Finde zuerst alle card_ids für diese Lektion
+    let cardsQuery = supabase.from('vocabulary_cards').select('id').eq('lesson', lessonName)
+    if (level) {
+      cardsQuery = cardsQuery.eq('level', level)
+    }
+
+    const { data: cards, error: cardsError } = await cardsQuery
+
+    if (cardsError || !cards || cards.length === 0) {
+      console.error(`Karten der Lektion "${lessonName}" nicht ladbar:`, cardsError?.message)
+      return { success: false }
+    }
+
+    const cardIds = cards.map(c => c.id)
+
+    const { error: deleteError } = await supabase
+      .from('user_vocabulary_progress')
+      .delete()
+      .eq('user_id', user.id)
+      .in('card_id', cardIds)
+
+    if (deleteError) {
+      console.error('Fehler beim Zurücksetzen des Fortschritts:', deleteError.message)
+      return { success: false }
+    }
+
+    revalidatePath('/[lang]/dashboard', 'page')
+    revalidatePath('/[lang]/dashboard/level/[level]', 'page')
+    revalidatePath('/[lang]/dashboard/level/[level]/vocabulary', 'page')
+
+    return { success: true }
+  } catch (err) {
+    console.error('Unerwarteter Fehler in resetLessonProgress:', err)
+    return { success: false }
+  }
+}

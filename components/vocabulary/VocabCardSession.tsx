@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Check, CloudOff, Image as ImageIcon, PartyPopper, X } from 'lucide-react'
+import { ArrowLeft, Check, CloudOff, Image as ImageIcon, PartyPopper, X, ArrowRightLeft } from 'lucide-react'
 import SolutionAudioButton from '@/components/exercises/SolutionAudioButton'
 import { finishVocabularySession, submitVocabularyAnswer } from '@/app/actions/vocabulary'
 import {
@@ -27,6 +27,7 @@ interface VocabCardSessionProps {
 const EXIT_MS = 260
 
 type ExitDirection = 'left' | 'right' | null
+type QuizDirection = 'native-to-target' | 'target-to-native'
 
 /** Deutsches Wort inkl. Artikel, wie es aufgedeckt angezeigt wird. */
 function toDisplayWord(card: DueVocabularyCard['card']): string {
@@ -38,8 +39,12 @@ function toDisplayWord(card: DueVocabularyCard['card']): string {
  * für die vorgerenderte nächste Karte im Stapel verwendet – so ist das Bild der
  * Folgekarte bereits dekodiert, sobald sie aktiv wird.
  */
-function CardFront({ item, t }: { item: DueVocabularyCard; t: VocabularyTranslator }) {
+function CardFront({ item, t, direction }: { item: DueVocabularyCard; t: VocabularyTranslator; direction: QuizDirection }) {
   const { card } = item
+  const displayWord = direction === 'native-to-target' 
+    ? (item.translation || t('no_translation'))
+    : toDisplayWord(card)
+
   return (
     <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-4 sm:p-8">
       {card.image_url ? (
@@ -55,8 +60,11 @@ function CardFront({ item, t }: { item: DueVocabularyCard; t: VocabularyTranslat
         </div>
       )}
 
-      <h2 className="break-words text-center text-xl font-bold text-gray-800 sm:text-3xl">
-        {item.translation || t('no_translation')}
+      <h2 className={cn(
+        "break-words text-center text-xl font-bold sm:text-3xl",
+        direction === 'target-to-native' ? articleColorClass(card.article) : "text-gray-800"
+      )}>
+        {displayWord}
       </h2>
     </div>
   )
@@ -75,6 +83,7 @@ export default function VocabCardSession({
   /** Solange gesetzt, läuft die Exit-Animation der aktuellen Karte. */
   const [exitDirection, setExitDirection] = useState<ExitDirection>(null)
   const [saveFailed, setSaveFailed] = useState(false)
+  const [quizDirection, setQuizDirection] = useState<QuizDirection>('native-to-target')
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const t = useMemo(() => createVocabularyTranslator(translations), [translations])
@@ -169,7 +178,9 @@ export default function VocabCardSession({
     )
   }
 
-  const displayWord = toDisplayWord(currentCard.card)
+  const displayTargetWord = toDisplayWord(currentCard.card)
+  const displayNativeWord = currentCard.translation || t('no_translation')
+  
   const isExiting = exitDirection !== null
 
   /*
@@ -205,8 +216,15 @@ export default function VocabCardSession({
         <p className="min-w-0 flex-1 text-center text-sm font-semibold text-gray-600 sm:text-base">
           {metaLine}
         </p>
-        {/* Symmetrie-Platzhalter, damit die Meta-Zeile optisch mittig bleibt. */}
-        <span className="h-11 w-11 shrink-0" aria-hidden="true" />
+        <button
+          type="button"
+          onClick={() => setQuizDirection(prev => prev === 'native-to-target' ? 'target-to-native' : 'native-to-target')}
+          title="Abfragerichtung ändern"
+          aria-label="Abfragerichtung ändern"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+        >
+          <ArrowRightLeft size={20} aria-hidden="true" />
+        </button>
       </div>
 
       {/* Karte im verbleibenden Bereich vertikal zentriert – ohne Scrollen. */}
@@ -233,7 +251,7 @@ export default function VocabCardSession({
               )}
             >
               <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
-                <CardFront item={nextCard} t={t} />
+                <CardFront item={nextCard} t={t} direction={quizDirection} />
                 <div className="flex items-center justify-center bg-white p-4 sm:p-8">
                   <div className="w-full rounded-2xl bg-blue-600 py-4 text-center text-xl font-bold text-white shadow-md sm:py-6 sm:text-2xl">
                     {t('reveal_solution')}
@@ -252,20 +270,20 @@ export default function VocabCardSession({
             )}
           >
             <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
-              <CardFront item={currentCard} t={t} />
+              <CardFront item={currentCard} t={t} direction={quizDirection} />
 
               {isRevealed ? (
                 <div className="flex flex-col items-center justify-center bg-white p-4 sm:p-8">
                   <span
                     className={cn(
                       'break-words text-center text-2xl font-extrabold sm:text-4xl',
-                      articleColorClass(currentCard.card.article)
+                      quizDirection === 'native-to-target' ? articleColorClass(currentCard.card.article) : 'text-gray-800'
                     )}
                   >
-                    {displayWord}
+                    {quizDirection === 'native-to-target' ? displayTargetWord : displayNativeWord}
                   </span>
 
-                  {currentCard.card.plural && (
+                  {quizDirection === 'native-to-target' && currentCard.card.plural && (
                     <p className="mt-1 text-lg text-gray-500 sm:mt-2 sm:text-xl">
                       {t('plural_label', { plural: currentCard.card.plural })}
                     </p>
@@ -273,7 +291,7 @@ export default function VocabCardSession({
 
                   <div className="mt-3 sm:mt-4">
                     <SolutionAudioButton
-                      text={displayWord}
+                      text={displayTargetWord}
                       audioUrl={currentCard.card.audio_url}
                       label={t('listen_word')}
                       ariaLabel={t('listen_word_aria', { word: currentCard.card.word_de })}

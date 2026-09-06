@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { BookmarkPlus, Check, CloudOff, PartyPopper } from 'lucide-react'
 import { submitLessonAssessment } from '@/app/actions/vocabulary'
+import { loadLernkastenSelection, saveLernkastenSelection } from '@/lib/vocabulary-lernkasten'
 import { createVocabularyTranslator, type VocabularyTranslations } from '@/lib/vocabulary-i18n'
 import { articleColorClass } from '@/lib/vocabulary-ui'
 import type { LessonCardView } from '@/lib/types/vocabulary'
@@ -71,6 +72,16 @@ export default function LessonAssessmentClient({
     },
     [currentCard, isSubmitting]
   )
+
+  // Automatisch in die Lernbox aufnehmen, wenn Einstufung beendet ist
+  useEffect(() => {
+    if (!currentCard) {
+      const saved = loadLernkastenSelection(level) || []
+      if (!saved.includes(lessonName)) {
+        saveLernkastenSelection(level, [...saved, lessonName])
+      }
+    }
+  }, [currentCard, level, lessonName])
 
   if (!currentCard) {
     return (

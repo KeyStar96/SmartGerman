@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useMemo, useState, type FormEvent, type WheelEvent } from 'react'
 import { CloudOff, Loader2, Plus, Trash2, X } from 'lucide-react'
-import { addCardsToTrainer, getLessonCards } from '@/app/actions/vocabulary'
+import { addCardsToTrainer, getLessonCards, resetLessonProgress } from '@/app/actions/vocabulary'
 import {
   addCustomVocabulary,
   loadCustomVocabulary,
@@ -79,6 +79,8 @@ export default function LessonCardsModal({
   const [customWord, setCustomWord] = useState('')
   const [customTranslation, setCustomTranslation] = useState('')
   const [customError, setCustomError] = useState(false)
+  const [isResetting, setIsResetting] = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   useEffect(() => {
     setCustomCards(loadCustomVocabulary(level, lesson))
@@ -184,6 +186,26 @@ export default function LessonCardsModal({
     },
     [lesson, level]
   )
+
+  const handleResetProgress = useCallback(async () => {
+    setIsResetting(true)
+    try {
+      const result = await resetLessonProgress(lesson, level)
+      if (result.success) {
+        // Refresh cards
+        const cards = await getLessonCards(lesson, level)
+        setCardsState(cards)
+        setShowResetConfirm(false)
+        onCardAdded() // trigger parent refresh
+      } else {
+        console.error('Fehler beim Zurücksetzen des Fortschritts')
+      }
+    } catch (err) {
+      console.error('Unerwarteter Fehler beim Zurücksetzen:', err)
+    } finally {
+      setIsResetting(false)
+    }
+  }, [lesson, level, onCardAdded])
 
   return (
     <div
@@ -438,6 +460,46 @@ export default function LessonCardsModal({
                 <p role="status" aria-live="polite" className="mt-4 text-lg font-medium text-amber-700 dark:text-amber-400">
                   {t('manual_add_failed')}
                 </p>
+              )}
+
+              {/* Reset Progress Section */}
+              {Array.isArray(cardsState) && cardsState.some((c) => c.phase !== null) && (
+                <div className="mt-8 border-t border-gray-200 pt-6 dark:border-slate-800">
+                  {showResetConfirm ? (
+                    <div className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/30">
+                      <p className="mb-4 text-lg font-bold text-red-900 dark:text-red-100">
+                        Bist du sicher? Alle Fortschritte in dieser Lektion werden gelöscht.
+                      </p>
+                      <div className="flex gap-4">
+                        <button
+                          type="button"
+                          onClick={handleResetProgress}
+                          disabled={isResetting}
+                          className="inline-flex min-h-12 items-center justify-center rounded-xl bg-red-600 px-6 font-bold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+                        >
+                          {isResetting ? <Loader2 size={20} className="animate-spin" /> : 'Ja, zurücksetzen'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowResetConfirm(false)}
+                          disabled={isResetting}
+                          className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-gray-300 bg-white px-6 font-bold text-gray-700 transition-colors hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                        >
+                          Abbrechen
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowResetConfirm(true)}
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      <Trash2 size={20} />
+                      <span className="font-bold underline underline-offset-4">Lernfortschritt zurücksetzen</span>
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}
