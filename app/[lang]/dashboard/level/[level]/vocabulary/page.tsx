@@ -24,7 +24,7 @@ export default async function VocabularyOverviewPage({
   const levelSegment = encodeURIComponent(decodedLevel)
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-4xl rounded-3xl bg-white p-5 py-8 shadow-sm ring-1 ring-gray-900/5 sm:p-8">
+    <div className="mx-auto min-h-screen w-full max-w-4xl rounded-3xl bg-white p-6 py-8 shadow-sm ring-1 ring-gray-900/5 sm:p-10">
       <Link
         href={`/${lang}/dashboard/level/${levelSegment}`}
         className="mb-4 inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800"
@@ -60,12 +60,12 @@ export default async function VocabularyOverviewPage({
       <h2 className="mb-6 text-2xl font-bold text-gray-900">{t('your_sets')}</h2>
 
       {stats.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 py-12 text-center">
+        <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center sm:p-12">
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
             <BookOpenCheck className="h-10 w-10 text-blue-600" aria-hidden="true" />
           </div>
-          <p className="text-xl font-bold text-gray-800">{t('no_sets')}</p>
-          <p className="mx-auto mt-2 max-w-md text-lg text-gray-600">{t('no_sets_hint')}</p>
+          <p className="break-words text-xl font-bold text-gray-800">{t('no_sets')}</p>
+          <p className="mx-auto mt-2 max-w-md break-words text-lg text-gray-600">{t('no_sets_hint')}</p>
         </div>
       ) : (
         <LessonList stats={stats} lang={lang} level={decodedLevel} translations={translations} />

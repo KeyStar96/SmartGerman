@@ -143,7 +143,7 @@ export default function VocabTrainerClient({
       {/* Kompakte Karte: kleinere Innenabstände als früher, damit sie auf Laptop-Displays (13"/14") möglichst ohne Scrollen komplett sichtbar ist. Wird sie trotzdem zu groß, scrollt die Seite jetzt einfach natürlich statt abzuschneiden. */}
       <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
         {/* Vorderseite: Muttersprache */}
-        <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-5 sm:p-8">
+        <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-6 sm:p-8">
           {card.image_url ? (
             <img
               src={card.image_url}
@@ -162,7 +162,7 @@ export default function VocabTrainerClient({
         </div>
 
         {isRevealed ? (
-          <div className="flex flex-col items-center justify-center bg-white p-5 sm:p-8">
+          <div className="flex flex-col items-center justify-center bg-white p-6 sm:p-8">
             <span className={cn('break-words text-center text-2xl font-extrabold sm:text-4xl', articleColorClass(card.article))}>
               {displayWord}
             </span>
@@ -186,7 +186,7 @@ export default function VocabTrainerClient({
                 role="status"
                 aria-live="polite"
                 className={cn(
-                  'mt-6 w-full rounded-2xl border-2 p-5 text-center',
+                  'mt-6 w-full rounded-2xl border-2 p-6 text-center',
                   feedback.movedBack
                     ? 'border-amber-200 bg-amber-50 text-amber-900'
                     : 'border-green-200 bg-green-50 text-green-900'
@@ -239,7 +239,7 @@ export default function VocabTrainerClient({
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center bg-white p-5 sm:p-8">
+          <div className="flex items-center justify-center bg-white p-6 sm:p-8">
             <button
               type="button"
               onClick={() => setIsRevealed(true)}

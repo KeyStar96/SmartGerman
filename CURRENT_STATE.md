@@ -173,6 +173,14 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 
 **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, neue Unit-Tests grün. Live-Klick im Browser nicht möglich (kein laufender Dev-Server, keine Browser-Tools in dieser Session).
 
+## 4h. Globale UI-Fixes: Padding, keine Silbentrennung, Niveau-Farbcodierung (2026-09-06)
+
+- **Keine automatische Silbentrennung mehr:** Die globale `p`-Regel in `app/globals.css` nutzte `text-justify hyphens-auto` und trennte Wörter an unnatürlichen Stellen (für die ältere Zielgruppe irritierend). Neu: `text-left` + `hyphens: none` (inkl. `-webkit-`/`-ms-`-Präfix) und `overflow-wrap: break-word`. Blocksatz entfernt, damit ohne Silbentrennung keine hässlichen Wortlücken (Rivers) entstehen. Keine weiteren `hyphens-auto`/`text-justify`-Vorkommen im Projekt.
+- **Mehr Padding auf Hinweis-/Card-Containern:** Der Empty-State „Für dieses Sprachniveau gibt es noch keine Lernsets…" (`app/[lang]/dashboard/level/[level]/vocabulary/page.tsx`) hatte nur vertikales `py-12` ohne Seitenabstand – Text klebte am Rand. Jetzt `p-8 sm:p-12` (+ `break-words`). Äußerer Übersichts-Container von `p-5` auf `p-6 sm:p-10` erhöht. Trainer-Kartenflächen (`VocabTrainerClient.tsx`) von `p-5` auf `p-6` (Vorder-/Rückseite, Aufdeck-Bereich, Feedback-Box).
+- **Niveau-Farbcodierung statt Abdunklung:** Bisher wurden die Icon-Verläufe der Niveaus (`app/[lang]/dashboard/page.tsx`) mit steigendem Level immer dunkler (`#FF5C00` → `#993500`), was wie ein deaktivierter/ausgegrauter Zustand wirkte. Neu: Helper `levelVisual(levelId)` in `lib/vocabulary-ui.ts` liefert pro CEFR-Stufe eine eigene Farbwelt (A1 Smaragd/Türkis, A2 Himmelblau, B1 Marken-Orange, B2 Rosé/Pink, C1 Violett, C2 Gold) mit `gradient`/`bar`/`soft`/`text`-Klassen inkl. Dark-Mode. Die Riesen-Hintergrundzahl wurde durch ein klar lesbares, farbcodiertes Niveau-Badge ersetzt.
+- **Tailwind-Content erweitert:** `tailwind.config.ts` scannt nun auch `./lib/**`, damit die statischen Farbklassen aus `levelVisual`/`phaseBarClasses` zuverlässig generiert werden.
+- **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei. Kein `any`, keine neuen Server Actions/DB-Änderungen.
+
 ## 5. Hosting
 - Die Lernplattform läuft auf **Netlify** (`netlify.toml`, `@netlify/plugin-nextjs`). `NEXT_PUBLIC_SITE_URL` ist dort auf `https://www.sitov-academy.com` gesetzt. Derselbe Satz gilt für Vercel Production (Dashboard → Environment Variables).
 - Caching muss für Server Components (z.B. Kurslisten) korrekt eingestellt werden, um Ladezeiten zu minimieren.

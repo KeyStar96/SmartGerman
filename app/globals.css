@@ -1037,6 +1037,16 @@ html.dark {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+/*
+ * Kein automatischer Silbenumbruch mehr: `hyphens: auto` trennte Wörter an
+ * unnatürlichen Stellen (gerade für unsere ältere Zielgruppe irritierend).
+ * Ohne Silbentrennung würde `text-justify` außerdem hässliche Lücken (Rivers)
+ * erzeugen – deshalb linksbündig mit sauberem, normalem Zeilenumbruch.
+ */
 p {
-  @apply text-justify hyphens-auto;
+  @apply text-left;
+  hyphens: none;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  overflow-wrap: break-word;
 }

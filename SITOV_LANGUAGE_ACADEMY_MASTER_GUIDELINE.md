@@ -1769,6 +1769,12 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-06 — Globale UI-Fixes: Padding, keine Silbentrennung, Niveau-Farbcodierung
+- **Silbentrennung aus:** Globale `p`-Regel in `app/globals.css` von `text-justify hyphens-auto` auf `text-left` + `hyphens: none` (+ `-webkit-`/`-ms-`) + `overflow-wrap: break-word` umgestellt. Grund: Automatische Trennung zerschnitt Wörter an unnatürlichen Stellen – für die Zielgruppe irritierend und schlechter lesbar. Blocksatz entfernt, damit keine Wortlücken/Rivers entstehen.
+- **Mehr Padding:** Hinweis-/Empty-State-Container (u.a. „Für dieses Sprachniveau gibt es noch keine Lernsets…") und Trainer-Kartenflächen haben jetzt rundum ausreichenden Innenabstand (`p-6`/`p-8`/`sm:p-12` statt knappem `py-12`/`p-5`), damit Text nicht am Rand klebt.
+- **Niveau-Farbcodierung statt Abdunklung:** Höhere Niveaus wirkten durch zunehmend dunklere Icons wie deaktiviert. Neu: `levelVisual(levelId)` in `lib/vocabulary-ui.ts` gibt jeder CEFR-Stufe eine eigene, elegante Farbwelt (A frisch: Smaragd/Himmelblau · B kräftig: Orange/Rosé · C edel: Violett/Gold) plus klar lesbares Niveau-Badge. `tailwind.config.ts` scannt dafür jetzt auch `./lib/**`.
+- QS: `tsc --noEmit` fehlerfrei; kein `any`, keine DB-/Server-Action-Änderungen.
+
 ### 2026-09-03 — Vokabel-Modal: Scroll-Fix, Tabs, eigene Vokabeln & Phasen-Diagramm
 - **Scroll:** Dialog `max-h-[calc(100vh-6rem)] flex flex-col`; Header `flex-shrink-0`; Body `flex-1 min-h-0 overflow-y-auto overscroll-contain` plus `.modal-scroll-region` (`-webkit-overflow-scrolling: touch`). `data-lenis-prevent` am Dialog, damit Lenis Trackpad-/Mausrad-Gesten nicht schluckt.
 - **Tabs:** Wörterliste und Phasen-Verteilung (`role="tablist"`), Texte in `dictionaries/{de,en,ru,uk,tr}.json`.
