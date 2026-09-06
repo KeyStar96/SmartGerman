@@ -32,6 +32,7 @@ export default function LessonAssessmentClient({
   level,
   translations = {},
 }: LessonAssessmentClientProps) {
+  const [sessionCards] = useState(cards)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
@@ -41,7 +42,7 @@ export default function LessonAssessmentClient({
   const t = useMemo(() => createVocabularyTranslator(translations), [translations])
   const overviewHref = `/${lang}/dashboard/level/${encodeURIComponent(level)}/vocabulary`
   const trainHref = `${overviewHref}/train`
-  const currentCard = cards[currentIndex]
+  const currentCard = sessionCards[currentIndex]
 
   const handleDecision = useCallback(
     async (alreadyKnown: boolean): Promise<void> => {
@@ -124,7 +125,7 @@ export default function LessonAssessmentClient({
     <div className="mx-auto mt-2 max-w-2xl">
       <div className="mb-6 flex flex-col gap-3 text-lg font-medium text-gray-600 sm:flex-row sm:items-center sm:justify-between">
         <span>{t('lesson_label', { lesson: stripLessonPrefix(lessonName) })}</span>
-        <span>{t('card_progress', { current: currentIndex + 1, total: cards.length })}</span>
+        <span>{t('card_progress', { current: currentIndex + 1, total: sessionCards.length })}</span>
       </div>
 
       <div className="flex min-h-[20rem] flex-col items-center justify-center overflow-hidden rounded-3xl bg-white p-6 text-center shadow-xl ring-1 ring-gray-900/10 sm:p-10">

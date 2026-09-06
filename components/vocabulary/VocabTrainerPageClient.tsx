@@ -183,14 +183,6 @@ export default function VocabTrainerPageClient({
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-4xl rounded-3xl bg-white p-4 py-6 shadow-sm ring-1 ring-gray-900/5 sm:p-10">
-      <div className="mb-4">
-        <Link
-          href={overviewHref}
-          className="inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800 active:text-blue-900 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-        >
-          <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_level')}
-        </Link>
-      </div>
 
       <div className="mb-8 border-b border-gray-200 pb-6">
         <h1 className="break-words text-3xl font-extrabold text-gray-900 sm:text-4xl">{t('title')}</h1>

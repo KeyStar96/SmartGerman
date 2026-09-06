@@ -46,7 +46,7 @@ function CardFront({ item, t, direction }: { item: DueVocabularyCard; t: Vocabul
     : toDisplayWord(card)
 
   return (
-    <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-4 sm:p-8">
+    <div className="flex flex-col items-center justify-center border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 p-4 sm:p-8">
       {card.image_url ? (
         <img
           src={card.image_url}
@@ -55,14 +55,14 @@ function CardFront({ item, t, direction }: { item: DueVocabularyCard; t: Vocabul
           className="mb-3 h-24 w-24 max-w-full rounded-2xl object-cover shadow-md sm:mb-6 sm:h-36 sm:w-36"
         />
       ) : (
-        <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-200 text-gray-400 shadow-inner sm:mb-6 sm:h-24 sm:w-24">
+        <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-200 dark:bg-slate-800 text-gray-400 dark:text-slate-500 shadow-inner sm:mb-6 sm:h-24 sm:w-24">
           <ImageIcon size={40} aria-hidden="true" />
         </div>
       )}
 
       <h2 className={cn(
         "break-words text-center text-xl font-bold sm:text-3xl",
-        direction === 'target-to-native' ? articleColorClass(card.article) : "text-gray-800"
+        direction === 'target-to-native' ? articleColorClass(card.article) : "text-gray-800 dark:text-slate-200"
       )}>
         {displayWord}
       </h2>
@@ -209,11 +209,11 @@ export default function VocabCardSession({
           type="button"
           onClick={onBackToLernkasten}
           aria-label={t('lernkasten_back')}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-blue-600 dark:text-blue-400 transition-colors hover:bg-blue-50 dark:hover:bg-blue-950 active:bg-blue-100 dark:active:bg-blue-900 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
         >
           <ArrowLeft size={24} aria-hidden="true" />
         </button>
-        <p className="min-w-0 flex-1 text-center text-sm font-semibold text-gray-600 sm:text-base">
+        <p className="min-w-0 flex-1 text-center text-sm font-semibold text-gray-600 dark:text-slate-400 sm:text-base">
           {metaLine}
         </p>
         <button
@@ -221,9 +221,9 @@ export default function VocabCardSession({
           onClick={() => setQuizDirection(prev => prev === 'native-to-target' ? 'target-to-native' : 'native-to-target')}
           title="Abfragerichtung ändern"
           aria-label="Abfragerichtung ändern"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+          className="flex h-9 px-3 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 text-sm font-bold transition-colors hover:bg-blue-100 dark:hover:bg-blue-900 active:bg-blue-200 dark:active:bg-blue-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
         >
-          <ArrowRightLeft size={20} aria-hidden="true" />
+          {quizDirection === 'native-to-target' ? '🌍 ➔ 🇩🇪' : '🇩🇪 ➔ 🌍'}
         </button>
       </div>
 
@@ -246,13 +246,13 @@ export default function VocabCardSession({
               aria-hidden="true"
               className={cn(
                 // Nur Skalierung/Opacity, KEINE Richtungs-Verschiebung (kein translateX/Y).
-                'z-0 self-start [grid-area:1/1] transition-[transform,opacity] duration-[260ms] ease-out motion-reduce:transition-none',
+                'z-0 self-center [grid-area:1/1] transition-[transform,opacity] duration-[260ms] ease-out motion-reduce:transition-none',
                 isExiting ? 'scale-100 opacity-100' : 'scale-[0.95] opacity-90'
               )}
             >
-              <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
+              <div className="flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-xl ring-1 ring-gray-900/10 dark:ring-slate-800">
                 <CardFront item={nextCard} t={t} direction={quizDirection} />
-                <div className="flex items-center justify-center bg-white p-4 sm:p-8">
+                <div className="flex items-center justify-center bg-white dark:bg-slate-900 p-4 sm:p-8">
                   <div className="w-full rounded-2xl bg-blue-600 py-4 text-center text-xl font-bold text-white shadow-md sm:py-6 sm:text-2xl">
                     {t('reveal_solution')}
                   </div>
@@ -264,27 +264,27 @@ export default function VocabCardSession({
           <div
             key={currentCard.progressId}
             className={cn(
-              'z-10 self-start [grid-area:1/1] transition-all duration-[260ms] ease-in will-change-transform motion-reduce:transition-none',
+              'z-10 self-center [grid-area:1/1] transition-all duration-[260ms] ease-in will-change-transform motion-reduce:transition-none',
               exitDirection === 'right' && 'translate-x-[130%] rotate-[8deg] opacity-0',
               exitDirection === 'left' && '-translate-x-[130%] -rotate-[8deg] opacity-0'
             )}
           >
-            <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
+            <div className="flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-xl ring-1 ring-gray-900/10 dark:ring-slate-800">
               <CardFront item={currentCard} t={t} direction={quizDirection} />
 
               {isRevealed ? (
-                <div className="flex flex-col items-center justify-center bg-white p-4 sm:p-8">
+                <div className="flex flex-col items-center justify-center bg-white dark:bg-slate-900 p-4 sm:p-8">
                   <span
                     className={cn(
                       'break-words text-center text-2xl font-extrabold sm:text-4xl',
-                      quizDirection === 'native-to-target' ? articleColorClass(currentCard.card.article) : 'text-gray-800'
+                      quizDirection === 'native-to-target' ? articleColorClass(currentCard.card.article) : 'text-gray-800 dark:text-slate-200'
                     )}
                   >
                     {quizDirection === 'native-to-target' ? displayTargetWord : displayNativeWord}
                   </span>
 
                   {quizDirection === 'native-to-target' && currentCard.card.plural && (
-                    <p className="mt-1 text-lg text-gray-500 sm:mt-2 sm:text-xl">
+                    <p className="mt-1 text-lg text-gray-500 dark:text-slate-400 sm:mt-2 sm:text-xl">
                       {t('plural_label', { plural: currentCard.card.plural })}
                     </p>
                   )}
@@ -305,7 +305,7 @@ export default function VocabCardSession({
                       type="button"
                       onClick={() => handleAnswer(false)}
                       disabled={isExiting}
-                      className="flex min-h-14 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-amber-300 bg-amber-50 py-3 text-amber-800 transition-colors hover:bg-amber-100 active:bg-amber-200 disabled:opacity-60 sm:min-h-16 sm:py-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                      className="flex min-h-14 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-amber-300 dark:border-amber-700/50 bg-amber-50 dark:bg-amber-950/30 py-3 text-amber-800 dark:text-amber-500 transition-colors hover:bg-amber-100 dark:hover:bg-amber-900/50 active:bg-amber-200 dark:active:bg-amber-900/80 disabled:opacity-60 sm:min-h-16 sm:py-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
                     >
                       <X size={28} className="mb-0.5 sm:mb-1" aria-hidden="true" />
                       <span className="text-lg font-bold sm:text-xl">{t('didnt_know')}</span>
@@ -316,7 +316,7 @@ export default function VocabCardSession({
                       type="button"
                       onClick={() => handleAnswer(true)}
                       disabled={isExiting}
-                      className="flex min-h-14 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-green-300 bg-green-50 py-3 text-green-800 transition-colors hover:bg-green-100 active:bg-green-200 disabled:opacity-60 sm:min-h-16 sm:py-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                      className="flex min-h-14 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-green-300 dark:border-green-700/50 bg-green-50 dark:bg-green-950/30 py-3 text-green-800 dark:text-green-500 transition-colors hover:bg-green-100 dark:hover:bg-green-900/50 active:bg-green-200 dark:active:bg-green-900/80 disabled:opacity-60 sm:min-h-16 sm:py-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
                     >
                       <Check size={28} className="mb-0.5 sm:mb-1" aria-hidden="true" />
                       <span className="text-lg font-bold sm:text-xl">{t('knew_it')}</span>
@@ -325,7 +325,7 @@ export default function VocabCardSession({
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-center bg-white p-4 sm:p-8">
+                <div className="flex items-center justify-center bg-white dark:bg-slate-900 p-4 sm:p-8">
                   <button
                     type="button"
                     onClick={() => setIsRevealed(true)}

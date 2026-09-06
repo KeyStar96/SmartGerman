@@ -31,6 +31,7 @@ const STANDARD_MIME_CANDIDATES = [
 ] as const
 
 let sharedContext: AudioContext | null = null
+let sharedMicContext: AudioContext | null = null
 
 export function prefersMp4Recording(userAgent: string, maxTouchPoints: number): boolean {
   const ua = userAgent
@@ -82,6 +83,20 @@ export function ensureAudioContext(): AudioContext | null {
   if (!Ctor) return null
   sharedContext = new Ctor()
   return sharedContext
+}
+
+/**
+ * Ein separater AudioContext für die Mikrofon-Visualisierung. 
+ * Löst einen iOS-Safari-Bug, bei dem `MediaStreamAudioSourceNode` stumm
+ * bleibt, wenn der Context *vor* getUserMedia (mit einer abweichenden
+ * Sample-Rate) erzeugt wurde. Wird *nach* getUserMedia initialisiert.
+ */
+export function ensureMicContext(): AudioContext | null {
+  if (sharedMicContext && sharedMicContext.state !== 'closed') return sharedMicContext
+  const Ctor = audioContextConstructor()
+  if (!Ctor) return null
+  sharedMicContext = new Ctor()
+  return sharedMicContext
 }
 
 export async function unlockAudioContext(): Promise<AudioContext | null> {

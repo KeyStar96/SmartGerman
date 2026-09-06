@@ -1,5 +1,22 @@
 # Current State Analysis (Ist-Zustand)
 
+## 1a. Änderungsprotokoll — 2026-09-06: Audio-Recorder UI & Safari Sample-Rate Bugfix
+
+**Kernänderungen:**
+- **Audio-WaveForm UI (Studenten):** In `AudioRecorder.tsx` wurde die Darstellung der Waveform (Aufnahme & Wiedergabe) exakt an das Design des Lehrerdashboards angeglichen. Der Löschen-Button (Papierkorb) steht nun als kompaktes Element direkt neben dem `WaveformPlayer`.
+- **Safari Sample-Rate Bugfix (Lehrer-Dashboard):** `web-audio.ts` stellt nun einen dedizierten `ensureMicContext()` bereit. Dies behebt einen WebKit/iOS-Bug: Wenn der globale `AudioContext` auf Seite der Wiedergabe (z. B. durch initiale `WaveformPlayer` auf der Lehrerseite) mit 44.1kHz instanziiert wurde, und danach `getUserMedia` das Mikrofon (oft 48kHz auf iOS) aktivierte, blieb der `MediaStreamAudioSourceNode` stumm. Der Analyser für die Mikrofon-Visualisierung nutzt nun konsequent diesen dedizierten, erst *nach* `getUserMedia` initialisierten Context, sodass die Waveform wieder flüssig auf Input reagiert.
+- **Text-Überlappung behoben:** Im `PendingSubmissionCard.tsx` (Lehrerdashboard) überlagerten sich bei aktiver Übersetzung (z.B. Chrome Translate) der Text "Feedback freigeben" und "Feedback wird gesendet...", weil React durch die extern eingefügten `<font>`-Tags den DOM-Tree nicht mehr sauber austauschen konnte. Dies wurde behoben, indem beide Texte permanent als `<span>` gerendert und nur über Tailwind `hidden` bzw. `flex` umgeschaltet werden.
+
+## 1a. Änderungsprotokoll — 2026-09-06: Vokabeltrainer & Grammatikübungen (Bugfixes & Dark Mode)
+
+**Kernänderungen:**
+- **Vokabeltrainer Überspringen-Bug:** In `LessonAssessmentClient.tsx` wird das `cards`-Array nun per `useState` eingefroren. Dadurch verschiebt sich der Index nicht mehr unerwartet, falls ein Hintergrund-Fetch durch `revalidatePath` die Liste der unbearbeiteten Karten aktualisiert.
+- **Vokabeltrainer Layout-Flackern:** In `VocabCardSession.tsx` wurde die Grid-Zentrierung von `self-start` auf `self-center` korrigiert. Damit tauchen ungelöste und verdeckte Vokabelkarten exakt an der gleichen Stelle wie die umgedrehten Karten auf, ohne am oberen Bildschirmrand zu flackern.
+- **Vokabeltrainer Sprachwechsel-Button:** Das schwer verständliche Pfeil-Icon wurde durch textliche Buttons (`🌍 ➔ 🇩🇪` bzw. `🇩🇪 ➔ 🌍`) ersetzt, die den Nutzern auf den ersten Blick ihre gewählte Abfragerichtung deutlich machen.
+- **Vokabeltrainer Navigations-Korrektur:** In `VocabTrainerPageClient.tsx` und der `page.tsx` des Assess-Modus wurden die redundanten "Zurück zur Übersicht"-Pfeile entfernt, da die Hauptnavigation (`DashboardHeader`) diese Aufgabe einheitlich für alle Sprachniveaus übernimmt.
+- **Grammatikübungen Dark Mode:** Für `ExerciseClient.tsx`, `MultipleChoiceExercise.tsx`, `FillInBlankExercise.tsx` und `SmartHintPanel.tsx` wurden umfassend Dark Mode Tailwind-Klassen (`dark:bg-slate-900`, `dark:text-slate-100`, `dark:border-slate-800` etc.) ergänzt. Die Übungen blenden damit nachts nicht mehr mit extrem harten, weißen Kontrasten und binden sich visuell nahtlos ins restliche Design ein.
+
+
 ## 1a. Änderungsprotokoll — 2026-09-06: iOS-Ton über HTML-Audio/WAV, eine Sinus-Welle
 
 **Kernänderungen:**

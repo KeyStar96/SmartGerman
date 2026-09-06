@@ -26,12 +26,6 @@ export default async function VocabularyAssessPage({
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-4xl rounded-3xl bg-white p-5 py-8 shadow-sm ring-1 ring-gray-900/5 sm:p-8">
-      <Link
-        href={overviewHref}
-        className="mb-4 inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800"
-      >
-        <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_overview')}
-      </Link>
 
       <div className="mb-6 border-b border-gray-200 pb-6">
         <h1 className="flex items-center gap-3 break-words text-3xl font-extrabold text-gray-900 sm:text-4xl">

@@ -188,15 +188,12 @@ export default function PendingSubmissionCard({ sub, onSubmit }: PendingSubmissi
             disabled={(!feedbackText.trim() && !recorder.audioBlob) || isSubmitting}
             className="mt-auto flex items-center justify-center gap-3 w-full min-h-[56px] bg-[#FF5C00] hover:bg-[#e05200] text-white px-6 py-4 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-orange-500/20"
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-6 w-6 animate-spin" /> Feedback wird gesendet...
-              </>
-            ) : (
-              <>
-                <Send className="h-5 w-5" /> Feedback freigeben
-              </>
-            )}
+            <span className={isSubmitting ? 'flex items-center gap-3' : 'hidden'}>
+              <Loader2 className="h-6 w-6 animate-spin" /> Feedback wird gesendet...
+            </span>
+            <span className={!isSubmitting ? 'flex items-center gap-3' : 'hidden'}>
+              <Send className="h-5 w-5" /> Feedback freigeben
+            </span>
           </button>
         </div>
       </div>

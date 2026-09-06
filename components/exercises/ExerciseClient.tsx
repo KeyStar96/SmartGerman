@@ -56,12 +56,12 @@ export default function ExerciseClient({
 
   if (session.length === 0) {
     return (
-      <div className="rounded-3xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-900/5 sm:p-12">
+      <div className="rounded-3xl bg-white dark:bg-slate-900 p-6 text-center shadow-sm ring-1 ring-gray-900/5 dark:ring-slate-800 sm:p-12">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
           <BookOpenCheck className="h-10 w-10 text-blue-600" aria-hidden="true" />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900">{t('no_exercises')}</h2>
-        <p className="mx-auto mt-3 max-w-lg text-xl text-gray-600">{t('no_exercises_hint')}</p>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-slate-100">{t('no_exercises')}</h2>
+        <p className="mx-auto mt-3 max-w-lg text-xl text-gray-600 dark:text-slate-400">{t('no_exercises_hint')}</p>
         <Link
           href={`/${lang}/dashboard/level/${encodeURIComponent(level)}`}
           className="mt-8 inline-flex min-h-16 items-center rounded-2xl bg-blue-600 px-8 py-4 text-xl font-bold text-white shadow-md transition-colors hover:bg-blue-500"
@@ -94,7 +94,7 @@ export default function ExerciseClient({
   const progressPercent = Math.round((currentIndex / session.length) * 100)
 
   return (
-    <div className="overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
+    <div className="overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-lg ring-1 ring-gray-900/5 dark:ring-slate-800">
       <div className="bg-blue-600 px-5 py-5 text-white sm:px-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <span className="break-words text-lg font-medium opacity-90">
@@ -146,10 +146,10 @@ export default function ExerciseClient({
         <div
           role="status"
           aria-live="polite"
-          className="flex items-center gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4 sm:px-10"
+          className="flex items-center gap-3 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 px-6 py-4 sm:px-10"
         >
           <CloudOff className="h-6 w-6 shrink-0 text-gray-500" aria-hidden="true" />
-          <p className="text-lg text-gray-600">{t('error_description')}</p>
+          <p className="text-lg text-gray-600 dark:text-slate-400">{t('error_description')}</p>
         </div>
       )}
     </div>

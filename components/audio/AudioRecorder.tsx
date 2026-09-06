@@ -121,37 +121,51 @@ export default function AudioRecorder({
       )}
 
       {(recorder.isRecording || recorder.hasRecording) && (
-        <div className="mb-6">
+        <div className="mb-6 bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 text-left">
           {recorder.isRecording ? (
-            <LiveWaveform
-              levels={recorder.levels}
-              isActive
-              elapsedSeconds={recorder.elapsedSeconds}
-              ariaLabel={t('waveform_live_aria')}
-              analyserRef={recorder.analyserRef}
-            />
+            <div className="mb-3">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  {t('your_recording')}
+                </span>
+                <span className="flex items-center gap-2 text-xs font-bold text-[#FF5C00] bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded">
+                  <span className="h-2 w-2 bg-[#FF5C00] rounded-full animate-pulse"></span>
+                  {t('recording_running')}
+                </span>
+              </div>
+              <LiveWaveform
+                levels={recorder.levels}
+                isActive
+                elapsedSeconds={recorder.elapsedSeconds}
+                ariaLabel={t('waveform_live_aria')}
+                analyserRef={recorder.analyserRef}
+              />
+            </div>
           ) : (
-            <WaveformPlayer
-              src={recorder.audioUrl}
-              blob={recorder.audioBlob}
-              t={t}
-              label={t('your_recording')}
-            />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="flex-1 w-full">
+                <WaveformPlayer
+                  src={recorder.audioUrl}
+                  blob={recorder.audioBlob}
+                  t={t}
+                  label={t('your_recording')}
+                  compact
+                />
+              </div>
+              {!isSubmitted && (
+                <button
+                  type="button"
+                  onClick={recorder.reset}
+                  disabled={isUploading}
+                  aria-label={t('delete_recording_aria')}
+                  className="mt-4 sm:mt-0 p-3 text-slate-400 hover:text-red-500 bg-white dark:bg-slate-900 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-800 disabled:opacity-50 shrink-0 w-full sm:w-auto flex justify-center"
+                >
+                  <Trash2 size={24} aria-hidden="true" />
+                </button>
+              )}
+            </div>
           )}
         </div>
-      )}
-
-      {recorder.isRecording && (
-        <p
-          className="mb-6 flex items-center justify-center gap-3 text-xl font-bold text-[#FF5C00]"
-          aria-live="polite"
-        >
-          <span className="relative flex h-4 w-4">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF5C00] opacity-75" />
-            <span className="relative inline-flex h-4 w-4 rounded-full bg-[#FF5C00]" />
-          </span>
-          {t('recording_running')}
-        </p>
       )}
 
       {statusMessage && (
@@ -169,36 +183,26 @@ export default function AudioRecorder({
           <button
             type="button"
             onClick={recorder.stop}
-            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-slate-900 px-8 text-xl font-bold text-white shadow-lg transition-colors hover:bg-slate-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto dark:bg-slate-700 dark:hover:bg-slate-600"
+            className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-2xl bg-slate-900 px-8 text-xl font-bold text-white shadow-lg transition-colors hover:bg-slate-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] sm:w-auto dark:bg-slate-700 dark:hover:bg-slate-600"
           >
             <Square size={26} aria-hidden="true" /> {t('stop_recording')}
           </button>
         ) : (
-          <button
-            type="button"
-            onClick={handleStart}
-            disabled={recorder.status === 'requesting' || isUploading}
-            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-[#FF5C00] px-8 text-xl font-bold text-white shadow-lg transition-colors hover:bg-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-          >
-            {recorder.status === 'requesting' ? (
-              <Loader2 size={26} className="animate-spin" aria-hidden="true" />
-            ) : (
-              <Mic size={26} aria-hidden="true" />
-            )}
-            {recorder.hasRecording ? t('record_again') : t('start_recording')}
-          </button>
-        )}
-
-        {recorder.hasRecording && !isSubmitted && (
-          <button
-            type="button"
-            onClick={recorder.reset}
-            disabled={isUploading}
-            aria-label={t('delete_recording_aria')}
-            className="flex min-h-16 w-full items-center justify-center gap-3 rounded-2xl bg-slate-100 px-8 text-xl font-bold text-slate-700 transition-colors hover:bg-slate-200 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00] disabled:opacity-60 sm:w-auto dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-          >
-            <Trash2 size={26} aria-hidden="true" /> {t('delete_recording')}
-          </button>
+          !recorder.hasRecording && (
+            <button
+              type="button"
+              onClick={handleStart}
+              disabled={recorder.status === 'requesting' || isUploading}
+              className="flex min-h-[56px] w-full items-center justify-center gap-3 rounded-2xl bg-[#FF5C00] px-8 text-xl font-bold text-white shadow-lg transition-colors hover:bg-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            >
+              {recorder.status === 'requesting' ? (
+                <Loader2 size={26} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Mic size={26} aria-hidden="true" />
+              )}
+              {t('start_recording')}
+            </button>
+          )
         )}
       </div>
 

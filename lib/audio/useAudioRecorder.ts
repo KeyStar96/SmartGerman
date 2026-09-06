@@ -7,6 +7,7 @@ import {
   createAnalyserNode,
   decodeFromSource,
   ensureAudioContext,
+  ensureMicContext,
   isMicrophonePermissionDenied,
   pickRecorderMimeType,
   requestMicrophoneStream,
@@ -230,10 +231,19 @@ export function useAudioRecorder(): UseAudioRecorderResult {
         teardown()
       }
 
-      const runningContext = ensureAudioContext()
-      if (runningContext && runningContext.state !== 'closed') {
-        const analyser = createAnalyserNode(runningContext)
-        const source = runningContext.createMediaStreamSource(stream)
+      const analyserContext = ensureMicContext()
+      if (analyserContext && analyserContext.state !== 'closed') {
+        // Im Fall von "suspended" versuchen wir einen Resume
+        if (analyserContext.state === 'suspended') {
+          try {
+            await analyserContext.resume()
+          } catch (err) {
+            console.error('MicContext resume failed:', err)
+          }
+        }
+        
+        const analyser = createAnalyserNode(analyserContext)
+        const source = analyserContext.createMediaStreamSource(stream)
         source.connect(analyser)
         sourceNodeRef.current = source
         analyserRef.current = analyser
