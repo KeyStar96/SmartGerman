@@ -40,6 +40,10 @@ export const PRONUNCIATION_FALLBACKS = {
   record_failed: 'Die Aufnahme hat nicht funktioniert. Bitte versuche es noch einmal.',
   upload_failed: 'Die Aufnahme konnte gerade nicht hochgeladen werden. Das lag nicht an dir – bitte versuche es erneut.',
   audio_unavailable: 'Diese Aufnahme kann gerade nicht abgespielt werden.',
+  audio_loading: 'Audio wird geladen …',
+  audio_retry: 'Erneut versuchen',
+  audio_format_unsupported:
+    'Dieses Audioformat kann dein Browser leider nicht abspielen. Bitte öffne die Seite in Chrome oder aktualisiere deinen Browser.',
 
   history_title: 'Deine bisherigen Einreichungen',
   history_empty: 'Du hast noch keine Aufnahme eingereicht.',

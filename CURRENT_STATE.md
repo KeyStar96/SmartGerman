@@ -198,6 +198,23 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 - **i18n:** 18 neue `lernkasten_*`-Keys in Fallbacks (`lib/vocabulary-i18n.ts`) und allen fünf Dictionaries (`de/en/ru/uk/tr`). Übersetzungs-Integritätstest grün.
 - **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, keine Lint-Fehler, kein `any`, keine DB-/Server-Action-Änderungen.
 
+## 4k. Audio-Wiedergabe: Player-Robustheit & deutsche TTS (2026-09-06)
+
+- **Sprachnachrichten-Player (`WaveformPlayer.tsx`):**
+  - **Sichtbares Error-Handling:** Statt stiller Fehlschläge jetzt eine `role="alert"`-Box mit klarer Meldung. Zwei Fehlerarten: `format` (Browser kann das Format grundsätzlich nicht) und `load` (Netzwerk/404/CORS) – letztere mit „Erneut versuchen"-Button (`audio.load()` + `play()`).
+  - **Format-Vorprüfung:** Vor dem Abspielen prüft `audio.canPlayType(guessAudioMimeType(src))` das Format. Ursache für „man hört nichts": Aufnahmen werden vom Recorder bevorzugt als `audio/webm` erzeugt (Chrome/Firefox), das **Safari/iOS nicht abspielen kann** → bisher stumm, jetzt klarer Hinweis „Dieses Audioformat kann dein Browser nicht abspielen …".
+  - **Ladezustand:** Neuer Buffering-Status (Spinner am Play-Button + „Audio wird geladen …") über `onWaiting`/`onPlaying`/`onCanPlay`, `aria-busy`.
+  - **webm-Dauer-Fix:** `MediaRecorder`-webm liefert teils `duration = Infinity`; Workaround (einmaliges Seek ans Ende via `onLoadedMetadata`/`onDurationChange`) ermittelt die reale Dauer für Seek-Leiste und Fortschritt.
+  - **State-Reset bei Quellenwechsel:** Beim `src`-Wechsel werden Fehler/Zeit/Status zurückgesetzt.
+  - **CORS-Hinweis:** Reine `<audio src>`-Wiedergabe braucht kein CORS; der Bucket `audio_submissions` ist `public=true`. Es wird bewusst kein `AnalyserNode`/`createMediaElementSource` verwendet (Stummschaltungs-/CORS-Risiko), die Welle ist eine Sinus-Simulation.
+- **Deutsche Sprachausgabe (TTS):** Neuer zentraler Helfer `lib/audio/speech.ts` – von `SolutionAudioButton` (Vokabeltrainer + Grammatik-/Lückentext-Übungen) genutzt.
+  - **Explizite Voice:** `pickGermanVoice` wählt bevorzugt eine lokale `de-DE`-Stimme, sonst irgendeine `de-*`; `utterance.lang = 'de-DE'` als Fallback, damit der Browser selbst eine deutsche Standardstimme nimmt.
+  - **Mobile-Fallback:** `getVoices()` ist mobil beim ersten Aufruf oft leer; `primeGermanSpeech()` cached die Stimmen und lauscht auf `voiceschanged`. Wird beim Mounten aufgerufen.
+  - **Autoplay-/Gesten-sicher:** `speakGerman()` läuft synchron im Klick-Handler (kein `await`), ruft nach `cancel()` bei Bedarf `resume()` (iOS/Safari) – der erste Klick wird nicht blockiert.
+- **i18n:** Neue Keys `audio_loading`, `audio_retry`, `audio_format_unsupported` in `pronunciation`-Fallbacks und allen fünf Dictionaries. Integritätstest grün.
+- **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, keine Lint-Fehler, Übersetzungs- und Waveform-Tests grün; kein `any`, keine DB-/Server-Action-Änderungen.
+- **Offen (bewusst außerhalb dieses Scopes):** Cross-Browser gilt endgültig erst mit serverseitiger Transkodierung von webm nach mp4/mp3 (z.B. Edge Function) – dann können iOS-Nutzer auch am Desktop (Chrome) aufgenommene Lehrer-Sprachnachrichten hören. Aktuell wird stattdessen ein verständlicher Hinweis angezeigt.
+
 ## 5. Hosting
 - Die Lernplattform läuft auf **Netlify** (`netlify.toml`, `@netlify/plugin-nextjs`). `NEXT_PUBLIC_SITE_URL` ist dort auf `https://www.sitov-academy.com` gesetzt. Derselbe Satz gilt für Vercel Production (Dashboard → Environment Variables).
 - Caching muss für Server Components (z.B. Kurslisten) korrekt eingestellt werden, um Ladezeiten zu minimieren.

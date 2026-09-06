@@ -1769,6 +1769,12 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-06 — Audio-Wiedergabe: Player-Robustheit & deutsche TTS
+- **Sprachnachrichten hörbar machen:** `WaveformPlayer` prüft das Format vorab (`canPlayType`), zeigt sichtbare Fehlermeldungen mit Retry statt stiller Fehlschläge, hat einen Ladezustand und behebt die `Infinity`-Dauer von webm-Aufnahmen. Häufigste Ursache für „man hört nichts": webm-Aufnahmen sind auf Safari/iOS nicht abspielbar – jetzt erscheint dazu ein klarer Hinweis (echte Cross-Browser-Wiedergabe erfordert serverseitige Transkodierung, bewusst als Folgeschritt notiert).
+- **Deutsche Aussprache (TTS):** Zentraler Helfer `lib/audio/speech.ts` setzt explizit eine `de-DE`-Stimme (mit Browser-Fallback über `utterance.lang`), cached Stimmen über `voiceschanged` (mobile Geräte laden sie verzögert) und startet die Ausgabe synchron/autoplay-sicher aus dem Klick-Handler. Genutzt im Vokabeltrainer und in den Grammatik-/Lückentext-Übungen.
+- **i18n:** `audio_loading`, `audio_retry`, `audio_format_unsupported` in allen fünf Sprachen.
+- QS: `tsc --noEmit` fehlerfrei, Übersetzungs-/Waveform-Tests grün; kein `any`, keine DB-/Server-Action-Änderungen.
+
 ### 2026-09-06 — Vokabeltrainer: „Lernkasten"-System zur Lektionsauswahl
 - **Vom Pauschal-Lernen zur Kuratierung:** „Vokabeln lernen" öffnet jetzt eine Zusammenstellungsansicht mit interaktivem Lernkasten (Selection-Box) oben und einer Übersicht aller Lektionen des Niveaus darunter. Lektionen werden per Klick oder Drag & Drop in den Lernkasten gelegt; nur deren fällige Vokabeln fließen in die aktive Lerneinheit.
 - **Transparente Zahl:** Der Lernkasten zeigt dynamisch „{Lektionen} ausgewählt – {Vokabeln}", wobei die Vokabelzahl den heute fälligen, tatsächlich zu lernenden Karten entspricht. Lektionen ohne fällige Vokabeln sind sichtbar, aber nicht wählbar.

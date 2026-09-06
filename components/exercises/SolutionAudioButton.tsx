@@ -3,6 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2, Volume2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  cancelGermanSpeech,
+  isSpeechSupported,
+  primeGermanSpeech,
+  speakGerman,
+} from '@/lib/audio/speech'
 
 /** Etwas langsamer als Normaltempo – gleiche Einstellung wie im Vokabeltrainer. */
 const SPEECH_RATE = 0.9
@@ -20,8 +26,12 @@ interface SolutionAudioButtonProps {
 
 /**
  * Tap-to-Listen-Button mit dreistufiger Fallback-Kette:
- * native Audio-Datei → Web-Speech-API → deaktivierter Button mit Hinweis.
- * Touch-Target liegt mit min-h-14 deutlich über den geforderten 48×48px.
+ * native Audio-Datei → deutsche Web-Speech-API → deaktivierter Button mit
+ * Hinweis. Touch-Target liegt mit min-h-14 deutlich über den geforderten
+ * 48×48px.
+ *
+ * Autoplay-/Gesten-sicher: Die Sprachausgabe startet synchron im Klick-Handler,
+ * die deutschen Stimmen werden bereits beim Mounten vorgewärmt (`primeGermanSpeech`).
  */
 export default function SolutionAudioButton({
   text,
@@ -34,32 +44,29 @@ export default function SolutionAudioButton({
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
+  // Deutsche Stimmen früh laden, damit der erste Klick nicht blockiert.
+  useEffect(() => {
+    primeGermanSpeech()
+  }, [])
+
   useEffect(() => {
     return () => {
       audioRef.current?.pause()
       audioRef.current = null
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel()
-      }
+      cancelGermanSpeech()
     }
   }, [])
 
+  /** Startet die deutsche Sprachausgabe. Gibt zurück, ob sie starten konnte. */
   const speak = useCallback((): boolean => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false
-
-    try {
-      window.speechSynthesis.cancel()
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = 'de-DE'
-      utterance.rate = SPEECH_RATE
-      utterance.onend = () => setIsPlaying(false)
-      utterance.onerror = () => setIsPlaying(false)
-      window.speechSynthesis.speak(utterance)
-      return true
-    } catch (err) {
-      console.error('Sprachausgabe fehlgeschlagen:', err)
-      return false
-    }
+    if (!isSpeechSupported()) return false
+    const result = speakGerman(text, {
+      rate: SPEECH_RATE,
+      lang: 'de-DE',
+      onEnd: () => setIsPlaying(false),
+      onError: () => setIsPlaying(false),
+    })
+    return result === 'started'
   }, [text])
 
   const handleClick = useCallback(() => {
@@ -72,13 +79,14 @@ export default function SolutionAudioButton({
         audioRef.current = audio
         audio.onended = () => setIsPlaying(false)
         audio.onerror = () => {
-          // Datei nicht abspielbar: still auf die Sprachausgabe wechseln.
+          // Datei nicht abspielbar (z.B. webm auf iOS): auf Sprachausgabe wechseln.
           if (!speak()) {
             setIsPlaying(false)
             onUnsupported?.()
           }
         }
-        void audio.play().catch(() => {
+        void audio.play().catch((err) => {
+          console.error('Audio-Datei nicht abspielbar, wechsle zur Sprachausgabe:', err)
           if (!speak()) {
             setIsPlaying(false)
             onUnsupported?.()

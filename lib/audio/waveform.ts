@@ -73,6 +73,24 @@ export function seekTargetSeconds(offsetX: number, width: number, duration: numb
 }
 
 /**
+ * Rät den MIME-Type einer Audio-URL anhand der Dateiendung.
+ *
+ * Dient dazu, VOR dem Abspielen per `audio.canPlayType()` zu prüfen, ob der
+ * Browser das Format überhaupt kann (z.B. spielt Safari/iOS kein `webm`).
+ * So lässt sich statt stummer Wiedergabe ein klarer Hinweis anzeigen.
+ * Gibt einen leeren String zurück, wenn die Endung unbekannt ist.
+ */
+export function guessAudioMimeType(url: string): string {
+  const withoutQuery = url.split('?')[0]?.toLowerCase() ?? ''
+  if (withoutQuery.endsWith('.webm')) return 'audio/webm'
+  if (withoutQuery.endsWith('.mp4') || withoutQuery.endsWith('.m4a')) return 'audio/mp4'
+  if (withoutQuery.endsWith('.ogg') || withoutQuery.endsWith('.oga')) return 'audio/ogg'
+  if (withoutQuery.endsWith('.mp3')) return 'audio/mpeg'
+  if (withoutQuery.endsWith('.wav')) return 'audio/wav'
+  return ''
+}
+
+/**
  * Nähert einen Wert pro Frame exponentiell an ein Ziel an (Lerp).
  *
  * Für die Siri-artige Live-Tonspur: Rohe Pegelwerte aus dem `AnalyserNode`

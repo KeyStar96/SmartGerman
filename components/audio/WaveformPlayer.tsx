@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react'
-import { Pause, Play } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type SyntheticEvent } from 'react'
+import { Loader2, Pause, Play, RotateCcw } from 'lucide-react'
 import FluidWaveform from '@/components/audio/FluidWaveform'
-import { formatDuration, playbackProgress, seekTargetSeconds } from '@/lib/audio/waveform'
+import { formatDuration, guessAudioMimeType, playbackProgress, seekTargetSeconds } from '@/lib/audio/waveform'
 import {
   createPronunciationTranslator,
   type PronunciationTranslator,
@@ -17,6 +17,13 @@ const KEYBOARD_SEEK_SECONDS = 5
 
 /** Greift nur, wenn kein Übersetzer übergeben wird (z.B. in der Lehrer-Ansicht). */
 const defaultTranslator = createPronunciationTranslator({})
+
+/**
+ * `null`   → alles in Ordnung
+ * `format` → der Browser kann dieses Format grundsätzlich nicht (z.B. webm auf iOS)
+ * `load`   → Datei nicht ladbar/abspielbar (Netzwerk, 404, CORS-Blockade)
+ */
+type PlaybackError = null | 'format' | 'load'
 
 export default function WaveformPlayer({
   src,
@@ -36,10 +43,11 @@ export default function WaveformPlayer({
   const simPhaseRef = useRef(0)
 
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isBuffering, setIsBuffering] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [speedIndex, setSpeedIndex] = useState(0)
-  const [hasError, setHasError] = useState(false)
+  const [error, setError] = useState<PlaybackError>(null)
 
   const translate: PronunciationTranslator = t ?? defaultTranslator
 
@@ -48,6 +56,28 @@ export default function WaveformPlayer({
   useEffect(() => {
     if (audioRef.current) audioRef.current.playbackRate = speed
   }, [speed])
+
+  /**
+   * Bei jedem Quellenwechsel den Zustand zurücksetzen und – noch bevor der
+   * Nutzer klickt – prüfen, ob der Browser das Format überhaupt abspielen kann.
+   * So erscheint bei nicht unterstützten Formaten (z.B. webm auf Safari/iOS)
+   * ein klarer Hinweis statt stummer Wiedergabe ohne Rückmeldung.
+   */
+  useEffect(() => {
+    setIsPlaying(false)
+    setIsBuffering(false)
+    setCurrentTime(0)
+    setDuration(0)
+    setError(null)
+
+    if (!src) return
+    const audio = audioRef.current
+    const mime = guessAudioMimeType(src)
+    if (audio && mime && audio.canPlayType(mime) === '') {
+      console.error('Audioformat wird vom Browser nicht unterstützt:', { src, mime })
+      setError('format')
+    }
+  }, [src])
 
   /**
    * Simulierter Lautstärke-Pegel während der Wiedergabe (0..1).
@@ -72,19 +102,60 @@ export default function WaveformPlayer({
 
   const togglePlayback = useCallback(() => {
     const audio = audioRef.current
-    if (!audio) return
+    if (!audio || error === 'format') return
 
     if (isPlaying) {
       audio.pause()
       return
     }
 
+    setIsBuffering(true)
     audio.playbackRate = speed
     void audio.play().catch((err) => {
       console.error('Wiedergabe nicht möglich:', err)
-      setHasError(true)
+      setIsBuffering(false)
+      setError('load')
     })
-  }, [isPlaying, speed])
+  }, [error, isPlaying, speed])
+
+  const handleRetry = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    setError(null)
+    setIsBuffering(true)
+    // Erzwingt ein frisches Laden der Quelle (nach Netzwerk-/Timeout-Fehlern).
+    audio.load()
+    void audio.play().catch((err) => {
+      console.error('Erneute Wiedergabe nicht möglich:', err)
+      setIsBuffering(false)
+      setError('load')
+    })
+  }, [])
+
+  /**
+   * Manche per `MediaRecorder` erzeugten webm-Dateien liefern zunächst eine
+   * unendliche Dauer (der Header trägt sie nicht). Das ist ein bekannter
+   * Browser-Bug: einmal ans Ende springen erzwingt die echte Dauer.
+   */
+  const handleLoadedMetadata = useCallback((event: SyntheticEvent<HTMLAudioElement>) => {
+    const audio = event.currentTarget
+    if (audio.duration === Infinity || Number.isNaN(audio.duration)) {
+      const forceDuration = () => {
+        audio.removeEventListener('timeupdate', forceDuration)
+        setDuration(Number.isFinite(audio.duration) ? audio.duration : 0)
+        audio.currentTime = 0
+      }
+      audio.addEventListener('timeupdate', forceDuration)
+      // Sehr großer Wert → Browser seekt ans reale Ende und kennt dann die Dauer.
+      try {
+        audio.currentTime = 1e101
+      } catch {
+        setDuration(0)
+      }
+      return
+    }
+    setDuration(audio.duration)
+  }, [])
 
   const handleSeek = useCallback(
     (clientX: number) => {
@@ -120,6 +191,7 @@ export default function WaveformPlayer({
   if (!src) return null
 
   const progress = playbackProgress(currentTime, duration)
+  const playbackBlocked = error !== null
 
   return (
     <div className="w-full">
@@ -133,13 +205,16 @@ export default function WaveformPlayer({
         <button
           type="button"
           onClick={togglePlayback}
-          disabled={hasError}
+          disabled={playbackBlocked}
           aria-label={isPlaying ? translate('pause_aria') : translate('play_aria')}
+          aria-busy={isBuffering}
           className={`flex shrink-0 items-center justify-center rounded-full bg-[#FF5C00] text-white shadow-md transition-colors hover:bg-[#e05200] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-50 ${
             compact ? 'h-12 w-12' : 'h-16 w-16'
           }`}
         >
-          {isPlaying ? (
+          {isBuffering ? (
+            <Loader2 size={compact ? 22 : 30} className="animate-spin" aria-hidden="true" />
+          ) : isPlaying ? (
             <Pause size={compact ? 22 : 30} aria-hidden="true" />
           ) : (
             <Play size={compact ? 22 : 30} aria-hidden="true" />
@@ -187,25 +262,63 @@ export default function WaveformPlayer({
         </div>
       </div>
 
-      {hasError && (
-        <p className="mt-2 text-base text-slate-600 dark:text-slate-400">
-          {translate('audio_unavailable')}
+      {isBuffering && !playbackBlocked && (
+        <p className="mt-2 flex items-center gap-2 text-base text-slate-600 dark:text-slate-400" role="status">
+          <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+          {translate('audio_loading')}
         </p>
+      )}
+
+      {playbackBlocked && (
+        <div
+          role="alert"
+          className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-900/20"
+        >
+          <p className="text-base text-amber-900 dark:text-amber-200">
+            {error === 'format' ? translate('audio_format_unsupported') : translate('audio_unavailable')}
+          </p>
+          {error === 'load' && (
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="mt-3 inline-flex min-h-12 items-center gap-2 rounded-xl bg-amber-600 px-5 text-base font-bold text-white shadow-sm transition-colors hover:bg-amber-500 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+            >
+              <RotateCcw size={18} aria-hidden="true" />
+              {translate('audio_retry')}
+            </button>
+          )}
+        </div>
       )}
 
       <audio
         ref={audioRef}
         src={src}
         preload="metadata"
-        onLoadedMetadata={(event) => setDuration(event.currentTarget.duration)}
+        onLoadedMetadata={handleLoadedMetadata}
+        onDurationChange={(event) => {
+          const value = event.currentTarget.duration
+          if (Number.isFinite(value) && value > 0) setDuration(value)
+        }}
         onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+        onWaiting={() => setIsBuffering(true)}
+        onCanPlay={() => setIsBuffering(false)}
+        onPlaying={() => {
+          setIsBuffering(false)
+          setError(null)
+        }}
         onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
+        onPause={() => {
+          setIsPlaying(false)
+          setIsBuffering(false)
+        }}
         onEnded={() => {
           setIsPlaying(false)
           setCurrentTime(0)
         }}
-        onError={() => setHasError(true)}
+        onError={() => {
+          setIsBuffering(false)
+          setError('load')
+        }}
         className="hidden"
       />
     </div>
