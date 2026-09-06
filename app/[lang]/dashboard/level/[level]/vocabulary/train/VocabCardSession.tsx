@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Check, CloudOff, Image as ImageIcon, Layers, PartyPopper, X } from 'lucide-react'
+import { ArrowLeft, Check, CloudOff, Image as ImageIcon, PartyPopper, X } from 'lucide-react'
 import SolutionAudioButton from '@/components/exercises/SolutionAudioButton'
 import { finishVocabularySession, submitVocabularyAnswer } from '@/app/actions/vocabulary'
 import {
@@ -41,21 +41,21 @@ function toDisplayWord(card: DueVocabularyCard['card']): string {
 function CardFront({ item, t }: { item: DueVocabularyCard; t: VocabularyTranslator }) {
   const { card } = item
   return (
-    <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-6 sm:p-8">
+    <div className="flex flex-col items-center justify-center border-b border-gray-100 bg-gray-50 p-4 sm:p-8">
       {card.image_url ? (
         <img
           src={card.image_url}
           alt={t('image_alt')}
           decoding="async"
-          className="mb-4 h-28 w-28 max-w-full rounded-2xl object-cover shadow-md sm:mb-6 sm:h-36 sm:w-36"
+          className="mb-3 h-24 w-24 max-w-full rounded-2xl object-cover shadow-md sm:mb-6 sm:h-36 sm:w-36"
         />
       ) : (
-        <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-200 text-gray-400 shadow-inner sm:mb-6 sm:h-24 sm:w-24">
+        <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-200 text-gray-400 shadow-inner sm:mb-6 sm:h-24 sm:w-24">
           <ImageIcon size={40} aria-hidden="true" />
         </div>
       )}
 
-      <h2 className="break-words text-center text-2xl font-bold text-gray-800 sm:text-3xl">
+      <h2 className="break-words text-center text-xl font-bold text-gray-800 sm:text-3xl">
         {item.translation || t('no_translation')}
       </h2>
     </div>
@@ -172,160 +172,166 @@ export default function VocabCardSession({
   const displayWord = toDisplayWord(currentCard.card)
   const isExiting = exitDirection !== null
 
+  /*
+    Eine einzige, kompakte Meta-Zeile statt gestapelter Blöcke
+    („Lektion 4 • Karte 1/2 • Phase 1/6"). Das spart auf dem Smartphone den
+    vertikalen Platz, der zuvor die Karte nach unten aus dem Bild schob.
+  */
+  const metaLine = [
+    t('lesson_label', { lesson: stripLessonPrefix(currentCard.card.lesson) }),
+    t('card_progress_compact', { current: currentIndex + 1, total: session.length }),
+    t('phase_compact', { phase: currentCard.phase }),
+  ].join(' • ')
+
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <div className="mb-4">
+    /*
+      Aktiver Lernmodus: füllt den sichtbaren Viewport (100dvh abzüglich
+      Dashboard-Header) und zentriert die Karte vertikal. `min-h` statt fester
+      Höhe: Sollte eine sehr hohe Karte auf sehr kleinen Geräten doch nicht
+      passen, wächst der Container mit und scrollt sanft, statt Buttons
+      abzuschneiden (Barrierefreiheit vor Pixel-Perfektion).
+    */
+    <div className="mx-auto flex min-h-[calc(100dvh-12rem)] w-full max-w-2xl flex-col sm:min-h-[calc(100dvh-9rem)]">
+      {/* Zusammengeführte Navigation: EIN Zurück-Pfeil + kompakte Meta-Zeile */}
+      <div className="flex items-center gap-2 pb-2">
         <button
           type="button"
           onClick={onBackToLernkasten}
-          className="inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+          aria-label={t('lernkasten_back')}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-blue-600 transition-colors hover:bg-blue-50 active:bg-blue-100 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
         >
-          <ArrowLeft size={22} aria-hidden="true" /> {t('lernkasten_back')}
+          <ArrowLeft size={24} aria-hidden="true" />
         </button>
+        <p className="min-w-0 flex-1 text-center text-sm font-semibold text-gray-600 sm:text-base">
+          {metaLine}
+        </p>
+        {/* Symmetrie-Platzhalter, damit die Meta-Zeile optisch mittig bleibt. */}
+        <span className="h-11 w-11 shrink-0" aria-hidden="true" />
       </div>
 
-      <div className="mb-4 flex flex-col gap-3 text-lg font-medium text-gray-600 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <span>{t('lesson_label', { lesson: stripLessonPrefix(currentCard.card.lesson) })}</span>
-        <span className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-blue-800">
-          <Layers size={20} aria-hidden="true" />
-          {t('phase_label', { phase: currentCard.phase })}
-        </span>
-        <span>{t('card_progress', { current: currentIndex + 1, total: session.length })}</span>
-      </div>
+      {/* Karte im verbleibenden Bereich vertikal zentriert – ohne Scrollen. */}
+      <div className="flex flex-1 items-center justify-center py-2">
+        {/*
+          Tinder-Stapel: aktuelle Karte (i) und bereits fertig gerenderte
+          Folgekarte (i+1) liegen per CSS-Grid in derselben Zelle übereinander.
+          Beim Antworten fliegt NUR die aktive Karte weich zur Seite; die
+          dahinterliegende Karte bleibt an ihrer festen Position und wird ohne
+          Ladezeit und ohne Einflieg-Bewegung sofort zur neuen aktiven Karte.
 
-      {/*
-        Tinder-Stapel: aktuelle Karte (i) und bereits fertig gerenderte
-        Folgekarte (i+1) liegen per CSS-Grid in derselben Zelle übereinander.
-        Beim Antworten fliegt NUR die aktive Karte weich zur Seite; die dahinter
-        liegende Karte bleibt an ihrer festen Position und wird ohne Ladezeit
-        und ohne Einflieg-Bewegung sofort zur neuen aktiven Karte.
-
-        Wichtig: Beide Slots sind per `key` an die `progressId` gebunden. Dadurch
-        mountet React beim Kartenwechsel jeweils einen FRISCHEN Knoten – der
-        obere Knoten kann so nicht aus seiner Fly-Out-Position „zurückfliegen"
-        (das war die störende Einflieg-Animation), und die nachrückende Karte
-        erscheint stabil an ihrer Position statt zu springen.
-      */}
-      <div className="grid">
-        {nextCard && (
-          <div
-            key={nextCard.progressId}
-            aria-hidden="true"
-            className={cn(
-              // Nur Skalierung/Opacity, KEINE Richtungs-Verschiebung (kein translateX/Y).
-              'z-0 self-start [grid-area:1/1] transition-[transform,opacity] duration-[260ms] ease-out motion-reduce:transition-none',
-              isExiting ? 'scale-100 opacity-100' : 'scale-[0.95] opacity-90'
-            )}
-          >
-            <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
-              <CardFront item={nextCard} t={t} />
-              <div className="flex items-center justify-center bg-white p-6 sm:p-8">
-                <div className="w-full rounded-2xl bg-blue-600 py-6 text-center text-2xl font-bold text-white shadow-md">
-                  {t('reveal_solution')}
+          Wichtig: Beide Slots sind per `key` an die `progressId` gebunden.
+          Dadurch mountet React beim Kartenwechsel jeweils einen FRISCHEN Knoten.
+        */}
+        <div className="grid w-full">
+          {nextCard && (
+            <div
+              key={nextCard.progressId}
+              aria-hidden="true"
+              className={cn(
+                // Nur Skalierung/Opacity, KEINE Richtungs-Verschiebung (kein translateX/Y).
+                'z-0 self-start [grid-area:1/1] transition-[transform,opacity] duration-[260ms] ease-out motion-reduce:transition-none',
+                isExiting ? 'scale-100 opacity-100' : 'scale-[0.95] opacity-90'
+              )}
+            >
+              <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
+                <CardFront item={nextCard} t={t} />
+                <div className="flex items-center justify-center bg-white p-4 sm:p-8">
+                  <div className="w-full rounded-2xl bg-blue-600 py-4 text-center text-xl font-bold text-white shadow-md sm:py-6 sm:text-2xl">
+                    {t('reveal_solution')}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-
-        <div
-          key={currentCard.progressId}
-          className={cn(
-            'z-10 self-start [grid-area:1/1] transition-all duration-[260ms] ease-in will-change-transform motion-reduce:transition-none',
-            exitDirection === 'right' && 'translate-x-[130%] rotate-[8deg] opacity-0',
-            exitDirection === 'left' && '-translate-x-[130%] -rotate-[8deg] opacity-0'
           )}
-        >
-          <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
-            <CardFront item={currentCard} t={t} />
 
-            {isRevealed ? (
-              <div className="flex flex-col items-center justify-center bg-white p-6 sm:p-8">
-                <span
-                  className={cn(
-                    'break-words text-center text-2xl font-extrabold sm:text-4xl',
-                    articleColorClass(currentCard.card.article)
+          <div
+            key={currentCard.progressId}
+            className={cn(
+              'z-10 self-start [grid-area:1/1] transition-all duration-[260ms] ease-in will-change-transform motion-reduce:transition-none',
+              exitDirection === 'right' && 'translate-x-[130%] rotate-[8deg] opacity-0',
+              exitDirection === 'left' && '-translate-x-[130%] -rotate-[8deg] opacity-0'
+            )}
+          >
+            <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
+              <CardFront item={currentCard} t={t} />
+
+              {isRevealed ? (
+                <div className="flex flex-col items-center justify-center bg-white p-4 sm:p-8">
+                  <span
+                    className={cn(
+                      'break-words text-center text-2xl font-extrabold sm:text-4xl',
+                      articleColorClass(currentCard.card.article)
+                    )}
+                  >
+                    {displayWord}
+                  </span>
+
+                  {currentCard.card.plural && (
+                    <p className="mt-1 text-lg text-gray-500 sm:mt-2 sm:text-xl">
+                      {t('plural_label', { plural: currentCard.card.plural })}
+                    </p>
                   )}
-                >
-                  {displayWord}
-                </span>
 
-                {currentCard.card.plural && (
-                  <p className="mt-2 text-xl text-gray-500">
-                    {t('plural_label', { plural: currentCard.card.plural })}
-                  </p>
-                )}
+                  <div className="mt-3 sm:mt-4">
+                    <SolutionAudioButton
+                      text={displayWord}
+                      audioUrl={currentCard.card.audio_url}
+                      label={t('listen_word')}
+                      ariaLabel={t('listen_word_aria', { word: currentCard.card.word_de })}
+                      variant="secondary"
+                    />
+                  </div>
 
-                <div className="mt-4">
-                  <SolutionAudioButton
-                    text={displayWord}
-                    audioUrl={currentCard.card.audio_url}
-                    label={t('listen_word')}
-                    ariaLabel={t('listen_word_aria', { word: currentCard.card.word_de })}
-                    variant="secondary"
-                  />
+                  {/* Direkt bewerten – ohne Bestätigungsmeldung, der Wechsel erfolgt sofort. */}
+                  <div className="mt-4 flex w-full flex-col gap-3 sm:mt-6 sm:flex-row sm:gap-4">
+                    <button
+                      type="button"
+                      onClick={() => handleAnswer(false)}
+                      disabled={isExiting}
+                      className="flex min-h-14 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-amber-300 bg-amber-50 py-3 text-amber-800 transition-colors hover:bg-amber-100 active:bg-amber-200 disabled:opacity-60 sm:min-h-16 sm:py-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                    >
+                      <X size={28} className="mb-0.5 sm:mb-1" aria-hidden="true" />
+                      <span className="text-lg font-bold sm:text-xl">{t('didnt_know')}</span>
+                      <span className="mt-0.5 text-sm opacity-90 sm:mt-1 sm:text-base">{t('didnt_know_hint')}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleAnswer(true)}
+                      disabled={isExiting}
+                      className="flex min-h-14 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-green-300 bg-green-50 py-3 text-green-800 transition-colors hover:bg-green-100 active:bg-green-200 disabled:opacity-60 sm:min-h-16 sm:py-4 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                    >
+                      <Check size={28} className="mb-0.5 sm:mb-1" aria-hidden="true" />
+                      <span className="text-lg font-bold sm:text-xl">{t('knew_it')}</span>
+                      <span className="mt-0.5 text-sm opacity-90 sm:mt-1 sm:text-base">{t('knew_it_hint')}</span>
+                    </button>
+                  </div>
                 </div>
-
-                {/* Direkt bewerten – ohne Bestätigungsmeldung, der Wechsel erfolgt sofort. */}
-                <div className="mt-6 flex w-full flex-col gap-3 sm:flex-row sm:gap-4">
+              ) : (
+                <div className="flex items-center justify-center bg-white p-4 sm:p-8">
                   <button
                     type="button"
-                    onClick={() => handleAnswer(false)}
+                    onClick={() => setIsRevealed(true)}
                     disabled={isExiting}
-                    className="flex min-h-16 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-amber-300 bg-amber-50 py-4 text-amber-800 transition-colors hover:bg-amber-100 disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+                    className="w-full rounded-2xl bg-blue-600 py-4 text-xl font-bold text-white shadow-md transition-all hover:bg-blue-500 hover:shadow-lg active:bg-blue-700 disabled:opacity-60 sm:py-6 sm:text-2xl focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
                   >
-                    <X size={30} className="mb-1" aria-hidden="true" />
-                    <span className="text-xl font-bold">{t('didnt_know')}</span>
-                    <span className="mt-1 text-base opacity-90">{t('didnt_know_hint')}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleAnswer(true)}
-                    disabled={isExiting}
-                    className="flex min-h-16 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-green-300 bg-green-50 py-4 text-green-800 transition-colors hover:bg-green-100 disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-                  >
-                    <Check size={30} className="mb-1" aria-hidden="true" />
-                    <span className="text-xl font-bold">{t('knew_it')}</span>
-                    <span className="mt-1 text-base opacity-90">{t('knew_it_hint')}</span>
+                    {t('reveal_solution')}
                   </button>
                 </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center bg-white p-6 sm:p-8">
-                <button
-                  type="button"
-                  onClick={() => setIsRevealed(true)}
-                  disabled={isExiting}
-                  className="w-full rounded-2xl bg-blue-600 py-6 text-2xl font-bold text-white shadow-md transition-all hover:bg-blue-500 hover:shadow-lg disabled:opacity-60 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
-                >
-                  {t('reveal_solution')}
-                </button>
-              </div>
-            )}
+              )}
 
-            {saveFailed && (
-              <div
-                role="status"
-                aria-live="polite"
-                className="flex items-center gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4"
-              >
-                <CloudOff className="h-6 w-6 shrink-0 text-gray-500" aria-hidden="true" />
-                <p className="text-lg text-gray-600">{t('save_failed')}</p>
-              </div>
-            )}
+              {saveFailed && (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="flex items-center gap-3 border-t border-gray-100 bg-gray-50 px-4 py-3 sm:px-6 sm:py-4"
+                >
+                  <CloudOff className="h-6 w-6 shrink-0 text-gray-500" aria-hidden="true" />
+                  <p className="text-base text-gray-600 sm:text-lg">{t('save_failed')}</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-
-      <p className="mt-4 text-center text-lg text-gray-500">{t('phase_explanation')}</p>
-      <div className="mt-3 text-center">
-        <Link
-          href={overviewHref}
-          className="inline-flex min-h-12 items-center text-lg font-medium text-blue-600 underline-offset-4 hover:underline"
-        >
-          {t('add_more_vocabulary')}
-        </Link>
       </div>
     </div>
   )

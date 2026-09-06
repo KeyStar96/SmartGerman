@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { BookOpenCheck, Check, Inbox, Layers, Plus, Sparkles, Trash2, X } from 'lucide-react'
+import { ArrowLeft, BookOpenCheck, Check, Inbox, Layers, Plus, Sparkles, Trash2, X } from 'lucide-react'
 import { createVocabularyTranslator, type VocabularyTranslations } from '@/lib/vocabulary-i18n'
 import { loadLernkastenSelection, saveLernkastenSelection } from '@/lib/vocabulary-lernkasten'
 import type { DueVocabularyCard, LessonStat } from '@/lib/types/vocabulary'
@@ -172,6 +172,16 @@ export default function VocabTrainerClient({
 
   return (
     <div className="mx-auto w-full max-w-2xl">
+      {/* Ein einziger, robuster Zurück-Pfeil führt zurück zur Vokabel-Übersicht. */}
+      <div className="mb-4">
+        <Link
+          href={overviewHref}
+          className="inline-flex min-h-12 items-center gap-2 text-lg font-medium text-blue-600 transition-colors hover:text-blue-800 active:text-blue-900 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#FF5C00]"
+        >
+          <ArrowLeft size={24} aria-hidden="true" /> {t('back_to_overview')}
+        </Link>
+      </div>
+
       {/* ── Lernkasten (Selection-Box) ───────────────────────────────── */}
       <section
         aria-label={t('lernkasten_title')}
@@ -346,15 +356,6 @@ export default function VocabTrainerClient({
           </ul>
         )}
       </section>
-
-      <div className="mt-8 text-center">
-        <Link
-          href={overviewHref}
-          className="inline-flex min-h-12 items-center text-lg font-medium text-blue-600 underline-offset-4 hover:underline"
-        >
-          {t('add_more_vocabulary')}
-        </Link>
-      </div>
     </div>
   )
 }

@@ -3,6 +3,25 @@
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
 
+## 1a. Änderungsprotokoll — 2026-09-06: Mobile-UX-Optimierung (Touch-Hover, Hintergrund, Vokabeltrainer-Flashcards)
+
+**Kernänderungen (rein clientseitig/UI, keine Schema- oder Monetarisierungsänderung):**
+
+- **Sticky-Hover-Fix auf Touch-Geräten:**
+  - `tailwind.config.ts`: `future.hoverOnlyWhenSupported = true` aktiviert. Dadurch werden ALLE `hover:`-Utilities global in `@media (hover: hover)` gekapselt – Hover-Farben greifen nur noch auf echten Zeigegeräten (Desktop-Maus/Trackpad). Auf Smartphones/Tablets bleibt nach dem Antippen kein Farbzustand mehr „hängen".
+  - `app/globals.css`: Die benutzerdefinierten Button-Klassen `.btn-primary` / `.btn-secondary` erhielten `@media (hover: hover)`-Kapselung ihrer `:hover`-Regeln sowie neue `:active`-Regeln für kurzes Druck-Feedback (Feedback nur während des aktiven Drückens, sofortiger Rücksprung beim Loslassen).
+  - Flashcard-Buttons (Lösung aufdecken, „Wusste ich"/„Wusste ich nicht", Zurück-Pfeil) haben zusätzlich `active:`-Tailwind-Varianten für Touch-Feedback.
+
+- **Homepage-/App-Hintergrund (Schlieren-/Banding-Fix):**
+  - `components/effects/AppBackground.tsx`: Die vier WebP-Hintergrundbilder (Light/Dark, Desktop/Mobile) wurden entfernt und durch einen reinen CSS-Farbverlauf ersetzt (Light: warmes Sand-Off-White `#FCF4E6→#EDE3CE`; Dark: `slate-900 → slate-800 → indigo-950`) inkl. subtilem Radial-Glow und feinem SVG-Rauschen (`bg-noise`) gegen Color-Banding auf mobilen 8-Bit-Panels. Kein Bild-Download/Decoding mehr.
+  - `app/globals.css`: Die ungenutzten `.app-bg`-Bildregeln wurden ebenfalls auf Gradienten umgestellt.
+
+- **Radikale Überarbeitung des Flashcard-Screens (aktiver Lernmodus, Mobile):**
+  - `app/[lang]/dashboard/level/[level]/vocabulary/train/page.tsx`: Navigation & Layout wandern vollständig in den Client (nur dort ist `compose` vs. `train` bekannt); der doppelte „Zurück zur Übersicht"-Link und der `min-h-screen`-Wrapper wurden entfernt.
+  - `VocabTrainerClient.tsx`: Compose-Modus (Lernkasten) erhält EINEN Zurück-Pfeil oben links; der redundante Bottom-Link „Weitere Vokabeln hinzufügen" wurde entfernt.
+  - `VocabCardSession.tsx` (Lernmodus): Zusammengeführte Navigation (ein `<`-Pfeil) + EINE kompakte Meta-Zeile `Lektion X • Karte a/b • Phase c/6`. Die Karte wird vertikal im verbleibenden Viewport zentriert (`min-h-[calc(100dvh-12rem)]`, mobil kompaktere Bild-/Padding-Größen), sodass Lösung und Aktions-Buttons ohne Scrollen sichtbar sind. Redundante Erklärtexte (`phase_explanation`) und der Link „Weitere Vokabeln hinzufügen" wurden aus dem Lernmodus entfernt.
+  - i18n: Neue Keys `card_progress_compact` und `phase_compact` in `lib/vocabulary-i18n.ts` (Fallbacks) sowie in allen fünf Dictionaries (`de/en/uk/ru/tr`).
+
 ## 1a. Änderungsprotokoll — 2026-09-06: SMTP Server-Only Isolation & Netlify Secret Leak Fix
 
 **Kernänderungen:**

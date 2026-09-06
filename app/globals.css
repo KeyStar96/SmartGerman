@@ -3,30 +3,17 @@
 @tailwind utilities;
 
 /* ============================================
-   APP BACKGROUND — Direct CSS (bypasses /_next/image)
-   Images are pre-optimized WebP, no processing needed.
+   APP BACKGROUND — Reiner CSS-Farbverlauf
+   Die früheren WebP-Hintergrundbilder erzeugten auf mobilen Displays
+   sichtbare Farb-Schlieren/Banding. Ersetzt durch einen sauberen,
+   performanten Gradienten (kein Bild-Download, kein Banding durch Kompression).
    ============================================ */
 .app-bg {
-  background-image: url('/Bilder/SG_Background_Light.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-@media (max-width: 767px) {
-  .app-bg {
-    background-image: url('/Bilder/SG_Background_Light_Mobile.webp');
-  }
+  background-image: linear-gradient(135deg, #FCF4E6 0%, #F5ECD9 55%, #EDE3CE 100%);
 }
 
 .dark .app-bg {
-  background-image: url('/Bilder/SG_Background_Dark.webp');
-}
-
-@media (max-width: 767px) {
-  .dark .app-bg {
-    background-image: url('/Bilder/SG_Background_Dark_Mobile.webp');
-  }
+  background-image: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1e1b4b 100%);
 }
 
 :root {
@@ -441,14 +428,23 @@ html.dark {
     transition: all 0.3s ease;
   }
 
-  .btn-primary:hover {
-    background: hsl(14, 100%, 45%);
-    border-color: hsl(14, 100%, 45%);
-    /* Dezenter Glow nur im Darkmode */
+  /* Hover NUR auf echten Zeigegeräten (Desktop-Maus) – kein Sticky-Hover auf Touch. */
+  @media (hover: hover) {
+    .btn-primary:hover {
+      background: hsl(14, 100%, 45%);
+      border-color: hsl(14, 100%, 45%);
+      /* Dezenter Glow nur im Darkmode */
+    }
+
+    .dark .btn-primary:hover {
+      box-shadow: 0 0 20px hsla(14, 100%, 50%, 0.25);
+    }
   }
 
-  .dark .btn-primary:hover {
-    box-shadow: 0 0 20px hsla(14, 100%, 50%, 0.25);
+  /* Touch/Desktop: kurzes Druck-Feedback beim aktiven Drücken. */
+  .btn-primary:active {
+    background: hsl(14, 100%, 42%);
+    border-color: hsl(14, 100%, 42%);
   }
 
   /* Sekundär: Ghost-Button mit Slate-Kontur und Cyan-Hover */
@@ -460,21 +456,35 @@ html.dark {
     border: 1px solid rgba(0, 0, 0, 0.2);
   }
 
-  .btn-secondary:hover {
-    /* Lightmode: Espresso-Hover */
-    border-color: var(--lm-text-espresso);
-    color: var(--lm-text-espresso);
-  }
-
-  /* Darkmode: Slate-Border mit Cyan-Hover */
+  /* Darkmode: Slate-Border (Basiszustand). */
   .dark .btn-secondary {
     border-color: var(--dm-border-slate);
   }
 
-  .dark .btn-secondary:hover {
+  /* Hover NUR auf echten Zeigegeräten (Desktop-Maus) – kein Sticky-Hover auf Touch. */
+  @media (hover: hover) {
+    .btn-secondary:hover {
+      /* Lightmode: Espresso-Hover */
+      border-color: var(--lm-text-espresso);
+      color: var(--lm-text-espresso);
+    }
+
+    .dark .btn-secondary:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      box-shadow: 0 0 15px hsla(180, 100%, 50%, 0.2);
+    }
+  }
+
+  /* Touch/Desktop: kurzes Druck-Feedback beim aktiven Drücken. */
+  .btn-secondary:active {
+    border-color: var(--lm-text-espresso);
+    color: var(--lm-text-espresso);
+  }
+
+  .dark .btn-secondary:active {
     border-color: var(--accent-cyan);
     color: var(--accent-cyan);
-    box-shadow: 0 0 15px hsla(180, 100%, 50%, 0.2);
   }
 
 

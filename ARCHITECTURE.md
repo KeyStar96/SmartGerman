@@ -1,5 +1,7 @@
 # Architecture Masterplan
 
+> **UI-Struktur-Notiz (2026-09-06):** Der globale App-Hintergrund (`components/effects/AppBackground.tsx`, eingebunden in `app/[lang]/layout.tsx`) verwendet keine WebP-Bilder mehr, sondern einen reinen CSS-Farbverlauf (+ Radial-Glow + SVG-Rauschen). Der Vokabeltrainer-Lernmodus rendert Navigation & Layout ausschließlich clientseitig (`train/page.tsx` → `VocabTrainerClient` → `VocabCardSession`): kompakte 100dvh-Ansicht mit zusammengeführtem Zurück-Pfeil und einzeiliger Meta-Info. Details siehe `CURRENT_STATE.md`.
+
 ## 1. Datenmodellierung (Datenbankschema)
 
 **Supabase-Projekt:** `wcaslabeiwtvygxtzcio` (Sitov Academy v2) — Live-Datenbank, produktiv im Einsatz.

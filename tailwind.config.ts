@@ -2,6 +2,16 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: 'class',
+  /*
+   * TOUCH-FIX (Sticky Hover): `hoverOnlyWhenSupported` kapselt ALLE `hover:`-
+   * Utilities global in `@media (hover: hover)`. Dadurch greifen Hover-Effekte
+   * ausschließlich auf echten Zeigegeräten (Desktop-Maus/Trackpad). Auf
+   * Smartphones/Tablets bleibt nach dem Antippen kein Farbzustand mehr hängen –
+   * dort gibt ausschließlich der `:active`-Zustand kurzes Druck-Feedback.
+   */
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",

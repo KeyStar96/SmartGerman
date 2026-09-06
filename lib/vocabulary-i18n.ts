@@ -21,8 +21,12 @@ export const VOCABULARY_FALLBACKS = {
   back_to_overview: 'Zurück zur Übersicht',
   back_to_level: 'Zurück zur Übersicht',
   card_progress: 'Karte {current} von {total}',
+  /** Kompaktvariante für die einzeilige Meta-Zeile im aktiven Lernmodus (Mobile). */
+  card_progress_compact: 'Karte {current}/{total}',
   lesson_label: 'Lektion {lesson}',
   phase_label: 'Phase {phase} von 6',
+  /** Kompaktvariante für die einzeilige Meta-Zeile im aktiven Lernmodus (Mobile). */
+  phase_compact: 'Phase {phase}/6',
   phase_explanation: 'Je höher die Phase, desto länger die Pause bis zur Wiederholung.',
   reveal_solution: 'Lösung aufdecken',
   next_card: 'Nächste Karte',
