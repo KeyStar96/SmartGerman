@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { currentUserHasLevelAccess } from '@/lib/access/server'
+import { getCatalogPrompts, mergePronunciationPrompts } from '@/lib/pronunciation-catalog'
 import {
   cefrFamilyFromLevel,
   isCefrFamily,
@@ -24,35 +25,46 @@ export async function getPronunciationPrompts(level: string): Promise<Pronunciat
     const allowed = await currentUserHasLevelAccess(level)
     if (!allowed) return []
 
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('pronunciation_prompts')
-      .select('id, cefr_level, sentence_de, focus, audio_url, sort_order')
-      .eq('cefr_level', family)
-      .order('sort_order', { ascending: true })
+    const catalog = getCatalogPrompts(level)
 
-    if (error) {
-      console.error('Übungssätze konnten nicht geladen werden:', {
+    try {
+      const supabase = await createClient()
+      const { data, error } = await supabase
+        .from('pronunciation_prompts')
+        .select('id, cefr_level, sentence_de, focus, audio_url, sort_order')
+        .eq('cefr_level', family)
+        .order('sort_order', { ascending: true })
+
+      if (error) {
+        console.error('Übungssätze konnten nicht geladen werden:', {
+          level,
+          family,
+          message: error.message,
+        })
+        return catalog
+      }
+
+      const fromDb: PronunciationPrompt[] = []
+      for (const row of data ?? []) {
+        if (!isCefrFamily(row.cefr_level) || row.sentence_de.trim().length === 0) continue
+        fromDb.push({
+          id: row.id,
+          cefrLevel: row.cefr_level,
+          sentenceDe: row.sentence_de,
+          focus: row.focus,
+          audioUrl: row.audio_url,
+          sortOrder: row.sort_order,
+        })
+      }
+      return mergePronunciationPrompts(catalog, fromDb)
+    } catch (err) {
+      console.error('Datenbankfehler beim Laden der Übungssätze, Katalog wird verwendet:', {
         level,
         family,
-        message: error.message,
+        error: err instanceof Error ? err.message : 'unbekannt',
       })
-      return []
+      return catalog
     }
-
-    const prompts: PronunciationPrompt[] = []
-    for (const row of data ?? []) {
-      if (!isCefrFamily(row.cefr_level) || row.sentence_de.trim().length === 0) continue
-      prompts.push({
-        id: row.id,
-        cefrLevel: row.cefr_level,
-        sentenceDe: row.sentence_de,
-        focus: row.focus,
-        audioUrl: row.audio_url,
-        sortOrder: row.sort_order,
-      })
-    }
-    return prompts
   } catch (err) {
     console.error('Unerwarteter Fehler beim Laden der Übungssätze:', {
       level,

@@ -3,7 +3,9 @@ import {
   appendLevel,
   formatDuration,
   levelFromTimeDomain,
+  peakAtStep,
   playbackProgress,
+  playbackTimeFromClock,
   seekTargetSeconds,
   smoothTowards,
   toneFromFrequency,
@@ -156,5 +158,32 @@ describe('smoothTowards', () => {
   it('begrenzt den Glättungsfaktor auf 0 bis 1', () => {
     expect(smoothTowards(0, 1, -5)).toBe(0)
     expect(smoothTowards(0, 1, 5)).toBe(1)
+  })
+})
+
+describe('peakAtStep', () => {
+  it('liefert 128 bei leeren Daten', () => {
+    expect(peakAtStep([], 0, 8)).toBe(128)
+  })
+
+  it('nimmt im Fenster den Wert mit der größten Auslenkung', () => {
+    const data = new Uint8Array([128, 128, 200, 128, 40, 128])
+    expect(peakAtStep(data, 0, 2)).toBe(200)
+    expect(peakAtStep(data, 1, 2)).toBe(40)
+  })
+})
+
+describe('playbackTimeFromClock', () => {
+  it('addiert die verstrichene Context-Zeit zum Start-Offset', () => {
+    expect(playbackTimeFromClock(5, 3, 1, 1, 20)).toBe(3)
+  })
+
+  it('berücksichtigt das Playback-Tempo', () => {
+    expect(playbackTimeFromClock(5, 3, 0, 0.5, 20)).toBe(1)
+  })
+
+  it('begrenzt auf die Dauer', () => {
+    expect(playbackTimeFromClock(50, 0, 0, 1, 10)).toBe(10)
+    expect(playbackTimeFromClock(2, 0, 0, 1, 0)).toBe(0)
   })
 })

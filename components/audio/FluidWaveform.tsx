@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { smoothTowards } from '@/lib/audio/waveform'
+import { peakAtStep, smoothTowards } from '@/lib/audio/waveform'
 
 /** Eine phasenverschobene Sinus-Schicht der Siri-Wave. */
 interface WaveLayer {
@@ -27,8 +27,8 @@ const WAVE_LAYERS: readonly WaveLayer[] = [
   { frequency: 2.3, speed: 1.8, scale: 0.45, alpha: 0.35, lineWidth: 1.8 },
 ]
 
-/** Anzahl der Geradenstücke pro Welle – 64 reicht für glatte Kurven bei üblicher Kartenbreite. */
-const CURVE_STEPS = 64
+/** Anzahl der Geradenstücke pro Welle. */
+const CURVE_STEPS = 96
 
 function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
@@ -38,20 +38,14 @@ function prefersReducedMotion(): boolean {
 /**
  * Wiederverwendbare Siri-artige, fließende Tonspur auf `<canvas>`.
  *
- * Bewusst datenquellen-agnostisch: `getVolume()` / `getTone()` liefern pro
- * Frame nur Zahlen zwischen 0 und 1 – die Quelle (Mikrofon-`AnalyserNode`
- * oder Wiedergabe-`AnalyserNode`) entscheidet der Aufrufer. Lautstärke
- * steuert die Amplitude, Stimmlage die Wellendichte.
- *
- * Zeichnet nur, während `isActive` true ist, mit `requestAnimationFrame`;
- * im inaktiven Zustand wird ein einzelner ruhiger Frame gezeichnet und die
- * Schleife gestoppt – wichtig, wenn mehrere Player gleichzeitig auf einer
- * Seite stehen (z.B. `SubmissionHistory`), damit nicht viele Canvas-Loops
- * parallel und unnötig CPU verbrauchen.
+ * Lautstärke steuert die Amplitude, Stimmlage die Wellendichte.
+ * Liegen Zeitbereich-Samples vor (`getSamples`), zeichnet die Komponente
+ * zusätzlich die echte Oszilloskop-Kurve der Stimme.
  */
 export default function FluidWaveform({
   getVolume,
   getTone,
+  getSamples,
   isActive,
   className,
 }: {
@@ -62,6 +56,8 @@ export default function FluidWaveform({
    * Höhere Werte verdichten die Welle (mehr Berge), tiefe Stimmen strecken sie.
    */
   getTone?: () => number
+  /** Optionaler Zeitbereich (0–255, Ruhe 128) für die echte Sprachkurve. */
+  getSamples?: () => ArrayLike<number> | null
   /** Ob gerade Ton läuft. `false` zeichnet einmalig eine ruhige Linie statt dauerhaft zu animieren. */
   isActive: boolean
   className?: string
@@ -72,6 +68,8 @@ export default function FluidWaveform({
   getVolumeRef.current = getVolume
   const getToneRef = useRef(getTone)
   getToneRef.current = getTone
+  const getSamplesRef = useRef(getSamples)
+  getSamplesRef.current = getSamples
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -89,11 +87,8 @@ export default function FluidWaveform({
 
     const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1
     const reducedMotion = prefersReducedMotion()
-    // Bei "reduzierter Bewegung" schwingt die Welle langsamer und glättet
-    // stärker – bewusst nicht komplett statisch, sonst wirkt eine laufende
-    // Aufnahme/Wiedergabe wie eingefroren (Geragogik: Rückmeldung muss erkennbar bleiben).
-    const phaseSpeed = reducedMotion ? 0.012 : 0.045
-    const smoothing = reducedMotion ? 0.08 : 0.18
+    const phaseSpeed = reducedMotion ? 0.016 : 0.055
+    const smoothing = reducedMotion ? 0.16 : 0.32
 
     const resize = () => {
       const { width, height } = container.getBoundingClientRect()
@@ -102,22 +97,23 @@ export default function FluidWaveform({
     }
     resize()
 
-    const drawFrame = () => {
-      const width = canvas.width
-      const height = canvas.height
-      if (width === 0 || height === 0) return
+    const strokeGradient = (width: number, alpha: number) => {
+      const gradient = ctx.createLinearGradient(0, 0, width, 0)
+      gradient.addColorStop(0, 'rgba(255, 92, 0, 0)')
+      gradient.addColorStop(0.5, `rgba(255, 122, 26, ${alpha})`)
+      gradient.addColorStop(1, 'rgba(255, 92, 0, 0)')
+      return gradient
+    }
 
-      ctx.clearRect(0, 0, width, height)
-
-      const midY = height / 2
-      const maxSwing = height * 0.42
-      // Pausen: Welle flacht fast auf die Mittellinie ab. Laute/prägnante
-      // Sprache nutzt die volle Höhe. Kein künstlicher Mindesthub mehr –
-      // Stille muss sichtbar still sein.
-      const swingFactor = amplitude
-      // Tiefe Stimme streckt die Welle, helle Laute verdichten sie.
-      const density = 0.7 + tone * 0.9
-
+    const drawSineLayers = (
+      width: number,
+      height: number,
+      midY: number,
+      maxSwing: number,
+      swingFactor: number,
+      density: number,
+      alphaScale: number
+    ) => {
       for (const layer of WAVE_LAYERS) {
         ctx.beginPath()
         for (let step = 0; step <= CURVE_STEPS; step += 1) {
@@ -133,12 +129,7 @@ export default function FluidWaveform({
           else ctx.lineTo(x, y)
         }
 
-        const gradient = ctx.createLinearGradient(0, 0, width, 0)
-        gradient.addColorStop(0, 'rgba(255, 92, 0, 0)')
-        gradient.addColorStop(0.5, `rgba(255, 122, 26, ${layer.alpha})`)
-        gradient.addColorStop(1, 'rgba(255, 92, 0, 0)')
-
-        ctx.strokeStyle = gradient
+        ctx.strokeStyle = strokeGradient(width, layer.alpha * alphaScale)
         ctx.lineWidth = layer.lineWidth * dpr
         ctx.lineCap = 'round'
         ctx.lineJoin = 'round'
@@ -148,11 +139,57 @@ export default function FluidWaveform({
       }
     }
 
+    const drawOscilloscope = (
+      samples: ArrayLike<number>,
+      width: number,
+      midY: number,
+      maxSwing: number
+    ) => {
+      ctx.beginPath()
+      for (let step = 0; step <= CURVE_STEPS; step += 1) {
+        const peak = peakAtStep(samples, step, CURVE_STEPS)
+        const centered = ((peak - 128) / 128) * 1.55
+        const x = (step / CURVE_STEPS) * width
+        const y = midY + Math.max(-1, Math.min(1, centered)) * maxSwing
+        if (step === 0) ctx.moveTo(x, y)
+        else ctx.lineTo(x, y)
+      }
+
+      ctx.strokeStyle = strokeGradient(width, 0.98)
+      ctx.lineWidth = 3.6 * dpr
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+      ctx.shadowColor = 'rgba(255, 122, 26, 0.7)'
+      ctx.shadowBlur = 12 * dpr
+      ctx.stroke()
+    }
+
+    const drawFrame = () => {
+      const width = canvas.width
+      const height = canvas.height
+      if (width === 0 || height === 0) return
+
+      ctx.clearRect(0, 0, width, height)
+
+      const midY = height / 2
+      const maxSwing = height * 0.42
+      const swingFactor = Math.min(1, amplitude * 1.45)
+      const density = 0.65 + tone * 1.15
+      const samples = getSamplesRef.current ? getSamplesRef.current() : null
+      const hasVoiceShape = Boolean(samples && samples.length > 0 && swingFactor > 0.02)
+
+      if (hasVoiceShape && samples) {
+        drawSineLayers(width, height, midY, maxSwing, swingFactor, density, 0.45)
+        drawOscilloscope(samples, width, midY, maxSwing)
+      } else {
+        drawSineLayers(width, height, midY, maxSwing, swingFactor, density, 1)
+      }
+    }
+
     const resizeObserver =
       typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(() => {
             resize()
-            // Ohne laufende Schleife (inaktiv) muss der Resize selbst neu zeichnen.
             if (!frameHandle) drawFrame()
           })
         : null
@@ -165,13 +202,11 @@ export default function FluidWaveform({
         amplitude = smoothTowards(amplitude, getVolumeRef.current(), smoothing)
         const toneTarget = getToneRef.current ? getToneRef.current() : 0.5
         tone = smoothTowards(tone, toneTarget, smoothing)
-        phase += phaseSpeed * (0.7 + amplitude * 0.6)
+        phase += phaseSpeed * (0.55 + amplitude * 1.1)
         drawFrame()
       }
       frameHandle = requestAnimationFrame(animate)
     } else {
-      // Einmaliger ruhiger Frame statt Dauerschleife – spart CPU, wenn z.B.
-      // mehrere Player in einer Liste gleichzeitig inaktiv sind.
       amplitude = 0
       tone = 0.5
       phase = 0

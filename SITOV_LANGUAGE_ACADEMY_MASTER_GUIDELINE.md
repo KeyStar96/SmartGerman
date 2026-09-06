@@ -1,6 +1,6 @@
 # Sitov Language Academy — Pedagogy & UI/UX Research
 
-> **Aussprache-Update (2026-09-06):** Die Tonspur im Aussprache-Trainer visualisiert echte Audiodaten (`AnalyserNode`: Lautstärke + Stimmlage) – bei der Live-Aufnahme und bei der Wiedergabe. Übungssätze liegen je CEFR-Familie (A1–C2) vor und werden nur für das freigeschaltete Niveau geladen. Referenzhören: native Audio-URL mit Echtzeit-Welle, sonst langsame deutsche Sprachausgabe.
+> **Aussprache-Update (2026-09-06):** Die Tonspur visualisiert echte Audiodaten (Lautstärke, Stimmlage, Zeitbereich) bei Aufnahme und Wiedergabe. Auf iOS/Safari läuft der Ton über einen geteilten, entsperrten `AudioContext` und dekodierte Buffer – nicht über `createMediaElementSource`. Übungssätze sind lückenlos für A1.1–B1.2 und die Familien A1–C2 im Katalog hinterlegt; die Datenbank kann Audio-URLs ergänzen. Referenzhören: native Audio-URL mit Echtzeit-Welle, sonst langsame deutsche Sprachausgabe.
 
 > **i18n-Update (2026-09-06):** Die Oberflächensprache folgt der bei der Registrierung gewählten Erstsprache und wird nach dem Login automatisch gesetzt; im Profil ist sie jederzeit über einen Sprachumschalter änderbar (Endonyme, große Bedienelemente). Grundsatz: Kein interner Fallback-String darf ungeübersetzt in der UI erscheinen – alle sieben Übersetzer-Sektionen sind in allen fünf Sprachen (de/en/uk/ru/tr) vollständig zu pflegen (Audit siehe `CURRENT_STATE.md` 1a). Routen-Segmente in Breadcrumbs müssen stets übersetzte Namen zeigen (`DASHBOARD_ROUTE_KEYS`).
 

@@ -1,6 +1,6 @@
 # Monetization Strategy (Stripe Integration)
 
-> **Hinweis (2026-09-06):** Die Überarbeitung des Aussprache-Trainers (Analyser-Waveform, Tabelle `pronunciation_prompts`) sowie die i18n- und Mobile-UX-Änderungen (siehe `CURRENT_STATE.md` Abschnitt 1a) berühren Stripe/Abo nicht. Die Übungssätze werden nach dem bestehenden Zugriffsmodell (`allowed_levels` + Route-Guard) gefiltert.
+> **Hinweis (2026-09-06):** Die iOS-Audio-, Waveform- und Übungssatz-Korrekturen des Aussprache-Trainers (siehe `CURRENT_STATE.md` Abschnitt 1a) berühren Stripe/Abo nicht. Die Sätze bleiben hinter `allowed_levels` + Route-Guard.
 
 > **STATUS-UPDATE (2026-09-06): In-App-Freemium abgelöst.**
 > Das nachstehend beschriebene In-App-Free/Premium-Modell steuert **nicht mehr** den Zugriff auf Lerninhalte. Der Inhaltszugriff wird jetzt ausschließlich über die **Admin-Freigabe je Sprachniveau** (`profiles.allowed_levels`) gesteuert – siehe `ARCHITECTURE.md` und `CURRENT_STATE.md` (Abschnitt 1a). Neu registrierte Nutzer haben zunächst keinen Zugriff; ein Admin schaltet einzelne Niveaus (A1.1 … B1.2) pro Nutzer frei.

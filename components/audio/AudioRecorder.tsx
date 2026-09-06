@@ -131,7 +131,12 @@ export default function AudioRecorder({
               analyserRef={recorder.analyserRef}
             />
           ) : (
-            <WaveformPlayer src={recorder.audioUrl} t={t} label={t('your_recording')} />
+            <WaveformPlayer
+              src={recorder.audioUrl}
+              blob={recorder.audioBlob}
+              t={t}
+              label={t('your_recording')}
+            />
           )}
         </div>
       )}

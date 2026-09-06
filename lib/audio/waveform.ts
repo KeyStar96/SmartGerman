@@ -155,3 +155,45 @@ export function smoothTowards(current: number, target: number, smoothing: number
   const factor = Math.min(1, Math.max(0, smoothing))
   return current + (target - current) * factor
 }
+
+/**
+ * Wählt in einem Zeitfenster den Sample-Wert mit der größten Auslenkung
+ * von der Ruhelinie (128). So bleiben Sprachspitzen in der gezeichneten
+ * Kurve sichtbar, statt durch Mittelung zu verschwinden.
+ */
+export function peakAtStep(data: ArrayLike<number>, step: number, totalSteps: number): number {
+  if (data.length === 0 || totalSteps <= 0) return 128
+
+  const safeStep = Math.min(Math.max(0, step), totalSteps - 1)
+  const start = Math.floor((safeStep / totalSteps) * data.length)
+  const end = Math.max(start + 1, Math.floor(((safeStep + 1) / totalSteps) * data.length))
+
+  let farthest = 128
+  let farthestDist = 0
+  for (let index = start; index < end && index < data.length; index += 1) {
+    const value = data[index] ?? 128
+    const distance = Math.abs(value - 128)
+    if (distance >= farthestDist) {
+      farthestDist = distance
+      farthest = value
+    }
+  }
+  return farthest
+}
+
+/**
+ * Laufzeit einer `AudioBufferSourceNode`-Wiedergabe aus dem AudioContext-Takt.
+ * `offsetSeconds` ist die Position, an der `source.start(0, offset)` begann.
+ */
+export function playbackTimeFromClock(
+  contextNow: number,
+  startedAt: number,
+  offsetSeconds: number,
+  rate: number,
+  duration: number
+): number {
+  if (!Number.isFinite(duration) || duration <= 0) return 0
+  const safeRate = Number.isFinite(rate) && rate > 0 ? rate : 1
+  const elapsed = Math.max(0, contextNow - startedAt) * safeRate
+  return Math.min(duration, Math.max(0, offsetSeconds + elapsed))
+}

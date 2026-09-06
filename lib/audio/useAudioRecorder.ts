@@ -1,14 +1,22 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
+import {
+  blobTypeForRecorder,
+  browserPrefersMp4Recording,
+  createAnalyserNode,
+  ensureAudioContext,
+  pickRecorderMimeType,
+  unlockAudioContext,
+} from '@/lib/audio/web-audio'
 import { appendLevel, levelFromTimeDomain, WAVEFORM_BAR_COUNT } from '@/lib/audio/waveform'
 
 /**
  * Gemeinsame Aufnahme-Logik für Schüler und Lehrkraft.
  *
  * Kapselt `getUserMedia`, `MediaRecorder` und den `AnalyserNode` für die
- * live mitlaufende Tonspur. Vorher lag diese Logik doppelt in
- * `AudioRecorder` und `PendingSubmissionCard`.
+ * live mitlaufende Tonspur. Der AudioContext wird geteilt und nicht
+ * geschlossen – auf iOS führt `close()` sonst zu stummer Wiedergabe.
  */
 
 export type RecorderStatus =
@@ -49,19 +57,8 @@ export interface UseAudioRecorderResult {
   reset: () => void
 }
 
-/** Reihenfolge nach Kompatibilität: Chrome/Firefox zuerst, dann Safari. */
-const MIME_CANDIDATES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'] as const
-
 /** Abstand zwischen zwei Balken der laufenden Tonspur. */
 const LEVEL_SAMPLE_INTERVAL_MS = 110
-
-function pickMimeType(): string | undefined {
-  if (typeof MediaRecorder === 'undefined') return undefined
-  for (const candidate of MIME_CANDIDATES) {
-    if (MediaRecorder.isTypeSupported(candidate)) return candidate
-  }
-  return undefined
-}
 
 function isRecordingSupported(): boolean {
   return (
@@ -70,17 +67,6 @@ function isRecordingSupported(): boolean {
     typeof navigator !== 'undefined' &&
     typeof navigator.mediaDevices?.getUserMedia === 'function'
   )
-}
-
-interface WindowWithLegacyAudioContext extends Window {
-  webkitAudioContext?: typeof AudioContext
-}
-
-function createAudioContext(): AudioContext | null {
-  if (typeof window === 'undefined') return null
-  const legacy = (window as WindowWithLegacyAudioContext).webkitAudioContext
-  const Ctor = window.AudioContext ?? legacy
-  return Ctor ? new Ctor() : null
 }
 
 export function useAudioRecorder(): UseAudioRecorderResult {
@@ -93,7 +79,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
   const chunksRef = useRef<Blob[]>([])
-  const audioContextRef = useRef<AudioContext | null>(null)
+  const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const frameRef = useRef<number | null>(null)
   const lastSampleAtRef = useRef(0)
@@ -107,19 +93,29 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     }
   }, [])
 
-  /** Gibt Mikrofon, AudioContext und die Animationsschleife frei. */
+  /** Gibt Mikrofon, Knoten und die Animationsschleife frei – nicht den Context. */
   const teardown = useCallback(() => {
     if (frameRef.current !== null) {
       cancelAnimationFrame(frameRef.current)
       frameRef.current = null
     }
 
-    analyserRef.current = null
+    if (sourceNodeRef.current) {
+      try {
+        sourceNodeRef.current.disconnect()
+      } catch {
+        // Bereits getrennt.
+      }
+      sourceNodeRef.current = null
+    }
 
-    if (audioContextRef.current) {
-      // Der Close-Promise interessiert uns nicht; Fehler hier sind unkritisch.
-      void audioContextRef.current.close().catch(() => undefined)
-      audioContextRef.current = null
+    if (analyserRef.current) {
+      try {
+        analyserRef.current.disconnect()
+      } catch {
+        // Bereits getrennt.
+      }
+      analyserRef.current = null
     }
 
     if (streamRef.current) {
@@ -144,6 +140,11 @@ export function useAudioRecorder(): UseAudioRecorderResult {
       return
     }
 
+    // Noch in der Nutzer-Geste: Context anlegen und resume anstoßen.
+    // Nach `await getUserMedia` ist die iOS-Geste verbraucht.
+    const context = ensureAudioContext()
+    void context?.resume()
+
     releaseObjectUrl()
     setAudioUrl(null)
     setAudioBlob(null)
@@ -154,7 +155,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     let stream: MediaStream
     try {
       stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true },
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
       })
     } catch (err) {
       console.error('Mikrofon-Zugriff nicht möglich:', err)
@@ -165,7 +166,13 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     streamRef.current = stream
 
     try {
-      const mimeType = pickMimeType()
+      await unlockAudioContext()
+
+      const preferMp4 = browserPrefersMp4Recording()
+      const mimeType = pickRecorderMimeType(
+        (candidate) => MediaRecorder.isTypeSupported(candidate),
+        preferMp4
+      )
       const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
       recorderRef.current = recorder
       chunksRef.current = []
@@ -175,9 +182,8 @@ export function useAudioRecorder(): UseAudioRecorderResult {
       }
 
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, {
-          type: recorder.mimeType || mimeType || 'audio/webm',
-        })
+        const type = blobTypeForRecorder(recorder.mimeType, mimeType, preferMp4)
+        const blob = new Blob(chunksRef.current, { type })
         const url = URL.createObjectURL(blob)
         objectUrlRef.current = url
         setAudioBlob(blob)
@@ -192,15 +198,12 @@ export function useAudioRecorder(): UseAudioRecorderResult {
         teardown()
       }
 
-      // Die Tonspur ist reine Zugabe: schlägt der AudioContext fehl,
-      // läuft die Aufnahme ohne Visualisierung weiter.
-      const audioContext = createAudioContext()
-      if (audioContext) {
-        audioContextRef.current = audioContext
-        const analyser = audioContext.createAnalyser()
-        analyser.fftSize = 1024
-        analyser.smoothingTimeConstant = 0.55
-        audioContext.createMediaStreamSource(stream).connect(analyser)
+      const runningContext = ensureAudioContext()
+      if (runningContext && runningContext.state !== 'closed') {
+        const analyser = createAnalyserNode(runningContext)
+        const source = runningContext.createMediaStreamSource(stream)
+        source.connect(analyser)
+        sourceNodeRef.current = source
         analyserRef.current = analyser
 
         const buffer = new Uint8Array(analyser.fftSize)
@@ -228,7 +231,8 @@ export function useAudioRecorder(): UseAudioRecorderResult {
         startedAtRef.current = performance.now()
       }
 
-      recorder.start()
+      // timeslice: iOS flush't sonst oft erst beim Stopp einen leeren Container.
+      recorder.start(250)
       setStatus('recording')
     } catch (err) {
       console.error('Aufnahme konnte nicht gestartet werden:', err)

@@ -167,7 +167,7 @@ export default function PendingSubmissionCard({ sub, onSubmit }: PendingSubmissi
             {recorder.hasRecording && !recorder.isRecording && (
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <WaveformPlayer src={recorder.audioUrl} compact />
+                  <WaveformPlayer src={recorder.audioUrl} blob={recorder.audioBlob} compact />
                 </div>
                 <button
                   type="button"

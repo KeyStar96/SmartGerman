@@ -56,3 +56,55 @@ INSERT INTO public.pronunciation_prompts (cefr_level, sentence_de, focus, sort_o
 ('C2', 'Ein geübtes Ohr unterscheidet Ironie von bloßer Höflichkeit im Bruchteil einer Sekunde.', 'ü, ch', 6),
 ('C2', 'Sprachliche Eleganz entsteht, wo Präzision und Rhythmus einander tragen.', 'z, ch', 7),
 ('C2', 'Wer Stil beherrscht, kann auch Schweigen beredt machen.', 'sch, ch', 8);
+
+-- Ergänzung: weitere Sätze je Familie (sort_order 9+), ohne Duplikate zum Kernsatz.
+INSERT INTO public.pronunciation_prompts (cefr_level, sentence_de, focus, sort_order)
+SELECT v.cefr_level, v.sentence_de, v.focus, v.sort_order
+FROM (VALUES
+  ('A1', 'Eins, zwei, drei, vier.', 'ei, z', 9),
+  ('A1', 'Ich bin müde.', 'ü', 10),
+  ('A1', 'Wie geht es Ihnen?', 'ie, ch', 11),
+  ('A1', 'Danke schön!', 'sch, ö', 12),
+  ('A1', 'Wo ist die Toilette?', 'ie, tt', 13),
+  ('A1', 'Ich heiße Jürgen.', 'ü, ei', 14),
+  ('A1', 'Ich kaufe Brot, Milch und Käse.', 'au, ch', 15),
+  ('A1', 'Wir wohnen in einer kleinen Wohnung.', 'ö, w', 16),
+  ('A1', 'Kannst du das bitte wiederholen?', 'ie, ö', 17),
+  ('A1', 'Meine Schwester spricht Deutsch.', 'sch, ch', 18),
+  ('A1', 'Der Apfel ist süß und rot.', 'pf, ü', 19),
+  ('A1', 'Ich möchte einen Tee, bitte.', 'ö, ch', 20),
+  ('A2', 'Ich stehe um sieben Uhr auf.', 'st, ie', 9),
+  ('A2', 'Im Sommer fahren wir an die Ostsee.', 'mm, ee', 10),
+  ('A2', 'Hast du Lust auf einen Spaziergang?', 'st, z', 11),
+  ('A2', 'Die Küche ist hell und freundlich.', 'ü, ch', 12),
+  ('A2', 'Wir treffen uns nach der Arbeit.', 'ff, ei', 13),
+  ('A2', 'Könntest du das Fenster zumachen?', 'ö, ch', 14),
+  ('A2', 'Trotz des Regens gehen wir spazieren.', 'z, z', 15),
+  ('A2', 'Ich habe gestern einen interessanten Film gesehen.', 'g, ie', 16),
+  ('A2', 'Nächste Woche besuchen wir unsere Großeltern.', 'ch, ß', 17),
+  ('A2', 'Sie spricht schnell, aber sehr deutlich.', 'ch, eu', 18),
+  ('A2', 'Das Frühstück schmeckt besonders gut.', 'ü, sch', 19),
+  ('A2', 'Bitte sprechen Sie etwas langsamer.', 'ch, er', 20),
+  ('B1', 'Weil ich krank war, habe ich den Kurs verpasst.', 'ei, st', 9),
+  ('B1', 'Manchmal fällt es mir schwer, ruhig zu bleiben.', 'ch, ei', 10),
+  ('B1', 'Wir haben uns lange über das Thema unterhalten.', 'th, h', 11),
+  ('B1', 'Ich versuche, jeden Tag ein bisschen Deutsch zu sprechen.', 'ch, ü', 12),
+  ('B1', 'Die Aussprache übe ich am liebsten laut vor dem Spiegel.', 'ss, ü', 13),
+  ('B1', 'Es wäre schön, wenn wir uns nächste Woche treffen könnten.', 'ä, ö', 14),
+  ('B1', 'Ich würde vorschlagen, die Übung noch einmal zu machen.', 'ü, sch', 15),
+  ('B1', 'Je genauer man zuhört, desto besser versteht man die Melodie.', 'au, ie', 16),
+  ('B1', 'Nach der Prüfung fühle ich mich erleichtert und müde.', 'ü, ch', 17),
+  ('B1', 'Man sollte nicht voreilig urteilen, bevor alle Fakten da sind.', 'ei, g', 18),
+  ('B1', 'Die Aussprache klappt besser, wenn man langsam und klar spricht.', 'ch, a', 19),
+  ('B2', 'Die Betonung verschiebt die Bedeutung oft um eine ganze Nuance.', 'ö, z', 9),
+  ('B2', 'Wer bewusst artikuliert, wird auch in schwierigen Sätzen verstanden.', 'z, ch', 10),
+  ('C1', 'Die Prosodie trägt oft mehr Bedeutung als das einzelne Lexem.', 's, ie', 9),
+  ('C1', 'Ein geübtes Ohr hört den Unterschied zwischen Distanz und Wärme.', 'ü, ä', 10),
+  ('C2', 'Die Kunst liegt darin, schwere Laute leicht und leichte Laute gewichtig zu sprechen.', 'ch, ei', 9),
+  ('C2', 'Nur wer die Satzmelodie beherrscht, klingt wirklich idiomatisch.', 'ch, t', 10)
+) AS v(cefr_level, sentence_de, focus, sort_order)
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM public.pronunciation_prompts existing
+  WHERE existing.sentence_de = v.sentence_de
+);
