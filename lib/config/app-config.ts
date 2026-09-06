@@ -18,4 +18,4 @@ export const IS_PRODUCTION: 'Y' | 'N' =
  * Convenience helper to determine whether the Learning Platform (Lernplattform / Dashboard)
  * should be visible in public navigation / menus.
  */
-export const SHOW_LEARNING_PLATFORM = IS_PRODUCTION !== 'Y';
+export const SHOW_LEARNING_PLATFORM = IS_PRODUCTION !== 'N';
