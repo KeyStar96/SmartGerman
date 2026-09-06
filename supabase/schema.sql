@@ -180,6 +180,17 @@ CREATE TABLE public.videos (
   CONSTRAINT videos_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE public.pronunciation_prompts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cefr_level text NOT NULL CHECK (cefr_level = ANY (ARRAY['A1'::text, 'A2'::text, 'B1'::text, 'B2'::text, 'C1'::text, 'C2'::text])),
+  sentence_de text NOT NULL,
+  focus text,
+  audio_url text,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT pronunciation_prompts_pkey PRIMARY KEY (id)
+);
+
 CREATE TABLE public.exercises (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   lesson text NOT NULL,
@@ -405,6 +416,7 @@ ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pronunciation_prompts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.teacher_feedback ENABLE ROW LEVEL SECURITY;
@@ -476,6 +488,12 @@ CREATE POLICY "Nutzer können eigenen Lernfortschritt löschen" ON public.user_v
 -- users
 CREATE POLICY "Users viewable by service_role only" ON public.users FOR SELECT TO service_role USING (true);
 CREATE POLICY "Service Role Full Access Users" ON public.users FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+-- pronunciation_prompts
+CREATE POLICY "Nutzer können Übungssätze sehen" ON public.pronunciation_prompts FOR SELECT TO public USING (auth.uid() IS NOT NULL);
+CREATE POLICY "Admins und Lehrer dürfen Übungssätze einfügen" ON public.pronunciation_prompts FOR INSERT TO public WITH CHECK ((SELECT profiles.role FROM profiles WHERE profiles.id = auth.uid()) = ANY (ARRAY['admin'::text, 'teacher'::text]));
+CREATE POLICY "Admins und Lehrer dürfen Übungssätze bearbeiten" ON public.pronunciation_prompts FOR UPDATE TO public USING ((SELECT profiles.role FROM profiles WHERE profiles.id = auth.uid()) = ANY (ARRAY['admin'::text, 'teacher'::text]));
+CREATE POLICY "Admins und Lehrer dürfen Übungssätze löschen" ON public.pronunciation_prompts FOR DELETE TO public USING ((SELECT profiles.role FROM profiles WHERE profiles.id = auth.uid()) = ANY (ARRAY['admin'::text, 'teacher'::text]));
 
 -- videos
 CREATE POLICY "Nutzer können Videos sehen" ON public.videos FOR SELECT TO public USING (auth.uid() IS NOT NULL);

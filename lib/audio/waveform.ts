@@ -33,6 +33,57 @@ export function levelFromTimeDomain(data: ArrayLike<number>): number {
 }
 
 /**
+ * Liest Lautstärke (Zeitbereich) und Stimmlage (Frequenzbereich) in einem
+ * Schritt aus einem `AnalyserNode`. Puffer werden vom Aufrufer wiederverwendet,
+ * damit pro Frame kein Garbage anfällt.
+ */
+export function analyseFrame(
+  analyser: AnalyserNode,
+  timeBuffer: Uint8Array<ArrayBuffer>,
+  frequencyBuffer: Uint8Array<ArrayBuffer>
+): { volume: number; tone: number } {
+  analyser.getByteTimeDomainData(timeBuffer)
+  analyser.getByteFrequencyData(frequencyBuffer)
+  return {
+    volume: levelFromTimeDomain(timeBuffer),
+    tone: toneFromFrequency(frequencyBuffer),
+  }
+}
+
+/**
+ * Rechnet die Frequenz-Rohdaten eines `AnalyserNode` (`getByteFrequencyData`,
+ * je Bucket 0–255) in einen normalisierten „Stimmlage"-Wert zwischen 0 und 1 um.
+ *
+ * Grundlage ist der spektrale Schwerpunkt (Spectral Centroid): der nach
+ * Energie gewichtete mittlere Frequenz-Bucket. Tiefe/dunkle Stimmen liefern
+ * einen niedrigen Wert, helle/hohe Laute (z. B. „s", „i") einen höheren.
+ * So kann die Visualisierung nicht nur auf die Lautstärke, sondern auch auf
+ * die Stimmlage reagieren (Wellenzahl/Dichte der Kurve).
+ *
+ * Bei Stille (keine Energie) wird ein neutraler Mittelwert (0.5) zurückgegeben,
+ * damit die Welle nicht ruckartig auf 0 zusammenfällt.
+ */
+export function toneFromFrequency(data: ArrayLike<number>): number {
+  if (data.length === 0) return 0.5
+
+  let weightedSum = 0
+  let energySum = 0
+  for (let index = 0; index < data.length; index += 1) {
+    const magnitude = data[index] ?? 0
+    weightedSum += index * magnitude
+    energySum += magnitude
+  }
+
+  // Ohne nennenswerte Energie (Pause) liefern wir einen neutralen Wert.
+  if (energySum < 1) return 0.5
+
+  const centroid = weightedSum / energySum / data.length
+  // Sprache konzentriert sich in den unteren Buckets; der Faktor spreizt den
+  // typischen Bereich (~0.05–0.35) auf eine deutlich sichtbare 0..1-Skala.
+  return Math.min(1, Math.max(0, centroid * 2.6))
+}
+
+/**
  * Schiebt einen neuen Pegelwert in die laufende Tonspur.
  *
  * Die Anzeige wächst von links nach rechts und scrollt erst, wenn sie voll

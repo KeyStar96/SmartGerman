@@ -199,6 +199,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
         audioContextRef.current = audioContext
         const analyser = audioContext.createAnalyser()
         analyser.fftSize = 1024
+        analyser.smoothingTimeConstant = 0.55
         audioContext.createMediaStreamSource(stream).connect(analyser)
         analyserRef.current = analyser
 

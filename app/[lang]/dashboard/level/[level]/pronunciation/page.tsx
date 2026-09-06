@@ -6,7 +6,8 @@ import {
   createPronunciationTranslator,
   type PronunciationTranslations,
 } from '@/lib/pronunciation-i18n'
-import AudioRecorder from '@/components/audio/AudioRecorder'
+import { getPronunciationPrompts } from '@/app/actions/pronunciation'
+import PronunciationPractice from '@/components/audio/PronunciationPractice'
 import SubmissionHistory from '@/components/audio/SubmissionHistory'
 
 export default async function PronunciationDashboard({
@@ -20,7 +21,10 @@ export default async function PronunciationDashboard({
   const translations = (dict.pronunciation ?? {}) as PronunciationTranslations
   const t = createPronunciationTranslator(translations)
 
-  const submissions = await getStudentSubmissions(decodedLevel)
+  const [submissions, prompts] = await Promise.all([
+    getStudentSubmissions(decodedLevel),
+    getPronunciationPrompts(decodedLevel),
+  ])
 
   return (
     <div className="mx-auto min-h-screen w-full max-w-4xl space-y-10 py-8">
@@ -39,7 +43,11 @@ export default async function PronunciationDashboard({
         <p className="relative z-10 text-lg leading-relaxed opacity-90 sm:text-xl">{t('subtitle')}</p>
       </div>
 
-      <AudioRecorder level={decodedLevel} translations={translations} />
+      <PronunciationPractice
+        prompts={prompts}
+        level={decodedLevel}
+        translations={translations}
+      />
 
       {/* Fließt natürlich unter der Aufnahme-Box; die Seite scrollt normal per Mausrad/Trackpad. */}
       <div className="space-y-6">

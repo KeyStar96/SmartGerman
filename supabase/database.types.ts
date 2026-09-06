@@ -233,6 +233,36 @@ export type Database = {
         }
         Relationships: []
       }
+      pronunciation_prompts: {
+        Row: {
+          audio_url: string | null
+          cefr_level: string
+          created_at: string | null
+          focus: string | null
+          id: string
+          sentence_de: string
+          sort_order: number
+        }
+        Insert: {
+          audio_url?: string | null
+          cefr_level: string
+          created_at?: string | null
+          focus?: string | null
+          id?: string
+          sentence_de: string
+          sort_order?: number
+        }
+        Update: {
+          audio_url?: string | null
+          cefr_level?: string
+          created_at?: string | null
+          focus?: string | null
+          id?: string
+          sentence_de?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       registrations: {
         Row: {
           agb_accepted: boolean

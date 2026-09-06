@@ -31,6 +31,7 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
 - **Content-Entitäten**:
   - `videos`: URL, Lektions-Zugehörigkeit, Titel.
   - `vocabulary_cards`: Wort, Artikel, Plural, Übersetzungen (`translation_ru` / `_tr` / `_en`), Audio, Bild. Lernsets sind der Text in `lesson` plus `level`. A1.1 live: **Lektion 1** (84 Karten), **Lektion 2** (85 Karten), **Lektion 3** (76 Karten). Seed: `supabase/seeds/a11_*.sql`. Migration: `supabase/migrations/move_einkauf_vocab_to_a11_lektion_3.sql`.
+  - `pronunciation_prompts`: Übungssätze des Aussprache-Trainers, nach CEFR-Familie (`A1`–`C2`). Felder: `sentence_de`, `focus`, optionale `audio_url`. 8 Sätze je Familie (Seed `supabase/seeds/pronunciation_prompts.sql`). Die Route `/dashboard/level/A1.1/pronunciation` mappt über `cefrFamilyFromLevel` auf `A1` usw.; Laden nur bei freigeschaltetem Niveau (`getPronunciationPrompts`). Migration: `add_pronunciation_prompts` (2026-09-06).
   - `exercises`: Typ (`fill_in_blank`, `multiple_choice`, `sentence_building`), Content als JSONB, `solution_audio_url` für Tap-to-Listen.
     - `content` bei `fill_in_blank`: `{ text_before, text_after, correct_answer, options?, smart_hint? }`.
       `options` sind die Auswahl-Chips; fehlen sie, werden sie serverseitig aus der Wortfamilie generiert.

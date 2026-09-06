@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type SyntheticEvent } from 'react'
 import { Loader2, Pause, Play, RotateCcw } from 'lucide-react'
 import FluidWaveform from '@/components/audio/FluidWaveform'
+import {
+  attachPlaybackAnalyser,
+  readPlaybackAnalysis,
+  resumePlaybackAnalyser,
+} from '@/lib/audio/playback-analyser'
 import { formatDuration, guessAudioMimeType, playbackProgress, seekTargetSeconds } from '@/lib/audio/waveform'
 import {
   createPronunciationTranslator,
@@ -39,8 +44,7 @@ export default function WaveformPlayer({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
-  /** Frame-Zähler für die Sinus-Simulation der Wiedergabe-Welle, siehe `getVolume`. */
-  const simPhaseRef = useRef(0)
+  const lastToneRef = useRef(0.5)
 
   const [isPlaying, setIsPlaying] = useState(false)
   const [isBuffering, setIsBuffering] = useState(false)
@@ -80,24 +84,25 @@ export default function WaveformPlayer({
   }, [src])
 
   /**
-   * Simulierter Lautstärke-Pegel während der Wiedergabe (0..1).
-   *
-   * Bewusst KEIN echter `AnalyserNode` am `<audio>`-Element: Das würde die
-   * Wiedergabe über `createMediaElementSource()` in den Web-Audio-Graphen
-   * umleiten (Stummschaltungsrisiko bei fehlendem `resume()`/fehlender
-   * Verbindung zu `destination`, nur eine Quelle pro Element über alle
-   * Re-Renders hinweg möglich, CORS-Abhängigkeit vom Storage-Bucket für
-   * echte Frequenzdaten). Für die Kernfunktion "Aufnahme anhören" ist das
-   * zu riskant – zwei sanft verstimmte, überlagerte Sinuswellen ergeben ein
-   * organisches, nie exakt periodisches Wellenbild, ganz ohne dieses Risiko.
+   * Echter Lautstärke-Pegel der laufenden Tonspur (0..1).
+   * Liest `getByteTimeDomainData` aus dem an das `<audio>`-Element
+   * angeschlossenen `AnalyserNode`. Bei Stille / Pause: 0.
    */
   const getVolume = useCallback((): number => {
-    if (!isPlaying) return 0
-    simPhaseRef.current += 1
-    const frame = simPhaseRef.current
-    const wave =
-      Math.sin(frame * 0.05) * 0.5 + Math.sin(frame * 0.087 + 1.3) * 0.35 + Math.sin(frame * 0.021) * 0.15
-    return Math.min(1, Math.max(0, 0.55 + wave * 0.45))
+    const audio = audioRef.current
+    if (!audio || !isPlaying) return 0
+    const frame = readPlaybackAnalysis(audio)
+    lastToneRef.current = frame.tone
+    return frame.volume
+  }, [isPlaying])
+
+  /** Spektraler Schwerpunkt (Stimmlage) derselben Tonspur. */
+  const getTone = useCallback((): number => {
+    const audio = audioRef.current
+    if (!audio || !isPlaying) return lastToneRef.current
+    const frame = readPlaybackAnalysis(audio)
+    lastToneRef.current = frame.tone
+    return frame.tone
   }, [isPlaying])
 
   const togglePlayback = useCallback(() => {
@@ -111,6 +116,8 @@ export default function WaveformPlayer({
 
     setIsBuffering(true)
     audio.playbackRate = speed
+    attachPlaybackAnalyser(audio)
+    void resumePlaybackAnalyser(audio)
     void audio.play().catch((err) => {
       console.error('Wiedergabe nicht möglich:', err)
       setIsBuffering(false)
@@ -125,6 +132,8 @@ export default function WaveformPlayer({
     setIsBuffering(true)
     // Erzwingt ein frisches Laden der Quelle (nach Netzwerk-/Timeout-Fehlern).
     audio.load()
+    attachPlaybackAnalyser(audio)
+    void resumePlaybackAnalyser(audio)
     void audio.play().catch((err) => {
       console.error('Erneute Wiedergabe nicht möglich:', err)
       setIsBuffering(false)
@@ -236,7 +245,7 @@ export default function WaveformPlayer({
             compact ? 'h-12' : 'h-16'
           }`}
         >
-          <FluidWaveform getVolume={getVolume} isActive={isPlaying} />
+          <FluidWaveform getVolume={getVolume} getTone={getTone} isActive={isPlaying} />
 
           {/* Dezente Fortschritts-Leiste unter der Welle – ersetzt die frühere Balken-Einfärbung. */}
           <div className="absolute inset-x-0 bottom-0 h-1 bg-slate-300/70 dark:bg-slate-600/70">
@@ -293,6 +302,7 @@ export default function WaveformPlayer({
       <audio
         ref={audioRef}
         src={src}
+        crossOrigin={src.startsWith('http') ? 'anonymous' : undefined}
         preload="metadata"
         onLoadedMetadata={handleLoadedMetadata}
         onDurationChange={(event) => {

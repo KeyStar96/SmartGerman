@@ -1,10 +1,12 @@
 import {
+  analyseFrame,
   appendLevel,
   formatDuration,
   levelFromTimeDomain,
   playbackProgress,
   seekTargetSeconds,
   smoothTowards,
+  toneFromFrequency,
 } from '@/lib/audio/waveform'
 
 describe('levelFromTimeDomain', () => {
@@ -27,6 +29,60 @@ describe('levelFromTimeDomain', () => {
 
   it('gibt bei leeren Daten 0 zurück', () => {
     expect(levelFromTimeDomain(new Uint8Array(0))).toBe(0)
+  })
+})
+
+describe('analyseFrame', () => {
+  it('liest Lautstärke und Stimmlage aus einem Analyser-ähnlichen Objekt', () => {
+    const time = new Uint8Array(8).fill(128)
+    const freq = new Uint8Array(8)
+    freq.fill(200, 0, 2)
+    const analyser = {
+      getByteTimeDomainData: (buffer: Uint8Array) => {
+        buffer.set(time)
+      },
+      getByteFrequencyData: (buffer: Uint8Array) => {
+        buffer.set(freq)
+      },
+    } as unknown as AnalyserNode
+
+    const frame = analyseFrame(analyser, new Uint8Array(8), new Uint8Array(8))
+    expect(frame.volume).toBe(0)
+    expect(frame.tone).toBeGreaterThanOrEqual(0)
+    expect(frame.tone).toBeLessThan(0.5)
+  })
+})
+
+describe('toneFromFrequency', () => {
+  it('gibt bei leeren Daten einen neutralen Mittelwert zurück', () => {
+    expect(toneFromFrequency(new Uint8Array(0))).toBe(0.5)
+  })
+
+  it('gibt bei Stille (keine Energie) einen neutralen Mittelwert zurück', () => {
+    expect(toneFromFrequency(new Uint8Array(64).fill(0))).toBe(0.5)
+  })
+
+  it('meldet bei tiefer Energie (untere Buckets) einen niedrigen Wert', () => {
+    const data = new Uint8Array(64)
+    data.fill(200, 0, 6) // Energie nur ganz unten
+    const lowTone = toneFromFrequency(data)
+    expect(lowTone).toBeGreaterThanOrEqual(0)
+    expect(lowTone).toBeLessThan(0.4)
+  })
+
+  it('meldet bei hoher Energie (obere Buckets) einen höheren Wert', () => {
+    const low = new Uint8Array(64)
+    low.fill(200, 0, 6)
+    const high = new Uint8Array(64)
+    high.fill(200, 48, 64) // Energie weit oben
+    expect(toneFromFrequency(high)).toBeGreaterThan(toneFromFrequency(low))
+  })
+
+  it('bleibt im Bereich 0 bis 1', () => {
+    const data = new Uint8Array(32).fill(255)
+    const tone = toneFromFrequency(data)
+    expect(tone).toBeGreaterThanOrEqual(0)
+    expect(tone).toBeLessThanOrEqual(1)
   })
 })
 

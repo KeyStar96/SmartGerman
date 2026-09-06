@@ -38,19 +38,10 @@ function prefersReducedMotion(): boolean {
 /**
  * Wiederverwendbare Siri-artige, fließende Tonspur auf `<canvas>`.
  *
- * Bewusst datenquellen-agnostisch: `getVolume()` liefert bei jedem Frame nur
- * einen Pegelwert zwischen 0 und 1 – woher der Wert kommt, entscheidet der
- * Aufrufer. Aktuell zwei Quellen im Projekt:
- *  - `LiveWaveform` (laufende Aufnahme): liest den Pegel direkt aus dem
- *    `AnalyserNode` von `useAudioRecorder` (echte Mikrofon-Lautstärke).
- *  - `WaveformPlayer` (Wiedergabe einer fertigen Aufnahme): simuliert den
- *    Pegel bewusst über sanft überlagerte Sinuswellen statt über einen
- *    echten `AnalyserNode` am `<audio>`-Element – das würde die
- *    Wiedergabe über den Web-Audio-Graphen umleiten (Stummschaltungsrisiko
- *    bei Fehlkonfiguration, doppelte Quellknoten bei Re-Renders, CORS-
- *    Abhängigkeit vom Storage-Bucket) und ist damit für die Kernfunktion
- *    "Aufnahme anhören" zu riskant. Die Sinus-Simulation ist eine bewusste,
- *    vom Projekt akzeptierte Alternative (siehe Aufgabenstellung).
+ * Bewusst datenquellen-agnostisch: `getVolume()` / `getTone()` liefern pro
+ * Frame nur Zahlen zwischen 0 und 1 – die Quelle (Mikrofon-`AnalyserNode`
+ * oder Wiedergabe-`AnalyserNode`) entscheidet der Aufrufer. Lautstärke
+ * steuert die Amplitude, Stimmlage die Wellendichte.
  *
  * Zeichnet nur, während `isActive` true ist, mit `requestAnimationFrame`;
  * im inaktiven Zustand wird ein einzelner ruhiger Frame gezeichnet und die
@@ -60,11 +51,17 @@ function prefersReducedMotion(): boolean {
  */
 export default function FluidWaveform({
   getVolume,
+  getTone,
   isActive,
   className,
 }: {
   /** Liefert bei jedem Frame den aktuellen Pegel (0..1). Wird per Ref gehalten, kein Trigger für Effect-Neustarts. */
   getVolume: () => number
+  /**
+   * Optionaler Stimmlage-Wert (0..1) aus `getByteFrequencyData`.
+   * Höhere Werte verdichten die Welle (mehr Berge), tiefe Stimmen strecken sie.
+   */
+  getTone?: () => number
   /** Ob gerade Ton läuft. `false` zeichnet einmalig eine ruhige Linie statt dauerhaft zu animieren. */
   isActive: boolean
   className?: string
@@ -73,6 +70,8 @@ export default function FluidWaveform({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const getVolumeRef = useRef(getVolume)
   getVolumeRef.current = getVolume
+  const getToneRef = useRef(getTone)
+  getToneRef.current = getTone
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -85,6 +84,7 @@ export default function FluidWaveform({
     let frameHandle: number | null = null
     let disposed = false
     let amplitude = 0
+    let tone = 0.5
     let phase = 0
 
     const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1
@@ -110,10 +110,13 @@ export default function FluidWaveform({
       ctx.clearRect(0, 0, width, height)
 
       const midY = height / 2
-      const maxSwing = height * 0.36
-      // Auch ohne Pegel leicht sichtbar schwingen lassen (0.15), damit eine
-      // stille Aufnahme/Pause nicht wie eine tote Linie aussieht.
-      const swingFactor = 0.15 + amplitude * 0.85
+      const maxSwing = height * 0.42
+      // Pausen: Welle flacht fast auf die Mittellinie ab. Laute/prägnante
+      // Sprache nutzt die volle Höhe. Kein künstlicher Mindesthub mehr –
+      // Stille muss sichtbar still sein.
+      const swingFactor = amplitude
+      // Tiefe Stimme streckt die Welle, helle Laute verdichten sie.
+      const density = 0.7 + tone * 0.9
 
       for (const layer of WAVE_LAYERS) {
         ctx.beginPath()
@@ -122,7 +125,7 @@ export default function FluidWaveform({
           const x = t * width
           const y =
             midY +
-            Math.sin(t * Math.PI * 2 * layer.frequency + phase * layer.speed) *
+            Math.sin(t * Math.PI * 2 * layer.frequency * density + phase * layer.speed) *
               maxSwing *
               layer.scale *
               swingFactor
@@ -160,7 +163,9 @@ export default function FluidWaveform({
         if (disposed) return
         frameHandle = requestAnimationFrame(animate)
         amplitude = smoothTowards(amplitude, getVolumeRef.current(), smoothing)
-        phase += phaseSpeed
+        const toneTarget = getToneRef.current ? getToneRef.current() : 0.5
+        tone = smoothTowards(tone, toneTarget, smoothing)
+        phase += phaseSpeed * (0.7 + amplitude * 0.6)
         drawFrame()
       }
       frameHandle = requestAnimationFrame(animate)
@@ -168,6 +173,7 @@ export default function FluidWaveform({
       // Einmaliger ruhiger Frame statt Dauerschleife – spart CPU, wenn z.B.
       // mehrere Player in einer Liste gleichzeitig inaktiv sind.
       amplitude = 0
+      tone = 0.5
       phase = 0
       drawFrame()
     }

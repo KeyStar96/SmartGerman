@@ -3,6 +3,17 @@
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
 
+## 1a. Änderungsprotokoll — 2026-09-06: Aussprache-Trainer (dynamische Analyser-Waveform + Übungssätze A1–C2)
+
+**Kernänderungen:**
+
+- **Dynamische Waveform (Web Audio API):**
+  - `WaveformPlayer` hängt jetzt einen echten `AnalyserNode` an das `<audio>`-Element (`lib/audio/playback-analyser.ts`: `createMediaElementSource` → Analyser → Destination, WeakMap gegen Doppel-Connect, `resume()` nach Klick). Keine simulierte Sinuswelle mehr.
+  - `LiveWaveform` liest pro Frame `getByteTimeDomainData` **und** `getByteFrequencyData` (`analyseFrame` in `lib/audio/waveform.ts`).
+  - `FluidWaveform` nutzt Lautstärke für die Amplitude (Pausen flachen ab) und den spektralen Schwerpunkt für die Wellendichte (Stimmlage).
+- **Übungssätze:** Neue Tabelle `pronunciation_prompts` (8 Sätze je CEFR-Familie A1, A2, B1, B2, C1, C2). Server Action `getPronunciationPrompts` mappt das Routen-Niveau (`A1.1` → `A1`) und prüft die Freigabe. UI: `PronunciationPractice` (Satzliste, Referenzhören per Audio-URL oder Web-Speech, anschließend Aufnahme).
+- **i18n:** Neue `pronunciation`-Keys (`prompts_*`, `reference_*`) in Fallbacks und allen fünf Dictionaries.
+
 ## 1a. Änderungsprotokoll — 2026-09-06: i18n-Überarbeitung (Erstsprachen-Onboarding, Auto-UI-Sprache, Sprachumschalter, Breadcrumb-Fix, Vollständigkeits-Audit)
 
 **Kernänderungen:**
