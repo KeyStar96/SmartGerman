@@ -3,7 +3,16 @@
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
 
-## 1a. Änderungsprotokoll — 2026-09-06: Meta Pixel Lead Tracking & Live-Produktionsschalter
+## 1a. Änderungsprotokoll — 2026-09-06: SMTP Server-Only Isolation & Netlify Secret Leak Fix
+
+**Kernänderungen:**
+- **Server-Only Isolation für Mailer:**
+  - `lib/mail.ts`: Zentrales Mailer-Modul mit `import 'server-only'` und `sendEmail(options)` Helper. Verhindert, dass `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` oder `SMTP_FROM` jemals in Client-Bundles oder Edge-Umgebungen gelangen.
+  - `app/actions/feedback.ts`: Direkte `nodemailer`-Aufrufe und inline-`process.env.SMTP_*`-Zugriffe durch `sendEmail()` aus `lib/mail.ts` ersetzt.
+- **Entkopplung öffentlicher E-Mail-Adressen:**
+  - Öffentliche Kontakt- und Impressums-Adressen (`info@sitov-academy.com`) sind strikt als statische Textbausteine in den Dictionaries und Komponenten hinterlegt und greifen niemals auf `SMTP_USER` zu.
+
+## 1b. Änderungsprotokoll — 2026-09-06: Meta Pixel Lead Tracking & Live-Produktionsschalter
 
 **Kernänderungen:**
 - **Meta Pixel Event Tracking:**

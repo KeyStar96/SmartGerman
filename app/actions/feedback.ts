@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { getOutboundSiteUrl } from '@/lib/site-url'
-import nodemailer from 'nodemailer'
+import { sendEmail } from '@/lib/mail'
 import { createClient } from '@/utils/supabase/server'
 import type {
   FeedbackActionResult,
@@ -331,8 +331,6 @@ async function notifyStudentByEmail(
   supabase: SupabaseServerClient,
   submissionId: string
 ): Promise<void> {
-  if (!process.env.SMTP_HOST) return
-
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -346,24 +344,9 @@ async function notifyStudentByEmail(
     const studentName = data.profiles.name ?? 'Schüler'
 
     const siteUrl = await getOutboundSiteUrl()
-
     const dashUrl = `${siteUrl}/de/dashboard/level/${encodeURIComponent(data.level)}/pronunciation`
 
-    const smtpFrom = process.env.SMTP_FROM ?? process.env.SMTP_USER ?? ''
-    const fromString =
-      smtpFrom.includes('<') && smtpFrom.includes('>')
-        ? smtpFrom
-        : `"Sitov Language Academy" <${smtpFrom}>`
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    })
-
-    await transporter.sendMail({
-      from: fromString,
+    await sendEmail({
       to: studentEmail,
       subject: 'Du hast eine neue Sprachnachricht erhalten',
       html: `

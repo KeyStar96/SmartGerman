@@ -114,6 +114,9 @@ Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` ver
   - Flag `IS_PRODUCTION: 'Y' | 'N'` (Standard: `'Y'`, konfigurierbar über `NEXT_PUBLIC_IS_PRODUCTION`).
   - Helper `SHOW_LEARNING_PLATFORM`: Bei `IS_PRODUCTION = 'Y'` werden die Einstiegs-Buttons zur Lernplattform ("Lernplattform" / "Plattform" im Header und Mobil-Menü) ausgeblendet, solange sich die Lernplattform in Entwicklung befindet.
 
+- **Mailer-Sicherheit (`lib/mail.ts`):**
+  - Server-Only Isolation (`import 'server-only'`) für SMTP-Konfigurationen (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), um Netlify-Secret-Leaks und fehlerhafte Client-Bundles auszuschließen.
+
 ## 4. UX/UI-Architektur (Geragogik & Barrierefreiheit)
 
 - **Smartphone zuerst:** Cursor-Agent `.cursor/rules/ux-smartphone-agent.mdc` (Mobile-First, 375px, kein Horizontal-Scroll, Safe-Area). Geragogik-Maße bleiben in `ux-geragogik-agent.mdc`.
