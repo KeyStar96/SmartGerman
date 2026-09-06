@@ -3,7 +3,6 @@
 import { useCallback, useState, type KeyboardEvent } from 'react'
 import { Loader2, Pause, Play, RotateCcw } from 'lucide-react'
 import FluidWaveform from '@/components/audio/FluidWaveform'
-import { useAnalyserFrame } from '@/lib/audio/useAnalyserFrame'
 import { useAudioPlayback } from '@/lib/audio/useAudioPlayback'
 import { formatDuration, playbackProgress, seekTargetSeconds } from '@/lib/audio/waveform'
 import {
@@ -40,16 +39,13 @@ export default function WaveformPlayer({
   const speed = SPEEDS[speedIndex] ?? 1
 
   const playback = useAudioPlayback(src, speed, blob)
-  const frame = useAnalyserFrame(playback.analyserRef)
 
   const getVolume = useCallback((): number => {
     if (!playback.isPlaying) return 0
-    return frame.getVolume()
-  }, [frame, playback.isPlaying])
+    return playback.getVolume()
+  }, [playback])
 
-  const getTone = useCallback((): number => {
-    return frame.getTone()
-  }, [frame])
+  const getTone = useCallback((): number => playback.getTone(), [playback])
 
   const togglePlayback = useCallback(() => {
     if (playback.error === 'format') return
@@ -138,12 +134,7 @@ export default function WaveformPlayer({
             compact ? 'h-12' : 'h-16'
           }`}
         >
-          <FluidWaveform
-            getVolume={getVolume}
-            getTone={getTone}
-            getSamples={playback.isPlaying ? frame.getSamples : undefined}
-            isActive={playback.isPlaying}
-          />
+          <FluidWaveform getVolume={getVolume} getTone={getTone} isActive={playback.isPlaying} />
 
           <div className="absolute inset-x-0 bottom-0 h-1 bg-slate-300/70 dark:bg-slate-600/70">
             <div
@@ -196,16 +187,7 @@ export default function WaveformPlayer({
         </div>
       )}
 
-      {playback.engine === 'html' && (
-        <audio
-          ref={playback.htmlAudioRef}
-          src={src}
-          playsInline
-          preload="metadata"
-          crossOrigin={src.startsWith('http') ? 'anonymous' : undefined}
-          className="hidden"
-        />
-      )}
+      <audio ref={playback.htmlAudioRef} playsInline preload="auto" className="hidden" />
     </div>
   )
 }

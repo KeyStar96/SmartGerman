@@ -2,39 +2,39 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import {
-  createAnalyserNode,
+  analysePcmWindow,
+  mixDownToMono,
+  wavBlobFromMono,
+} from '@/lib/audio/wav'
+import {
+  browserPrefersMp4Recording,
   decodeFromSource,
   ensureAudioContext,
   prepareHtmlAudioElement,
-  unlockAudioContext,
+  requestPlaybackAudioSession,
 } from '@/lib/audio/web-audio'
-import { guessAudioMimeType, playbackTimeFromClock } from '@/lib/audio/waveform'
+import { guessAudioMimeType } from '@/lib/audio/waveform'
 
 /**
- * iOS-sichere Wiedergabe mit echter Waveform.
+ * Wiedergabe ausschließlich über ein natives `<audio>`-Element.
  *
- * Bevorzugt Web Audio (`AudioBufferSourceNode` → Analyser → Destination):
- * das umgeht den Safari-Bug, bei dem `createMediaElementSource` das
- * `<audio>`-Element stumm auf den Graphen umleitet.
- *
- * Fallback: natives `<audio>` *ohne* MediaElementSource, damit Ton auf
- * iOS hörbar bleibt, auch wenn `decodeAudioData` scheitert.
+ * Web-Audio-Ausgabe (`AudioBufferSourceNode` / `createMediaElementSource`)
+ * bleibt auf dem iPhone stumm, sobald der Ring/Silent-Schalter an ist –
+ * die Zeitanzeige läuft trotzdem. HTML-Audio plus WAV-Umkodierung und
+ * `navigator.audioSession.type = 'playback'` umgeht das.
  */
 
 export type PlaybackError = null | 'format' | 'load'
-export type PlaybackEngine = 'webaudio' | 'html' | 'none'
-
-const CLOCK_UPDATE_MS = 80
 
 export interface UseAudioPlaybackResult {
-  engine: PlaybackEngine
   error: PlaybackError
   isPlaying: boolean
   isBuffering: boolean
   currentTime: number
   duration: number
-  analyserRef: RefObject<AnalyserNode | null>
   htmlAudioRef: RefObject<HTMLAudioElement | null>
+  getVolume: () => number
+  getTone: () => number
   play: () => Promise<void>
   pause: () => void
   seek: (seconds: number) => void
@@ -45,19 +45,13 @@ export function useAudioPlayback(
   rate: number,
   blob?: Blob | null
 ): UseAudioPlaybackResult {
-  const analyserRef = useRef<AnalyserNode | null>(null)
   const htmlAudioRef = useRef<HTMLAudioElement | null>(null)
-  const bufferRef = useRef<AudioBuffer | null>(null)
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null)
-  const destinationConnectedRef = useRef(false)
-  const offsetRef = useRef(0)
-  const startedAtRef = useRef(0)
+  const samplesRef = useRef<Float32Array | null>(null)
+  const sampleRateRef = useRef(44100)
+  const wavUrlRef = useRef<string | null>(null)
+  const isPlayingRef = useRef(false)
   const rateRef = useRef(rate)
-  const engineRef = useRef<PlaybackEngine>('none')
-  const clockTimerRef = useRef<number | null>(null)
-  const playGenerationRef = useRef(0)
 
-  const [engine, setEngine] = useState<PlaybackEngine>('none')
   const [error, setError] = useState<PlaybackError>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isBuffering, setIsBuffering] = useState(false)
@@ -65,206 +59,116 @@ export function useAudioPlayback(
   const [duration, setDuration] = useState(0)
 
   rateRef.current = rate
-  engineRef.current = engine
+  isPlayingRef.current = isPlaying
 
-  const stopClock = useCallback(() => {
-    if (clockTimerRef.current !== null) {
-      window.clearInterval(clockTimerRef.current)
-      clockTimerRef.current = null
+  const releaseWavUrl = useCallback(() => {
+    if (wavUrlRef.current) {
+      URL.revokeObjectURL(wavUrlRef.current)
+      wavUrlRef.current = null
     }
   }, [])
 
-  const readWebAudioTime = useCallback((): number => {
-    const context = ensureAudioContext()
-    const buffer = bufferRef.current
-    if (!context || !buffer) return offsetRef.current
-    return playbackTimeFromClock(
-      context.currentTime,
-      startedAtRef.current,
-      offsetRef.current,
-      rateRef.current,
-      buffer.duration
-    )
-  }, [])
-
-  const stopSource = useCallback(
-    (rememberOffset: boolean) => {
-      if (rememberOffset && engineRef.current === 'webaudio' && sourceRef.current) {
-        offsetRef.current = readWebAudioTime()
-      }
-      const source = sourceRef.current
-      sourceRef.current = null
-      if (source) {
-        source.onended = null
-        try {
-          source.stop()
-        } catch {
-          // Bereits gestoppt.
-        }
-        try {
-          source.disconnect()
-        } catch {
-          // Bereits getrennt.
-        }
-      }
-    },
-    [readWebAudioTime]
-  )
-
-  const startClock = useCallback(() => {
-    stopClock()
-    clockTimerRef.current = window.setInterval(() => {
-      if (engineRef.current === 'webaudio') {
-        setCurrentTime(readWebAudioTime())
-        return
-      }
-      const audio = htmlAudioRef.current
-      if (audio) setCurrentTime(audio.currentTime)
-    }, CLOCK_UPDATE_MS)
-  }, [readWebAudioTime, stopClock])
-
-  const ensureAnalyser = useCallback((context: AudioContext): AnalyserNode => {
-    if (!analyserRef.current || analyserRef.current.context !== context) {
-      analyserRef.current = createAnalyserNode(context)
-      destinationConnectedRef.current = false
+  const assignSrc = useCallback((audio: HTMLAudioElement, nextSrc: string) => {
+    prepareHtmlAudioElement(audio, nextSrc)
+    audio.muted = false
+    audio.volume = 1
+    audio.playbackRate = rateRef.current
+    if (audio.src !== nextSrc) {
+      audio.src = nextSrc
+      audio.load()
     }
-    if (!destinationConnectedRef.current) {
-      analyserRef.current.connect(context.destination)
-      destinationConnectedRef.current = true
-    }
-    return analyserRef.current
   }, [])
-
-  const startBufferSource = useCallback(
-    (fromSeconds: number) => {
-      const context = ensureAudioContext()
-      const buffer = bufferRef.current
-      if (!context || !buffer) return
-
-      stopSource(false)
-      const analyser = ensureAnalyser(context)
-      const source = context.createBufferSource()
-      source.buffer = buffer
-      source.playbackRate.value = rateRef.current
-      source.connect(analyser)
-
-      const durationSeconds = buffer.duration
-      const offset = Math.min(Math.max(0, fromSeconds), Math.max(0, durationSeconds - 0.01))
-      offsetRef.current = offset
-      startedAtRef.current = context.currentTime
-
-      const generation = playGenerationRef.current
-      source.onended = () => {
-        if (playGenerationRef.current !== generation) return
-        if (sourceRef.current !== source) return
-        sourceRef.current = null
-        stopClock()
-        offsetRef.current = 0
-        setCurrentTime(0)
-        setIsPlaying(false)
-      }
-
-      source.start(0, offset)
-      sourceRef.current = source
-      setCurrentTime(offset)
-      setIsPlaying(true)
-      startClock()
-    },
-    [ensureAnalyser, startClock, stopClock, stopSource]
-  )
 
   useEffect(() => {
     setIsPlaying(false)
+    isPlayingRef.current = false
     setIsBuffering(Boolean(src))
     setCurrentTime(0)
     setDuration(0)
     setError(null)
-    setEngine('none')
-    engineRef.current = 'none'
-    bufferRef.current = null
-    offsetRef.current = 0
-    stopSource(false)
-    stopClock()
-    if (analyserRef.current) {
-      try {
-        analyserRef.current.disconnect()
-      } catch {
-        // Bereits getrennt.
-      }
-    }
-    analyserRef.current = null
-    destinationConnectedRef.current = false
+    samplesRef.current = null
+    releaseWavUrl()
 
-    if (!src) {
+    const audio = htmlAudioRef.current
+    if (!src || !audio) {
       setIsBuffering(false)
       return
     }
 
     const mime = guessAudioMimeType(src)
-    const probe = typeof Audio !== 'undefined' ? new Audio() : null
-    const formatBlocked = Boolean(mime && probe && probe.canPlayType(mime) === '')
+    const formatBlocked = Boolean(mime && audio.canPlayType(mime) === '')
+    const iosLike = browserPrefersMp4Recording()
+
+    if (!iosLike) {
+      assignSrc(audio, src)
+    }
 
     let cancelled = false
 
     void (async () => {
       try {
         const context = ensureAudioContext()
-        if (context) {
-          const decoded = await decodeFromSource(context, src, blob)
-          if (cancelled) return
-          bufferRef.current = decoded
-          setDuration(decoded.duration)
-          setEngine('webaudio')
-          engineRef.current = 'webaudio'
+        if (!context) {
+          if (formatBlocked) {
+            setError('format')
+          } else if (iosLike) {
+            assignSrc(audio, src)
+          }
           setIsBuffering(false)
           return
         }
-      } catch (err) {
-        console.error('Web-Audio-Dekodierung fehlgeschlagen, Fallback auf HTML-Audio:', err)
-      }
 
-      if (cancelled) return
+        const decoded = await decodeFromSource(context, src, blob)
+        if (cancelled) return
 
-      if (formatBlocked) {
-        console.error('Audioformat wird vom Browser nicht unterstützt:', { src, mime })
-        setError('format')
-        setEngine('none')
-        engineRef.current = 'none'
+        const channels: Float32Array[] = []
+        for (let channel = 0; channel < decoded.numberOfChannels; channel += 1) {
+          channels.push(decoded.getChannelData(channel))
+        }
+        const mono = mixDownToMono(channels)
+        samplesRef.current = mono
+        sampleRateRef.current = decoded.sampleRate
+        setDuration(decoded.duration)
+
+        const wavUrl = URL.createObjectURL(wavBlobFromMono(mono, decoded.sampleRate))
+        if (cancelled) {
+          URL.revokeObjectURL(wavUrl)
+          return
+        }
+        releaseWavUrl()
+        wavUrlRef.current = wavUrl
+        if (!isPlayingRef.current) {
+          assignSrc(audio, wavUrl)
+        }
         setIsBuffering(false)
-        return
+      } catch (err) {
+        console.error('Audio konnte nicht in WAV gewandelt werden, Originalquelle wird genutzt:', err)
+        if (cancelled) return
+        if (formatBlocked) {
+          setError('format')
+        } else {
+          assignSrc(audio, src)
+        }
+        setIsBuffering(false)
       }
-
-      setEngine('html')
-      engineRef.current = 'html'
-      setIsBuffering(false)
     })()
 
     return () => {
       cancelled = true
-      playGenerationRef.current += 1
-      stopSource(false)
-      stopClock()
     }
-  }, [src, blob, stopClock, stopSource])
+  }, [assignSrc, blob, releaseWavUrl, src])
 
   useEffect(() => {
-    if (engine !== 'html') return
     const audio = htmlAudioRef.current
-    if (!audio || !src) return
+    if (!audio) return
 
-    prepareHtmlAudioElement(audio, src)
-    audio.playbackRate = rateRef.current
-
-    const handleLoaded = () => {
-      if (Number.isFinite(audio.duration) && audio.duration > 0) {
-        setDuration(audio.duration)
-      }
-    }
-    const handleDurationHack = () => {
-      if (audio.duration === Infinity || Number.isNaN(audio.duration)) {
+    const handleTime = () => setCurrentTime(audio.currentTime)
+    const handleDuration = () => {
+      const value = audio.duration
+      if (value === Infinity || Number.isNaN(value)) {
         const forceDuration = () => {
           audio.removeEventListener('timeupdate', forceDuration)
-          setDuration(Number.isFinite(audio.duration) ? audio.duration : 0)
+          if (Number.isFinite(audio.duration)) setDuration(audio.duration)
           audio.currentTime = 0
         }
         audio.addEventListener('timeupdate', forceDuration)
@@ -275,23 +179,23 @@ export function useAudioPlayback(
         }
         return
       }
-      setDuration(audio.duration)
+      if (Number.isFinite(value) && value > 0) setDuration(value)
     }
     const handlePlay = () => {
       setIsPlaying(true)
+      isPlayingRef.current = true
       setIsBuffering(false)
       setError(null)
-      startClock()
     }
     const handlePause = () => {
       setIsPlaying(false)
+      isPlayingRef.current = false
       setIsBuffering(false)
-      stopClock()
       setCurrentTime(audio.currentTime)
     }
     const handleEnded = () => {
       setIsPlaying(false)
-      stopClock()
+      isPlayingRef.current = false
       setCurrentTime(0)
     }
     const handleWaiting = () => setIsBuffering(true)
@@ -301,8 +205,9 @@ export function useAudioPlayback(
       setError('load')
     }
 
-    audio.addEventListener('loadedmetadata', handleDurationHack)
-    audio.addEventListener('durationchange', handleLoaded)
+    audio.addEventListener('timeupdate', handleTime)
+    audio.addEventListener('loadedmetadata', handleDuration)
+    audio.addEventListener('durationchange', handleDuration)
     audio.addEventListener('play', handlePlay)
     audio.addEventListener('pause', handlePause)
     audio.addEventListener('ended', handleEnded)
@@ -311,8 +216,9 @@ export function useAudioPlayback(
     audio.addEventListener('error', handleError)
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleDurationHack)
-      audio.removeEventListener('durationchange', handleLoaded)
+      audio.removeEventListener('timeupdate', handleTime)
+      audio.removeEventListener('loadedmetadata', handleDuration)
+      audio.removeEventListener('durationchange', handleDuration)
       audio.removeEventListener('play', handlePlay)
       audio.removeEventListener('pause', handlePause)
       audio.removeEventListener('ended', handleEnded)
@@ -320,121 +226,76 @@ export function useAudioPlayback(
       audio.removeEventListener('canplay', handleCanPlay)
       audio.removeEventListener('error', handleError)
     }
-  }, [engine, src, startClock, stopClock])
-
-  const previousRateRef = useRef(rate)
+  }, [src])
 
   useEffect(() => {
-    if (engine === 'html' && htmlAudioRef.current) {
-      htmlAudioRef.current.playbackRate = rate
-    }
+    const audio = htmlAudioRef.current
+    if (audio) audio.playbackRate = rate
+  }, [rate])
 
-    const rateChanged = previousRateRef.current !== rate
-    previousRateRef.current = rate
-    if (rateChanged && engine === 'webaudio' && sourceRef.current) {
-      startBufferSource(readWebAudioTime())
-    }
-  }, [engine, rate, readWebAudioTime, startBufferSource])
+  useEffect(() => () => releaseWavUrl(), [releaseWavUrl])
+
+  const getVolume = useCallback((): number => {
+    if (!isPlayingRef.current) return 0
+    const samples = samplesRef.current
+    if (!samples) return 0.28
+    const time = htmlAudioRef.current?.currentTime ?? 0
+    return analysePcmWindow(samples, time, sampleRateRef.current).volume
+  }, [])
+
+  const getTone = useCallback((): number => {
+    const samples = samplesRef.current
+    if (!samples) return 0.5
+    const time = htmlAudioRef.current?.currentTime ?? 0
+    return analysePcmWindow(samples, time, sampleRateRef.current).tone
+  }, [])
 
   const play = useCallback(async () => {
-    if (!src || error === 'format') return
-
-    // Context noch in der Geste anfassen, bevor irgendetwas awaited wird.
-    const context = ensureAudioContext()
-    void context?.resume()
-
-    if (engineRef.current === 'webaudio' && bufferRef.current) {
-      setIsBuffering(true)
-      await unlockAudioContext()
-      startBufferSource(offsetRef.current)
-      setIsBuffering(false)
-      return
-    }
-
     const audio = htmlAudioRef.current
-    if (engineRef.current === 'html' && audio) {
-      setIsBuffering(true)
-      audio.playbackRate = rateRef.current
-      try {
-        await audio.play()
-      } catch (err) {
-        console.error('Wiedergabe nicht möglich:', err)
-        setIsBuffering(false)
-        setError('load')
-      }
-      return
+    if (!audio || !src || error === 'format') return
+
+    requestPlaybackAudioSession()
+    audio.muted = false
+    audio.volume = 1
+    audio.playbackRate = rateRef.current
+
+    if (!audio.src) {
+      assignSrc(audio, wavUrlRef.current ?? src)
     }
 
     setIsBuffering(true)
     try {
-      await unlockAudioContext()
-      const running = ensureAudioContext()
-      if (running && !bufferRef.current) {
-        const decoded = await decodeFromSource(running, src, blob)
-        bufferRef.current = decoded
-        setDuration(decoded.duration)
-        setEngine('webaudio')
-        engineRef.current = 'webaudio'
-      }
-      if (bufferRef.current) {
-        startBufferSource(offsetRef.current)
-        setIsBuffering(false)
-        return
-      }
-      const fallback = htmlAudioRef.current
-      if (fallback) {
-        await fallback.play()
-        return
-      }
-      setError('load')
+      await audio.play()
     } catch (err) {
       console.error('Wiedergabe nicht möglich:', err)
-      setError('load')
-    } finally {
       setIsBuffering(false)
+      setError('load')
     }
-  }, [blob, error, src, startBufferSource])
+  }, [assignSrc, error, src])
 
   const pause = useCallback(() => {
-    if (engineRef.current === 'webaudio') {
-      stopSource(true)
-      stopClock()
-      setCurrentTime(offsetRef.current)
-      setIsPlaying(false)
-      return
-    }
     htmlAudioRef.current?.pause()
-  }, [stopClock, stopSource])
+  }, [])
 
   const seek = useCallback(
     (seconds: number) => {
-      const safe = Number.isFinite(seconds) ? Math.max(0, seconds) : 0
-      if (engineRef.current === 'webaudio') {
-        const max = bufferRef.current?.duration ?? duration
-        const next = Math.min(safe, max)
-        offsetRef.current = next
-        setCurrentTime(next)
-        if (isPlaying) startBufferSource(next)
-        return
-      }
       const audio = htmlAudioRef.current
-      if (audio && duration > 0) {
-        audio.currentTime = Math.min(safe, duration)
-        setCurrentTime(audio.currentTime)
-      }
+      if (!audio || duration <= 0) return
+      audio.currentTime = Math.min(Math.max(0, seconds), duration)
+      setCurrentTime(audio.currentTime)
     },
-    [duration, isPlaying, startBufferSource]
+    [duration]
   )
 
   return {
-    engine,
     error,
     isPlaying,
     isBuffering,
     currentTime,
     duration,
-    analyserRef,
     htmlAudioRef,
+    getVolume,
+    getTone,
     play,
     pause,
     seek,

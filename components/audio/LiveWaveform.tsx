@@ -8,9 +8,8 @@ import { formatDuration } from '@/lib/audio/waveform'
 /**
  * Siri-artige, fließende Tonspur der laufenden Aufnahme.
  *
- * Liest Lautstärke, Stimmlage und Zeitbereich direkt aus dem Mikrofon-
- * `AnalyserNode`. Ohne Analyser fällt die Amplitude auf den letzten
- * `levels`-Wert zurück.
+ * Liest Lautstärke und Stimmlage direkt aus dem Mikrofon-`AnalyserNode`.
+ * Ohne Analyser fällt die Amplitude auf den letzten `levels`-Wert zurück.
  */
 export default function LiveWaveform({
   levels,
@@ -31,8 +30,7 @@ export default function LiveWaveform({
   const frame = useAnalyserFrame(analyserRef ?? emptyAnalyserRef)
 
   const getVolume = (): number => {
-    const live = frame.getVolume()
-    if (analyserRef?.current) return live
+    if (analyserRef?.current) return frame.getVolume()
     const fallback = levelsRef.current
     return fallback.length > 0 ? (fallback[fallback.length - 1] ?? 0) : 0
   }
@@ -44,12 +42,7 @@ export default function LiveWaveform({
         aria-label={ariaLabel}
         className="h-24 w-full overflow-hidden rounded-2xl bg-gradient-to-b from-orange-50 to-slate-100 dark:from-slate-800 dark:to-slate-900"
       >
-        <FluidWaveform
-          getVolume={getVolume}
-          getTone={frame.getTone}
-          getSamples={frame.getSamples}
-          isActive={isActive}
-        />
+        <FluidWaveform getVolume={getVolume} getTone={frame.getTone} isActive={isActive} />
       </div>
 
       <p className="mt-2 text-center text-lg font-semibold tabular-nums text-slate-600 dark:text-slate-300">

@@ -10,7 +10,6 @@ import { analyseFrame } from '@/lib/audio/waveform'
 export function useAnalyserFrame(analyserRef: RefObject<AnalyserNode | null>): {
   getVolume: () => number
   getTone: () => number
-  getSamples: () => Uint8Array<ArrayBuffer> | null
 } {
   const timeBufferRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
   const freqBufferRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
@@ -37,10 +36,5 @@ export function useAnalyserFrame(analyserRef: RefObject<AnalyserNode | null>): {
     return frame ? frame.tone : lastToneRef.current
   }, [read])
 
-  const getSamples = useCallback((): Uint8Array<ArrayBuffer> | null => {
-    if (!read()) return null
-    return timeBufferRef.current
-  }, [read])
-
-  return { getVolume, getTone, getSamples }
+  return { getVolume, getTone }
 }

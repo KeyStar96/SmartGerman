@@ -33,6 +33,7 @@ export function baseMimeType(mimeType: string | undefined | null): string {
 /** Dateiendung passend zum aufgenommenen MIME-Type (`audio/webm` → `webm`, `audio/mp4` → `mp4`). */
 export function extensionForMimeType(mimeType: string): string {
   const base = baseMimeType(mimeType)
+  if (base.includes('wav')) return 'wav'
   if (base.includes('mp4')) return 'mp4'
   if (base.includes('ogg')) return 'ogg'
   return 'webm'

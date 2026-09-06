@@ -5,10 +5,13 @@ import {
   blobTypeForRecorder,
   browserPrefersMp4Recording,
   createAnalyserNode,
+  decodeFromSource,
   ensureAudioContext,
   pickRecorderMimeType,
+  requestPlaybackAudioSession,
   unlockAudioContext,
 } from '@/lib/audio/web-audio'
+import { mixDownToMono, wavBlobFromMono } from '@/lib/audio/wav'
 import { appendLevel, levelFromTimeDomain, WAVEFORM_BAR_COUNT } from '@/lib/audio/waveform'
 
 /**
@@ -78,6 +81,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
 
   const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const recordStreamRef = useRef<MediaStream | null>(null)
   const chunksRef = useRef<Blob[]>([])
   const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
@@ -118,12 +122,16 @@ export function useAudioRecorder(): UseAudioRecorderResult {
       analyserRef.current = null
     }
 
-    if (streamRef.current) {
-      for (const track of streamRef.current.getTracks()) {
+    const stopStream = (stream: MediaStream | null) => {
+      if (!stream) return
+      for (const track of stream.getTracks()) {
         track.stop()
       }
-      streamRef.current = null
     }
+    stopStream(recordStreamRef.current)
+    recordStreamRef.current = null
+    stopStream(streamRef.current)
+    streamRef.current = null
   }, [])
 
   useEffect(
@@ -143,6 +151,7 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     // Noch in der Nutzer-Geste: Context anlegen und resume anstoßen.
     // Nach `await getUserMedia` ist die iOS-Geste verbraucht.
     const context = ensureAudioContext()
+    requestPlaybackAudioSession()
     void context?.resume()
 
     releaseObjectUrl()
@@ -173,7 +182,15 @@ export function useAudioRecorder(): UseAudioRecorderResult {
         (candidate) => MediaRecorder.isTypeSupported(candidate),
         preferMp4
       )
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
+      let recordStream = stream
+      try {
+        recordStream = stream.clone()
+      } catch (err) {
+        console.error('MediaStream.clone() nicht möglich, nutze denselben Stream:', err)
+      }
+      recordStreamRef.current = recordStream
+
+      const recorder = new MediaRecorder(recordStream, mimeType ? { mimeType } : undefined)
       recorderRef.current = recorder
       chunksRef.current = []
 
@@ -182,14 +199,31 @@ export function useAudioRecorder(): UseAudioRecorderResult {
       }
 
       recorder.onstop = () => {
-        const type = blobTypeForRecorder(recorder.mimeType, mimeType, preferMp4)
-        const blob = new Blob(chunksRef.current, { type })
-        const url = URL.createObjectURL(blob)
-        objectUrlRef.current = url
-        setAudioBlob(blob)
-        setAudioUrl(url)
-        setStatus(blob.size > 0 ? 'ready' : 'failed')
-        teardown()
+        void (async () => {
+          const type = blobTypeForRecorder(recorder.mimeType, mimeType, preferMp4)
+          let output = new Blob(chunksRef.current, { type })
+          try {
+            const running = ensureAudioContext()
+            if (running) {
+              const decoded = await decodeFromSource(running, '', output)
+              const channels: Float32Array[] = []
+              for (let channel = 0; channel < decoded.numberOfChannels; channel += 1) {
+                channels.push(decoded.getChannelData(channel))
+              }
+              const wav = wavBlobFromMono(mixDownToMono(channels), decoded.sampleRate)
+              if (wav.size > 0) output = wav
+            }
+          } catch (err) {
+            console.error('Aufnahme konnte nicht nach WAV gewandelt werden:', err)
+          }
+
+          const url = URL.createObjectURL(output)
+          objectUrlRef.current = url
+          setAudioBlob(output)
+          setAudioUrl(url)
+          setStatus(output.size > 0 ? 'ready' : 'failed')
+          teardown()
+        })()
       }
 
       recorder.onerror = () => {

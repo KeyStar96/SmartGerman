@@ -51,8 +51,8 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
 - **Audio-Pipeline**:
   - Gemeinsamer Context: `lib/audio/web-audio.ts` – genau ein `AudioContext` (nie `close()`), `resume()` noch in der Nutzer-Geste, Safari/iOS nimmt `audio/mp4` auf.
   - Aufnahme: `lib/audio/useAudioRecorder.ts` (getUserMedia, MediaRecorder, AnalyserNode) – einzige Quelle für Schüler- und Lehrer-Aufnahmen. Context wird vor `await getUserMedia` entsperrt; `MediaRecorder.start(250)` flush't auf iOS; Blob-MIME ist plattformrichtig. Gibt `analyserRef` nach außen frei.
-  - Wiedergabe: `lib/audio/useAudioPlayback.ts` dekodiert die Datei (`decodeAudioData`, bei Eigenaufnahmen direkt aus dem `Blob`) und spielt über `AudioBufferSourceNode` → Analyser → Destination. **Kein** `createMediaElementSource` (das schaltet iOS/Safari stumm). Fallback: natives `<audio playsInline>` ohne Web-Audio-Umleitung.
-  - Darstellung: `lib/audio/waveform.ts` (reine Funktionen, inkl. `smoothTowards()`, `peakAtStep()`, `playbackTimeFromClock()`) plus `FluidWaveform` – Siri-Sinus plus echte Oszilloskop-Kurve aus dem Zeitbereich. Lautstärke = Amplitude, Stimmlage = Wellendichte, Samples = Sprachform.
+  - Wiedergabe: `lib/audio/useAudioPlayback.ts` spielt **nur** über natives `<audio playsInline>`. Dekodierte Aufnahmen werden nach WAV gewandelt (`lib/audio/wav.ts`), weil MediaRecorder-MP4 auf iOS oft stumm bleibt. `navigator.audioSession.type = 'playback'` (iOS 16.4+) hält den Silent-Switch fern. **Kein** `createMediaElementSource` und **kein** `AudioBufferSourceNode` als Lautsprecher-Pfad.
+  - Darstellung: `FluidWaveform` nur Siri-Sinus (Lautstärke = Amplitude, Stimmlage = Dichte). Live aus dem Mikrofon-Analyser, Wiedergabe aus PCM-Fenster der dekodierten Datei.
     - `LiveWaveform`: Mikrofon-Analyser via `useAnalyserFrame`.
     - `WaveformPlayer`: derselbe Analyser-Pfad während der Buffer-Wiedergabe; Seek (Klick, Pfeiltasten, `role="slider"`) bleibt erhalten.
     - `FluidWaveform` animiert nur, während `isActive` true ist.

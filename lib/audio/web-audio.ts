@@ -173,3 +173,26 @@ export function browserPrefersMp4Recording(): boolean {
   if (typeof navigator === 'undefined') return false
   return prefersMp4Recording(navigator.userAgent, navigator.maxTouchPoints ?? 0)
 }
+
+interface NavigatorAudioSession {
+  type: string
+}
+
+interface NavigatorWithAudioSession extends Navigator {
+  audioSession?: NavigatorAudioSession
+}
+
+/**
+ * iOS 16.4+: Media-Session auf „playback“, damit der Stummschalter
+ * die Wiedergabe nicht verschluckt. Muss aus einer Nutzer-Geste kommen.
+ */
+export function requestPlaybackAudioSession(): void {
+  if (typeof navigator === 'undefined') return
+  const session = (navigator as NavigatorWithAudioSession).audioSession
+  if (!session) return
+  try {
+    session.type = 'playback'
+  } catch (err) {
+    console.error('audioSession konnte nicht auf playback gesetzt werden:', err)
+  }
+}

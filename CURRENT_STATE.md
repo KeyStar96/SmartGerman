@@ -1,12 +1,12 @@
 # Current State Analysis (Ist-Zustand)
 
-## 1a. Änderungsprotokoll — 2026-09-06: Aussprache-Trainer (iOS-Ton, Echtzeit-Waveform, vollständige Übungssätze)
+## 1a. Änderungsprotokoll — 2026-09-06: iOS-Ton über HTML-Audio/WAV, eine Sinus-Welle
 
 **Kernänderungen:**
 
-- **iOS/Safari-Wiedergabe:** `createMediaElementSource` entfernt (hat das `<audio>`-Element auf iOS stumm auf den Web-Audio-Graphen umgeleitet). Stattdessen gemeinsamer, nie geschlossener `AudioContext` (`lib/audio/web-audio.ts`), Unlock noch in der Klick-Geste, Aufnahme als `audio/mp4` auf Safari, Wiedergabe über dekodierten `AudioBuffer` + `AudioBufferSourceNode` (`lib/audio/useAudioPlayback.ts`). Fallback: natives `<audio playsInline>` ohne Graph-Hijack.
-- **Dynamische Waveform:** Live-Aufnahme und Wiedergabe lesen Lautstärke, Stimmlage und Zeitbereich aus demselben `AnalyserNode`. `FluidWaveform` zeichnet die echte Sprachkurve (`peakAtStep`) und passt Sinus-Amplitude/Dichte in Echtzeit an.
-- **Übungssätze A1–C2:** Eingebauter Katalog mit eigenen Sätzen für A1.1, A1.2, A2.1, A2.2, B1.1, B1.2 sowie B2/C1/C2. `getPronunciationPrompts` mergt Katalog + DB (DB-Fehler fällt auf den Katalog zurück). Live-Tabelle erweitert (A1/A2 je 20, B1 19, B2/C1/C2 je 10).
+- **iOS-Stille behoben:** Web-Audio-Ausgabe (`AudioBufferSourceNode`) bleibt auf dem iPhone stumm (Silent-Switch). Wiedergabe läuft jetzt nur noch über natives `<audio playsInline>`. Aufnahmen werden nach WAV gewandelt (`lib/audio/wav.ts`), `navigator.audioSession.type = 'playback'` setzt die Media-Session. MediaRecorder nutzt einen geklonten Stream, damit die Visualisierung die Aufnahme nicht stummschaltet.
+- **Zweite Welle entfernt:** `FluidWaveform` zeichnet wieder nur die Siri-Sinus-Schichten. Keine Oszilloskop-Kurve mehr.
+- **Übungssätze A1–C2:** Katalog + Live-DB unverändert zum vorherigen Stand (A1.1–B1.2 eigene Sätze, Familien A1–C2).
 
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
