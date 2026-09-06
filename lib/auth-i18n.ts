@@ -39,6 +39,9 @@ export const AUTH_FALLBACKS = {
   field_native_language_placeholder: 'Bitte auswählen',
   native_language_russian: 'Russisch',
   native_language_turkish: 'Türkisch',
+  native_language_ukrainian: 'Ukrainisch',
+  native_language_english: 'Englisch',
+  native_language_german: 'Deutsch',
   native_language_other: 'Andere',
 
   // --- Passwort vergessen ---

@@ -64,6 +64,46 @@ export function mapLegacyLang(raw: string): UiLocale {
   return LOCALES.find(locale => locale === mapped) ?? DEFAULT_LOCALE
 }
 
+/**
+ * Endonyme der Oberflächensprachen (jede Sprache in ihrer eigenen Schrift).
+ *
+ * Bewusst NICHT übersetzt: Ein Sprachumschalter zeigt jede Option in ihrer
+ * eigenen Sprache an, damit sie unabhängig von der aktuellen UI-Sprache
+ * erkennbar ist (Standard bei mehrsprachigen Oberflächen).
+ */
+export const UI_LOCALE_ENDONYMS: Readonly<Record<UiLocale, string>> = {
+  de: 'Deutsch',
+  en: 'English',
+  uk: 'Українська',
+  ru: 'Русский',
+  tr: 'Türkçe',
+}
+
+/**
+ * Ordnet die bei der Registrierung gewählte Erstsprache (deutsches Label in
+ * `profiles.native_language`) der passenden Oberflächensprache zu. Unbekanntes
+ * bzw. „Andere" fällt sicher auf Deutsch zurück. Muss mit dem DB-Trigger
+ * `handle_new_user` konsistent bleiben (Migration
+ * `add_ui_language_and_expand_native_language`).
+ */
+const NATIVE_LANGUAGE_TO_LOCALE: Readonly<Record<string, UiLocale>> = {
+  Deutsch: 'de',
+  Englisch: 'en',
+  Russisch: 'ru',
+  Türkisch: 'tr',
+  Ukrainisch: 'uk',
+}
+
+export function localeFromNativeLanguage(value: string | null | undefined): UiLocale {
+  if (!value) return DEFAULT_LOCALE
+  return NATIVE_LANGUAGE_TO_LOCALE[value] ?? DEFAULT_LOCALE
+}
+
+/** Sichere Normalisierung eines beliebigen Werts auf eine bekannte UI-Locale. */
+export function toUiLocale(value: string | null | undefined): UiLocale {
+  return LOCALES.find(locale => locale === value) ?? DEFAULT_LOCALE
+}
+
 export function isProtectedPath(pathname: string): boolean {
   return (
     pathname.includes('/dashboard') ||

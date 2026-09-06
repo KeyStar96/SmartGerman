@@ -3,6 +3,30 @@
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
 
+## 1a. Änderungsprotokoll — 2026-09-06: i18n-Überarbeitung (Erstsprachen-Onboarding, Auto-UI-Sprache, Sprachumschalter, Breadcrumb-Fix, Vollständigkeits-Audit)
+
+**Kernänderungen:**
+
+- **DB (Live-Migration `add_ui_language_and_expand_native_language`, additiv & rückwärtskompatibel):**
+  - `profiles.native_language`-CHECK erweitert auf die fünf Erstsprachen `Deutsch, Englisch, Russisch, Türkisch, Ukrainisch` (+ Legacy `Andere`). Bestehende Werte (`Russisch`, `Türkisch`) bleiben gültig.
+  - Neue Spalte `profiles.ui_language text NOT NULL DEFAULT 'de'` (CHECK `de|en|uk|ru|tr`): persistente Oberflächensprache, im Profil manuell änderbar.
+  - Backfill: bestehende Nutzer erhielten `ui_language` abgeleitet aus `native_language` (Russisch→ru, Türkisch→tr).
+  - Trigger `handle_new_user()` setzt `ui_language` bei Neuregistrierungen passend zur Erstsprache. `supabase/schema.sql` + `supabase/database.types.ts` synchronisiert; Migrationsdatei im Repo abgelegt.
+
+- **Erstsprachen-Onboarding & automatische UI-Sprache:**
+  - Registrierung (`app/[lang]/register/page.tsx`, `lib/types/auth.ts` → `NATIVE_LANGUAGES`) bietet jetzt fünf Erstsprachen zur Auswahl.
+  - Login (`app/actions/auth.ts`): Nach erfolgreicher Anmeldung wird die im Profil gespeicherte `ui_language` gelesen und der Nutzer auf `/{ui_language}/dashboard` geleitet – die gesamte Oberfläche erscheint automatisch in seiner Sprache (getrennter try/catch, Fallback = Formularsprache).
+
+- **Manueller Sprachumschalter im Profil:**
+  - Neue Server Action `app/actions/profile.ts` → `updateUiLanguage` (validiert via `uiLanguageSchema`, schreibt `profiles.ui_language`, `revalidatePath('/', 'layout')`, redirect auf `/{lang}/dashboard/profile`).
+  - Neue Client-Komponente `components/dashboard/UiLanguageForm.tsx` (barrierefrei, min. 56px, Auto-Submit bei Auswahl + Fallback-Button). Eingebunden in `app/[lang]/dashboard/profile/page.tsx`. Sprachen als Endonyme (`lib/locale-routing.ts` → `UI_LOCALE_ENDONYMS`).
+
+- **Breadcrumb-Fix (unübersetztes „train"):**
+  - `lib/dashboard-i18n.ts`: neue Keys `nav_train`, `nav_assess`, `nav_lessons` + Ergänzung in `DASHBOARD_ROUTE_KEYS` (`train`, `assess`, `lessons`). Damit zeigt die Navigation den übersetzten Bereichsnamen statt des rohen Routen-Segments.
+
+- **Vollständigkeits-Audit der Übersetzungen:**
+  - Alle sieben Übersetzer-Sektionen (`dashboard, auth, profile, vocabulary, pronunciation, videos, exercises`) in allen fünf Dictionaries auf fehlende Fallback-Keys geprüft. Ergebnis: nur die neu eingeführten Keys fehlten; diese wurden in `de/en/uk/ru/tr` ergänzt. Danach 0 fehlende Fallback-Keys → kein interner Fallback-String erreicht mehr ungeübersetzt die UI.
+
 ## 1a. Änderungsprotokoll — 2026-09-06: Mobile-UX-Optimierung (Touch-Hover, Hintergrund, Vokabeltrainer-Flashcards)
 
 **Kernänderungen (rein clientseitig/UI, keine Schema- oder Monetarisierungsänderung):**

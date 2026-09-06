@@ -23,6 +23,9 @@ export const DASHBOARD_FALLBACKS = {
   nav_vocabulary: 'Vokabeln',
   nav_videos: 'Videos',
   nav_pronunciation: 'Aussprache',
+  nav_train: 'Lernen',
+  nav_assess: 'Einstufen',
+  nav_lessons: 'Lektionen',
   nav_back: 'Zurück',
   nav_back_aria: 'Eine Seite zurück',
   open_profile: 'Profil',
@@ -63,6 +66,9 @@ export const DASHBOARD_ROUTE_KEYS = {
   vocabulary: 'nav_vocabulary',
   videos: 'nav_videos',
   pronunciation: 'nav_pronunciation',
+  train: 'nav_train',
+  assess: 'nav_assess',
+  lessons: 'nav_lessons',
 } as const
 
 export type DashboardRouteSegment = keyof typeof DASHBOARD_ROUTE_KEYS

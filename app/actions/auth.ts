@@ -91,6 +91,10 @@ async function authCallbackUrl(lang: string, next?: string): Promise<string> {
 export async function login(formData: FormData) {
   const lang = readLanguage(formData)
   let status: AuthStatusCode | null = null
+  // Nach erfolgreichem Login wird die Oberfläche auf die im Profil gespeicherte
+  // Sprache (`ui_language`, initial aus der Erstsprache abgeleitet) umgestellt.
+  // Fällt auf die Formularsprache zurück, falls das Profil nicht lesbar ist.
+  let targetLang = lang
 
   try {
     const parsed = loginSchema.safeParse({
@@ -104,7 +108,7 @@ export async function login(formData: FormData) {
       status = 'login_rate_limited'
     } else {
       const supabase = await createClient()
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: parsed.data.email,
         password: parsed.data.password,
       })
@@ -121,6 +125,24 @@ export async function login(formData: FormData) {
             message: error.message,
           })
         }
+      } else if (data.user) {
+        // Oberflächensprache aus dem Profil laden (getrennter try/catch: ein
+        // Fehler hier darf die erfolgreiche Anmeldung nicht scheitern lassen).
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('ui_language')
+            .eq('id', data.user.id)
+            .single()
+
+          if (profile?.ui_language) {
+            targetLang = uiLanguageSchema.parse(profile.ui_language)
+          }
+        } catch (profileError) {
+          console.error('[auth] Oberflächensprache konnte nicht geladen werden', {
+            error: profileError instanceof Error ? profileError.message : 'unbekannt',
+          })
+        }
       }
     }
   } catch (error) {
@@ -135,7 +157,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect(`/${lang}/dashboard`)
+  redirect(`/${targetLang}/dashboard`)
 }
 
 export async function signup(formData: FormData) {

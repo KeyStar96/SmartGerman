@@ -70,10 +70,21 @@ export function toneForAuthStatus(status: AuthStatusCode): AuthStatusTone {
  */
 export const PASSWORD_MIN_LENGTH = 8
 
-/** In `profiles.native_language` sind ausschließlich diese Werte erlaubt (CHECK-Constraint). */
-export const NATIVE_LANGUAGES = ['Russisch', 'Türkisch', 'Andere'] as const
+/**
+ * Bei der Registrierung auswählbare Erstsprachen. Reihenfolge = Anzeigereihenfolge.
+ * Die Werte müssen dem CHECK-Constraint auf `profiles.native_language` entsprechen
+ * (Migration `add_ui_language_and_expand_native_language`).
+ */
+export const NATIVE_LANGUAGES = ['Russisch', 'Türkisch', 'Ukrainisch', 'Englisch', 'Deutsch'] as const
 
 export type NativeLanguage = (typeof NATIVE_LANGUAGES)[number]
+
+/**
+ * Legacy-Wert: Bestandsprofile bzw. Alt-Registrierungen konnten „Andere"
+ * speichern. Nicht mehr auswählbar, aber für Anzeige/Validierung weiterhin
+ * bekannt (CHECK-Constraint erlaubt ihn rückwärtskompatibel weiter).
+ */
+export const LEGACY_NATIVE_LANGUAGE = 'Andere' as const
 
 const emailField = z
   .string()

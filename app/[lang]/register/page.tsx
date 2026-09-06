@@ -78,10 +78,14 @@ export default async function RegisterPage({
             placeholder: t('field_native_language_placeholder'),
             // Die Werte müssen dem CHECK-Constraint auf `profiles.native_language`
             // entsprechen, sonst scheitert der Trigger beim Anlegen des Profils.
+            // Aus der Erstsprache leitet der Trigger `handle_new_user` zugleich
+            // die Start-Oberflächensprache (`ui_language`) ab.
             options: [
               { value: 'Russisch', label: t('native_language_russian') },
               { value: 'Türkisch', label: t('native_language_turkish') },
-              { value: 'Andere', label: t('native_language_other') },
+              { value: 'Ukrainisch', label: t('native_language_ukrainian') },
+              { value: 'Englisch', label: t('native_language_english') },
+              { value: 'Deutsch', label: t('native_language_german') },
             ],
           },
           {

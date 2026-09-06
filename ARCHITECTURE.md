@@ -17,7 +17,8 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
   - `allowed_levels` (`text[]`, `NOT NULL DEFAULT '{}'`): **Zugriffssteuerung pro Sprachniveau** (feingranular, z. B. `A1.1`, `A1.2`). Leeres Array = kein Zugriff. Admin/Teacher haben rollenbasiert Vollzugriff (siehe `lib/access/levels.ts`). Migration: `add_allowed_levels_to_profiles` (2026-09-06). Dies ist das aktive Rechtemodell und hat das Free/Premium-Gating abgelöst.
   - `subscription_status`: `kostenlos` | `aktiv` — **legacy**, bleibt für Stripe-Webhook-Kompatibilität erhalten, steuert aber **keinen** Inhaltszugriff mehr.
   - `stripe_customer_id`, `stripe_subscription_id` (legacy/Stripe)
-  - `native_language` (für i18n Hints)
+  - `native_language` (text, CHECK): Erstsprache/Muttersprache, ausgewählt bei der Registrierung. Erlaubte Werte: `Deutsch, Englisch, Russisch, Türkisch, Ukrainisch` (+ Legacy `Andere`). Dient als Grundlage für die Start-Oberflächensprache und für sprachspezifische Lern-Hinweise.
+  - `ui_language` (text, `NOT NULL DEFAULT 'de'`, CHECK `de|en|uk|ru|tr`): **persistente Oberflächensprache** (Locale-Code). Wird bei der Registrierung vom Trigger `handle_new_user` aus `native_language` abgeleitet und ist im Profil jederzeit manuell änderbar (`app/actions/profile.ts` → `updateUiLanguage`). Nach dem Login leitet `app/actions/auth.ts` auf `/{ui_language}/dashboard`, sodass die gesamte UI automatisch in der Nutzersprache erscheint. Migration: `add_ui_language_and_expand_native_language` (2026-09-06). Mapping Erstsprache→Locale zentral in `lib/locale-routing.ts` (`localeFromNativeLanguage`), konsistent mit dem DB-Trigger.
 
   **Zugriffskontrolle (Access Control):**
   - Kernlogik in `lib/access/levels.ts` (`ACCESS_LEVELS`, `hasLevelAccess`, `sanitizeAllowedLevels`), server-seitige Helfer in `lib/access/server.ts` (`loadLevelAccessProfile`, `currentUserHasLevelAccess`).

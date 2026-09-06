@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import { User, Globe, Mail } from 'lucide-react'
+import { User, Globe, Mail, Languages } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { getDictionary } from '@/lib/dictionary'
 import {
@@ -7,6 +7,8 @@ import {
   translateNativeLanguage,
   type ProfileTranslations,
 } from '@/lib/profile-i18n'
+import { LOCALES, UI_LOCALE_ENDONYMS, toUiLocale } from '@/lib/locale-routing'
+import UiLanguageForm from '@/components/dashboard/UiLanguageForm'
 
 export default async function ProfilePage({
   params,
@@ -28,6 +30,12 @@ export default async function ProfilePage({
   const t = createProfileTranslator((dict.profile ?? {}) as ProfileTranslations)
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+
+  const currentUiLanguage = toUiLocale(profile?.ui_language ?? lang)
+  const uiLanguageOptions = LOCALES.map(locale => ({
+    value: locale,
+    label: UI_LOCALE_ENDONYMS[locale],
+  }))
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -74,6 +82,32 @@ export default async function ProfilePage({
               <p className="break-words text-xl font-bold text-slate-900 dark:text-white">
                 {translateNativeLanguage(t, profile?.native_language)}
               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Oberflächensprache – jederzeit manuell änderbar */}
+      <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-gray-900/5 sm:p-8 dark:bg-slate-900 dark:ring-slate-800">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300">
+            <Languages size={24} aria-hidden="true" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
+              {t('ui_language')}
+            </h2>
+            <p className="mt-1 text-base text-slate-600 dark:text-slate-400">
+              {t('ui_language_description')}
+            </p>
+
+            <div className="mt-5">
+              <UiLanguageForm
+                current={currentUiLanguage}
+                options={uiLanguageOptions}
+                ariaLabel={t('ui_language')}
+                saveLabel={t('ui_language_save')}
+              />
             </div>
           </div>
         </div>

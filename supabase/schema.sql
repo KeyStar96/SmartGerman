@@ -114,13 +114,16 @@ CREATE TABLE public.profiles (
   id uuid NOT NULL,
   name text,
   email text NOT NULL,
-  native_language text CHECK (native_language = ANY (ARRAY['Russisch'::text, 'Türkisch'::text, 'Andere'::text])),
+  native_language text CHECK (native_language = ANY (ARRAY['Deutsch'::text, 'Englisch'::text, 'Russisch'::text, 'Türkisch'::text, 'Ukrainisch'::text, 'Andere'::text])),
   subscription_status text DEFAULT 'kostenlos'::text CHECK (subscription_status = ANY (ARRAY['kostenlos'::text, 'aktiv'::text])),
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   stripe_customer_id text,
   stripe_subscription_id text,
   role text DEFAULT 'student'::text CHECK (role = ANY (ARRAY['student'::text, 'teacher'::text])),
+  -- Persistente Oberflächensprache (Locale-Code). Standard 'de'; wird bei der
+  -- Registrierung aus der Erstsprache abgeleitet, im Profil manuell änderbar.
+  ui_language text NOT NULL DEFAULT 'de'::text CHECK (ui_language = ANY (ARRAY['de'::text, 'en'::text, 'uk'::text, 'ru'::text, 'tr'::text])),
   -- Explizit freigeschaltete Sprachniveaus (feingranular, z. B. A1.1). Leeres Array = kein Zugriff.
   -- Admin/Teacher haben unabhängig davon Vollzugriff (siehe lib/access/levels.ts).
   allowed_levels text[] NOT NULL DEFAULT '{}'::text[],
@@ -272,13 +275,23 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
+DECLARE
+  v_native text := new.raw_user_meta_data->>'native_language';
 BEGIN
-  INSERT INTO public.profiles (id, email, name, native_language)
+  INSERT INTO public.profiles (id, email, name, native_language, ui_language)
   VALUES (
     new.id,
     new.email,
     new.raw_user_meta_data->>'name',
-    new.raw_user_meta_data->>'native_language'
+    v_native,
+    CASE v_native
+      WHEN 'Russisch' THEN 'ru'
+      WHEN 'Türkisch' THEN 'tr'
+      WHEN 'Ukrainisch' THEN 'uk'
+      WHEN 'Englisch' THEN 'en'
+      WHEN 'Deutsch' THEN 'de'
+      ELSE 'de'
+    END
   );
   RETURN new;
 END;
