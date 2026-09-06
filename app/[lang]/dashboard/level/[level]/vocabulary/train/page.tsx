@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
-import { getDueCards } from '@/app/actions/vocabulary'
+import { getDueCards, getLessonStats } from '@/app/actions/vocabulary'
 import { getDictionary } from '@/lib/dictionary'
 import { createVocabularyTranslator, type VocabularyTranslations } from '@/lib/vocabulary-i18n'
 import VocabTrainerClient from './VocabTrainerClient'
@@ -16,7 +16,10 @@ export default async function VocabTrainPage({
   const translations = (dict.vocabulary ?? {}) as VocabularyTranslations
   const t = createVocabularyTranslator(translations)
 
-  const dueCards = await getDueCards(decodedLevel)
+  const [dueCards, lessonStats] = await Promise.all([
+    getDueCards(decodedLevel),
+    getLessonStats(decodedLevel),
+  ])
 
   return (
     <div className="flex min-h-screen w-full flex-col py-8">
@@ -39,6 +42,7 @@ export default async function VocabTrainPage({
       <div className="flex flex-1 items-center justify-center py-4">
         <VocabTrainerClient
           initialCards={dueCards}
+          lessonStats={lessonStats}
           translations={translations}
           lang={lang}
           level={decodedLevel}

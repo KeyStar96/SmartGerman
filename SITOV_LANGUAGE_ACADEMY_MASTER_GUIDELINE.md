@@ -1769,6 +1769,13 @@ Evidence is encouraging but still comparatively limited and heterogeneous. Use l
 
 ## Changelog (Protokoll)
 
+### 2026-09-06 — Vokabeltrainer: „Lernkasten"-System zur Lektionsauswahl
+- **Vom Pauschal-Lernen zur Kuratierung:** „Vokabeln lernen" öffnet jetzt eine Zusammenstellungsansicht mit interaktivem Lernkasten (Selection-Box) oben und einer Übersicht aller Lektionen des Niveaus darunter. Lektionen werden per Klick oder Drag & Drop in den Lernkasten gelegt; nur deren fällige Vokabeln fließen in die aktive Lerneinheit.
+- **Transparente Zahl:** Der Lernkasten zeigt dynamisch „{Lektionen} ausgewählt – {Vokabeln}", wobei die Vokabelzahl den heute fälligen, tatsächlich zu lernenden Karten entspricht. Lektionen ohne fällige Vokabeln sind sichtbar, aber nicht wählbar.
+- **Persistenz:** Auswahl je Niveau im `localStorage` (`sitov_lernkasten:{level}`), damit die Zusammenstellung Reload und Wiederkehr übersteht (gerätegebunden, kein Server-State). Erstbesuch = alle fälligen Lektionen (nicht-brechend), danach frei anpassbar.
+- **Struktur:** Kartensession nach `VocabCardSession.tsx` ausgelagert, `VocabTrainerClient.tsx` orchestriert `compose`/`train`. 18 neue `lernkasten_*`-i18n-Keys in allen fünf Sprachen.
+- QS: `tsc --noEmit` fehlerfrei, Übersetzungs-Integritätstest grün; kein `any`, keine DB-/Server-Action-Änderungen.
+
 ### 2026-09-06 — Vokabeltrainer: Sofortiger Kartenwechsel & Tinder-Pre-Rendering
 - **Keine Bestätigungsmeldung mehr:** Nach der Selbsteinschätzung („Wusste ich" / „Wusste ich nicht") entfällt die Zwischenmeldung samt „Nächste Karte"-Button; die nächste Karte wird sofort aktiv. Das Speichern des Lernstands läuft fire-and-forget im Hintergrund (Kartenwechsel wartet nicht darauf). Fehler weiterhin als dezenter, nicht-blockierender Hinweis (Graceful Degradation).
 - **Pacing-Hinweis:** Der Lernende steuert das Tempo weiterhin selbst — über den Zeitpunkt des Aufdeckens und der Bewertung. Der zuvor dokumentierte „kein automatischer Kartenwechsel"-Zwischenschritt entfällt zugunsten eines flüssigeren Flows ohne unnötige Klicks.

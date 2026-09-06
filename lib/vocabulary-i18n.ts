@@ -105,6 +105,27 @@ export const VOCABULARY_FALLBACKS = {
   assess_empty_text: 'Alle Vokabeln dieser Lektion sind schon in deinem Karteikasten.',
   assess_save_failed: 'Deine Einstufung konnte nicht gespeichert werden. Bitte versuche es noch einmal.',
   add_more_vocabulary: 'Weitere Vokabeln hinzufügen',
+
+  // Lernkasten (Selection-Box): Lektionen für die aktive Lerneinheit auswählen
+  lernkasten_title: 'Dein Lernkasten',
+  lernkasten_intro:
+    'Lege die Lektionen in den Lernkasten, die du jetzt lernen möchtest. Nur deren Vokabeln fließen in die Lerneinheit ein.',
+  lernkasten_empty: 'Dein Lernkasten ist noch leer. Tippe unten eine Lektion an oder ziehe sie hierher.',
+  lernkasten_summary: '{lessons} Lektionen ausgewählt – {cards} Vokabeln',
+  lernkasten_start: 'Ausgewählte Vokabeln lernen',
+  lernkasten_start_hint_empty: 'Lege zuerst mindestens eine Lektion in den Lernkasten.',
+  lernkasten_start_hint_nothing_due:
+    'In deiner Auswahl ist heute nichts fällig. Wähle andere Lektionen oder komm morgen wieder.',
+  lernkasten_clear: 'Lernkasten leeren',
+  lernkasten_select_all: 'Alle fälligen hinzufügen',
+  lernkasten_available_title: 'Verfügbare Lektionen',
+  lernkasten_available_empty: 'Für dieses Sprachniveau sind aktuell keine Lektionen fällig.',
+  lernkasten_lesson_meta: '{due} fällig · {total} Vokabeln',
+  lernkasten_no_due_badge: 'nichts fällig',
+  lernkasten_in_box: 'Im Lernkasten',
+  lernkasten_add_aria: 'Lektion „{lesson}“ in den Lernkasten legen',
+  lernkasten_remove_aria: 'Lektion „{lesson}“ aus dem Lernkasten entfernen',
+  lernkasten_back: 'Zurück zum Lernkasten',
 } as const
 
 export type VocabularyTranslationKey = Extract<keyof typeof VOCABULARY_FALLBACKS, string>

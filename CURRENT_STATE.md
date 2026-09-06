@@ -188,6 +188,16 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 - **Tinder-Pre-Rendering:** Aktuelle Karte (Index `i`) und Folgekarte (`i+1`) liegen per CSS-Grid (`[grid-area:1/1]`) übereinander im DOM. Die Folgekarte ist inkl. Bild fertig gerendert; zusätzlich werden die Bilder von `i+1` und `i+2` per `new Image()` vorgeladen. Beim Antworten fliegt die aktive Karte weich zur Seite (rechts = gewusst, links = nicht gewusst; `translate`+`rotate`+`opacity`, 260 ms), die dahinterliegende Karte wird ohne Ladezeit sofort aktiv. `motion-reduce:transition-none` respektiert Bewegungsreduktion.
 - **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, keine Lint-Fehler, kein `any`, keine DB-/Server-Action-Änderungen.
 
+## 4j. Vokabeltrainer: „Lernkasten"-System zur Lektionsauswahl (2026-09-06)
+
+- **Problem:** „Vokabeln lernen" startete pauschal alle fälligen Vokabeln des Sprachniveaus.
+- **Lernkasten (Selection-Box):** Der Trainer (`vocabulary/train`) zeigt jetzt zuerst eine Zusammenstellungsansicht. Oben eine interaktive Selection-Box („Dein Lernkasten"), darunter die Übersicht aller Lektionen des Niveaus. Lektionen werden per Klick **oder** Drag & Drop (HTML5-DnD, MIME `application/x-sitov-lesson` + `text/plain`-Fallback) in den Lernkasten gelegt/entfernt. Nur die fälligen Vokabeln der Lektionen im Lernkasten fließen in die aktive Lerneinheit.
+- **Dynamische Anzeige:** „{lessons} Lektionen ausgewählt – {cards} Vokabeln"; die Zahl `cards` = Anzahl der heute fälligen Karten in der Auswahl (das, was tatsächlich in die Session fließt). Pro Lektion: „{due} fällig · {total} Vokabeln". Lektionen ohne fällige Karten sind sichtbar, aber nicht wählbar (Badge „nichts fällig").
+- **Persistenz:** Auswahl je Niveau im `localStorage` (`sitov_lernkasten:{level}`) über neuen Helfer `lib/vocabulary-lernkasten.ts` (`load`/`save`, `null` = Erstbesuch). Erstbesuch-Standard: alle fälligen Lektionen ausgewählt (bisheriges „alles lernen"-Verhalten, jetzt bearbeitbar). Deterministische Initialisierung → keine Hydration-Mismatches; Persistenz erst nach dem Mount.
+- **Refactor:** Die Kartensession (Tinder-Flow) wurde nach `VocabCardSession.tsx` ausgelagert; `VocabTrainerClient.tsx` ist jetzt Orchestrator (Phasen `compose`/`train`) + Lernkasten-Composer. `train/page.tsx` lädt zusätzlich `getLessonStats(level)` parallel zu `getDueCards(level)`.
+- **i18n:** 18 neue `lernkasten_*`-Keys in Fallbacks (`lib/vocabulary-i18n.ts`) und allen fünf Dictionaries (`de/en/ru/uk/tr`). Übersetzungs-Integritätstest grün.
+- **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, keine Lint-Fehler, kein `any`, keine DB-/Server-Action-Änderungen.
+
 ## 5. Hosting
 - Die Lernplattform läuft auf **Netlify** (`netlify.toml`, `@netlify/plugin-nextjs`). `NEXT_PUBLIC_SITE_URL` ist dort auf `https://www.sitov-academy.com` gesetzt. Derselbe Satz gilt für Vercel Production (Dashboard → Environment Variables).
 - Caching muss für Server Components (z.B. Kurslisten) korrekt eingestellt werden, um Ladezeiten zu minimieren.
