@@ -207,6 +207,13 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 - **Dynamische Anzeige:** „{lessons} Lektionen ausgewählt – {cards} Vokabeln"; die Zahl `cards` = Anzahl der heute fälligen Karten in der Auswahl (das, was tatsächlich in die Session fließt). Pro Lektion: „{due} fällig · {total} Vokabeln". Lektionen ohne fällige Karten sind sichtbar, aber nicht wählbar (Badge „nichts fällig").
 - **Persistenz:** Auswahl je Niveau im `localStorage` (`sitov_lernkasten:{level}`) über neuen Helfer `lib/vocabulary-lernkasten.ts` (`load`/`save`, `null` = Erstbesuch). Erstbesuch-Standard: alle fälligen Lektionen ausgewählt (bisheriges „alles lernen"-Verhalten, jetzt bearbeitbar). Deterministische Initialisierung → keine Hydration-Mismatches; Persistenz erst nach dem Mount.
 - **Refactor:** Die Kartensession (Tinder-Flow) wurde nach `VocabCardSession.tsx` ausgelagert; `VocabTrainerClient.tsx` ist jetzt Orchestrator (Phasen `compose`/`train`) + Lernkasten-Composer. `train/page.tsx` lädt zusätzlich `getLessonStats(level)` parallel zu `getDueCards(level)`.
+
+## 4k. Vokabeltrainer: Tinder-Animation entschlackt – nur noch Fly-Out (2026-09-06)
+
+- **Problem:** Beim Antworten flog die obere Karte raus, aber die nachrückende Karte führte zusätzlich eine eigene Einflieg-Bewegung aus (unruhig/redundant). Ursache: Der DOM-Knoten der oberen Karte wurde über den Index-Wechsel hinweg wiederverwendet und transitionierte via `transition-all` aus der Fly-Out-Position zurück.
+- **Lösung:** Beide Kartenslots in `VocabCardSession.tsx` sind jetzt per `key={progressId}` gebunden → beim Kartenwechsel mountet React einen frischen Knoten (kein „Zurückfliegen"). Erhalten bleibt ausschließlich die Fly-Out-Animation der aktiven Karte (`translate`+`rotate`+`opacity`, 260 ms).
+- **Dezenter Stapel-Effekt ohne Richtungsverschiebung:** Die Hintergrundkarte nutzt nur noch `scale-[0.95]`/`opacity-90` → beim Wegfliegen der oberen Karte weich auf `scale-100`/`opacity-100`; jegliches `translateX/translateY` beim Nachrücken wurde entfernt. `motion-reduce:transition-none` bleibt erhalten.
+- **Qualitätssicherung:** keine Lint-Fehler, kein `any`, keine DB-/Server-Action-Änderungen.
 - **i18n:** 18 neue `lernkasten_*`-Keys in Fallbacks (`lib/vocabulary-i18n.ts`) und allen fünf Dictionaries (`de/en/ru/uk/tr`). Übersetzungs-Integritätstest grün.
 - **Qualitätssicherung:** `npx tsc --noEmit` fehlerfrei, keine Lint-Fehler, kein `any`, keine DB-/Server-Action-Änderungen.
 

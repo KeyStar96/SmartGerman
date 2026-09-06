@@ -196,16 +196,25 @@ export default function VocabCardSession({
       {/*
         Tinder-Stapel: aktuelle Karte (i) und bereits fertig gerenderte
         Folgekarte (i+1) liegen per CSS-Grid in derselben Zelle übereinander.
-        Beim Antworten fliegt die aktive Karte weich zur Seite, die dahinter
-        vorgerenderte Karte wird ohne Ladezeit sofort aktiv.
+        Beim Antworten fliegt NUR die aktive Karte weich zur Seite; die dahinter
+        liegende Karte bleibt an ihrer festen Position und wird ohne Ladezeit
+        und ohne Einflieg-Bewegung sofort zur neuen aktiven Karte.
+
+        Wichtig: Beide Slots sind per `key` an die `progressId` gebunden. Dadurch
+        mountet React beim Kartenwechsel jeweils einen FRISCHEN Knoten – der
+        obere Knoten kann so nicht aus seiner Fly-Out-Position „zurückfliegen"
+        (das war die störende Einflieg-Animation), und die nachrückende Karte
+        erscheint stabil an ihrer Position statt zu springen.
       */}
       <div className="grid">
         {nextCard && (
           <div
+            key={nextCard.progressId}
             aria-hidden="true"
             className={cn(
-              'z-0 origin-top self-start [grid-area:1/1] transition-transform duration-[260ms] ease-out motion-reduce:transition-none',
-              isExiting ? 'translate-y-0 scale-100' : 'translate-y-2 scale-[0.96]'
+              // Nur Skalierung/Opacity, KEINE Richtungs-Verschiebung (kein translateX/Y).
+              'z-0 self-start [grid-area:1/1] transition-[transform,opacity] duration-[260ms] ease-out motion-reduce:transition-none',
+              isExiting ? 'scale-100 opacity-100' : 'scale-[0.95] opacity-90'
             )}
           >
             <div className="flex flex-col overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-gray-900/10">
@@ -220,6 +229,7 @@ export default function VocabCardSession({
         )}
 
         <div
+          key={currentCard.progressId}
           className={cn(
             'z-10 self-start [grid-area:1/1] transition-all duration-[260ms] ease-in will-change-transform motion-reduce:transition-none',
             exitDirection === 'right' && 'translate-x-[130%] rotate-[8deg] opacity-0',
