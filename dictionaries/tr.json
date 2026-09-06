@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Hannover'de Almanca Öğrenin | Ukraynalılar ve Rusça Konuşanlar İçin Uzmanlaşmış | Sitov Language Academy",
-    "description": "Hannover'de ana dili öğretmen ile Almanca kursları. Almanca öğrenmek isteyen herkes için. A1-B1 kursları, Online ve Yüz yüze. Hemen kaydolun!",
+    "description": "Hannover'de ana dili öğretmen ile Almanca kursları. Almanca öğrenmek isteyen herkes için. A1-B2 kursları, Online ve Yüz yüze. Hemen kaydolun!",
     "keywords": [
       "Hannover Almanca kursları",
       "Hannover dil okulu",
@@ -144,8 +144,8 @@
           {
             "id": "speech_a1_1",
             "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A1-B1",
-            "level": "A1-B1",
+            "title": "Konuşma Eğitimi A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Sal 12:00-13:00",
             "freq": "1x 60 dk",
@@ -159,8 +159,8 @@
           {
             "id": "speech_a1_2",
             "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A1-B1",
-            "level": "A1-B1",
+            "title": "Konuşma Eğitimi A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Çar 12:00-13:00",
             "freq": "1x 60 dk",
@@ -174,8 +174,8 @@
           {
             "id": "speech_a2",
             "group": "Grup 2: Yüz Yüze (Konuşma Eğitimi)",
-            "title": "Konuşma Eğitimi A1-B1",
-            "level": "A1-B1",
+            "title": "Konuşma Eğitimi A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Pzt 12:00-13:00",
             "freq": "1x 60 dk",
@@ -286,21 +286,21 @@
       "location": "Yüz yüze"
     },
     "speech_a1_1": {
-      "title": "Konuşma Pratiği A1-B1",
+      "title": "Konuşma Pratiği A1-B2",
       "description": "Çekingenliği yenmek, özgüven kazanmak.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Yüz yüze"
     },
     "speech_a1_2": {
-      "title": "Konuşma Pratiği A1-B1",
+      "title": "Konuşma Pratiği A1-B2",
       "description": "Konuşma becerilerini derinleştirme.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Yüz yüze"
     },
     "speech_a2": {
-      "title": "Konuşma Pratiği A1-B1",
+      "title": "Konuşma Pratiği A1-B2",
       "description": "Günlük durumlarda özgüvenli konuşma.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Yüz yüze"
     },
     "online_a1_1": {
@@ -326,9 +326,9 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {
-      "title": "Konuşma Pratiği A1-B1",
+      "title": "Konuşma Pratiği A1-B2",
       "description": "Konuşma korkunuzu yenin. A1.1 kursu için ideal bir eklenti.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1_2026_09": {

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Learn German in Hannover | Specialized for Ukrainians & Russian Speakers | Sitov Language Academy",
-    "description": "German courses in Hannover with native teacher. For everyone who wants to learn German. A1-B1 courses, Online & In-person. Sign up now!",
+    "description": "German courses in Hannover with native teacher. For everyone who wants to learn German. A1-B2 courses, Online & In-person. Sign up now!",
     "keywords": [
       "German courses Hannover",
       "language school Hannover",
@@ -145,8 +145,8 @@
           {
             "id": "speech_a1_1",
             "group": "Group 2: In-Person (Speaking Training)",
-            "title": "Speaking Training A1-B1",
-            "level": "A1-B1",
+            "title": "Speaking Training A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Tue 12:00-13:00",
             "freq": "1x 60 min",
@@ -160,8 +160,8 @@
           {
             "id": "speech_a1_2",
             "group": "Group 2: In-Person (Speaking Training)",
-            "title": "Speaking Training A1-B1",
-            "level": "A1-B1",
+            "title": "Speaking Training A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Wed 12:00-13:00",
             "freq": "1x 60 min",
@@ -175,8 +175,8 @@
           {
             "id": "speech_a2",
             "group": "Group 2: In-Person (Speaking Training)",
-            "title": "Speaking Training A1-B1",
-            "level": "A1-B1",
+            "title": "Speaking Training A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Mon 12:00-13:00",
             "freq": "1x 60 min",
@@ -550,21 +550,21 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1": {
-      "title": "Speech Training A1-B1",
+      "title": "Speech Training A1-B2",
       "description": "Lose shyness, gain confidence.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_2": {
-      "title": "Speech Training A1-B1",
+      "title": "Speech Training A1-B2",
       "description": "Deepening speaking skills.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a2": {
-      "title": "Speech Training A1-B1",
+      "title": "Speech Training A1-B2",
       "description": "Confident speaking in everyday situations.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1": {
@@ -586,9 +586,9 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {
-      "title": "Speech Training A1-B1",
+      "title": "Speech Training A1-B2",
       "description": "Lose your fear of speaking. Ideal addition to the A1.1 course.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1_2026_09": {

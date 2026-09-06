@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Deutsch lernen in Hannover | Spezialisiert auf Ukrainer & Russischsprachige | Sitov Language Academy",
-    "description": "Deutschkurse in Hannover mit muttersprachlicher Lehrerin. Für alle, die Deutsch lernen möchten. A1-B1 Kurse, Online & Präsenz. Jetzt anmelden!",
+    "description": "Deutschkurse in Hannover mit muttersprachlicher Lehrerin. Für alle, die Deutsch lernen möchten. A1-B2 Kurse, Online & Präsenz. Jetzt anmelden!",
     "keywords": [
       "Deutschkurse Hannover",
       "Sprachschule Hannover",
@@ -147,8 +147,8 @@
           {
             "id": "speech_a1_1",
             "group": "Gruppe 2: Präsenz (Sprechtraining)",
-            "title": "Sprechtraining A1-B1",
-            "level": "A1-B1",
+            "title": "Sprechtraining A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Di 12:00-13:00",
             "freq": "1x 60 min",
@@ -162,8 +162,8 @@
           {
             "id": "speech_a1_2",
             "group": "Gruppe 2: Präsenz (Sprechtraining)",
-            "title": "Sprechtraining A1-B1",
-            "level": "A1-B1",
+            "title": "Sprechtraining A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Mi 12:00-13:00",
             "freq": "1x 60 min",
@@ -177,8 +177,8 @@
           {
             "id": "speech_a2",
             "group": "Gruppe 2: Präsenz (Sprechtraining)",
-            "title": "Sprechtraining A1-B1",
-            "level": "A1-B1",
+            "title": "Sprechtraining A1-B2",
+            "level": "A1-B2",
             "instructor": "Anastasia Sitov",
             "time": "Mo 12:00-13:00",
             "freq": "1x 60 min",
@@ -552,21 +552,21 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1": {
-      "title": "Sprechtraining A1-B1",
+      "title": "Sprechtraining A1-B2",
       "description": "Verlieren Sie die Scheu vorm Sprechen.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_2": {
-      "title": "Sprechtraining A1-B1",
+      "title": "Sprechtraining A1-B2",
       "description": "Fokus auf Aussprache und Wortfluss.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a2": {
-      "title": "Sprechtraining A1-B1",
+      "title": "Sprechtraining A1-B2",
       "description": "Sicherheit im freien Sprechen gewinnen.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1": {
@@ -588,9 +588,9 @@
       "location": "Freizeitheim Vahrenwald"
     },
     "speech_a1_1_replacement_2026_07": {
-      "title": "Sprechtraining A1-B1",
+      "title": "Sprechtraining A1-B2",
       "description": "Verlieren Sie die Scheu vorm Sprechen. Ideale Ergänzung zum A1.1 Kurs.",
-      "level": "A1-B1",
+      "level": "A1-B2",
       "location": "Freizeitheim Vahrenwald"
     },
     "online_a1_1_2026_09": {
