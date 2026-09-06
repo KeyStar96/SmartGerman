@@ -67,7 +67,6 @@ export function mapLegacyLang(raw: string): UiLocale {
 export function isProtectedPath(pathname: string): boolean {
   return (
     pathname.includes('/dashboard') ||
-    pathname.includes('/premium') ||
     pathname.includes('/admin')
   )
 }

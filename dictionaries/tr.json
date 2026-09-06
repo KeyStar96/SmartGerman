@@ -1258,8 +1258,6 @@
     "hello": "Merhaba, {name}",
     "logout": "Çıkış yap",
     "logout_aria": "Çıkış yap",
-    "premium_badge": "Premium",
-    "free_badge": "Ücretsiz",
     "toggle_theme": "Görünümü değiştir",
     "toggle_theme_light": "Açık temayı aç",
     "toggle_theme_dark": "Koyu temayı aç",
@@ -1283,13 +1281,11 @@
     "cat_exercises_desc": "Boşluk doldurma ve çoktan seçmeli görevlerle bilgilerinizi pekiştirin.",
     "cat_pronunciation_title": "Telaffuz çalışması",
     "cat_pronunciation_desc": "Sesinizi kaydedin ve öğretmeninizden geri bildirim alın.",
-    "premium_locked_title": "Bu alan henüz kilitli",
-    "premium_locked_text": "Premium tüm dersleri, kelime antrenörünü ve alıştırmaları açar.",
-    "premium_cta": "Premium’u şimdi aç",
     "back_to_dashboard": "Genel bakışa dön",
-    "premium_area_title": "Premium öğrenme alanı",
-    "premium_area_badge": "Aktif",
-    "premium_area_text": "Özel öğrenme materyalleriniz burada."
+    "level_locked_badge": "Kilitli",
+    "level_locked_title": "Bu dil seviyesi henüz açılmadı",
+    "level_locked_text": "{level} seviyesine erişiminiz henüz verilmedi. Bu seviyeyi açtırmak için lütfen öğretmeninizle iletişime geçin.",
+    "level_locked_hint": "Bu seviyeyi açmak için lütfen öğretmeninizle iletişime geçin."
   },
   "videos": {
     "back_to_level": "Genel görünüme dön",

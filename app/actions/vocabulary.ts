@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
+import { hasLevelAccess } from '@/lib/access/levels'
+import { loadLevelAccessProfile } from '@/lib/access/server'
 import {
   applyLeitnerAnswer,
   LEITNER_LEARNED_BOX,
@@ -73,6 +75,13 @@ export async function getDueCards(level?: string): Promise<DueVocabularyCard[]> 
     } = await supabase.auth.getUser()
 
     if (!user) return []
+
+    // Defense-in-Depth: gesperrte Niveaus liefern keine Karten, auch wenn die
+    // Action direkt (ohne Route-Guard) aufgerufen wird.
+    if (level) {
+      const profile = await loadLevelAccessProfile(supabase, user.id)
+      if (!hasLevelAccess(profile, level)) return []
+    }
 
     const nativeLanguage = await loadNativeLanguage(supabase, user.id)
 
@@ -161,6 +170,11 @@ export async function initializeLesson(
 
     if (!user) return { success: false, added: 0 }
 
+    if (level) {
+      const profile = await loadLevelAccessProfile(supabase, user.id)
+      if (!hasLevelAccess(profile, level)) return { success: false, added: 0 }
+    }
+
     let cardsQuery = supabase.from('vocabulary_cards').select('id').eq('lesson', lessonName)
     if (level) {
       cardsQuery = cardsQuery.eq('level', level)
@@ -230,6 +244,11 @@ export async function getLessonCards(lessonName: string, level?: string): Promis
     } = await supabase.auth.getUser()
 
     if (!user) return []
+
+    if (level) {
+      const profile = await loadLevelAccessProfile(supabase, user.id)
+      if (!hasLevelAccess(profile, level)) return []
+    }
 
     const nativeLanguage = await loadNativeLanguage(supabase, user.id)
 
@@ -515,6 +534,11 @@ export async function getLessonStats(level?: string): Promise<LessonStat[]> {
     } = await supabase.auth.getUser()
 
     if (!user) return []
+
+    if (level) {
+      const profile = await loadLevelAccessProfile(supabase, user.id)
+      if (!hasLevelAccess(profile, level)) return []
+    }
 
     let cardsQuery = supabase.from('vocabulary_cards').select('id, lesson')
     if (level) {

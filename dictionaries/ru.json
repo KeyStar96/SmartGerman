@@ -1258,8 +1258,6 @@
     "hello": "Здравствуйте, {name}",
     "logout": "Выйти",
     "logout_aria": "Выйти",
-    "premium_badge": "Premium",
-    "free_badge": "Бесплатно",
     "toggle_theme": "Сменить оформление",
     "toggle_theme_light": "Включить светлое оформление",
     "toggle_theme_dark": "Включить тёмное оформление",
@@ -1283,13 +1281,11 @@
     "cat_exercises_desc": "Закрепите знания с помощью пропусков и выбора ответа.",
     "cat_pronunciation_title": "Тренировка произношения",
     "cat_pronunciation_desc": "Запишите свой голос и получите отзыв преподавателя.",
-    "premium_locked_title": "Этот раздел пока закрыт",
-    "premium_locked_text": "Premium открывает все уроки, тренажёр слов и упражнения.",
-    "premium_cta": "Подключить Premium",
     "back_to_dashboard": "Вернуться к обзору",
-    "premium_area_title": "Премиум-обучение",
-    "premium_area_badge": "Активно",
-    "premium_area_text": "Здесь находятся ваши эксклюзивные учебные материалы."
+    "level_locked_badge": "Закрыто",
+    "level_locked_title": "Этот языковой уровень ещё не открыт",
+    "level_locked_text": "Доступ к уровню {level} пока не предоставлен. Пожалуйста, обратитесь к преподавателю, чтобы открыть этот уровень.",
+    "level_locked_hint": "Чтобы открыть уровень, обратитесь к преподавателю."
   },
   "videos": {
     "back_to_level": "Вернуться к обзору",

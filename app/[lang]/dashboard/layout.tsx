@@ -41,7 +41,6 @@ export default async function DashboardLayout({
   const translations = (dict.dashboard ?? {}) as DashboardTranslations
   const t = createDashboardTranslator(translations)
   const displayName = profile?.name || user.email || ''
-  const isPremium = profile?.subscription_status === 'aktiv'
 
   return (
     <div className="flex min-h-dvh flex-col bg-slate-50 transition-colors dark:bg-slate-950">
@@ -77,15 +76,6 @@ export default async function DashboardLayout({
             <div className="order-2 flex shrink-0 items-center gap-2 md:order-3">
               <span className="hidden min-w-0 items-center text-sm font-medium text-slate-700 lg:inline-flex dark:text-slate-300">
                 <span className="max-w-[12rem] truncate">{t('hello', { name: displayName })}</span>
-                <span
-                  className={`ml-2 inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${
-                    isPremium
-                      ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20'
-                      : 'bg-slate-50 text-slate-600 ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700'
-                  }`}
-                >
-                  {isPremium ? t('premium_badge') : t('free_badge')}
-                </span>
               </span>
 
               <Link

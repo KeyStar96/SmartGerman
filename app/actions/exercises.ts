@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
+import { hasLevelAccess } from '@/lib/access/levels'
+import { loadLevelAccessProfile } from '@/lib/access/server'
 import { buildFillInBlankChips, scoreForAttempts } from '@/lib/exercise-chips'
 import {
   parseFillInBlankContent,
@@ -97,6 +99,11 @@ export async function getExercises(level?: string): Promise<StudentExercise[]> {
     } = await supabase.auth.getUser()
 
     if (!user) return []
+
+    if (level) {
+      const accessProfile = await loadLevelAccessProfile(supabase, user.id)
+      if (!hasLevelAccess(accessProfile, level)) return []
+    }
 
     const { data: profile, error: profileError } = await supabase
       .from('profiles')

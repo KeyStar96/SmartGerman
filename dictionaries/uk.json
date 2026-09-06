@@ -1257,8 +1257,6 @@
     "hello": "Вітаємо, {name}",
     "logout": "Вийти",
     "logout_aria": "Вийти",
-    "premium_badge": "Premium",
-    "free_badge": "Безкоштовно",
     "toggle_theme": "Змінити оформлення",
     "toggle_theme_light": "Увімкнути світле оформлення",
     "toggle_theme_dark": "Увімкнути темне оформлення",
@@ -1282,13 +1280,11 @@
     "cat_exercises_desc": "Закріпіть знання за допомогою пропусків і вибору відповіді.",
     "cat_pronunciation_title": "Тренування вимови",
     "cat_pronunciation_desc": "Запишіть свій голос і отримайте відгук викладачки.",
-    "premium_locked_title": "Цей розділ ще закритий",
-    "premium_locked_text": "Premium відкриває всі уроки, тренажер слів і вправи.",
-    "premium_cta": "Активувати Premium",
     "back_to_dashboard": "Повернутися до огляду",
-    "premium_area_title": "Преміум-навчання",
-    "premium_area_badge": "Активно",
-    "premium_area_text": "Тут зібрані ваші ексклюзивні навчальні матеріали."
+    "level_locked_badge": "Закрито",
+    "level_locked_title": "Цей мовний рівень ще не відкрито",
+    "level_locked_text": "Доступ до рівня {level} ще не надано. Будь ласка, зверніться до викладачки, щоб відкрити цей рівень.",
+    "level_locked_hint": "Щоб відкрити рівень, зверніться до викладачки."
   },
   "videos": {
     "back_to_level": "Повернутися до огляду",

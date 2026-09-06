@@ -121,6 +121,9 @@ CREATE TABLE public.profiles (
   stripe_customer_id text,
   stripe_subscription_id text,
   role text DEFAULT 'student'::text CHECK (role = ANY (ARRAY['student'::text, 'teacher'::text])),
+  -- Explizit freigeschaltete Sprachniveaus (feingranular, z. B. A1.1). Leeres Array = kein Zugriff.
+  -- Admin/Teacher haben unabhängig davon Vollzugriff (siehe lib/access/levels.ts).
+  allowed_levels text[] NOT NULL DEFAULT '{}'::text[],
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );

@@ -71,7 +71,7 @@ describe('Routenschutz', () => {
   it('schützt Lernbereich und Lehrerbereich', () => {
     expect(isProtectedPath('/de/dashboard')).toBe(true)
     expect(isProtectedPath('/de/admin/submissions')).toBe(true)
-    expect(isProtectedPath('/de/premium')).toBe(true)
+    expect(isProtectedPath('/de/dashboard/level/A1.1')).toBe(true)
     expect(isProtectedPath('/de/login')).toBe(false)
   })
 

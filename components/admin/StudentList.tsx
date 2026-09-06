@@ -1,16 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { updateStudentRole, updateStudentSubscription } from '@/app/actions/admin'
-import { CheckCircle2, XCircle, Shield, User, Loader2 } from 'lucide-react'
+import { updateStudentRole, updateStudentAllowedLevels } from '@/app/actions/admin'
+import { ACCESS_LEVELS } from '@/lib/access/levels'
+import { Loader2 } from 'lucide-react'
 
 type Profile = {
   id: string
-  name: string
+  name: string | null
   email: string
-  role: string
-  subscription_status: string
-  created_at: string
+  role: string | null
+  allowed_levels: string[] | null
+  created_at: string | null
 }
 
 export default function StudentList({ 
@@ -44,13 +45,22 @@ export default function StudentList({
     setLoadingId(null)
   }
 
-  const handleSubChange = async (id: string, newSub: string) => {
+  // Freigabe eines einzelnen Sprachniveaus umschalten und sofort speichern.
+  const handleLevelToggle = async (id: string, level: string) => {
+    const student = students.find(s => s.id === id)
+    if (!student) return
+
+    const current = student.allowed_levels ?? []
+    const nextLevels = current.includes(level)
+      ? current.filter(l => l !== level)
+      : [...current, level]
+
     setLoadingId(id)
-    const res = await updateStudentSubscription(id, newSub)
+    const res = await updateStudentAllowedLevels(id, nextLevels)
     if (res.success) {
-      setStudents(students.map(s => s.id === id ? { ...s, subscription_status: newSub } : s))
+      setStudents(students.map(s => s.id === id ? { ...s, allowed_levels: res.allowedLevels ?? nextLevels } : s))
     } else {
-      alert('Fehler beim Ändern des Abos: ' + res.error)
+      alert('Fehler beim Speichern der Freigaben: ' + res.error)
     }
     setLoadingId(null)
   }
@@ -78,25 +88,28 @@ export default function StudentList({
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Name & Email</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Registriert am</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Fortschritt</th>
-              <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Abo-Status</th>
+              <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Freigegebene Sprachniveaus</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Rolle</th>
               <th className="p-4 font-bold border-b border-slate-200 dark:border-slate-800">Aktionen</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {students.map((student) => (
+            {students.map((student) => {
+              const isFullAccess = student.role === 'admin' || student.role === 'teacher'
+              const allowed = student.allowed_levels ?? []
+              return (
               <tr key={student.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
                 <td className="p-4">
                   <div className="font-bold text-slate-900 dark:text-white">{student.name || 'Unbekannt'}</div>
                   <div className="text-sm text-slate-500">{student.email}</div>
                 </td>
                 <td className="p-4 text-sm text-slate-500">
-                  {new Date(student.created_at).toLocaleDateString('de-DE')}
+                  {student.created_at ? new Date(student.created_at).toLocaleDateString('de-DE') : '—'}
                 </td>
                 <td className="p-4">
                   {(() => {
                     const p = progressData[student.id] || {}
-                    const activeLevels = Object.entries(p).filter(([_, val]) => val > 0).sort((a, b) => a[0].localeCompare(b[0]))
+                    const activeLevels = Object.entries(p).filter(([, val]) => val > 0).sort((a, b) => a[0].localeCompare(b[0]))
                     if (activeLevels.length === 0) return <span className="text-slate-400 text-xs italic">Noch kein Fortschritt</span>
                     return (
                       <div className="flex flex-wrap gap-1.5 max-w-[140px]">
@@ -110,31 +123,43 @@ export default function StudentList({
                   })()}
                 </td>
                 <td className="p-4">
-                  <div className="relative inline-block w-32">
-                    <select
-                      value={student.subscription_status}
-                      onChange={(e) => handleSubChange(student.id, e.target.value)}
-                      disabled={loadingId === student.id}
-                      className={`appearance-none w-full px-3 py-1.5 pr-8 rounded-lg text-sm font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#FF5C00] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-                        student.subscription_status === 'aktiv'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
-                          : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
-                      }`}
-                    >
-                      <option value="kostenlos">Free</option>
-                      <option value="aktiv">Premium</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
-                      {loadingId === student.id ? <Loader2 size={14} className="animate-spin" /> : (
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                  {isFullAccess ? (
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20">
+                      Vollzugriff (Rolle)
+                    </span>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5 max-w-[220px]">
+                      {ACCESS_LEVELS.map((level) => {
+                        const isOn = allowed.includes(level)
+                        return (
+                          <button
+                            key={level}
+                            type="button"
+                            role="checkbox"
+                            aria-checked={isOn}
+                            aria-label={`Sprachniveau ${level} für ${student.name || student.email} ${isOn ? 'entziehen' : 'freischalten'}`}
+                            disabled={loadingId === student.id}
+                            onClick={() => handleLevelToggle(student.id, level)}
+                            className={`min-h-9 rounded-lg px-2.5 py-1 text-xs font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#FF5C00] disabled:opacity-50 disabled:cursor-not-allowed ${
+                              isOn
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+                                : 'bg-slate-50 text-slate-500 border-slate-200 hover:border-slate-300 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                            }`}
+                          >
+                            {isOn ? '✓ ' : ''}{level}
+                          </button>
+                        )
+                      })}
+                      {loadingId === student.id && (
+                        <span className="inline-flex items-center text-slate-400"><Loader2 size={14} className="animate-spin" /></span>
                       )}
                     </div>
-                  </div>
+                  )}
                 </td>
                 <td className="p-4">
                   <div className="relative inline-block w-32">
                     <select
-                      value={student.role}
+                      value={student.role ?? 'student'}
                       onChange={(e) => handleRoleChange(student.id, e.target.value)}
                       disabled={loadingId === student.id || student.id === currentUserId || currentUserRole !== 'admin'}
                       className={`appearance-none w-full px-3 py-1.5 pr-8 rounded-lg text-sm font-bold border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#FF5C00] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -162,12 +187,9 @@ export default function StudentList({
                       onChange={(e) => setResetLevel({ ...resetLevel, [student.id]: e.target.value })}
                       disabled={loadingId === student.id}
                     >
-                      <option value="A1.1">A1.1</option>
-                      <option value="A1.2">A1.2</option>
-                      <option value="A2.1">A2.1</option>
-                      <option value="A2.2">A2.2</option>
-                      <option value="B1.1">B1.1</option>
-                      <option value="B1.2">B1.2</option>
+                      {ACCESS_LEVELS.map((level) => (
+                        <option key={level} value={level}>{level}</option>
+                      ))}
                     </select>
                     <button 
                       onClick={() => handleResetProgress(student.id, resetLevel[student.id] || 'A1.1')}
@@ -180,7 +202,8 @@ export default function StudentList({
                   </div>
                 </td>
               </tr>
-            ))}
+              )
+            })}
             {students.length === 0 && (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-slate-500">

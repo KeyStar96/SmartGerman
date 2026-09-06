@@ -190,6 +190,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          allowed_levels: string[]
           created_at: string | null
           email: string
           id: string
@@ -202,6 +203,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          allowed_levels?: string[]
           created_at?: string | null
           email: string
           id: string
@@ -214,6 +216,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          allowed_levels?: string[]
           created_at?: string | null
           email?: string
           id?: string

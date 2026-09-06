@@ -14,8 +14,6 @@ export const DASHBOARD_FALLBACKS = {
   hello: 'Hallo, {name}',
   logout: 'Abmelden',
   logout_aria: 'Abmelden',
-  premium_badge: 'Premium',
-  free_badge: 'Kostenlos',
   toggle_theme: 'Darstellung wechseln',
   toggle_theme_light: 'Helles Design aktivieren',
   toggle_theme_dark: 'Dunkles Design aktivieren',
@@ -39,14 +37,13 @@ export const DASHBOARD_FALLBACKS = {
   cat_exercises_desc: 'Festige dein Wissen mit Lückentexten und Multiple Choice.',
   cat_pronunciation_title: 'Aussprache-Training',
   cat_pronunciation_desc: 'Nimm deine Stimme auf und erhalte Feedback von deiner Lehrkraft.',
-  premium_locked_title: 'Dieser Bereich ist noch gesperrt',
-  premium_locked_text:
-    'Mit Premium öffnest du alle Lektionen, den Vokabeltrainer und die Übungen.',
-  premium_cta: 'Jetzt Premium aktivieren',
   back_to_dashboard: 'Zurück zur Übersicht',
-  premium_area_title: 'Premium Lernbereich',
-  premium_area_badge: 'Aktiv',
-  premium_area_text: 'Hier findest du deine exklusiven Lernmaterialien.',
+  // Zugriffssteuerung: gesperrte Sprachniveaus
+  level_locked_badge: 'Gesperrt',
+  level_locked_title: 'Dieses Sprachniveau ist noch nicht freigeschaltet',
+  level_locked_text:
+    'Dein Zugang zu Niveau {level} wurde noch nicht freigegeben. Bitte wende dich an deine Lehrkraft, damit dieses Niveau für dich freigeschaltet wird.',
+  level_locked_hint: 'Zum Freischalten bitte an die Lehrkraft wenden.',
 } as const
 
 export type DashboardTranslationKey = Extract<keyof typeof DASHBOARD_FALLBACKS, string>

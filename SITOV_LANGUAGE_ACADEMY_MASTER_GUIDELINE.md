@@ -41,6 +41,12 @@ W3C explicitly notes that ageing can affect vision, dexterity, hearing and short
 
 ---
 
+### Content access model (decision, 2026-09-06)
+
+Sitov Language Academy does **not** use a self-service Free/Premium paywall for learning content. Access to paid CEFR levels is **granted per user by an admin/teacher** and stored in `profiles.allowed_levels` (fine-grained sub-levels `A1.1 … B1.2`). Newly registered learners start with **no** paid-level access; an admin enables the appropriate levels. Admin/teacher roles retain full access. This is consistent with the calm, teacher-guided doctrine (the school decides who is ready for which level) and avoids upsell pressure in the learner UI. The public course-booking flow (real presence/online courses, via Stripe) remains a separate, unaffected business process. Implementation: `lib/access/levels.ts`, `lib/access/server.ts`, the level route-guard `app/[lang]/dashboard/level/[level]/layout.tsx`, and the admin toggle UI in `components/admin/StudentList.tsx`.
+
+---
+
 # 1. UI/UX guidelines for learners in later adulthood
 
 ## 1.1 User model: design for capability diversity, not “senior simplicity”

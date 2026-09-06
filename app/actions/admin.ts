@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { sanitizeAllowedLevels } from '@/lib/access/levels'
 
 // Helper to check if current user is admin/teacher
 async function requireAdmin() {
@@ -31,13 +32,13 @@ export async function getAdminStats() {
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .eq('role', 'student')
-      
-    // Get premium users
-    const { count: premiumCount } = await supabase
+
+    // Freigeschaltete Nutzer: mind. ein Sprachniveau freigegeben.
+    const { count: activatedCount } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-      .eq('subscription_status', 'aktiv')
-      
+      .not('allowed_levels', 'eq', '{}')
+
     // Get pending submissions
     const { count: pendingSubmissions } = await supabase
       .from('submissions')
@@ -46,12 +47,12 @@ export async function getAdminStats() {
       
     return {
       studentCount: studentCount || 0,
-      premiumCount: premiumCount || 0,
+      activatedCount: activatedCount || 0,
       pendingSubmissions: pendingSubmissions || 0
     }
   } catch (error) {
     console.error('Error fetching admin stats', error)
-    return { studentCount: 0, premiumCount: 0, pendingSubmissions: 0 }
+    return { studentCount: 0, activatedCount: 0, pendingSubmissions: 0 }
   }
 }
 
@@ -87,29 +88,40 @@ export async function updateStudentRole(userId: string, role: string) {
     
     revalidatePath('/[lang]/admin/students', 'page')
     return { success: true }
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error updating role', error)
-    return { success: false, error: error.message }
+    const message = error instanceof Error ? error.message : 'Unbekannter Fehler'
+    return { success: false, error: message }
   }
 }
 
-export async function updateStudentSubscription(userId: string, status: string) {
+/**
+ * Setzt die pro Nutzer freigeschalteten Sprachniveaus.
+ *
+ * Nur bekannte, gültige Niveaus werden übernommen (sanitize) – so kann der
+ * Client keine beliebigen Werte in `allowed_levels` schreiben. Ein leeres Array
+ * entzieht den Zugriff vollständig.
+ */
+export async function updateStudentAllowedLevels(userId: string, levels: string[]) {
   try {
     await requireAdmin()
     const supabase = createAdminClient()
-    
+
+    const allowedLevels = sanitizeAllowedLevels(levels)
+
     const { error } = await supabase
       .from('profiles')
-      .update({ subscription_status: status })
+      .update({ allowed_levels: allowedLevels })
       .eq('id', userId)
-      
+
     if (error) throw error
-    
+
     revalidatePath('/[lang]/admin/students', 'page')
-    return { success: true }
-  } catch (error: any) {
-    console.error('Error updating subscription', error)
-    return { success: false, error: error.message }
+    return { success: true, allowedLevels }
+  } catch (error) {
+    console.error('Error updating allowed levels', error)
+    const message = error instanceof Error ? error.message : 'Unbekannter Fehler'
+    return { success: false, error: message }
   }
 }
 
@@ -223,8 +235,9 @@ export async function resetStudentProgress(userId: string, level: string) {
 
     revalidatePath('/[lang]/admin/students', 'page')
     return { success: true }
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error resetting student progress', error)
-    return { success: false, error: error.message }
+    const message = error instanceof Error ? error.message : 'Unbekannter Fehler'
+    return { success: false, error: message }
   }
 }

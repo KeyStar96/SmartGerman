@@ -1,6 +1,6 @@
 import { getAdminStats } from '@/app/actions/admin'
 import Link from 'next/link'
-import { Users, Crown, Mic, ArrowRight, LayoutDashboard, PlusCircle } from 'lucide-react'
+import { Users, Unlock, Mic, ArrowRight, LayoutDashboard, PlusCircle } from 'lucide-react'
 
 export default async function AdminDashboardPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
@@ -29,12 +29,12 @@ export default async function AdminDashboardPage({ params }: { params: Promise<{
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Premium Abos</h3>
+            <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Freigeschaltete Nutzer</h3>
             <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-              <Crown size={24} />
+              <Unlock size={24} />
             </div>
           </div>
-          <div className="text-4xl font-black text-slate-900 dark:text-white">{stats.premiumCount}</div>
+          <div className="text-4xl font-black text-slate-900 dark:text-white">{stats.activatedCount}</div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden">
@@ -61,7 +61,7 @@ export default async function AdminDashboardPage({ params }: { params: Promise<{
           <Link href={`/${lang}/admin/students`} className="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-[#FF5C00] dark:hover:border-[#FF5C00] transition-colors">
             <Users className="text-slate-400 group-hover:text-[#FF5C00] transition-colors mb-3" size={32} />
             <h3 className="font-bold text-slate-900 dark:text-white">Nutzerverwaltung</h3>
-            <p className="text-sm text-slate-500 mt-1">Rollen & Abos zuweisen</p>
+            <p className="text-sm text-slate-500 mt-1">Rollen & Sprachniveaus freigeben</p>
           </Link>
           <Link href={`/${lang}/admin/content/vocabulary`} className="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-[#FF5C00] dark:hover:border-[#FF5C00] transition-colors">
             <LayoutDashboard className="text-slate-400 group-hover:text-[#FF5C00] transition-colors mb-3" size={32} />

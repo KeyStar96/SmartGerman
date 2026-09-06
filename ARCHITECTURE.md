@@ -11,10 +11,17 @@ Das Supabase-Schema muss für eine klare Trennung von Identität (`auth.users`),
 
 ### Kern-Entitäten
 - **Profiles (`profiles`)**: Erweiterung von `auth.users`.
-  - `role`: `student` | `teacher` (für RBAC)
-  - `subscription_status`: `kostenlos` | `aktiv` | `pausiert`
-  - `stripe_customer_id`, `stripe_subscription_id`
+  - `role`: `student` | `teacher` | `admin` (für RBAC)
+  - `allowed_levels` (`text[]`, `NOT NULL DEFAULT '{}'`): **Zugriffssteuerung pro Sprachniveau** (feingranular, z. B. `A1.1`, `A1.2`). Leeres Array = kein Zugriff. Admin/Teacher haben rollenbasiert Vollzugriff (siehe `lib/access/levels.ts`). Migration: `add_allowed_levels_to_profiles` (2026-09-06). Dies ist das aktive Rechtemodell und hat das Free/Premium-Gating abgelöst.
+  - `subscription_status`: `kostenlos` | `aktiv` — **legacy**, bleibt für Stripe-Webhook-Kompatibilität erhalten, steuert aber **keinen** Inhaltszugriff mehr.
+  - `stripe_customer_id`, `stripe_subscription_id` (legacy/Stripe)
   - `native_language` (für i18n Hints)
+
+  **Zugriffskontrolle (Access Control):**
+  - Kernlogik in `lib/access/levels.ts` (`ACCESS_LEVELS`, `hasLevelAccess`, `sanitizeAllowedLevels`), server-seitige Helfer in `lib/access/server.ts` (`loadLevelAccessProfile`, `currentUserHasLevelAccess`).
+  - **Route-Guard:** `app/[lang]/dashboard/level/[level]/layout.tsx` prüft den Zugriff und rendert bei fehlender Freigabe `components/dashboard/LevelLocked.tsx` statt der Kindrouten (Videos, Vokabeln, Übungen, Aussprache).
+  - **Defense-in-Depth:** Level-bezogene Server Actions (`app/actions/vocabulary.ts`, `app/actions/exercises.ts`) prüfen den Zugriff zusätzlich, falls sie ohne Layout-Guard aufgerufen werden.
+  - **Admin-Freigabe:** `updateStudentAllowedLevels` (`app/actions/admin.ts`) + Checkbox-UI in `components/admin/StudentList.tsx`.
 - **Courses (`courses`) & Lektionen (`lessons`)**: 
   - Kurse (A1.1 bis C2) mit Typ (`presence` | `online`), Preis, Instructor.
   - *Zusätzlich benötigt*: Eine hierarchische `lessons`-Tabelle (gehört zu Kurs), um Videos, Vokabeln und Übungen sauber zu bündeln.

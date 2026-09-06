@@ -3,6 +3,18 @@
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
 
+## 1a. Änderungsprotokoll — 2026-09-06: Neues Lizenz- & Rechtemodell (Admin-Freigabe je Sprachniveau)
+
+**Kernänderung:** Das Free/Premium-Modell wurde als Zugriffssteuerung im Lernbereich abgelöst durch ein **Admin-Freigabe-System pro Sprachniveau**.
+
+- **DB (Live-Migration `add_allowed_levels_to_profiles`):** Neue Spalte `profiles.allowed_levels text[] NOT NULL DEFAULT '{}'`. Additiv & rückwärtskompatibel; bestehende `subscription_status`/Stripe-Spalten bleiben unangetastet. Bestehende aktive Nutzer wurden mit allen aktuell verfügbaren Levels backfilled, damit kein Zugang bricht. `schema.sql` und `database.types.ts` synchronisiert.
+- **Neu registrierte Nutzer** haben `allowed_levels = '{}'` → zunächst keinen Zugriff auf gebührenpflichtige Niveaus. Admin/Teacher besitzen rollenbasiert Vollzugriff.
+- **Zugriffslogik:** `lib/access/levels.ts` (`ACCESS_LEVELS = A1.1, A1.2, A2.1, A2.2, B1.1, B1.2`, `hasLevelAccess`, `sanitizeAllowedLevels`) + `lib/access/server.ts`.
+- **Route-Guard:** `app/[lang]/dashboard/level/[level]/layout.tsx` sperrt alle Level-Unterseiten und zeigt eine freundliche „gesperrt"-Ansicht (`components/dashboard/LevelLocked.tsx`, i18n `level_locked_*` in fünf Sprachen). Zusätzlich Defense-in-Depth in den level-bezogenen Server Actions.
+- **Dashboard:** Gesperrte Niveaus werden auf der Startseite mit Schloss-Badge und Hinweis dargestellt und sind nicht klickbar.
+- **Admin-Dashboard:** `components/admin/StudentList.tsx` zeigt statt Abo-Dropdown pro Nutzer Checkbox-Chips für jedes Sprachniveau; Speichern über `updateStudentAllowedLevels`. KPI „Premium Abos" → „Freigeschaltete Nutzer".
+- **In-App-Premium entfernt:** Route `/dashboard/premium` gelöscht, Free/Premium-Badge im Dashboard-Header entfernt, Abo-/Kauf-Sektion aus dem Profil entfernt, `/premium` aus `isProtectedPath` entfernt. Öffentliche Kurs-Buchung (Stripe für echte Kurse: `registrations`/`enrollments`/`courses`) bleibt **unverändert** erhalten.
+
 ## 2. Tech-Stack & Abhängigkeiten
 - **Framework:** Next.js 16.1.1 (App Router)
 - **Sprache:** TypeScript (strict mode)
@@ -19,7 +31,7 @@ Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendu
 - **Internationalisierung (i18n):** Middleware für Routing über `app/[lang]`. Unterstützte Sprachen: `de`, `en`, `ru`, `uk`, `tr`.
 - **Authentifizierung:** Supabase Auth mit Session-Update in der Middleware, Confirm-Route unter `/auth/confirm` (PKCE und Token-Hash), i18n-Auth-Seiten in fünf Sprachen. Bestätigungslinks zeigen auf `https://www.sitov-academy.com`, nicht auf localhost.
 - **Vokabeltrainer A1.1:** Live-Inhalt sind die Lernsets **Lektion 1** (84 Karten), **Lektion 2** (85 Karten: Befinden, Familie, Zahlen) und **Lektion 3** (76 Karten: Lebensmittel, Geschäfte, Mengen, Verben & Redemittel beim Einkaufen). Seed-SQL: `supabase/seeds/a11_lektion_1.sql`, `a11_lektion_2_familie.sql`, `a11_lektion_3_einkauf.sql`. Migration: `supabase/migrations/move_einkauf_vocab_to_a11_lektion_3.sql`.
-- **Rollen-Routing & Schutz:** Die Middleware unterscheidet zwischen öffentlichen Pfaden, geschützten Pfaden (`/dashboard`, `/premium`) und Auth-Pfaden (`/login`, `/register`).
+- **Rollen-Routing & Schutz:** Die Middleware unterscheidet zwischen öffentlichen Pfaden, geschützten Pfaden (`/dashboard`, `/admin`) und Auth-Pfaden (`/login`, `/register`). Der Zugriff auf einzelne Sprachniveaus wird zusätzlich pro Nutzer über `profiles.allowed_levels` gesteuert (Route-Guard im Level-Layout).
 - **Teacher/Admin Dashboard (Ansatz):** Ordnerstrukturen für `/admin` existieren, grundlegende Routen sind angelegt.
 - **Datenbank-Schema:** Komplexe Tabellenstrukturen existieren bereits (Kurse, Registrierungen, Profile mit Rollen `student/teacher`, Vokabel-Kartenbank, Übungen, Video-Lektionen, Lehrer-Feedback-System).
 - **Supabase MCP-Integration:** Cursor-Supabase-Plugin authentifiziert; Schema-Sync via Live-Projekt `wcaslabeiwtvygxtzcio`. `supabase/schema.sql` und `supabase/database.types.ts` sind mit dem Live-Stand synchronisiert (2026-09-02).

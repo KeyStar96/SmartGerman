@@ -1257,8 +1257,6 @@
     "hello": "Hello, {name}",
     "logout": "Sign out",
     "logout_aria": "Sign out",
-    "premium_badge": "Premium",
-    "free_badge": "Free",
     "toggle_theme": "Switch appearance",
     "toggle_theme_light": "Switch to light mode",
     "toggle_theme_dark": "Switch to dark mode",
@@ -1282,13 +1280,11 @@
     "cat_exercises_desc": "Practise with gap-fill and multiple-choice tasks.",
     "cat_pronunciation_title": "Pronunciation training",
     "cat_pronunciation_desc": "Record your voice and receive feedback from your teacher.",
-    "premium_locked_title": "This area is still locked",
-    "premium_locked_text": "Premium unlocks all lessons, the vocabulary trainer and the exercises.",
-    "premium_cta": "Activate Premium now",
     "back_to_dashboard": "Back to overview",
-    "premium_area_title": "Premium learning area",
-    "premium_area_badge": "Active",
-    "premium_area_text": "Here you will find your exclusive learning materials."
+    "level_locked_badge": "Locked",
+    "level_locked_title": "This language level is not unlocked yet",
+    "level_locked_text": "Your access to level {level} has not been granted yet. Please contact your teacher to have this level unlocked for you.",
+    "level_locked_hint": "Please contact your teacher to unlock this level."
   },
   "videos": {
     "back_to_level": "Back to overview",

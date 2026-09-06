@@ -1,8 +1,16 @@
 # Monetization Strategy (Stripe Integration)
 
-## 1. Übersicht: Free vs. Premium
+> **STATUS-UPDATE (2026-09-06): In-App-Freemium abgelöst.**
+> Das nachstehend beschriebene In-App-Free/Premium-Modell steuert **nicht mehr** den Zugriff auf Lerninhalte. Der Inhaltszugriff wird jetzt ausschließlich über die **Admin-Freigabe je Sprachniveau** (`profiles.allowed_levels`) gesteuert – siehe `ARCHITECTURE.md` und `CURRENT_STATE.md` (Abschnitt 1a). Neu registrierte Nutzer haben zunächst keinen Zugriff; ein Admin schaltet einzelne Niveaus (A1.1 … B1.2) pro Nutzer frei.
+>
+> **Entfernt:** öffentliche In-App-Paywall (`/dashboard/premium`), Free/Premium-Badges, Abo-/Kauf-CTA im Profil.
+> **Erhalten (unverändert):** die **öffentliche Kurs-Buchung** echter Präsenz-/Online-Kurse über Stripe (`registrations`, `enrollments`, `courses`) sowie der Stripe-Webhook. Die Spalte `subscription_status` und die Stripe-Spalten bleiben aus Kompatibilitätsgründen bestehen, haben aber keine gating-Funktion mehr.
+>
+> Der folgende Abschnitt beschreibt das historische Freemium-Konzept und dient als Referenz/Audit-Trail.
 
-Die Lernplattform der Sitov Language Academy operiert nach einem Freemium-Modell:
+## 1. Übersicht: Free vs. Premium (historisch — nicht mehr aktiv für Inhaltszugriff)
+
+Die Lernplattform der Sitov Language Academy operierte nach einem Freemium-Modell:
 - **Free-Account (`subscription_status = 'kostenlos'`):** 
   - Zugriff auf Lektion 1 jedes Kurs-Levels (A1.1 bis C2).
   - Begrenzter Vokabeltrainer (z.B. max. 50 Vokabeln).
