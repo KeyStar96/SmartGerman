@@ -1,5 +1,6 @@
 import {
   blobTypeForRecorder,
+  isMicrophonePermissionDenied,
   pickRecorderMimeType,
   prefersMp4Recording,
   recorderMimeCandidates,
@@ -55,6 +56,20 @@ describe('blobTypeForRecorder', () => {
   it('fällt auf das plattformübliche Format zurück', () => {
     expect(blobTypeForRecorder('', undefined, true)).toBe('audio/mp4')
     expect(blobTypeForRecorder('', undefined, false)).toBe('audio/webm')
+  })
+})
+
+describe('isMicrophonePermissionDenied', () => {
+  it('erkennt NotAllowedError', () => {
+    expect(isMicrophonePermissionDenied({ name: 'NotAllowedError' })).toBe(true)
+    expect(isMicrophonePermissionDenied({ name: 'PermissionDeniedError' })).toBe(true)
+  })
+
+  it('ordnet Constraint- und Gerätefehler nicht als Verweigerung ein', () => {
+    expect(isMicrophonePermissionDenied({ name: 'OverconstrainedError' })).toBe(false)
+    expect(isMicrophonePermissionDenied({ name: 'NotFoundError' })).toBe(false)
+    expect(isMicrophonePermissionDenied({ name: 'NotReadableError' })).toBe(false)
+    expect(isMicrophonePermissionDenied('nope')).toBe(false)
   })
 })
 

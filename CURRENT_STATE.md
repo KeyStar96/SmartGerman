@@ -4,7 +4,7 @@
 
 **Kernänderungen:**
 
-- **iOS-Stille behoben:** Web-Audio-Ausgabe (`AudioBufferSourceNode`) bleibt auf dem iPhone stumm (Silent-Switch). Wiedergabe läuft jetzt nur noch über natives `<audio playsInline>`. Aufnahmen werden nach WAV gewandelt (`lib/audio/wav.ts`), `navigator.audioSession.type = 'playback'` setzt die Media-Session. MediaRecorder nutzt einen geklonten Stream, damit die Visualisierung die Aufnahme nicht stummschaltet.
+- **Mikrofon-Falschmeldung:** `audioSession = playback` vor `getUserMedia` hat auf iPhone „Zugriff nicht erlaubt“ ausgelöst, obwohl Safari das Mikrofon erlaubt. Aufnahme setzt jetzt `play-and-record`; nur die Wiedergabe nutzt `playback`. `getUserMedia` versucht zuerst verarbeitete Constraints, dann `{ audio: true }`. Nur echte `NotAllowedError` zeigen den Verweigert-Text.
 - **Zweite Welle entfernt:** `FluidWaveform` zeichnet wieder nur die Siri-Sinus-Schichten. Keine Oszilloskop-Kurve mehr.
 - **Übungssätze A1–C2:** Katalog + Live-DB unverändert zum vorherigen Stand (A1.1–B1.2 eigene Sätze, Familien A1–C2).
 

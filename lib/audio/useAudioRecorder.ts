@@ -7,8 +7,9 @@ import {
   createAnalyserNode,
   decodeFromSource,
   ensureAudioContext,
+  isMicrophonePermissionDenied,
   pickRecorderMimeType,
-  requestPlaybackAudioSession,
+  requestMicrophoneStream,
   unlockAudioContext,
 } from '@/lib/audio/web-audio'
 import { mixDownToMono, wavBlobFromMono } from '@/lib/audio/wav'
@@ -151,7 +152,6 @@ export function useAudioRecorder(): UseAudioRecorderResult {
     // Noch in der Nutzer-Geste: Context anlegen und resume anstoßen.
     // Nach `await getUserMedia` ist die iOS-Geste verbraucht.
     const context = ensureAudioContext()
-    requestPlaybackAudioSession()
     void context?.resume()
 
     releaseObjectUrl()
@@ -163,12 +163,10 @@ export function useAudioRecorder(): UseAudioRecorderResult {
 
     let stream: MediaStream
     try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-      })
+      stream = await requestMicrophoneStream()
     } catch (err) {
       console.error('Mikrofon-Zugriff nicht möglich:', err)
-      setStatus('denied')
+      setStatus(isMicrophonePermissionDenied(err) ? 'denied' : 'failed')
       return
     }
 

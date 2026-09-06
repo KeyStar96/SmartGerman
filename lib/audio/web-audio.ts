@@ -182,17 +182,65 @@ interface NavigatorWithAudioSession extends Navigator {
   audioSession?: NavigatorAudioSession
 }
 
-/**
- * iOS 16.4+: Media-Session auf „playback“, damit der Stummschalter
- * die Wiedergabe nicht verschluckt. Muss aus einer Nutzer-Geste kommen.
- */
-export function requestPlaybackAudioSession(): void {
+export type AudioSessionKind = 'auto' | 'playback' | 'play-and-record'
+
+export function setAudioSessionType(kind: AudioSessionKind): void {
   if (typeof navigator === 'undefined') return
   const session = (navigator as NavigatorWithAudioSession).audioSession
   if (!session) return
   try {
-    session.type = 'playback'
+    session.type = kind
   } catch (err) {
-    console.error('audioSession konnte nicht auf playback gesetzt werden:', err)
+    console.error('audioSession konnte nicht gesetzt werden:', { kind, err })
   }
+}
+
+/**
+ * iOS 16.4+: Session auf „playback“, damit der Stummschalter die
+ * Wiedergabe nicht verschluckt. Nur beim Abspielen verwenden – vor
+ * `getUserMedia` würde `playback` den Mikrofon-Zugriff blockieren.
+ */
+export function requestPlaybackAudioSession(): void {
+  setAudioSessionType('playback')
+}
+
+export function isMicrophonePermissionDenied(err: unknown): boolean {
+  if (!err || typeof err !== 'object') return false
+  const name = 'name' in err && typeof err.name === 'string' ? err.name : ''
+  return name === 'NotAllowedError' || name === 'PermissionDeniedError'
+}
+
+const MIC_CONSTRAINT_ATTEMPTS: readonly MediaStreamConstraints[] = [
+  { audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } },
+  { audio: true },
+]
+
+/**
+ * Holt den Mikrofon-Stream. Auf iOS zuerst `play-and-record`, dann
+ * `getUserMedia` – `playback` davor führt zu einem falschen „Zugriff verweigert“.
+ * Zweiter Versuch ohne Constraints, falls Safari die ersten ablehnt.
+ */
+export async function requestMicrophoneStream(): Promise<MediaStream> {
+  if (typeof navigator === 'undefined' || typeof navigator.mediaDevices?.getUserMedia !== 'function') {
+    throw new Error('getUserMedia ist nicht verfügbar')
+  }
+
+  setAudioSessionType('play-and-record')
+
+  let lastError: unknown
+  for (const constraints of MIC_CONSTRAINT_ATTEMPTS) {
+    try {
+      return await navigator.mediaDevices.getUserMedia(constraints)
+    } catch (err) {
+      lastError = err
+      console.error('getUserMedia fehlgeschlagen:', {
+        constraint: constraints.audio === true ? 'audio:true' : 'audio:processed',
+        name: err && typeof err === 'object' && 'name' in err ? err.name : undefined,
+        message: err instanceof Error ? err.message : String(err),
+      })
+      if (isMicrophonePermissionDenied(err)) break
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('Mikrofon nicht verfügbar')
 }
