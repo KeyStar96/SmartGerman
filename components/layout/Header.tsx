@@ -14,6 +14,7 @@ import {
   MotionConfig
 } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { SHOW_LEARNING_PLATFORM } from "@/lib/config/app-config";
 
 // --- Types ---
 interface HeaderProps {
@@ -398,12 +399,14 @@ function ActionButtons({ lang, dictionary, isHidden }: any) {
       <LanguageSelector lang={lang} />
 
       {/* CTA */}
-      <Link
-        href={`/${lang}/dashboard`}
-        className="border border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 text-foreground px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-transform hover:scale-105"
-      >
-        Plattform
-      </Link>
+      {SHOW_LEARNING_PLATFORM && (
+        <Link
+          href={`/${lang}/dashboard`}
+          className="border border-black/10 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/10 text-foreground px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-transform hover:scale-105"
+        >
+          Plattform
+        </Link>
+      )}
       <Link
         href={`/${lang}/registration`}
         className="bg-primary-orange hover:bg-primary-orange/90 text-white px-5 py-2.5 rounded-full text-xs font-bold tracking-wider uppercase transition-transform hover:scale-105 shadow-lg shadow-orange-500/20"
@@ -564,15 +567,17 @@ function MobileMenu({ isOpen, onClose, links, lang, dictionary, onNavClick }: an
             className="flex flex-col items-center gap-8 relative z-10 w-full max-w-sm mx-auto"
           >
             <div className="w-full flex flex-col gap-4">
-              <Link
-                href={`/${lang}/dashboard`}
-                onClick={onClose}
-                className="group relative w-full overflow-hidden rounded-full p-[1px] transition-transform hover:scale-[1.02] active:scale-[0.98] border border-black/10 dark:border-white/20"
-              >
-                <div className="relative flex w-full items-center justify-center gap-2 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur-md px-8 py-4">
-                  <span className="text-sm font-bold uppercase tracking-widest text-foreground">Lernplattform</span>
-                </div>
-              </Link>
+              {SHOW_LEARNING_PLATFORM && (
+                <Link
+                  href={`/${lang}/dashboard`}
+                  onClick={onClose}
+                  className="group relative w-full overflow-hidden rounded-full p-[1px] transition-transform hover:scale-[1.02] active:scale-[0.98] border border-black/10 dark:border-white/20"
+                >
+                  <div className="relative flex w-full items-center justify-center gap-2 rounded-full bg-white/50 dark:bg-white/5 backdrop-blur-md px-8 py-4">
+                    <span className="text-sm font-bold uppercase tracking-widest text-foreground">Lernplattform</span>
+                  </div>
+                </Link>
+              )}
               
               <Link
                 href={`/${lang}/registration`}

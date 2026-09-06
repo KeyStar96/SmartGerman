@@ -20,6 +20,7 @@ import { PremiumDatePicker } from "@/components/ui/PremiumDatePicker";
 import { submitEnrollment } from "@/app/actions/submit-enrollment";
 import { submitTrialLesson } from "@/app/actions/submit-trial";
 import { checkTrialEligibility } from "@/app/actions/check-trial-eligibility";
+import { trackMetaEvent } from "@/lib/analytics/meta-pixel";
 
 // Use the CSS variable --font-mono from layout.tsx instead of re-instantiating
 const monoClassName = "font-mono";
@@ -914,6 +915,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
             });
 
             if (result.success) {
+                trackMetaEvent('Lead', {
+                    content_name: 'Kostenlose Probestunde',
+                    content_category: 'Trial Lesson',
+                    content_ids: [courseId],
+                    currency: 'EUR',
+                    value: 0.00,
+                });
                 setIsSuccess(true);
             } else if (result.message === 'trial_already_used') {
                 setIsAlreadyUsed(true);
@@ -957,6 +965,13 @@ export default function EnrollmentTerminal({ dictionary, lang = "de", serverTime
 
             if (result.success) {
                 console.log("Enrollment success:", result);
+                trackMetaEvent('Purchase', {
+                    content_name: 'Kurseinschreibung',
+                    content_category: 'Course Enrollment',
+                    content_ids: selectedCourseIds,
+                    currency: 'EUR',
+                    value: totalMonthlyPrice,
+                });
                 setIsSuccess(true);
             } else {
                 console.error("Enrollment failed:", result); // Log full result for debugging

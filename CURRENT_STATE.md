@@ -3,7 +3,19 @@
 ## 1. Übersicht
 Das Repository "Sitov Academy" ist eine Next.js (App Router) basierte Webanwendung, die als Lernplattform für die "Sitov Language Academy" dient. Der aktuelle Stand bildet die Basis für eine Transition in eine produktionsreife und monetarisierbare Umgebung, optimiert für eine Zielgruppe im besten Alter (Fokus: Geragogik, Barrierefreiheit, klare Strukturen).
 
-## 1a. Änderungsprotokoll — 2026-09-06: Neues Lizenz- & Rechtemodell (Admin-Freigabe je Sprachniveau)
+## 1a. Änderungsprotokoll — 2026-09-06: Meta Pixel Lead Tracking & Live-Produktionsschalter
+
+**Kernänderungen:**
+- **Meta Pixel Event Tracking:**
+  - `lib/analytics/meta-pixel.ts`: Typensicherer Client-Helper `trackMetaEvent(eventName, params)` für Meta Pixel Events.
+  - `components/registration/EnrollmentTerminal.tsx`:
+    - Probestunden-Buchung (`onTrialSubmit`) triggert bei Erfolg das Standard-Event `Lead` (`content_name: 'Kostenlose Probestunde'`, `value: 0.00`, `currency: 'EUR'`).
+    - Reguläre Kurseinschreibung (`onSubmit`) triggert bei Erfolg das Standard-Event `Purchase` mit dem monatlichen Kurspreis und den gebuchten Kurs-IDs.
+- **Produktionsschalter (Lernplattform ausblenden):**
+  - `lib/config/app-config.ts`: Zentraler Parameter `IS_PRODUCTION: 'Y' | 'N'` (Standard: `'Y'`, steuerbar auch via `NEXT_PUBLIC_IS_PRODUCTION`).
+  - Helper `SHOW_LEARNING_PLATFORM`: Bei `IS_PRODUCTION = 'Y'` wird der Button "Lernplattform" / "Plattform" im Desktop- und Mobile-Menü (`components/layout/Header.tsx`) für Besucher vollständig ausgeblendet, da sich dieser Bereich noch in der Entwicklung befindet.
+
+## 1b. Änderungsprotokoll — 2026-09-06: Neues Lizenz- & Rechtemodell (Admin-Freigabe je Sprachniveau)
 
 **Kernänderung:** Das Free/Premium-Modell wurde als Zugriffssteuerung im Lernbereich abgelöst durch ein **Admin-Freigabe-System pro Sprachniveau**.
 

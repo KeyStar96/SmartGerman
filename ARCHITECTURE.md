@@ -102,6 +102,18 @@ Statt traditioneller `/api`-Routen werden React Server Actions in `actions/` ver
 - **`handle_registration_confirmation`**: Trigger auf `registrations.status` → erstellt `enrollments` bei Bestätigung.
 - **`notify-registration-insert` / `notify-trial-insert`**: HTTP-Trigger → Edge Function `notify-new-enrollment`.
 
+## 3a. Analytics & Feature-Flags
+
+- **Meta Pixel Tracking (`lib/analytics/meta-pixel.ts`):**
+  - Pixel-ID `1550332886706723` (global in `app/[lang]/layout.tsx`).
+  - Standard-Events werden über die Hilfsfunktion `trackMetaEvent(eventName, params)` typensicher und SSR-sicher aufgerufen.
+  - Probestunden-Anmeldung (`EnrollmentTerminal.tsx` -> `onTrialSubmit`) feuert das Standard-Event `Lead` (`content_name: 'Kostenlose Probestunde'`, `value: 0.00`, `currency: 'EUR'`).
+  - Reguläre Kurs-Einschreibung (`EnrollmentTerminal.tsx` -> `onSubmit`) feuert das Standard-Event `Purchase` mit `totalMonthlyPrice` und `selectedCourseIds`.
+
+- **Production Flag & Lernplattform-Gating (`lib/config/app-config.ts`):**
+  - Flag `IS_PRODUCTION: 'Y' | 'N'` (Standard: `'Y'`, konfigurierbar über `NEXT_PUBLIC_IS_PRODUCTION`).
+  - Helper `SHOW_LEARNING_PLATFORM`: Bei `IS_PRODUCTION = 'Y'` werden die Einstiegs-Buttons zur Lernplattform ("Lernplattform" / "Plattform" im Header und Mobil-Menü) ausgeblendet, solange sich die Lernplattform in Entwicklung befindet.
+
 ## 4. UX/UI-Architektur (Geragogik & Barrierefreiheit)
 
 - **Smartphone zuerst:** Cursor-Agent `.cursor/rules/ux-smartphone-agent.mdc` (Mobile-First, 375px, kein Horizontal-Scroll, Safe-Area). Geragogik-Maße bleiben in `ux-geragogik-agent.mdc`.
